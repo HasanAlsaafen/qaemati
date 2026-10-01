@@ -413,3 +413,22 @@ routes, or a successful build.
 - Category and item ordering is whatever `sortOrder` the seed script assigned (category/item
   insertion order); there's no admin reordering yet — that's Phase 4 (htmx-based drag/drop with
   an up/down-button fallback).
+
+## Phase 3 fixes (requested before Phase 4)
+
+- **Instagram icon was wrong.** The hand-typed SVG path in `restaurant-header.njk` didn't
+  actually draw the camera body outline, just an incomplete fragment. Replaced both the
+  WhatsApp and Instagram icons with the verified official glyphs from Simple Icons rather than
+  hand-typing path data again — the same class of mistake as the earlier bidi/CSP bugs: anything
+  copied or typed by hand should be checked by actually rendering it, not assumed correct.
+- **Dish placeholder images redesigned.** The Phase 2 placeholder was a giant initial letter
+  (e.g. "K" for Knafeh) on a gradient circle, which read as a crude avatar rather than a menu
+  photo placeholder. `prisma/seed/placeholder-image.ts` now draws a fork-and-spoon glyph (Material
+  Symbols' "restaurant" icon, Apache-2.0) for items and a storefront glyph for restaurant logos,
+  both centered on the same soft gradient-circle background — closer to what food delivery apps
+  use as a generic placeholder, still fully generated (no real photos), and legible at the small
+  80x80 size item cards actually render it at. Re-seeded; verified both icons render correctly
+  in a browser before committing, given the Instagram lesson above.
+- **Category navigation style**: asked the user to choose between the current filled-pill chips,
+  underline tabs, and minimal divider tabs (all keeping the same sticky/scroll-spy/horizontal-
+  scroll mechanics from the brief, varying only visual treatment). Filled pills were kept as-is.

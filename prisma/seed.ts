@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { generatePlaceholderSvg } from './seed/placeholder-image';
+import { generateLogoPlaceholderSvg, generatePlaceholderSvg } from './seed/placeholder-image';
 import { seedRestaurants } from './seed/data';
 
 const prisma = new PrismaClient();
@@ -20,9 +20,13 @@ function slugify(value: string): string {
     .replace(/(^-|-$)/g, '');
 }
 
-function writeImage(dir: string, filename: string, seed: string, label: string): string {
-  const svg = generatePlaceholderSvg(seed, label);
-  writeFileSync(join(dir, filename), svg, 'utf8');
+function writeItemImage(dir: string, filename: string, seed: string): string {
+  writeFileSync(join(dir, filename), generatePlaceholderSvg(seed), 'utf8');
+  return filename;
+}
+
+function writeLogoImage(dir: string, filename: string, seed: string): string {
+  writeFileSync(join(dir, filename), generateLogoPlaceholderSvg(seed), 'utf8');
   return filename;
 }
 
@@ -40,7 +44,7 @@ async function main() {
 
   for (const restaurantData of seedRestaurants) {
     const logoFilename = `${restaurantData.slug}-logo.svg`;
-    writeImage(RESTAURANTS_IMAGE_DIR, logoFilename, restaurantData.slug, restaurantData.nameEn);
+    writeLogoImage(RESTAURANTS_IMAGE_DIR, logoFilename, restaurantData.slug);
 
     const restaurant = await prisma.restaurant.create({
       data: {
@@ -81,7 +85,7 @@ async function main() {
       for (const itemData of categoryData.items) {
         const imageSeed = `${restaurant.slug}-${slugify(itemData.nameEn)}`;
         const imageFilename = `${imageSeed}.svg`;
-        writeImage(ITEMS_IMAGE_DIR, imageFilename, imageSeed, itemData.nameEn);
+        writeItemImage(ITEMS_IMAGE_DIR, imageFilename, imageSeed);
 
         await prisma.item.create({
           data: {
