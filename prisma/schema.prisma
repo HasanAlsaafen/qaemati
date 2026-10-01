@@ -1,4 +1,3 @@
-// Data models are added in Phase 2 (see docs/progress.md).
 generator client {
   provider = "prisma-client-js"
 }
@@ -6,4 +5,105 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum ItemTag {
+  SPICY
+  VEGETARIAN
+  NEW
+  POPULAR
+}
+
+model Restaurant {
+  id String @id @default(cuid())
+
+  slug String @unique
+
+  nameAr String
+  nameEn String
+
+  descriptionAr String?
+  descriptionEn String?
+
+  logoPath String?
+
+  whatsapp        String?
+  instagramHandle String?
+
+  workingHoursAr String?
+  workingHoursEn String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  adminUsers AdminUser[]
+  categories Category[]
+  items      Item[]
+}
+
+model AdminUser {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  email        String @unique
+  passwordHash String
+  name         String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([restaurantId])
+}
+
+model Category {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  nameAr String
+  nameEn String
+
+  sortOrder Int @default(0)
+
+  items Item[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([restaurantId])
+}
+
+model Item {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  nameAr String
+  nameEn String
+
+  descriptionAr String?
+  descriptionEn String?
+
+  price    Decimal @db.Decimal(10, 2)
+  currency String  @default("ILS")
+
+  imagePath String?
+
+  tags ItemTag[]
+
+  available Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([restaurantId])
+  @@index([categoryId])
 }

@@ -19,6 +19,7 @@
     "test": "jest",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "prisma db seed",
     "contrast:check": "ts-node scripts/check-contrast.ts"
   },
   "dependencies": {
@@ -76,6 +77,7 @@
     "typescript": "^5.7.2"
   },
   "prisma": {
-    "schema": "prisma/schema.prisma"
+    "schema": "prisma/schema.prisma",
+    "seed": "ts-node prisma/seed.ts"
   }
 }

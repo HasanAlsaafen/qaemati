@@ -37,13 +37,21 @@ Nunjucks templates, Tailwind CSS, Prisma/PostgreSQL, and bilingual (Arabic/Engli
    docker compose up -d
    ```
 
-4. Run the app in development (Nest in watch mode plus a Tailwind watcher):
+4. Run migrations and seed demo data (one fictional cafe, one fictional restaurant, bilingual
+   menus):
+
+   ```bash
+   npm run prisma:migrate
+   npm run prisma:seed
+   ```
+
+5. Run the app in development (Nest in watch mode plus a Tailwind watcher):
 
    ```bash
    npm run start:dev
    ```
 
-5. Open http://localhost:3000. The Arabic page is the default; the header link switches to
+6. Open http://localhost:3000. The Arabic page is the default; the header link switches to
    English (and back), setting a cookie that persists the choice.
 
 ## Scripts
@@ -54,7 +62,9 @@ Nunjucks templates, Tailwind CSS, Prisma/PostgreSQL, and bilingual (Arabic/Engli
 - `npm run lint` / `npm run lint:fix` - ESLint
 - `npm run format` - Prettier on TypeScript sources
 - `npm run prisma:generate` - generate the Prisma client
-- `npm run prisma:migrate` - run Prisma migrations (added once the data model lands in Phase 2)
+- `npm run prisma:migrate` - run Prisma migrations
+- `npm run prisma:seed` - wipe and reseed demo data (one cafe, one restaurant; see
+  `prisma/seed.ts`). Prints the shared demo admin password when it finishes.
 
 ## Project layout
 
@@ -65,8 +75,19 @@ Nunjucks templates, Tailwind CSS, Prisma/PostgreSQL, and bilingual (Arabic/Engli
 - `prisma/` - Prisma schema and migrations
 - `docs/` - design system and progress notes
 
+## Demo data
+
+`npm run prisma:seed` creates two fictional, fully bilingual businesses:
+
+- **Bayt Al-Zaytoun** (`bayt-al-zaytoun`) - a cafe, 7 categories, 30 items, ILS.
+- **Al-Sanabel** (`al-sanabel`) - a restaurant, 6 categories, 21 items, JOD.
+
+Each gets one seeded admin user (`admin@<slug>.example.com`); every seeded account shares the
+password `Qaemati@Demo123` (also printed at the end of the seed run). Item images are generated
+gradient SVG placeholders (`prisma/seed/placeholder-image.ts`), never real photos.
+
 ## Notes
 
-- The Arabic typeface (Thmanyah) is a licensed asset provided separately. Until the font files
-  are added to `public/fonts/thmanyah/`, the UI falls back to IBM Plex Sans Arabic.
+- The Arabic typeface is Thmanyah, a licensed asset in `public/fonts/thmanyah/` (see
+  `docs/design-system.md` for the licensing caveat around self-hosting it).
 - All demo data is fictional; no real businesses or copyrighted assets are used.
