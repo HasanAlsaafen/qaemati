@@ -29,7 +29,7 @@ CSS variables (for example `--color-primary`) without touching Tailwind config o
 | `--color-text` | `#2B2622` | Primary text |
 | `--color-text-muted` | `#6B6258` | Secondary text |
 | `--color-primary` / `-hover` / `-soft` | `#44603C` / `#365030` / `#E7EEDF` | Primary actions, availability/success-adjacent accents |
-| `--color-secondary` / `-text` / `-soft` | `#C4622D` / `#A8501F` / `#F7E3D6` | Terracotta accents. Use `-text` for small text and button backgrounds (the lighter `DEFAULT` fails AA at small sizes) |
+| `--color-secondary` / `-text` / `-soft` | `#C4622D` / `#A0481B` / `#F7E3D6` | Terracotta accents. Use `-text` for small text and button backgrounds (the lighter `DEFAULT` fails AA at small sizes) |
 | `--color-gold` | `#E2B04A` | "Popular" badge only, paired with dark text |
 | `--color-success` | `#2E7D4F` | Success states |
 | `--color-warning` | `#A56716` | Warning states. Adjusted from the originally specified `#B7791F` (3.64:1 with white text) to `#A56716` (4.61:1), per the contrast script below |
@@ -38,11 +38,18 @@ CSS variables (for example `--color-primary`) without touching Tailwind config o
 Every text/background and button/status pairing is checked by `npm run contrast:check`
 (`scripts/check-contrast.ts`), which computes WCAG relative luminance and fails the build if any
 pair drops below 4.5:1 (body text) or 3:1 (large text / non-text UI boundaries like input
-borders). The only palette value changed to pass was `--color-warning`; everything else in the
-brief already passed. `--color-border` is intentionally below 3:1 against white: it is a
-decorative divider, always paired with spacing or a background change, never the only way a user
-tells two regions apart. Interactive elements (inputs, selects, toggles) use the darker
-`--color-border-strong` instead, which does meet 3:1.
+borders). `--color-border` is intentionally below 3:1 against white: it is a decorative divider,
+always paired with spacing or a background change, never the only way a user tells two regions
+apart. Interactive elements (inputs, selects, toggles) use the darker `--color-border-strong`
+instead, which does meet 3:1.
+
+`--color-secondary-text` was adjusted a second time, in Phase 3, from `#A8501F` to `#A0481B`. The
+contrast script had only ever checked it against `--color-bg` and `--color-surface`, both of
+which it passed comfortably; it was never checked against `--color-secondary-soft`, the tinted
+background badges and the Instagram button actually use it on, where it measured 4.41:1 and
+failed AA. A live Lighthouse accessibility audit on the running `/m/:slug` page caught this, not
+the script — the script now has that pairing (and the equivalent `primary`/`primary-soft` one)
+added so it can't happen again silently.
 
 ### Typography
 
@@ -123,6 +130,14 @@ numbers, and counts. This is a deliberate, documented choice: the font stack alr
 Latin/digit character in Inter regardless of surrounding Arabic text (see above), so prices stay
 visually consistent whether the page is in Arabic or English. Arabic-Indic digits would need a
 different numeral treatment and would break that consistency.
+
+**A price like "18.00 ILS" needs an explicit `dir="ltr"` wrapper on an RTL page.** Found on the
+public menu: without it, the Unicode bidi algorithm reorders the digit run and the Latin
+currency-code run relative to each other inside the ambient RTL paragraph, rendering "ILS 18.00"
+even though the source order is "18.00 ILS" (the digits inside "18.00" are never reversed, only
+the position of the whole number relative to the word "ILS"). Every place a price is shown
+(`components/menu-item-card.njk`, `components/item-detail-sheet.njk`) wraps it in `dir="ltr"`.
+Any future bilingual number-plus-Latin-word string on an RTL page needs the same treatment.
 
 No faux bold or faux italic: only the weights actually declared via `@font-face` are used in
 component CSS; nothing sets `font-weight` or `font-style` to a value without a matching face.

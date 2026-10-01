@@ -1,10 +1,12 @@
 {#
   A single chip in the sticky horizontal category bar. active reflects
-  scroll-spy state (wired up with Alpine/JS in Phase 3).
+  scroll-spy state, toggled client-side by public/js/menu.js (which
+  duplicates the active/inactive classes below; keep them in sync).
 #}
 {% macro categoryChip(label, href, active=false) %}
   <a
     href="{{ href }}"
+    data-category-chip="{{ href }}"
     class="inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium transition-colors duration-fast ease-standard focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'bg-primary text-primary-on' if active else 'bg-muted-surface text-text hover:bg-primary-soft' }}"
     {% if active %}aria-current="true"{% endif %}
   >

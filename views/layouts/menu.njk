@@ -1,0 +1,17 @@
+{% from "components/toast.njk" import toastHost %}
+<!DOCTYPE html>
+<html lang="{{ locale }}" dir="{{ dir }}">
+<head>
+  <title>{% block title %}{{ t('common.app.name') }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{{ t('common.home.subtitle') }}{% endblock %}">
+  {% include "partials/head.njk" %}
+</head>
+<body class="min-h-screen bg-bg text-text font-sans antialiased">
+  {% block content %}{% endblock %}
+
+  {{ toastHost() }}
+
+  <script defer src="/js/scroll-restore.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

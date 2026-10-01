@@ -28,7 +28,13 @@
   --color-on-primary: 255 255 255;
 
   --color-secondary: 196 98 45; /* #C4622D */
-  --color-secondary-text: 168 80 31; /* #A8501F */
+  /* Adjusted from the original #A8501F (4.41:1 against --color-secondary-soft,
+     the badge/button background it's most often paired with, so it failed
+     WCAG AA at small text sizes) to #A0481B (4.92:1 against secondary-soft).
+     Caught by a Lighthouse accessibility audit on the live page, not the
+     contrast-check script, which never tested this specific background
+     pairing -- see docs/design-system.md and scripts/check-contrast.ts. */
+  --color-secondary-text: 160 72 27; /* #A0481B */
   --color-secondary-soft: 247 227 214; /* #F7E3D6 */
   --color-on-secondary: 255 255 255;
 
@@ -66,6 +72,10 @@
 html[lang='ar'] {
   --leading-body: 1.8;
   --leading-heading: 1.5;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 @media (prefers-reduced-motion: reduce) {

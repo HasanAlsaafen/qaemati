@@ -4,6 +4,8 @@ import { join } from 'path';
 import { AcceptLanguageResolver, CookieResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import { LocaleViewMiddleware } from './common/middleware/locale-view.middleware';
 import { HomeModule } from './home/home.module';
+import { MenuModule } from './menu/menu.module';
+import { PrismaModule } from './prisma/prisma.module';
 import { StyleguideModule } from './styleguide/styleguide.module';
 
 @Module({
@@ -21,7 +23,9 @@ import { StyleguideModule } from './styleguide/styleguide.module';
         AcceptLanguageResolver,
       ],
     }),
+    PrismaModule,
     HomeModule,
+    MenuModule,
     StyleguideModule,
   ],
 })

@@ -51,8 +51,9 @@ Nunjucks templates, Tailwind CSS, Prisma/PostgreSQL, and bilingual (Arabic/Engli
    npm run start:dev
    ```
 
-6. Open http://localhost:3000. The Arabic page is the default; the header link switches to
-   English (and back), setting a cookie that persists the choice.
+6. Open http://localhost:3000 for the home page (lists the seeded demo menus), or go straight to
+   a menu: http://localhost:3000/m/bayt-al-zaytoun or http://localhost:3000/m/al-sanabel. Arabic
+   is the default language; the switcher sets a cookie that persists the choice.
 
 ## Scripts
 

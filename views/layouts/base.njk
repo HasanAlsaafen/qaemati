@@ -3,19 +3,9 @@
 <!DOCTYPE html>
 <html lang="{{ locale }}" dir="{{ dir }}">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}{{ t('common.app.name') }}{% endblock %}</title>
-
-  {# Above-the-fold font preloads: body text (Thmanyah Sans Regular) and
-     numerals/Latin (Inter). See docs/design-system.md. #}
-  <link rel="preload" href="/fonts/inter/inter-variable-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/fonts/thmanyah/thmanyahsans-Regular.woff2" as="font" type="font/woff2" crossorigin>
-
-  <link rel="stylesheet" href="/css/app.css">
-  <script defer src="/js/vendor/htmx.min.js"></script>
-  <script defer src="/js/vendor/alpine.min.js"></script>
-  <style>[x-cloak] { display: none !important; }</style>
+  <meta name="description" content="{% block meta_description %}{{ t('common.home.subtitle') }}{% endblock %}">
+  {% include "partials/head.njk" %}
 </head>
 <body class="min-h-screen bg-bg text-text font-sans antialiased">
   <header class="border-b border-border bg-surface">

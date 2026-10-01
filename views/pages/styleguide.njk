@@ -94,8 +94,8 @@
       {% call card('flat') %}
         <p class="text-sm text-text">Flat card content.</p>
       {% endcall %}
-      {{ menuItemCard(sampleItem) }}
-      {{ menuItemCard(unavailableItem) }}
+      {{ menuItemCard(sampleItem, t('common.menu.unavailable')) }}
+      {{ menuItemCard(unavailableItem, t('common.menu.unavailable')) }}
     </div>
   </section>
 

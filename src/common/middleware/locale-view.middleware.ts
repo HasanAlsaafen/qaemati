@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 
 const SUPPORTED_LOCALES = ['ar', 'en'] as const;
-type Locale = (typeof SUPPORTED_LOCALES)[number];
+export type Locale = (typeof SUPPORTED_LOCALES)[number];
 const DEFAULT_LOCALE: Locale = 'ar';
 const RTL_LOCALES = new Set<Locale>(['ar']);
 
@@ -27,6 +27,7 @@ export class LocaleViewMiddleware implements NestMiddleware {
     const locale = this.resolveLocale(req);
     const dir = RTL_LOCALES.has(locale) ? 'rtl' : 'ltr';
 
+    req.locale = locale;
     res.locals.locale = locale;
     res.locals.dir = dir;
     res.locals.otherLocale = locale === 'ar' ? 'en' : 'ar';

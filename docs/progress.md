@@ -262,3 +262,154 @@ project moves past a demo into something with real restaurant customers, this sh
 revisited — either by asking Thmanyah for an explicit web-use exception (the license itself
 names `ask@thmanyah.com` for exactly this kind of case) or by switching to a licensed webfont
 delivery service that doesn't expose raw files.
+
+## Phase 3: Public menu (done)
+
+Public menu at `/m/:slug`: restaurant header, sticky search + category bar with scroll-spy,
+instant Arabic-aware search, a single shared item detail bottom sheet, unavailable-item state,
+and a language switch that preserves scroll position. Lighthouse mobile scores:
+**performance 97, accessibility 100, best practices 100, SEO 100** (report saved at
+`docs/lighthouse-mobile-report.html`; started at 90/95/96/91 before the fixes below).
+
+What was built:
+
+- `src/prisma/`: `PrismaService`/`PrismaModule` (global), connecting/disconnecting with the Nest
+  app lifecycle. Phase 2 only built the schema and a standalone seed script; this is the first
+  place the running app itself talks to the database.
+- `src/menu/`: `MenuController` (`GET /m/:slug`, 404 via `NotFoundException` if the slug doesn't
+  exist) and `MenuService`, which loads a restaurant with its categories/items and maps them to
+  a locale-resolved view model (picking `nameAr`/`nameEn` etc. based on the request's locale,
+  formatting price as a fixed 2-decimal string, building `wa.me`/`instagram.com` URLs, and
+  precomputing a normalized search string per item).
+- `src/common/text/normalize-search-text.ts`: strips Arabic diacritics, folds alef/taa marbuta
+  variants, lowercases. Computed once per item server-side at render time; `public/js/menu.js`
+  re-implements the same normalization on the typed query (documented as needing to stay in
+  sync, since they're necessarily two separate implementations — one Node, one browser).
+- Templates: `views/layouts/menu.njk` (a second, leaner layout — no generic app header, since
+  the restaurant's own header replaces it), `views/pages/menu.njk`, and two new components:
+  `restaurant-header.njk` (logo, name, description, hours, WhatsApp/Instagram links) and
+  `item-detail-sheet.njk` (one shared bottom sheet for all items, populated client-side by
+  Alpine from a `data-item` JSON payload on each card — not one sheet per item, which would mean
+  30+ hidden dialogs in the DOM for the cafe menu alone).
+- `views/partials/head.njk`: the common `<head>` boilerplate (preloads, stylesheet, vendor
+  scripts) factored out so `layouts/base.njk` and `layouts/menu.njk` can't drift apart. `title`
+  and the new `meta_description` block stay directly in each layout, not in the partial — see
+  "bugs found" below for why.
+- `public/js/menu.js`: vanilla JS (not Alpine) for search filtering and category scroll-spy via
+  `IntersectionObserver`. Deliberately not Alpine here: this runs over every item card on the
+  page, and Alpine's reactivity overhead isn't worth it for a text filter and a scroll listener.
+  The item detail sheet (low-frequency interaction) stays Alpine, consistent with the rest of
+  the component system.
+- `public/js/scroll-restore.js`: saves `scrollY` to `sessionStorage` (keyed by pathname) when a
+  link carrying `data-preserve-scroll` is clicked, restores it once on the next load of that
+  path. External file, not an inline `<script>` block — see "bugs found" below.
+- Home page now lists the seeded restaurants with links to their menus (`HomeController` now
+  queries `PrismaService`), since otherwise the public menu has no discoverable entry point.
+
+### Bugs found and fixed while building this (worth knowing about)
+
+Several of these were only catchable by actually loading the page in a browser and clicking
+through it, or by running Lighthouse against the live server — not by reading the code, curling
+routes, or a successful build.
+
+- **Prices read backwards in Arabic: "ILS 18.00" instead of "18.00 ILS".** The Unicode
+  bidirectional algorithm reorders a digit-run and an adjacent Latin-word-run relative to each
+  other inside an RTL paragraph, even though neither run's own characters are reversed. Fixed by
+  wrapping every price in `dir="ltr"`, which isolates it from the ambient RTL context. See the
+  "Numerals" section of `docs/design-system.md`.
+- **My own seed data violated the numeral-consistency rule I had just documented.** The Arabic
+  working-hours strings in `prisma/seed/data.ts` used Arabic-Indic digits (٧، ١١، ١٢) instead of
+  the Western digits the design system mandates everywhere. Caught only by reading the actual
+  rendered page, not by writing the seed data itself. Fixed, and re-seeded.
+- **Helmet's default `Referrer-Policy: no-referrer` silently broke the language switch.**
+  `LocaleController` redirects back to `Referer` after setting the locale cookie; with no
+  Referer header at all (Helmet's default), every language switch fell back to `/`, silently
+  sending the user to the homepage instead of back to the menu they were reading. Fixed by
+  setting `referrerPolicy: { policy: 'same-origin' }` in `main.ts` — still never leaks Referer
+  cross-origin (more private than the browser's own default), while fixing our same-origin
+  redirect. `LocaleController` also now re-validates the Referer's host against the request's
+  own host before using it (defense in depth against it ever being trusted blindly) and strips
+  any `lang` query param from the redirect target, since the cookie it just set is the new
+  source of truth and `?lang=` is resolved with higher precedence — redirecting back to a URL
+  that still carried the old `?lang=` would silently re-apply it and undo the switch.
+- **The language switcher was unreachable mid-scroll, making "preserve scroll position" nearly
+  pointless.** It originally lived in the restaurant header, which scrolls away with the rest of
+  the page (only the search/category bar is sticky) — so reaching it at all required scrolling
+  to the top first, which defeats a feature whose entire purpose is not losing your scroll
+  position. Found while testing the scroll-restore feature itself: every test kept saving a
+  scroll position of ~0 because reaching the switcher always meant scrolling to the top first.
+  Moved the switcher into the sticky bar, where it's reachable from anywhere on the page.
+- **`{% block %}` tags inside an `{% include %}`-ed template don't participate in the
+  `{% extends %}` chain.** Nunjucks/Jinja2 block overriding only works through `extends`; a
+  block defined inside a partial brought in via `include` is a separate, independent scope that
+  a page template has no way to override. `views/partials/head.njk` only holds content with no
+  blocks (preloads, stylesheet, vendor scripts); `title` and `meta_description` are declared
+  directly in each layout file instead, where per-page `{% block %}` overrides actually work.
+- **An inline `<script>` block in the scroll-restore implementation was silently blocked by
+  CSP**, the same class of bug as the Alpine/CSP issue from Phase 1 (`script-src` has no
+  `unsafe-inline`). Written straight to an external file (`public/js/scroll-restore.js`) instead
+  before it ever shipped, once the Alpine precedent made the risk obvious.
+- **Lighthouse (mobile) found a real, un-tested color-contrast failure**: `--color-secondary-text`
+  on `--color-secondary-soft` (badges, the Instagram button) measured 4.41:1, below AA's 4.5:1 —
+  `scripts/check-contrast.ts` had only ever checked that color against `--color-bg` and
+  `--color-surface`, never against the tinted background it's actually paired with most often in
+  real components. Fixed by darkening it slightly (`#A8501F` → `#A0481B`) and adding the missing
+  pairing (plus the equivalent `primary`/`primary-soft` one) to the script so it can't recur
+  silently.
+- **Lighthouse also found three cheap, concrete performance/SEO gaps**: no response compression
+  (Express sends no `Content-Encoding` by default; the menu page was ~91KB uncompressed, ~9.4KB
+  gzipped — added the `compression` middleware), a missing `<link rel="preload">` for the
+  Thmanyah Medium weight (used above-the-fold by category chips and buttons, but only Regular
+  was preloaded, so the browser discovered and fetched it only after parsing CSS, adding a
+  chained request to the critical path), and no `<link rel="icon">` (browsers auto-request
+  `/favicon.ico`, which 404'd and showed up as a console error) or `<meta name="description">`.
+  All four fixed; mobile performance went from 90 to 97 and SEO from 91 to 100.
+
+### Decisions made
+
+- `MenuService` resolves locale-specific fields and formats everything (price, tag labels,
+  WhatsApp/Instagram URLs, search text) server-side, so templates and client JS only ever handle
+  already-correct display strings — no locale or formatting logic duplicated in Nunjucks or JS
+  beyond what's unavoidable (the search query normalization, which necessarily has to run
+  client-side on what the user types).
+- One shared `item-detail-sheet` populated via a `data-item="{{ item | dump }}"` JSON payload per
+  card, instead of one static bottom-sheet instance per item. Nunjucks' `dump` filter HTML-escapes
+  its JSON output by default (not marked `safe`), so it's already attribute-injection-safe; the
+  browser decodes the HTML entities back to valid JSON before `JSON.parse` ever sees it.
+- Scroll-spy and search use plain vanilla JS (`public/js/menu.js`), not Alpine, specifically
+  because they operate over every item on the page (up to 30+ for the cafe) — kept per the
+  brief's "minimal JS" and Lighthouse performance goals. The item detail sheet (one shared
+  instance, low-frequency interaction) stays Alpine, consistent with every other overlay
+  component built in Phase 1.
+- Images stay simple `<img loading="lazy">` with explicit `width`/`height` and a
+  `bg-muted-surface` placeholder behind them (no separate animated skeleton-loader JS): the
+  colored placeholder is already visible before the (small, local, SVG) image paints, satisfies
+  "no layout shift," and adding a second loading-state mechanism on top would be unjustified
+  complexity for images this cheap to load.
+
+### Verified
+
+- `npm run lint`, `npx tsc --noEmit -p tsconfig.json`, and `npm run contrast:check` all pass.
+- Full production build + smoke test: home (AR/EN), both seeded menus, an unknown slug (404),
+  `/styleguide`, and a generic unknown route (404) all return the expected status.
+- Tested in a real browser, not just curl: search narrows results and hides empty categories
+  and their chips correctly with real Arabic input (normalization verified against a word
+  containing a taa marbuta); scroll-spy highlights the correct chip while scrolling and
+  auto-scrolls the chip strip to keep it visible; the item detail sheet opens with the correct
+  dynamic content (name, image, description, tags, price) and closes correctly; the unavailable
+  item stays visible with a dimmed/"Currently unavailable" state rather than being hidden;
+  language switch round-tripped with scroll position preserved exactly, verified against both
+  seeded restaurants (ILS and JOD) in both languages.
+- `npx lighthouse` run against the live `/m/bayt-al-zaytoun` page (mobile, simulated
+  throttling): performance 97, accessibility 100, best practices 100, SEO 100. Report saved at
+  `docs/lighthouse-mobile-report.html`.
+
+### Known gaps / follow-ups
+
+- No automated/scripted responsive-width check (e.g. a real 360px-viewport screenshot) is saved
+  anywhere; verification was interactive browser testing during this session, not a persisted
+  artifact. Consider adding a Playwright/Puppeteer screenshot script in a later phase if visual
+  regression coverage becomes a priority.
+- Category and item ordering is whatever `sortOrder` the seed script assigned (category/item
+  insertion order); there's no admin reordering yet — that's Phase 4 (htmx-based drag/drop with
+  an up/down-button fallback).

@@ -9,8 +9,9 @@ export class StyleguideController {
       id: 'sample-1',
       name: 'Manakeesh Zaatar',
       description: 'Fresh-baked flatbread topped with zaatar, olive oil, and sesame.',
-      price: '18',
+      priceFormatted: '18.00',
       currency: 'ILS',
+      searchText: 'manakeesh zaatar',
       imageUrl:
         'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80"%3E%3Crect width="80" height="80" fill="%23E7EEDF"/%3E%3C/svg%3E',
       tags: [

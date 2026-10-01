@@ -5,7 +5,7 @@
   "home": {
     "title": "Welcome to Qaemati",
     "subtitle": "Beautiful digital menus for cafes and restaurants in Palestine",
-    "description": "This is a demo. The public menu and admin panel are under construction."
+    "description": "This is a demo. Try one of the menus below:"
   },
   "nav": {
     "language": "العربية"
@@ -16,5 +16,19 @@
     "serverErrorTitle": "Something went wrong",
     "serverErrorBody": "Sorry for the inconvenience, we are working on fixing it.",
     "backHome": "Back to home"
+  },
+  "tags": {
+    "spicy": "Spicy",
+    "vegetarian": "Vegetarian",
+    "new": "New",
+    "popular": "Popular"
+  },
+  "menu": {
+    "searchPlaceholder": "Search the menu",
+    "noResults": "No items match your search",
+    "unavailable": "Currently unavailable",
+    "whatsapp": "WhatsApp",
+    "instagram": "Instagram",
+    "viewMenu": "View menu"
   }
 }
