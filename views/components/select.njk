@@ -1,0 +1,23 @@
+{#
+  options: list of { value, label }
+#}
+{% macro select(name, label, options, selected=none, error=none, attrs='') %}
+  {% set fieldId = 'field-' + name %}
+  <div class="flex flex-col gap-1.5">
+    <label for="{{ fieldId }}" class="text-sm font-medium text-text">{{ label }}</label>
+    <select
+      id="{{ fieldId }}"
+      name="{{ name }}"
+      class="min-h-11 rounded-md border bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'border-danger' if error else 'border-border-strong' }}"
+      {% if error %}aria-invalid="true" aria-describedby="{{ fieldId }}-error"{% endif %}
+      {{ attrs | safe }}
+    >
+      {% for option in options %}
+        <option value="{{ option.value }}" {% if option.value == selected %}selected{% endif %}>{{ option.label }}</option>
+      {% endfor %}
+    </select>
+    {% if error %}
+      <p id="{{ fieldId }}-error" class="text-sm text-danger">{{ error }}</p>
+    {% endif %}
+  </div>
+{% endmacro %}

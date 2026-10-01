@@ -1,0 +1,21 @@
+{% macro input(name, label, type='text', value='', placeholder='', error=none, hint=none, attrs='') %}
+  {% set inputId = 'field-' + name %}
+  <div class="flex flex-col gap-1.5">
+    <label for="{{ inputId }}" class="text-sm font-medium text-text">{{ label }}</label>
+    <input
+      id="{{ inputId }}"
+      name="{{ name }}"
+      type="{{ type }}"
+      value="{{ value }}"
+      placeholder="{{ placeholder }}"
+      class="min-h-11 rounded-md border bg-surface px-3 text-base text-text placeholder:text-muted-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'border-danger' if error else 'border-border-strong' }}"
+      {% if error %}aria-invalid="true" aria-describedby="{{ inputId }}-error"{% elif hint %}aria-describedby="{{ inputId }}-hint"{% endif %}
+      {{ attrs | safe }}
+    >
+    {% if error %}
+      <p id="{{ inputId }}-error" class="text-sm text-danger">{{ error }}</p>
+    {% elif hint %}
+      <p id="{{ inputId }}-hint" class="text-sm text-muted-text">{{ hint }}</p>
+    {% endif %}
+  </div>
+{% endmacro %}

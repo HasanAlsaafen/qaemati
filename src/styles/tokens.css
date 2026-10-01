@@ -1,0 +1,80 @@
+/*
+  Zaytoun palette and base design tokens as CSS custom properties.
+  Exposed on :root so a restaurant can later override --color-primary
+  (and friends) without touching Tailwind config or templates.
+
+  Colors are stored as "R G B" triplets (not hex) so Tailwind's
+  rgb(var(--x) / <alpha-value>) pattern can apply opacity modifiers
+  (bg-text/40, etc) to them. See tailwind.config.js.
+*/
+:root {
+  /* Colors */
+  --color-bg: 250 246 239; /* #FAF6EF */
+  --color-surface: 255 255 255; /* #FFFFFF */
+  --color-surface-muted: 242 235 221; /* #F2EBDD */
+  --color-border: 230 220 201; /* #E6DCC9 */
+  /* Stronger border for interactive boundaries (inputs, selects, toggles)
+     where WCAG 1.4.11 non-text contrast (3:1) applies. The lighter
+     --color-border above stays for decorative dividers between sections,
+     where it is never the only cue (always paired with spacing or a
+     background change). */
+  --color-border-strong: 156 146 127; /* #9C927F */
+  --color-text: 43 38 34; /* #2B2622 */
+  --color-text-muted: 107 98 88; /* #6B6258 */
+
+  --color-primary: 68 96 60; /* #44603C */
+  --color-primary-hover: 54 80 48; /* #365030 */
+  --color-primary-soft: 231 238 223; /* #E7EEDF */
+  --color-on-primary: 255 255 255;
+
+  --color-secondary: 196 98 45; /* #C4622D */
+  --color-secondary-text: 168 80 31; /* #A8501F */
+  --color-secondary-soft: 247 227 214; /* #F7E3D6 */
+  --color-on-secondary: 255 255 255;
+
+  --color-gold: 226 176 74; /* #E2B04A */
+  --color-on-gold: 43 38 34; /* #2B2622 */
+
+  --color-success: 46 125 79; /* #2E7D4F */
+  /* Adjusted from the original #B7791F (3.64:1 with white) to meet WCAG AA
+     4.5:1 for white text, per docs/design-system.md contrast verification. */
+  --color-warning: 165 103 22; /* #A56716 */
+  --color-danger: 179 56 44; /* #B3382C */
+  --color-on-status: 255 255 255;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Elevation (warm, low-opacity shadows, not pure black) */
+  --shadow-raised: 0 1px 2px 0 rgb(43 38 34 / 0.06), 0 1px 3px 0 rgb(43 38 34 / 0.08);
+  --shadow-overlay: 0 8px 16px -4px rgb(43 38 34 / 0.12), 0 4px 6px -2px rgb(43 38 34 / 0.08);
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 250ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Typography: per-language line height (see docs/design-system.md) */
+  --leading-body: 1.5;
+  --leading-heading: 1.25;
+}
+
+html[lang='ar'] {
+  --leading-body: 1.8;
+  --leading-heading: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

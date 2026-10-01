@@ -1,0 +1,19 @@
+{% macro textarea(name, label, value='', rows=4, error=none, hint=none, attrs='') %}
+  {% set fieldId = 'field-' + name %}
+  <div class="flex flex-col gap-1.5">
+    <label for="{{ fieldId }}" class="text-sm font-medium text-text">{{ label }}</label>
+    <textarea
+      id="{{ fieldId }}"
+      name="{{ name }}"
+      rows="{{ rows }}"
+      class="rounded-md border bg-surface px-3 py-2 text-base text-text placeholder:text-muted-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'border-danger' if error else 'border-border-strong' }}"
+      {% if error %}aria-invalid="true" aria-describedby="{{ fieldId }}-error"{% elif hint %}aria-describedby="{{ fieldId }}-hint"{% endif %}
+      {{ attrs | safe }}
+    >{{ value }}</textarea>
+    {% if error %}
+      <p id="{{ fieldId }}-error" class="text-sm text-danger">{{ error }}</p>
+    {% elif hint %}
+      <p id="{{ fieldId }}-hint" class="text-sm text-muted-text">{{ hint }}</p>
+    {% endif %}
+  </div>
+{% endmacro %}

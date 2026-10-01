@@ -1,0 +1,17 @@
+{#
+  Generic content card. elevation: 'flat' | 'raised' | 'overlay'.
+  Usage:
+    {% call card() %}...{% endcall %}
+#}
+{% macro card(elevation='raised', attrs='') %}
+  {% if elevation == 'overlay' %}
+    {% set look = 'shadow-overlay' %}
+  {% elif elevation == 'flat' %}
+    {% set look = 'border border-border' %}
+  {% else %}
+    {% set look = 'shadow-raised' %}
+  {% endif %}
+  <div class="rounded-lg bg-surface p-4 {{ look }}" {{ attrs | safe }}>
+    {{ caller() }}
+  </div>
+{% endmacro %}

@@ -4,6 +4,7 @@ import { join } from 'path';
 import { AcceptLanguageResolver, CookieResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import { LocaleViewMiddleware } from './common/middleware/locale-view.middleware';
 import { HomeModule } from './home/home.module';
+import { StyleguideModule } from './styleguide/styleguide.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { HomeModule } from './home/home.module';
       ],
     }),
     HomeModule,
+    StyleguideModule,
   ],
 })
 export class AppModule implements NestModule {

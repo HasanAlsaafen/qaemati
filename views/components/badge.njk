@@ -1,0 +1,21 @@
+{#
+  variant: 'neutral' | 'primary' | 'secondary' | 'popular' (gold) | 'success' | 'warning' | 'danger'
+#}
+{% macro badge(label, variant='neutral') %}
+  {% if variant == 'primary' %}
+    {% set look = 'bg-primary-soft text-primary' %}
+  {% elif variant == 'secondary' %}
+    {% set look = 'bg-secondary-soft text-secondary-text' %}
+  {% elif variant == 'popular' %}
+    {% set look = 'bg-gold text-on-gold' %}
+  {% elif variant == 'success' %}
+    {% set look = 'bg-success text-white' %}
+  {% elif variant == 'warning' %}
+    {% set look = 'bg-warning text-white' %}
+  {% elif variant == 'danger' %}
+    {% set look = 'bg-danger text-white' %}
+  {% else %}
+    {% set look = 'bg-muted-surface text-muted-text' %}
+  {% endif %}
+  <span class="inline-flex items-center rounded-sm px-2 py-0.5 text-xs font-medium {{ look }}">{{ label }}</span>
+{% endmacro %}

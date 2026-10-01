@@ -1,13 +1,22 @@
+/*
+  @import must come before any other rule (per the CSS spec, browsers
+  silently drop an @import that appears after other rules), so these two
+  come before @tailwind.
+*/
+@import './tokens.css';
+@import './fonts.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/*
-  Provisional font stack for Phase 0. The full self-hosted Thmanyah
-  @font-face rules, weight-based scale, and per-language line heights are
-  defined in Phase 1 once the licensed font files are provided.
-*/
 :root {
-  --font-sans: 'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif;
-  --font-display: 'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif;
+  /*
+    Single font stack for mixed Arabic/Latin text. Thmanyah and IBM Plex
+    Sans Arabic are scoped to Arabic unicode-range only (see fonts.css), so
+    Latin characters always resolve to Inter regardless of which Arabic
+    face is active. See docs/design-system.md for the fallback chain.
+  */
+  --font-sans: 'Thmanyah', 'Inter', 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+  --font-display: var(--font-sans);
 }

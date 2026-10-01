@@ -1,0 +1,139 @@
+{% extends "layouts/base.njk" %}
+
+{% from "components/button.njk" import button %}
+{% from "components/icon-button.njk" import iconButton %}
+{% from "components/input.njk" import input %}
+{% from "components/textarea.njk" import textarea %}
+{% from "components/select.njk" import select %}
+{% from "components/toggle.njk" import toggle %}
+{% from "components/badge.njk" import badge %}
+{% from "components/card.njk" import card %}
+{% from "components/menu-item-card.njk" import menuItemCard %}
+{% from "components/category-chip.njk" import categoryChip %}
+{% from "components/bottom-sheet.njk" import bottomSheet %}
+{% from "components/modal.njk" import modal %}
+{% from "components/skeleton.njk" import skeletonLine, skeletonCard %}
+{% from "components/empty-state.njk" import emptyState %}
+{% from "components/confirm-dialog.njk" import confirmDialog %}
+{% from "components/table-row.njk" import tableRow %}
+
+{% block title %}Styleguide{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-10">
+  <section>
+    <h2 class="font-display text-xl font-semibold text-text">Buttons</h2>
+    <div class="mt-3 flex flex-wrap items-center gap-3">
+      {{ button('Primary', 'primary') }}
+      {{ button('Secondary', 'secondary') }}
+      {{ button('Ghost', 'ghost') }}
+      {{ button('Danger', 'danger') }}
+      {{ button('Small', 'primary', 'sm') }}
+      {{ button('Disabled', 'primary', 'md', 'button', '', true) }}
+      {{ iconButton('Add item', '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>', 'primary') }}
+      {{ iconButton('More options', '<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><circle cx="4" cy="10" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="16" cy="10" r="1.5"/></svg>', 'ghost') }}
+    </div>
+  </section>
+
+  <section>
+    <h2 class="font-display text-xl font-semibold text-text">Form fields</h2>
+    <div class="mt-3 grid gap-4 sm:grid-cols-2">
+      {{ input('item-name', 'Item name', 'text', 'Manakeesh Zaatar', 'e.g. Hummus') }}
+      {{ input('item-price', 'Price', 'number', '', '0', 'Price must be a positive number') }}
+      {{ textarea('item-description', 'Description', 'Fresh-baked flatbread topped with zaatar.', 3) }}
+      {{ select('item-category', 'Category', selectOptions, 'ils') }}
+    </div>
+    <div class="mt-4">
+      {{ toggle('item-available', 'Available', true) }}
+    </div>
+  </section>
+
+  <section>
+    <h2 class="font-display text-xl font-semibold text-text">Badges</h2>
+    <div class="mt-3 flex flex-wrap gap-2">
+      {{ badge('Neutral', 'neutral') }}
+      {{ badge('Primary', 'primary') }}
+      {{ badge('Secondary', 'secondary') }}
+      {{ badge('Popular', 'popular') }}
+      {{ badge('Success', 'success') }}
+      {{ badge('Warning', 'warning') }}
+      {{ badge('Danger', 'danger') }}
+    </div>
+  </section>
+
+  <section>
+    <h2 class="font-display text-xl font-semibold text-text">Category chips</h2>
+    <div class="mt-3 flex gap-2 overflow-x-auto pb-1">
+      {{ categoryChip('Breakfast', '#', true) }}
+      {{ categoryChip('Mains', '#') }}
+      {{ categoryChip('Drinks', '#') }}
+      {{ categoryChip('Desserts', '#') }}
+    </div>
+  </section>
+
+  <section>
+    <h2 class="font-display text-xl font-semibold text-text">Cards and menu items</h2>
+    <div class="mt-3 grid gap-4 sm:grid-cols-2">
+      {% call card('raised') %}
+        <p class="text-sm text-text">Raised card content.</p>
+      {% endcall %}
+      {% call card('flat') %}
+        <p class="text-sm text-text">Flat card content.</p>
+      {% endcall %}
+      {{ menuItemCard(sampleItem) }}
+      {{ menuItemCard(unavailableItem) }}
+    </div>
+  </section>
+
+  <section>
+    <h2 class="font-display text-xl font-semibold text-text">Skeleton loaders</h2>
+    <div class="mt-3 flex flex-col gap-3 sm:max-w-sm">
+      {{ skeletonLine('w-1/2') }}
+      {{ skeletonLine() }}
+      {{ skeletonCard() }}
+    </div>
+  </section>
+
+  <section>
+    <h2 class="font-display text-xl font-semibold text-text">Empty state</h2>
+    <div class="mt-3">
+      {{ emptyState('No categories yet', 'Add your first category to start building the menu.', 'Add category', '#') }}
+    </div>
+  </section>
+
+  <section>
+    <h2 class="font-display text-xl font-semibold text-text">Table rows</h2>
+    <div class="mt-3 rounded-lg border border-border bg-surface">
+      {% call tableRow() %}
+        <span class="flex-1 text-sm text-text">Manakeesh Zaatar</span>
+        <span class="text-sm text-muted-text">18 ILS</span>
+      {% endcall %}
+      {% call tableRow() %}
+        <span class="flex-1 text-sm text-text">Knafeh Nabulsieh</span>
+        <span class="text-sm text-muted-text">22 ILS</span>
+      {% endcall %}
+    </div>
+  </section>
+
+  <section>
+    <h2 class="font-display text-xl font-semibold text-text">Overlays</h2>
+    <div class="mt-3 flex flex-wrap gap-3">
+      {{ button('Open bottom sheet', 'secondary', 'md', 'button', 'x-on:click="$dispatch(\'open-sheet-demo\')"') }}
+      {{ button('Open modal', 'secondary', 'md', 'button', 'x-on:click="$dispatch(\'open-modal-demo\')"') }}
+      {{ button('Open confirm dialog', 'danger', 'md', 'button', 'x-on:click="$dispatch(\'open-confirm-demo\')"') }}
+      {{ button('Show toast', 'ghost', 'md', 'button', 'x-on:click="$dispatch(\'toast\', { message: \'Saved\', variant: \'success\' })"') }}
+    </div>
+
+    {% call bottomSheet('demo', 'Manakeesh Zaatar') %}
+      <p class="text-sm text-muted-text">Fresh-baked flatbread topped with zaatar, olive oil, and sesame.</p>
+      <p class="mt-3 text-lg font-semibold text-text">18 ILS</p>
+    {% endcall %}
+
+    {% call modal('demo', 'Edit category') %}
+      {{ input('category-name', 'Category name', 'text', 'Breakfast') }}
+    {% endcall %}
+
+    {{ confirmDialog('demo', 'Delete this item?', 'This cannot be undone.', 'Delete', 'Cancel') }}
+  </section>
+</div>
+{% endblock %}

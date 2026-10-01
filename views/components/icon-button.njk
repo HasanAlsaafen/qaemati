@@ -1,0 +1,15 @@
+{#
+  Icon-only button. iconSvg is raw inline SVG markup (trusted, authored by us, not user input).
+  label is required for aria-label since there is no visible text.
+#}
+{% macro iconButton(label, iconSvg, variant='ghost', attrs='') %}
+  {% set look = 'bg-primary text-primary-on hover:bg-primary-hover' if variant == 'primary' else 'bg-transparent text-text hover:bg-muted-surface border border-border' %}
+  <button
+    type="button"
+    aria-label="{{ label }}"
+    class="inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-fast ease-standard focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ look }}"
+    {{ attrs | safe }}
+  >
+    {{ iconSvg | safe }}
+  </button>
+{% endmacro %}

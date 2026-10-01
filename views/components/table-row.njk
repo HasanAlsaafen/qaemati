@@ -1,0 +1,14 @@
+{#
+  A single admin list row. Not a <table> row (the admin lists are card-like
+  rows on mobile, not literal HTML tables, to stay usable on a phone), but
+  named per the brief's component list. Wrap cell content with
+  {% call tableRow() %}...{% endcall %}.
+#}
+{% macro tableRow(attrs='') %}
+  <div
+    class="flex min-h-11 items-center gap-3 border-b border-border px-3 py-2 last:border-b-0 hover:bg-muted-surface"
+    {{ attrs | safe }}
+  >
+    {{ caller() }}
+  </div>
+{% endmacro %}
