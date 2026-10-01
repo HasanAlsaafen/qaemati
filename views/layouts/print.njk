@@ -1,0 +1,16 @@
+{#
+  No app header/nav/logout chrome -- this layout is for pages meant to be
+  printed (or saved as PDF) directly, where that chrome would just be
+  wasted paper. Still shares partials/head.njk so fonts/CSS match the rest
+  of the app.
+#}
+<!DOCTYPE html>
+<html lang="{{ locale }}" dir="{{ dir }}">
+<head>
+  <title>{% block title %}{{ t('common.app.name') }}{% endblock %}</title>
+  {% include "partials/head.njk" %}
+</head>
+<body class="min-h-screen bg-bg text-text font-sans antialiased">
+  {% block content %}{% endblock %}
+</body>
+</html>

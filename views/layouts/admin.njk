@@ -16,6 +16,7 @@
         <a href="/admin" class="text-lg font-bold">{{ t('common.app.name') }}</a>
         <nav class="flex items-center gap-2 text-sm">
           <a href="/admin" class="min-h-11 inline-flex items-center rounded-md px-3 hover:bg-muted-surface">{{ t('common.admin.nav.categories') }}</a>
+          <a href="/admin/qr" class="min-h-11 inline-flex items-center rounded-md px-3 hover:bg-muted-surface">{{ t('common.admin.nav.qr') }}</a>
           {% if restaurantSlug %}
             <a href="/m/{{ restaurantSlug }}" target="_blank" rel="noopener noreferrer" class="min-h-11 inline-flex items-center rounded-md px-3 hover:bg-muted-surface">{{ t('common.admin.nav.previewMenu') }}</a>
           {% endif %}

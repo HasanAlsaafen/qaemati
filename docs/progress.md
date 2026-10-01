@@ -536,3 +536,91 @@ What was built:
 - Re-seeded the database afterward (`npx prisma db seed`) to leave the demo data clean, and
   removed the test image left in `public/uploads/items/` (gitignored, but still filesystem
   litter).
+
+## Phase 5: QR codes and printing (done)
+
+The original spec text for this phase wasn't available in this session (only the phase title,
+"QR/print", survived into the handoff summary from the prior conversation), so scope was
+confirmed with the user before building rather than guessed: a QR code linking to the public
+menu, a printable table-tent page carrying that QR, a print-friendly version of the public menu
+itself, and per-table QR codes.
+
+What was built:
+
+- `prisma/schema.prisma`: new `RestaurantTable` model (`id`, `restaurantId`, `label`,
+  `sortOrder`) — purely a label for which printed QR code is which, not a seating/ordering
+  concept (this app has neither). Migration `20261001134531_add_restaurant_tables` created by
+  hand via `prisma migrate diff --from-url ... --to-schema-datamodel` + `prisma migrate deploy`,
+  since `prisma migrate dev` refuses to run in this non-interactive shell — see "bugs found"
+  below for why the diff needed hand-editing before applying.
+- `src/admin/table.service.ts`: CRUD + up/down `move()`, same ownership-assertion/sortOrder-swap
+  shape as `CategoryService`/`ItemService` from Phase 4.
+- `src/admin/qr-code.ts`: `buildMenuUrl(req, slug, tableLabel?)` builds the public menu URL from
+  the request's own protocol/host (no configured base-URL env var to keep in sync across
+  environments) with `?table=<label>` appended for a table-specific code; `generateQrSvg(url)`
+  wraps the `qrcode` package (already a dependency, unused until now) to produce inline SVG
+  markup rather than a PNG or a saved file — scales crisp at any print size and needs no
+  upload-style lifecycle management for a handful of codes per restaurant.
+- `src/admin/qr.controller.ts` (`/admin/qr`): a dashboard-style page with the general QR code,
+  an htmx-driven table list (add/rename/reorder/delete, mirroring the categories-list pattern
+  from Phase 4 exactly — same shared confirm dialog, same local-edit-mode macros), and
+  `/admin/qr/print`, a separate printable page.
+- `views/layouts/print.njk`: a second minimal layout with no admin nav/logout chrome, for pages
+  meant to be printed directly rather than browsed.
+- `views/admin/qr-print.njk`: a grid of cards (general QR + one per table), each with the
+  restaurant name, the QR code, and a caption; `break-inside-avoid` so a card never splits across
+  a page break, and a `window.print()` button that's itself `print:hidden`.
+- Public menu (`src/menu/menu.controller.ts`, `views/pages/menu.njk`): an optional `?table=`
+  query param renders a small "Table {label}" chip under the restaurant header — informational
+  only, not persisted anywhere; scanning a table's QR is what sets it, each visit is independent.
+- Print-friendly public menu: `print:hidden` on the sticky search/category bar, the table chip,
+  and the (already-closed-by-default) item detail sheet, so printing `/m/:slug` directly (e.g.
+  browser Ctrl+P as a paper backup menu) produces a clean, chrome-free page — no new stylesheet
+  needed, just Tailwind's built-in `print:` variant, already available with zero config changes.
+
+### Bugs found and fixed while building this
+
+- **`prisma migrate dev` refuses to run at all**: "Prisma Migrate has detected that the
+  environment is non-interactive, which is not supported" — this shell has no TTY for the
+  migration-name prompt, and `CI=true` didn't change that. Generated the migration SQL instead
+  with `prisma migrate diff --from-url <live db> --to-schema-datamodel prisma/schema.prisma
+  --script`, then applied it with `prisma migrate deploy` (itself fully non-interactive).
+- **That generated diff included `DROP TABLE "session"`.** The live database the diff ran
+  against already had the `session` table that `connect-pg-simple` creates at runtime
+  (`createTableIfMissing: true` in `main.ts`), but that table isn't part of `schema.prisma` at
+  all — Prisma doesn't know it's supposed to exist, so a diff against the live database proposes
+  dropping it. Caught by reading the generated SQL before applying it, not after; would have
+  logged out every admin session (not destroyed any real data, since express-session just
+  recreates the table on next request, but still the wrong migration to ship). Stripped that
+  statement before running `migrate deploy`.
+- **Stale session after reseeding broke every admin QR/table action with "Foreign key constraint
+  violated" / "No Restaurant found".** Re-seeding (standard cleanup after browser-testing Phase
+  4, and done again here) generates fresh `cuid()`s for every row, including the restaurant the
+  logged-in session's `restaurantId` pointed at. The browser still had Phase 4's session cookie,
+  now referencing a restaurant that no longer exists. Not a code bug — logging out and back in
+  fixed it immediately — but worth noting because the failure mode (a 500 on every table
+  mutation, right after a routine reseed) looked exactly like a real bug at first. Also: trying
+  to "clear cookies" via `document.cookie` in the browser console does nothing to the session
+  cookie, since it's `httpOnly` by design (see Phase 4's CSRF work) — the actual fix has to go
+  through the real `/admin/logout` form, not a script-side cookie wipe.
+
+### Verified
+
+- `npx tsc --noEmit`, `npm run lint`, and a full production build all pass.
+- Logged into the seeded Bayt Al-Zaytoun owner account and exercised the full QR/table flow in a
+  real browser, in both languages: viewed the general QR code, added two tables ("5" and
+  "Patio 2"), confirmed each got its own distinct QR encoding the correct `?table=` URL, reordered
+  them, opened `/admin/qr/print` and confirmed both table cards and the general card rendered
+  correctly, deleted both tables through the shared confirm dialog (toast fired each time), and
+  confirmed the Arabic locale (`?lang=ar`) renders the admin page and the confirm dialog's text
+  correctly in RTL. Visited the public menu with `?table=Patio%202` (and again in Arabic with
+  `?table=5`) and confirmed the table chip decodes and displays correctly.
+- Confirmed via a direct CSS check (not just visual inspection) that `print:hidden` and other
+  `print:` utilities actually compiled into `public/css/app.css` under a `@media print` block,
+  since a missing Tailwind variant would otherwise fail silently (the class just wouldn't exist,
+  with no error anywhere).
+- Production smoke test: home, public menu, public menu with `?table=`, and both new admin QR
+  routes (redirecting to login when unauthenticated) all returned the expected status codes.
+- Left no test data behind: both tables added during testing were deleted before finishing, and
+  the general-QR/table-QR feature itself needs no seed data (it's generated from a restaurant's
+  existing slug, not stored).

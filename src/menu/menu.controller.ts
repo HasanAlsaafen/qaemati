@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Render, Req } from '@nestjs/common';
+import { Controller, Get, Param, Query, Render, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { MenuService } from './menu.service';
 
@@ -8,9 +8,13 @@ export class MenuController {
 
   @Get(':slug')
   @Render('pages/menu')
-  async show(@Param('slug') slug: string, @Req() req: Request) {
+  async show(
+    @Param('slug') slug: string,
+    @Query('table') table: string | undefined,
+    @Req() req: Request,
+  ) {
     const locale = req.locale ?? 'ar';
     const menu = await this.menuService.getMenu(slug, locale);
-    return { menu };
+    return { menu, tableLabel: table?.trim() || null };
   }
 }

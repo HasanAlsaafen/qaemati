@@ -1,0 +1,71 @@
+{% from "components/button.njk" import button %}
+{% from "admin/components/delete-trigger.njk" import deleteTrigger %}
+
+{#
+  table: { id, label, url, qrSvg }
+  Same local-edit-mode pattern as category-block/item-row: renaming opens
+  instantly via Alpine state, only Save/Cancel-with-save hits the server.
+#}
+{% macro tableRow(table, labels, isFirst, isLast) %}
+  <div id="table-{{ table.id }}" x-data="{ editing: false }" class="flex items-center justify-between gap-3 rounded-md border border-border bg-surface p-3">
+    <div x-show="!editing" class="flex min-w-0 items-center gap-3">
+      <div class="h-14 w-14 shrink-0 [&_svg]:h-full [&_svg]:w-full">{{ table.qrSvg | safe }}</div>
+      <div class="min-w-0">
+        <p class="font-medium text-text">{{ labels.qr.tableLabel }} {{ table.label }}</p>
+        <a href="{{ table.url }}" target="_blank" rel="noopener noreferrer" dir="ltr" class="block truncate text-xs text-muted-text hover:underline">{{ table.url }}</a>
+      </div>
+    </div>
+
+    <form
+      x-show="editing"
+      x-cloak
+      hx-patch="/admin/qr/tables/{{ table.id }}"
+      hx-target="#table-{{ table.id }}"
+      hx-swap="outerHTML"
+      class="flex flex-1 flex-wrap items-end gap-3"
+    >
+      <div class="flex flex-col gap-1.5">
+        <label for="table-{{ table.id }}-label" class="text-sm font-medium text-text">{{ labels.qr.tableLabel }}</label>
+        <input id="table-{{ table.id }}-label" name="label" type="text" value="{{ table.label }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
+      </div>
+      {{ button(labels.form.save, 'primary', 'sm', 'submit') }}
+      {{ button(labels.form.cancel, 'ghost', 'sm', 'button', 'x-on:click="editing = false"') }}
+    </form>
+
+    <div x-show="!editing" class="flex shrink-0 items-center gap-1">
+      <button
+        type="button"
+        aria-label="{{ labels.form.moveUp }}"
+        {% if isFirst %}disabled{% endif %}
+        class="inline-flex h-9 w-9 items-center justify-center rounded-full text-text hover:bg-muted-surface disabled:opacity-30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        hx-post="/admin/qr/tables/{{ table.id }}/move"
+        hx-vals='{"direction": "up"}'
+        hx-target="#tables-list"
+        hx-swap="outerHTML"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 10l5-5 5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button
+        type="button"
+        aria-label="{{ labels.form.moveDown }}"
+        {% if isLast %}disabled{% endif %}
+        class="inline-flex h-9 w-9 items-center justify-center rounded-full text-text hover:bg-muted-surface disabled:opacity-30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        hx-post="/admin/qr/tables/{{ table.id }}/move"
+        hx-vals='{"direction": "down"}'
+        hx-target="#tables-list"
+        hx-swap="outerHTML"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button
+        type="button"
+        aria-label="{{ labels.form.edit }}"
+        class="inline-flex h-11 w-11 items-center justify-center rounded-full text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        x-on:click="editing = true"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      {{ deleteTrigger(labels.form.delete, labels.qr.deleteConfirmTitle, labels.qr.deleteConfirmBody, labels.form.delete, labels.form.cancel, '/admin/qr/tables/' + table.id, '#table-' + table.id) }}
+    </div>
+  </div>
+{% endmacro %}

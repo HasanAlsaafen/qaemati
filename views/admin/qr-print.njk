@@ -1,0 +1,33 @@
+{% extends "layouts/print.njk" %}
+
+{% block title %}{{ labels.qr.printAll }}{% endblock %}
+
+{% block content %}
+<div class="print:hidden mx-auto flex max-w-3xl justify-end gap-3 p-4">
+  <button
+    type="button"
+    onclick="window.print()"
+    class="inline-flex min-h-11 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+  >
+    {{ labels.qr.printButton }}
+  </button>
+</div>
+
+<div class="mx-auto grid max-w-3xl grid-cols-1 gap-6 p-4 sm:grid-cols-2 print:max-w-none print:grid-cols-2 print:gap-4 print:p-6">
+  <div class="break-inside-avoid rounded-lg border border-border p-6 text-center">
+    <h2 class="font-display text-xl font-bold text-text">{{ restaurantName }}</h2>
+    <p class="mt-1 text-sm text-muted-text">{{ labels.qr.scanToView }}</p>
+    <div class="mx-auto mt-4 h-48 w-48 [&_svg]:h-full [&_svg]:w-full">{{ generalQrSvg | safe }}</div>
+    <p class="mt-3 text-sm font-medium text-text">{{ labels.qr.generalTitle }}</p>
+  </div>
+
+  {% for table in tables %}
+    <div class="break-inside-avoid rounded-lg border border-border p-6 text-center">
+      <h2 class="font-display text-xl font-bold text-text">{{ restaurantName }}</h2>
+      <p class="mt-1 text-sm text-muted-text">{{ labels.qr.scanToView }}</p>
+      <div class="mx-auto mt-4 h-48 w-48 [&_svg]:h-full [&_svg]:w-full">{{ table.qrSvg | safe }}</div>
+      <p class="mt-3 text-sm font-medium text-text">{{ labels.qr.tableLabel }} {{ table.label }}</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

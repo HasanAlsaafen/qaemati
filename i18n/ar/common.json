@@ -29,7 +29,8 @@
     "unavailable": "غير متوفر حاليًا",
     "whatsapp": "واتساب",
     "instagram": "إنستغرام",
-    "viewMenu": "عرض القائمة"
+    "viewMenu": "عرض القائمة",
+    "tableLabel": "طاولة {name}"
   },
   "admin": {
     "auth": {
@@ -45,7 +46,8 @@
     "nav": {
       "dashboard": "لوحة التحكم",
       "categories": "الأقسام",
-      "previewMenu": "معاينة القائمة"
+      "previewMenu": "معاينة القائمة",
+      "qr": "رمز QR والطباعة"
     },
     "form": {
       "required": "هذا الحقل مطلوب.",
@@ -92,6 +94,25 @@
       "imageUpdatedToast": "تم تحديث الصورة",
       "imageTooLarge": "يجب أن يكون حجم الصورة أقل من 5 ميجابايت.",
       "invalidImageType": "يرجى رفع صورة بصيغة JPG أو PNG أو WebP."
+    },
+    "qr": {
+      "title": "رموز QR والطباعة",
+      "generalTitle": "رمز QR العام للقائمة",
+      "generalCaption": "مسح هذا الرمز يفتح قائمتك الكاملة للزوار.",
+      "tablesTitle": "رموز QR للطاولات",
+      "tableLabel": "طاولة",
+      "addTable": "إضافة طاولة",
+      "emptyTitle": "لا توجد طاولات بعد",
+      "emptyDescription": "أضف طاولة لإنشاء رمز QR خاص بها.",
+      "deleteConfirmTitle": "حذف هذه الطاولة؟",
+      "deleteConfirmBody": "سيتوقف رمز QR الخاص بها عن العمل. لا يمكن التراجع عن هذا.",
+      "savedToast": "تم حفظ الطاولة",
+      "addedToast": "تمت إضافة الطاولة",
+      "deletedToast": "تم حذف الطاولة",
+      "printAll": "فتح صفحة الطباعة",
+      "printButton": "طباعة",
+      "scanToView": "امسح لعرض قائمتنا",
+      "downloadLinkLabel": "فتح رابط القائمة"
     }
   }
 }

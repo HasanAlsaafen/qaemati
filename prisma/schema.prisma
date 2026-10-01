@@ -39,6 +39,7 @@ model Restaurant {
   adminUsers AdminUser[]
   categories Category[]
   items      Item[]
+  tables     RestaurantTable[]
 }
 
 model AdminUser {
@@ -106,4 +107,24 @@ model Item {
 
   @@index([restaurantId])
   @@index([categoryId])
+}
+
+/// A printable QR target: scanning it opens the public menu with
+/// ?table=<label> appended, so the page can show a "Table X" indicator.
+/// Not used for ordering/seating logic -- this app has none -- purely a
+/// label for which QR code is which when printing a batch of them.
+model RestaurantTable {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  label String
+
+  sortOrder Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([restaurantId])
 }

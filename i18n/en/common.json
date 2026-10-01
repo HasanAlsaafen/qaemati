@@ -29,7 +29,8 @@
     "unavailable": "Currently unavailable",
     "whatsapp": "WhatsApp",
     "instagram": "Instagram",
-    "viewMenu": "View menu"
+    "viewMenu": "View menu",
+    "tableLabel": "Table {name}"
   },
   "admin": {
     "auth": {
@@ -45,7 +46,8 @@
     "nav": {
       "dashboard": "Dashboard",
       "categories": "Categories",
-      "previewMenu": "Preview menu"
+      "previewMenu": "Preview menu",
+      "qr": "QR & print"
     },
     "form": {
       "required": "This field is required.",
@@ -92,6 +94,25 @@
       "imageUpdatedToast": "Image updated",
       "imageTooLarge": "Image must be smaller than 5 MB.",
       "invalidImageType": "Please upload a JPG, PNG, or WebP image."
+    },
+    "qr": {
+      "title": "QR codes & printing",
+      "generalTitle": "General menu QR code",
+      "generalCaption": "Scanning this opens your full public menu.",
+      "tablesTitle": "Table QR codes",
+      "tableLabel": "Table",
+      "addTable": "Add table",
+      "emptyTitle": "No tables yet",
+      "emptyDescription": "Add a table to generate a QR code for it.",
+      "deleteConfirmTitle": "Delete this table?",
+      "deleteConfirmBody": "Its QR code will stop working. This cannot be undone.",
+      "savedToast": "Table saved",
+      "addedToast": "Table added",
+      "deletedToast": "Table deleted",
+      "printAll": "Open printable page",
+      "printButton": "Print",
+      "scanToView": "Scan to view our menu",
+      "downloadLinkLabel": "Open menu link"
     }
   }
 }

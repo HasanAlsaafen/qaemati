@@ -1,0 +1,38 @@
+{% extends "layouts/admin.njk" %}
+
+{% from "admin/components/tables-list.njk" import tablesList %}
+{% from "admin/components/admin-confirm-dialog.njk" import adminConfirmDialog %}
+
+{% block title %}{{ labels.qr.title }}{% endblock %}
+
+{% block content %}
+<h1 class="font-sans text-2xl font-bold text-text">{{ labels.qr.title }}</h1>
+
+<section class="mt-4 rounded-lg border border-border bg-surface p-4">
+  <h2 class="font-sans text-lg font-bold text-text">{{ labels.qr.generalTitle }}</h2>
+  <p class="mt-1 text-sm text-muted-text">{{ labels.qr.generalCaption }}</p>
+  <div class="mt-4 flex flex-wrap items-center gap-4">
+    <div class="h-36 w-36 shrink-0 [&_svg]:h-full [&_svg]:w-full">{{ generalQrSvg | safe }}</div>
+    <a href="{{ generalUrl }}" target="_blank" rel="noopener noreferrer" dir="ltr" class="break-all text-sm text-primary hover:underline">{{ generalUrl }}</a>
+  </div>
+</section>
+
+<section class="mt-6">
+  <h2 class="font-sans text-lg font-bold text-text">{{ labels.qr.tablesTitle }}</h2>
+  {{ tablesList(tables, labels) }}
+</section>
+
+<div class="mt-6">
+  <a
+    href="/admin/qr/print"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="inline-flex min-h-11 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+  >
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a1 1 0 0 1-1-1v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1h-2M6 14h12v7H6z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    {{ labels.qr.printAll }}
+  </a>
+</div>
+
+{{ adminConfirmDialog() }}
+{% endblock %}
