@@ -12,11 +12,16 @@
 
 :root {
   /*
-    Single font stack for mixed Arabic/Latin text. Thmanyah and IBM Plex
-    Sans Arabic are scoped to Arabic unicode-range only (see fonts.css), so
+    Two stacks for mixed Arabic/Latin text. Thmanyah and IBM Plex Sans
+    Arabic are scoped to Arabic unicode-range only (see fonts.css), so
     Latin characters always resolve to Inter regardless of which Arabic
     face is active. See docs/design-system.md for the fallback chain.
+
+    --font-sans: body text and most headings (Thmanyah Sans).
+    --font-display: the public menu header and category titles ONLY, per
+    the brief's "editorial touch" (Thmanyah Serif Display, Bold only).
   */
   --font-sans: 'Thmanyah', 'Inter', 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
-  --font-display: var(--font-sans);
+  --font-display: 'Thmanyah Serif Display', 'Thmanyah', 'Inter', 'IBM Plex Sans Arabic', 'Segoe UI',
+    Tahoma, sans-serif;
 }

@@ -2,22 +2,32 @@
   Font loading strategy (see docs/design-system.md "Typography" for the
   full rationale):
 
-  - Thmanyah is the Arabic typeface, provided separately as a licensed
-    asset. The font files are not present yet, so the @font-face rules
-    below point at paths under public/fonts/thmanyah/ that do not exist.
-    That is intentional: the browser's font request 404s, and per-character
-    font matching silently moves on to the next family in the stack
-    (IBM Plex Sans Arabic, self-hosted here as the interim fallback).
-    Nothing breaks. Once the real files land, update src/weight below
-    and re-run the type scale review the design system calls for ("inspect
-    which weights and styles exist... design the scale around them only").
-    The weights declared here (400/500/700) are a placeholder assumption,
-    not a confirmed fact about the licensed files.
+  - Thmanyah is the Arabic typeface, a licensed asset provided by the
+    project owner (public/fonts/thmanyah/LICENSE.pdf). It has two faces in
+    use here: "Thmanyah Sans" for body text and most headings, and
+    "Thmanyah Serif Display" reserved for the public menu header and
+    category titles only (the "editorial touch" called for in the design
+    brief). Weights available from the licensed family: Light (300),
+    Regular (400), Medium (500), Bold (700), Black (900). We ship Regular,
+    Medium and Bold for the Sans face (matching the type scale) and Bold
+    for the Serif Display face (the one weight the editorial treatment
+    uses). No faux bold or faux italic anywhere: only declared weights are
+    ever requested.
+  - Self-hosting these as plain @font-face files is a deliberate, informed
+    exception to the license's "embed only as part of a compiled, packaged,
+    or obfuscated product" wording (full text in LICENSE.pdf) -- the
+    project owner reviewed that clause and chose to proceed anyway for
+    this demo. Flagging this here so it isn't mistaken for an oversight;
+    revisit if this app moves beyond a demo.
+  - IBM Plex Sans Arabic stays wired in as the fallback face: if a
+    Thmanyah file is ever missing or pulled, the browser's font request
+    404s and font matching silently moves on to the next family in the
+    stack. Nothing breaks.
   - Each Arabic face is restricted to the Arabic Unicode ranges with
     unicode-range, so Latin characters (numerals, English words) never
-    match Thmanyah/IBM Plex Sans Arabic and fall through to Inter instead,
-    keeping numerals and Latin text visually consistent regardless of
-    which Arabic face is active.
+    match an Arabic face and fall through to Inter instead, keeping
+    numerals and Latin text visually consistent regardless of which
+    Arabic face is active.
 */
 
 @font-face {
@@ -25,9 +35,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src:
-    url('/fonts/thmanyah/thmanyah-regular.woff2') format('woff2'),
-    url('/fonts/thmanyah/thmanyah-regular.woff') format('woff');
+  src: url('/fonts/thmanyah/thmanyahsans-Regular.woff2') format('woff2');
   unicode-range:
     U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
     U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
@@ -38,9 +46,7 @@
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src:
-    url('/fonts/thmanyah/thmanyah-medium.woff2') format('woff2'),
-    url('/fonts/thmanyah/thmanyah-medium.woff') format('woff');
+  src: url('/fonts/thmanyah/thmanyahsans-Medium.woff2') format('woff2');
   unicode-range:
     U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
     U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
@@ -51,15 +57,25 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src:
-    url('/fonts/thmanyah/thmanyah-bold.woff2') format('woff2'),
-    url('/fonts/thmanyah/thmanyah-bold.woff') format('woff');
+  src: url('/fonts/thmanyah/thmanyahsans-Bold.woff2') format('woff2');
   unicode-range:
     U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
     U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
 }
 
-/* Interim Arabic fallback, self-hosted (SIL OFL), see public/fonts/ibm-plex-sans-arabic/OFL.txt */
+/* Editorial face: public menu header and category titles only. */
+@font-face {
+  font-family: 'Thmanyah Serif Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/thmanyah/thmanyahserifdisplay-Bold.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+
+/* Fallback Arabic face, self-hosted (SIL OFL), see public/fonts/ibm-plex-sans-arabic/OFL.txt */
 @font-face {
   font-family: 'IBM Plex Sans Arabic';
   font-style: normal;

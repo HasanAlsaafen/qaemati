@@ -142,14 +142,53 @@ of the three cases.
   `docs/design-system.md`. The font stack already renders Latin/digit characters in Inter
   regardless of surrounding Arabic text, so this keeps prices visually consistent across
   languages without a separate numeral-conversion step anywhere in the codebase.
-- Thmanyah's declared weights (400/500/700) in `fonts.css` are a placeholder assumption, not a
-  confirmed fact, since the font folder is still empty. Revisit once the real files land.
+- Thmanyah's declared weights (400/500/700) in `fonts.css` were a placeholder assumption at the
+  time; superseded the same day once the real files arrived (see addendum below).
 
 ### Known gaps / follow-ups
 
-- Thmanyah font files are still not present (`public/fonts/thmanyah/` only has `.gitkeep`).
-  Once provided: inspect actual weights/styles, update `fonts.css` to match exactly, and swap
-  the `<link rel="preload">` hrefs in `views/layouts/base.njk` from the IBM Plex Sans Arabic
-  files to the Thmanyah files.
 - `docker compose up -d` still not verified end-to-end in this environment (see Phase 0 note);
   port mapping is now 5435 on the host.
+
+## Phase 1 addendum: real Thmanyah font files (done, same day)
+
+The project owner provided the official Thmanyah font package
+(`Thmanyah-Font-Family.zip`, downloaded from font.thmanyah.com) and the real files replaced the
+placeholder the same day Phase 1 was built.
+
+What changed:
+
+- `public/fonts/thmanyah/` now has real files: `thmanyahsans-{Regular,Medium,Bold}.woff2` and
+  `thmanyahserifdisplay-Bold.woff2` (only the weights an actual `@font-face` rule references
+  are kept; the source zip also has Light/Black/Serif Text variants, not committed), plus the
+  official `LICENSE.pdf`.
+- `src/styles/fonts.css` updated to reference the real filenames and added a second family,
+  `'Thmanyah Serif Display'`, for the editorial treatment. `src/styles/app.css`'s
+  `--font-display` now actually differs from `--font-sans` (previously identical placeholders).
+- Audited every template for the `font-display` Tailwind class and restricted it to exactly the
+  two contexts the brief specifies (public menu header, category titles) — a styleguide
+  demonstration heading is the only current usage, since Phase 3 hasn't built the real public
+  menu header yet. Everything else (modal/dialog/card titles, admin headings) was switched to
+  `font-sans`, since `--font-display` now renders visibly differently and using it everywhere
+  would have violated "editorial touch... only" from the brief.
+- Replaced every `font-semibold` (weight 600) with `font-bold` (700) across all templates. Thmanyah
+  only ships 300/400/500/700/900 — no 600 — so `font-semibold` was silently being remapped by the
+  browser's font-matching algorithm to the nearest declared weight (700 in this case) anyway;
+  using `font-bold` directly makes that explicit instead of implicit. Updated the type scale table
+  in `docs/design-system.md` to match (H1/H2 now documented as weight 700, not 600).
+
+**Licensing: a real constraint, not a formality.** Before wiring the files in, the official
+`LICENSE.pdf` (bundled in the zip, identical wording to font.thmanyah.com/licenses) was read in
+full. It explicitly permits web embedding "only as part of a compiled, packaged, or obfuscated
+product," and separately prohibits "mak[ing] the Font Software available in any manner that
+allows end users or third parties to extract, download, access, reuse, or redistribute the Font
+Software independently as font files, including through web embedding." A plain self-hosted
+`@font-face` setup — what this project does, and the only practical way to serve a custom
+non-system font to a browser without a paid third-party webfont-obfuscation service — does not
+meet that bar: anyone can retrieve the raw `.woff2` from `/fonts/thmanyah/...` or devtools. This
+was raised to the project owner directly (not silently worked around, and not silently skipped
+either); they reviewed the clause and explicitly chose to proceed anyway for this demo. If this
+project moves past a demo into something with real restaurant customers, this should be
+revisited — either by asking Thmanyah for an explicit web-use exception (the license itself
+names `ask@thmanyah.com` for exactly this kind of case) or by switching to a licensed webfont
+delivery service that doesn't expose raw files.

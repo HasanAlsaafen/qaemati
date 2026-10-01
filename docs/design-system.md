@@ -46,45 +46,55 @@ tells two regions apart. Interactive elements (inputs, selects, toggles) use the
 
 ### Typography
 
-- **Arabic**: Thmanyah (licensed, provided separately) for headings and body.
+- **Arabic, body and most headings**: Thmanyah Sans, the digital-use member of the licensed
+  Thmanyah family, provided by the project owner
+  (`public/fonts/thmanyah/LICENSE.pdf`, downloaded from font.thmanyah.com).
+- **Arabic, editorial only**: Thmanyah Serif Display, Bold, reserved exclusively for the public
+  menu header (restaurant name) and category titles, per the brief's "editorial touch... on the
+  public menu header and category titles only." Nowhere else uses this face: admin headings,
+  dialog titles, card titles, and every other heading use Thmanyah Sans.
 - **Latin**: Inter, for numerals and English text, so a price or English word reads consistently
   regardless of which Arabic face is active.
-- **Font stack** (one place, `--font-sans` in `src/styles/app.css`):
-  `'Thmanyah', 'Inter', 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif`.
-  `--font-display` is the same stack today; the editorial header/category-title treatment comes
-  from size and weight, not a different family.
+- **Font stacks**, declared once in `src/styles/app.css`:
+  - `--font-sans`: `'Thmanyah', 'Inter', 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif`
+    (`'Thmanyah'` here is the Thmanyah Sans face).
+  - `--font-display`: `'Thmanyah Serif Display', 'Thmanyah', 'Inter', 'IBM Plex Sans Arabic', ...`
+    — only ever applied via the `font-display` Tailwind utility, and only to the two elements
+    named above.
 
-**How the fallback actually works.** Thmanyah's `@font-face` rules
-(`src/styles/fonts.css`) point at `public/fonts/thmanyah/*.woff2`, which do not exist yet (only
-a `.gitkeep` placeholder is committed). That is intentional, not a bug: when the browser 404s on
-a font file, it does not break the layout, it simply treats that face as unavailable and moves to
-the next family in the stack for that character. Both Thmanyah and the interim
-`IBM Plex Sans Arabic` fallback restrict their `unicode-range` to Arabic code points, so:
+**Available weights (confirmed from the licensed family).** Thmanyah ships five weights across
+all three of its sub-families (Sans, Serif Display, Serif Text): Light (300), Regular (400),
+Medium (500), Bold (700), Black (900). We ship Thmanyah Sans at 400/500/700 (matching the type
+scale below) and Thmanyah Serif Display at 700 only (the one weight the editorial treatment
+uses). No faux bold or faux italic anywhere: component CSS never requests a weight/style without
+a matching `@font-face` declaration.
 
-- An Arabic character tries Thmanyah (missing today) → falls through to Inter (no Arabic
-  glyphs, skipped) → falls through to IBM Plex Sans Arabic (self-hosted now, renders). Once the
-  real Thmanyah files are added, the same character renders in Thmanyah automatically, no
-  template changes needed.
-- A Latin character or digit never matches Thmanyah or IBM Plex Sans Arabic's unicode-range at
-  all, so it always renders in Inter, regardless of which Arabic face is active.
+**Licensing note.** The Thmanyah license (`public/fonts/thmanyah/LICENSE.pdf`) permits embedding
+the font in websites "only as part of a compiled, packaged, or obfuscated product," and
+separately prohibits making the font available in any way that lets a third party extract,
+download, or reuse the font files independently, "including through web embedding." Plain
+self-hosted `@font-face` files, which is what this project does, do not meet that bar — a visitor
+can retrieve the `.woff2` directly via devtools. The project owner reviewed this clause
+(including the version in the official download's `LICENSE.pdf`, not just the website) and
+made an informed decision to self-host anyway for this demo. Documented here so it's a known,
+deliberate tradeoff rather than an oversight if this project moves beyond a demo.
+
+**Fallback behavior.** Both Thmanyah faces and the `IBM Plex Sans Arabic` fallback restrict their
+`unicode-range` to Arabic code points (`src/styles/fonts.css`), so:
+
+- An Arabic character tries Thmanyah first. If a Thmanyah file is ever missing (a 404 doesn't
+  break the layout — the browser just treats that face as unavailable for that character) it
+  falls through to Inter (no Arabic glyphs, skipped), then to IBM Plex Sans Arabic, which renders.
+- A Latin character or digit never matches a Thmanyah/IBM Plex Sans Arabic unicode-range at all,
+  so it always renders in Inter, regardless of which Arabic face is active.
 
 IBM Plex Sans Arabic and Inter are self-hosted under `public/fonts/` (SIL Open Font License,
 `OFL.txt` included in each folder) rather than linked from Google Fonts, to avoid a third-party
-request on every page load and keep the Lighthouse performance budget intact. They are **not**
-the licensed Thmanyah asset and can be replaced freely.
+request on every page load and keep the Lighthouse performance budget intact.
 
-**Placeholder weights.** The brief asks to inspect the Thmanyah folder's available weights and
-styles before building the type scale, and design the scale around them only. The folder is
-currently empty, so the `@font-face` rules declare 400/500/700 as a placeholder assumption (a
-typical regular/medium/bold set), not a confirmed fact about the licensed files. When the real
-files arrive: inspect the actual weights, update `src/styles/fonts.css` to match exactly
-(including removing any weight that doesn't exist, so the browser doesn't synthesize faux-bold),
-and re-check this type scale.
-
-**Preloading.** Only fonts actually rendering above the fold today are preloaded, in
-`views/layouts/base.njk`: Inter (needed immediately for any numeral/Latin text) and IBM Plex Sans
-Arabic 400 and 700 (the faces currently in effect for Arabic body and heading text, since
-Thmanyah isn't present). Swap these preload links to the Thmanyah files once they exist.
+**Preloading.** Only fonts actually rendering above the fold are preloaded, in
+`views/layouts/base.njk`: Inter (needed immediately for any numeral/Latin text) and Thmanyah Sans
+Regular (the default body/heading face).
 
 **Line height is per-language**, via CSS variables that flip based on `<html lang>`:
 
@@ -96,17 +106,17 @@ Thmanyah isn't present). Swap these preload links to the Thmanyah files once the
 Exposed as Tailwind `leading-body` / `leading-heading`.
 
 **Type scale** (Tailwind's default `text-*` sizes, no custom scale needed, combined with
-`leading-body`/`leading-heading` and `font-display`/`font-sans`):
+`leading-body`/`leading-heading` and `font-display`/`font-sans`). Weights are limited to what
+Thmanyah actually ships (300/400/500/700/900); there is no 600, so nothing in this scale uses it:
 
-| Role | Size | Weight | Line height |
-|---|---|---|---|
-| Editorial display (menu header name) | `text-4xl` (36px) | 700 | `leading-heading` |
-| Category title | `text-2xl` (24px) | 700 | `leading-heading` |
-| H1 (page title, admin) | `text-2xl` (24px) | 600 | `leading-heading` |
-| H2 | `text-xl` (20px) | 600 | `leading-heading` |
-| Body | `text-base` (16px) | 400 | `leading-body` |
-| Small / meta | `text-sm` (14px) | 400 | `leading-body` |
-| Caption / badge | `text-xs` (12px) | 500 | `leading-body` |
+| Role | Size | Weight | Font | Line height |
+|---|---|---|---|---|
+| Editorial display (menu header name, category titles) | `text-4xl` (36px) / `text-2xl` (24px) | 700 | `font-display` | `leading-heading` |
+| H1 (page title, admin) | `text-2xl` (24px) | 700 | `font-sans` | `leading-heading` |
+| H2 | `text-xl` (20px) | 700 | `font-sans` | `leading-heading` |
+| Body | `text-base` (16px) | 400 | `font-sans` | `leading-body` |
+| Small / meta | `text-sm` (14px) | 400 | `font-sans` | `leading-body` |
+| Caption / badge | `text-xs` (12px) | 500 | `font-sans` | `leading-body` |
 
 **Numerals**: Western digits (0-9) are used everywhere, in both languages, for prices, phone
 numbers, and counts. This is a deliberate, documented choice: the font stack already renders any

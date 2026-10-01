@@ -7,12 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}{{ t('common.app.name') }}{% endblock %}</title>
 
-  {# Above-the-fold font preloads. These are the interim fallback faces in
-     effect today (Thmanyah files are not present yet); swap to the
-     Thmanyah files once they land, see docs/design-system.md. #}
+  {# Above-the-fold font preloads: body text (Thmanyah Sans Regular) and
+     numerals/Latin (Inter). See docs/design-system.md. #}
   <link rel="preload" href="/fonts/inter/inter-variable-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/fonts/ibm-plex-sans-arabic/ibm-plex-sans-arabic-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/fonts/ibm-plex-sans-arabic/ibm-plex-sans-arabic-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/thmanyah/thmanyahsans-Regular.woff2" as="font" type="font/woff2" crossorigin>
 
   <link rel="stylesheet" href="/css/app.css">
   <script defer src="/js/vendor/htmx.min.js"></script>
@@ -22,7 +20,7 @@
 <body class="min-h-screen bg-bg text-text font-sans antialiased">
   <header class="border-b border-border bg-surface">
     <div class="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
-      <span class="text-lg font-semibold">{{ t('common.app.name') }}</span>
+      <span class="text-lg font-bold">{{ t('common.app.name') }}</span>
       {{ languageSwitcher(otherLocale, t('common.nav.language')) }}
     </div>
   </header>
