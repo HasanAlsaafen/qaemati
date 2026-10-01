@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Provisional font stack for Phase 0. The full self-hosted Thmanyah
+  @font-face rules, weight-based scale, and per-language line heights are
+  defined in Phase 1 once the licensed font files are provided.
+*/
+:root {
+  --font-sans: 'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif;
+  --font-display: 'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif;
+}

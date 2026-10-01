@@ -1,0 +1,20 @@
+{
+  "app": {
+    "name": "Qaemati"
+  },
+  "home": {
+    "title": "Welcome to Qaemati",
+    "subtitle": "Beautiful digital menus for cafes and restaurants in Palestine",
+    "description": "This is a demo. The public menu and admin panel are under construction."
+  },
+  "nav": {
+    "language": "العربية"
+  },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "Sorry, the page you are looking for does not exist.",
+    "serverErrorTitle": "Something went wrong",
+    "serverErrorBody": "Sorry for the inconvenience, we are working on fixing it.",
+    "backHome": "Back to home"
+  }
+}

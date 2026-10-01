@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: qaemati-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: qaemati
+      POSTGRES_PASSWORD: qaemati
+      POSTGRES_DB: qaemati
+    ports:
+      - "5432:5432"
+    volumes:
+      - qaemati-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  qaemati-postgres-data:
