@@ -1,0 +1,145 @@
+{% from "components/toggle.njk" import toggle %}
+{% from "components/button.njk" import button %}
+{% from "admin/components/delete-trigger.njk" import deleteTrigger %}
+
+{#
+  item: { id, categoryId, nameAr, nameEn, descriptionAr, descriptionEn,
+          priceFormatted, currency, imagePath, available, tags[] (codes) }
+  Edit mode is local Alpine state (x-data), not a server round trip -- only
+  Save and the image upload actually hit the server. Keeps the common case
+  (open the row, maybe cancel) instant.
+#}
+{% macro itemRow(item, labels, isFirst, isLast) %}
+  <div
+    id="item-{{ item.id }}"
+    x-data="{ editing: false }"
+    class="border-b border-border py-3 last:border-b-0"
+  >
+    <div x-show="!editing" class="flex items-start gap-3">
+      <span class="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-muted-surface">
+        {% if item.imagePath %}
+          <img src="{{ item.imagePath }}" alt="" width="56" height="56" class="h-full w-full object-cover">
+        {% endif %}
+      </span>
+
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-sm font-bold text-text">{{ item.nameEn }} <span class="font-normal text-muted-text">/ {{ item.nameAr }}</span></p>
+        <p class="text-sm text-muted-text" dir="ltr">{{ item.priceFormatted }} {{ item.currency }}</p>
+        {% if item.tags.length %}
+          <p class="mt-1 flex flex-wrap gap-1">
+            {% for tag in item.tags %}
+              <span class="inline-flex items-center rounded-sm bg-muted-surface px-1.5 py-0.5 text-xs text-muted-text">{{ labels.tags[tag] }}</span>
+            {% endfor %}
+          </p>
+        {% endif %}
+      </div>
+
+      <div class="flex shrink-0 flex-col items-end gap-1">
+        <div class="flex items-center gap-1">
+          <button
+            type="button"
+            aria-label="{{ labels.form.moveUp }}"
+            {% if isFirst %}disabled{% endif %}
+            class="inline-flex h-9 w-9 items-center justify-center rounded-full text-text hover:bg-muted-surface disabled:opacity-30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            hx-post="/admin/items/{{ item.id }}/move"
+            hx-vals='{"direction": "up"}'
+            hx-target="#category-{{ item.categoryId }}"
+            hx-swap="outerHTML"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 10l5-5 5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button
+            type="button"
+            aria-label="{{ labels.form.moveDown }}"
+            {% if isLast %}disabled{% endif %}
+            class="inline-flex h-9 w-9 items-center justify-center rounded-full text-text hover:bg-muted-surface disabled:opacity-30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            hx-post="/admin/items/{{ item.id }}/move"
+            hx-vals='{"direction": "down"}'
+            hx-target="#category-{{ item.categoryId }}"
+            hx-swap="outerHTML"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="flex items-center gap-1">
+          {{ toggle('available-' + item.id, labels.form.available, item.available, 'hx-patch="/admin/items/' + item.id + '/availability" hx-target="#item-' + item.id + '" hx-swap="outerHTML"') }}
+          <button
+            type="button"
+            aria-label="{{ labels.form.edit }}"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-full text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            x-on:click="editing = true"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          {{ deleteTrigger(labels.form.delete, labels.items.deleteConfirmTitle, labels.items.deleteConfirmBody, labels.form.delete, labels.form.cancel, '/admin/items/' + item.id, '#item-' + item.id) }}
+        </div>
+      </div>
+    </div>
+
+    <form
+      x-show="editing"
+      x-cloak
+      hx-patch="/admin/items/{{ item.id }}"
+      hx-target="#item-{{ item.id }}"
+      hx-swap="outerHTML"
+      class="flex flex-col gap-3"
+    >
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div class="flex flex-col gap-1.5">
+          <label for="item-{{ item.id }}-nameAr" class="text-sm font-medium text-text">{{ labels.form.nameAr }}</label>
+          <input id="item-{{ item.id }}-nameAr" name="nameAr" type="text" value="{{ item.nameAr }}" dir="rtl" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="item-{{ item.id }}-nameEn" class="text-sm font-medium text-text">{{ labels.form.nameEn }}</label>
+          <input id="item-{{ item.id }}-nameEn" name="nameEn" type="text" value="{{ item.nameEn }}" dir="ltr" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="item-{{ item.id }}-descriptionAr" class="text-sm font-medium text-text">{{ labels.form.descriptionAr }}</label>
+          <textarea id="item-{{ item.id }}-descriptionAr" name="descriptionAr" dir="rtl" rows="2" class="rounded-md border border-border-strong bg-surface px-3 py-2 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ item.descriptionAr }}</textarea>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="item-{{ item.id }}-descriptionEn" class="text-sm font-medium text-text">{{ labels.form.descriptionEn }}</label>
+          <textarea id="item-{{ item.id }}-descriptionEn" name="descriptionEn" dir="ltr" rows="2" class="rounded-md border border-border-strong bg-surface px-3 py-2 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ item.descriptionEn }}</textarea>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="item-{{ item.id }}-price" class="text-sm font-medium text-text">{{ labels.form.price }}</label>
+          <input id="item-{{ item.id }}-price" name="price" type="number" min="0" step="0.01" dir="ltr" value="{{ item.priceFormatted }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="item-{{ item.id }}-currency" class="text-sm font-medium text-text">{{ labels.form.currency }}</label>
+          <input id="item-{{ item.id }}-currency" name="currency" type="text" dir="ltr" value="{{ item.currency }}" maxlength="3" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
+        </div>
+      </div>
+
+      <fieldset class="flex flex-wrap gap-3">
+        <legend class="text-sm font-medium text-text">{{ labels.form.tags }}</legend>
+        {% for code, label in labels.tags %}
+          <label class="inline-flex min-h-11 items-center gap-1.5 text-sm text-text">
+            <input type="checkbox" name="tags" value="{{ code }}" {% if code in item.tags %}checked{% endif %} class="h-4 w-4 rounded border-border-strong text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+            {{ label }}
+          </label>
+        {% endfor %}
+      </fieldset>
+
+      <div class="flex items-center gap-2">
+        {{ button(labels.form.save, 'primary', 'sm', 'submit') }}
+        {{ button(labels.form.cancel, 'ghost', 'sm', 'button', 'x-on:click="editing = false"') }}
+      </div>
+    </form>
+
+    <div x-show="editing" x-cloak class="mt-2">
+      <label class="text-sm font-medium text-text">{{ labels.form.image }}</label>
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        name="image"
+        class="mt-1 block text-sm text-text"
+        hx-post="/admin/items/{{ item.id }}/image"
+        hx-trigger="change"
+        hx-target="#item-{{ item.id }}"
+        hx-swap="outerHTML"
+        hx-encoding="multipart/form-data"
+      >
+    </div>
+  </div>
+{% endmacro %}

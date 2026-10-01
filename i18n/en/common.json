@@ -30,5 +30,68 @@
     "whatsapp": "WhatsApp",
     "instagram": "Instagram",
     "viewMenu": "View menu"
+  },
+  "admin": {
+    "auth": {
+      "title": "Admin Login",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "submit": "Log In",
+      "invalidCredentials": "Incorrect email or password.",
+      "tooManyAttempts": "Too many attempts. Please try again in a few minutes.",
+      "logout": "Log Out",
+      "loggedInAs": "Signed in as {name}"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "categories": "Categories",
+      "previewMenu": "Preview menu"
+    },
+    "form": {
+      "required": "This field is required.",
+      "invalidPrice": "Enter a valid price.",
+      "save": "Save",
+      "cancel": "Cancel",
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete",
+      "nameArLabel": "Name (Arabic)",
+      "nameEnLabel": "Name (English)",
+      "descriptionArLabel": "Description (Arabic)",
+      "descriptionEnLabel": "Description (English)",
+      "priceLabel": "Price",
+      "currencyLabel": "Currency",
+      "availableLabel": "Available",
+      "imageLabel": "Image",
+      "tagsLabel": "Tags",
+      "moveUp": "Move up",
+      "moveDown": "Move down"
+    },
+    "categories": {
+      "title": "Categories",
+      "addCategory": "Add category",
+      "emptyTitle": "No categories yet",
+      "emptyDescription": "Add your first category to start building the menu.",
+      "deleteConfirmTitle": "Delete this category?",
+      "deleteConfirmBody": "This will also delete every item in it. This cannot be undone.",
+      "savedToast": "Category saved",
+      "deletedToast": "Category deleted",
+      "addedToast": "Category added"
+    },
+    "items": {
+      "addItem": "Add item",
+      "emptyTitle": "No items in this category yet",
+      "emptyDescription": "Add your first item to this category.",
+      "deleteConfirmTitle": "Delete this item?",
+      "deleteConfirmBody": "This cannot be undone.",
+      "savedToast": "Item saved",
+      "deletedToast": "Item deleted",
+      "addedToast": "Item added",
+      "availabilityOnToast": "Marked as available",
+      "availabilityOffToast": "Marked as unavailable",
+      "imageUpdatedToast": "Image updated",
+      "imageTooLarge": "Image must be smaller than 5 MB.",
+      "invalidImageType": "Please upload a JPG, PNG, or WebP image."
+    }
   }
 }

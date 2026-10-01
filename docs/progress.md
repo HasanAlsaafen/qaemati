@@ -432,3 +432,107 @@ routes, or a successful build.
 - **Category navigation style**: asked the user to choose between the current filled-pill chips,
   underline tabs, and minimal divider tabs (all keeping the same sticky/scroll-spy/horizontal-
   scroll mechanics from the brief, varying only visual treatment). Filled pills were kept as-is.
+
+## Phase 4: Authentication and admin panel (done)
+
+Session-based login (bcrypt + csrf-csrf double-submit cookies + in-memory rate limiting) and an
+htmx-powered admin panel: rename/add/delete/reorder categories and items, inline price/name/
+description/tag editing, one-tap availability toggle, image upload with validation, and a
+confirm dialog before every destructive action. Verified end-to-end in a real browser against
+the seeded Bayt Al-Zaytoun data, then the demo database was re-seeded to a clean state.
+
+What was built:
+
+- `src/auth/`: `AuthController` (`GET`/`POST /admin/login`, `POST /admin/logout`), session
+  regeneration on login (fixes session fixation), bcrypt comparison against `AdminUser`,
+  `LoginRateLimiter` (in-memory, 5 attempts / 15 min — documented as not viable across multiple
+  app instances, acceptable for this single-process demo), `AdminAuthMiddleware` (redirects to
+  `/admin/login?redirect=...` when unauthenticated), `AdminLocalsMiddleware` (exposes
+  `adminName`/`restaurantSlug` to every admin template), `csrf.ts` (csrf-csrf double-submit-
+  cookie setup, token tied to `req.session.id`), `csrf-view.middleware.ts` (exposes the current
+  token to templates via `res.locals.csrfToken`).
+- `src/admin/`: `DashboardController`, `CategoriesController`, `ItemsController`,
+  `CategoryService`/`ItemService` (every mutation asserts restaurant ownership first, throwing
+  `NotFoundException`/`ForbiddenException` on a tampered id — real defense even without a true
+  multi-tenant UI), `admin-labels.ts` (resolves every i18n string server-side into one `labels`
+  object — see "bugs found" below for why), `upload.config.ts` (Multer disk storage, 5MB limit,
+  jpeg/png/webp whitelist).
+- Templates: `views/layouts/admin.njk` (nav, logout form, `hx-headers` carrying the CSRF token
+  for every htmx request on the page), `views/admin/login.njk`, and the reusable macro set in
+  `views/admin/components/` — `category-block.njk` and `item-row.njk` each render an inline
+  display/edit toggle (Alpine `x-show`, no server round-trip to start editing) with the actual
+  save going through htmx; `admin-confirm-dialog.njk` + `delete-trigger.njk` are one shared
+  dialog instance for every delete button on the page (mirrors the Phase 3 item-detail-sheet
+  pattern), driven by `htmx.ajax()` from Alpine's click handler rather than static `hx-*`
+  attributes, since the dialog doesn't know which row triggered it until the event fires.
+- Reordering is up/down buttons only, not drag-and-drop: the approved stack has no drag library,
+  and htmx/Alpine don't provide one. `CategoryService`/`ItemService` swap `sortOrder` with the
+  nearest neighbor inside a transaction per click — a deliberate scope reduction from the
+  brief's "drag and drop reordering," not an oversight.
+- `HttpExceptionFilter` now detects `hx-request` and responds with an `HX-Trigger` toast header
+  + empty body instead of a full error-page render, so a failed admin action surfaces a visible
+  toast rather than htmx silently discarding the (non-2xx) response.
+
+### Bugs found and fixed while building this
+
+- **Nunjucks macros can't see the calling template's globals.** Verified empirically (a
+  standalone `nunjucks` Node script) before writing any admin macro: a macro imported via
+  `{% from %}` only sees what's passed as an explicit argument, and `{% set %}` inside an
+  `{% include %}` doesn't leak back to the including template either. This is why every macro
+  takes an explicit `labels` argument instead of calling `t()` directly — `admin-labels.ts`
+  resolves the full translation tree once per request instead.
+- **`req.csrfToken()`'s default `validateOnReuse=true` throws on any stale CSRF cookie.** The
+  very first `GET /admin` crashed with a 500. Reading csrf-csrf's source showed the two-argument
+  form (`req.csrfToken(false, false)`) silently reissues a token instead of throwing — needed
+  since a leftover cookie from before a session existed is a completely ordinary case, not an
+  attack.
+- **The login form itself failed CSRF validation on every submit, even right after the fix
+  above.** Root cause: `saveUninitialized: false` meant an anonymous visitor's session was never
+  persisted, so express-session handed out a new, unstable `session.id` on every request — and
+  csrf-csrf's token hash is tied to `session.id`. The id used to generate the token when the
+  login page rendered never matched the id seen when the form posted back. Fixed by setting
+  `saveUninitialized: true`, which establishes a stable cookied session from the very first
+  request.
+- **Still failing after both fixes above, with no useful stack trace.** csrf-csrf's exported
+  error object is constructed once at module load time and reused for every validation failure,
+  so its stack trace always points at that one `require()` call, not the actual request that
+  triggered it — a complete red herring that took real time to rule out. Instrumenting
+  `getSessionIdentifier` with a `console.log` showed it was never even being called for the
+  failing `POST /admin/login`, which narrowed it to the *other* branch of csrf-csrf's check: the
+  token embedded in the cookie vs. `getTokenFromRequest(req)`, which reads `req.body.csrf_token`.
+  Nest's own default body-parser middleware is applied later than `main.ts`'s own `app.use()`
+  calls (the same ordering issue noted below for `LocaleViewMiddleware`), so `req.body` was
+  still `{}` when `doubleCsrfProtection` read it. Fixed by explicitly calling
+  `app.use(express.urlencoded(...))` / `app.use(express.json())` early in `main.ts`, before
+  session/CSRF middleware — confirmed with a `curl` cookie-jar repro before and after, isolating
+  it from any browser-side flakiness.
+- **The error page itself crashed ("Unable to call `t`") while debugging the CSRF issue above.**
+  `doubleCsrfProtection` is applied via `app.use()` in `main.ts`, before Nest's module-managed
+  `LocaleViewMiddleware` (applied via `consumer.apply().forRoutes('*')` in `AppModule`) ever
+  runs — so when CSRF validation threw, `res.locals.t` was never set, and the global exception
+  filter's own attempt to render the error template crashed too. Fixed by moving
+  `LocaleViewMiddleware` to run directly and early in `main.ts` (`app.use(app.get(...))`),
+  before session/CSRF setup, instead of leaving it to Nest's (later-running) middleware chain.
+  Doing so meant `LocaleViewMiddleware` also had to stay registered as a plain `provider` in
+  `AppModule` (not applied via `consumer.apply()`) purely so `main.ts` could `app.get()` an
+  instance of it.
+- **`validation.ts`'s server-side field-validation helpers were written but never wired into any
+  controller** — found during final cleanup, not during feature work. Every create/update form
+  already has HTML5 `required` and `min="0"` constraints, and the controllers' own inline
+  `.trim()` checks already guard the server-side no-op path, so this was genuine dead code
+  rather than a gap; removed rather than wired in, along with the unused bulk `reorder()`
+  methods on `CategoryService`/`ItemService` (built anticipating drag-and-drop, never called
+  once that was descoped to up/down buttons).
+
+### Verified
+
+- `npx tsc --noEmit`, `npm run lint`, and a full production build all pass.
+- Logged in as the seeded Bayt Al-Zaytoun owner in a real browser and exercised every admin
+  action: renamed a category, changed an item's price, toggled availability, moved items up/down
+  (confirmed the reorder persisted and re-rendered in the new order), uploaded a replacement item
+  image, deleted an item through the shared confirm dialog, and confirmed a toast fired for every
+  action. Confirmed the public `/m/bayt-al-zaytoun` page reflected every change immediately —
+  the core acceptance criterion for this phase.
+- Re-seeded the database afterward (`npx prisma db seed`) to leave the demo data clean, and
+  removed the test image left in `public/uploads/items/` (gitignored, but still filesystem
+  litter).

@@ -1,0 +1,24 @@
+{#
+  A button that opens the shared admin confirm dialog (admin-confirm-dialog.njk)
+  and, if confirmed, issues an htmx DELETE against `url`, swapping the
+  element matched by `target` out of the DOM.
+#}
+{% macro deleteTrigger(label, title, body, confirmLabel, cancelLabel, url, target) %}
+  <button
+    type="button"
+    x-data
+    aria-label="{{ label }}"
+    class="inline-flex h-11 w-11 items-center justify-center rounded-full text-danger hover:bg-danger/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    x-on:click="$dispatch('open-admin-confirm', {
+      title: {{ title | dump }},
+      body: {{ body | dump }},
+      confirmLabel: {{ confirmLabel | dump }},
+      cancelLabel: {{ cancelLabel | dump }},
+      method: 'DELETE',
+      url: {{ url | dump }},
+      target: {{ target | dump }},
+    })"
+  >
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+{% endmacro %}

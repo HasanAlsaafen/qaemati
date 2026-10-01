@@ -1,0 +1,48 @@
+{#
+  One shared confirm dialog for the whole admin panel (not one per
+  row -- the public menu's item-detail-sheet established this pattern for
+  the same reason: dozens of per-row dialogs would mean dozens of hidden
+  fixed-position overlays in the DOM). A delete/destructive button
+  dispatches "open-admin-confirm" with the dialog's content and the htmx
+  request to issue if confirmed; confirming calls htmx.ajax() directly
+  (htmx's JS API) since there's no static element to carry hx-* attributes.
+#}
+{% macro adminConfirmDialog() %}
+  <div
+    x-data="{ open: false, title: '', body: '', confirmLabel: '', cancelLabel: '', method: 'DELETE', url: '', target: '', swap: 'outerHTML swap:1s' }"
+    x-on:open-admin-confirm.window="Object.assign($data, $event.detail); open = true"
+    x-on:keydown.escape.window="open = false"
+    x-show="open"
+    x-cloak
+    class="fixed inset-0 z-50 flex items-center justify-center p-4"
+    role="presentation"
+  >
+    <div class="absolute inset-0 bg-text/40" x-show="open" x-on:click="open = false"></div>
+    <div
+      role="alertdialog"
+      aria-modal="true"
+      class="relative w-full max-w-sm rounded-lg bg-surface p-5 shadow-overlay"
+      x-show="open"
+      x-transition:enter="transition duration-base ease-standard"
+      x-transition:enter-start="opacity-0 scale-95"
+      x-transition:enter-end="opacity-100 scale-100"
+    >
+      <h2 class="font-sans text-lg font-bold text-text" x-text="title"></h2>
+      <p class="mt-2 text-sm text-muted-text" x-text="body"></p>
+      <div class="mt-5 flex justify-end gap-2">
+        <button
+          type="button"
+          class="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          x-on:click="open = false"
+          x-text="cancelLabel"
+        ></button>
+        <button
+          type="button"
+          class="inline-flex min-h-11 items-center justify-center rounded-md bg-danger px-4 text-sm font-medium text-white hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          x-on:click="open = false; htmx.ajax(method, url, { target: target, swap: swap })"
+          x-text="confirmLabel"
+        ></button>
+      </div>
+    </div>
+  </div>
+{% endmacro %}

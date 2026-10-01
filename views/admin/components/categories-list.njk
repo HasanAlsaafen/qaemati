@@ -1,0 +1,52 @@
+{% from "components/button.njk" import button %}
+{% from "components/empty-state.njk" import emptyState %}
+{% from "admin/components/category-block.njk" import categoryBlock %}
+
+{#
+  Wraps every category block. A category move swaps this whole element
+  (hx-target="#categories-list"), since moving one category changes which
+  category is adjacent to which -- simplest to just re-render the list.
+#}
+{% macro categoriesList(categories, labels) %}
+  <div id="categories-list" x-data="{ adding: false }" class="flex flex-col gap-4">
+    {% if categories.length %}
+      {% for category in categories %}
+        {{ categoryBlock(category, labels, loop.first, loop.last) }}
+      {% endfor %}
+    {% else %}
+      {{ emptyState(labels.categories.emptyTitle, labels.categories.emptyDescription) }}
+    {% endif %}
+
+    <div>
+      <button
+        type="button"
+        x-show="!adding"
+        x-on:click="adding = true"
+        class="inline-flex min-h-11 items-center gap-2 rounded-md border border-dashed border-border-strong px-4 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
+        {{ labels.categories.addCategory }}
+      </button>
+
+      <form
+        x-show="adding"
+        x-cloak
+        hx-post="/admin/categories"
+        hx-target="#categories-list"
+        hx-swap="outerHTML"
+        class="flex flex-wrap items-end gap-3 rounded-md border border-border bg-muted-surface p-3"
+      >
+        <div class="flex flex-col gap-1.5">
+          <label for="new-category-nameAr" class="text-sm font-medium text-text">{{ labels.form.nameAr }}</label>
+          <input id="new-category-nameAr" name="nameAr" type="text" dir="rtl" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="new-category-nameEn" class="text-sm font-medium text-text">{{ labels.form.nameEn }}</label>
+          <input id="new-category-nameEn" name="nameEn" type="text" dir="ltr" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
+        </div>
+        {{ button(labels.form.add, 'primary', 'sm', 'submit') }}
+        {{ button(labels.form.cancel, 'ghost', 'sm', 'button', 'x-on:click="adding = false"') }}
+      </form>
+    </div>
+  </div>
+{% endmacro %}

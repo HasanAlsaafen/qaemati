@@ -1,0 +1,126 @@
+{% from "components/button.njk" import button %}
+{% from "components/empty-state.njk" import emptyState %}
+{% from "admin/components/delete-trigger.njk" import deleteTrigger %}
+{% from "admin/components/item-row.njk" import itemRow %}
+
+{#
+  category: { id, nameAr, nameEn, items[] }
+  Same local-edit-mode pattern as item-row: renaming opens instantly via
+  Alpine state, only Save/Cancel-with-save hits the server.
+#}
+{% macro categoryBlock(category, labels, isFirst, isLast) %}
+  <section id="category-{{ category.id }}" x-data="{ editing: false, addingItem: false }" class="rounded-lg border border-border bg-surface p-4">
+    <div x-show="!editing" class="flex items-start justify-between gap-3">
+      <h2 class="font-sans text-lg font-bold text-text">{{ category.nameEn }} <span class="font-normal text-muted-text">/ {{ category.nameAr }}</span></h2>
+      <div class="flex shrink-0 items-center gap-1">
+        <button
+          type="button"
+          aria-label="{{ labels.form.moveUp }}"
+          {% if isFirst %}disabled{% endif %}
+          class="inline-flex h-9 w-9 items-center justify-center rounded-full text-text hover:bg-muted-surface disabled:opacity-30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          hx-post="/admin/categories/{{ category.id }}/move"
+          hx-vals='{"direction": "up"}'
+          hx-target="#categories-list"
+          hx-swap="outerHTML"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 10l5-5 5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button
+          type="button"
+          aria-label="{{ labels.form.moveDown }}"
+          {% if isLast %}disabled{% endif %}
+          class="inline-flex h-9 w-9 items-center justify-center rounded-full text-text hover:bg-muted-surface disabled:opacity-30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          hx-post="/admin/categories/{{ category.id }}/move"
+          hx-vals='{"direction": "down"}'
+          hx-target="#categories-list"
+          hx-swap="outerHTML"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button
+          type="button"
+          aria-label="{{ labels.form.edit }}"
+          class="inline-flex h-11 w-11 items-center justify-center rounded-full text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          x-on:click="editing = true"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        {{ deleteTrigger(labels.form.delete, labels.categories.deleteConfirmTitle, labels.categories.deleteConfirmBody, labels.form.delete, labels.form.cancel, '/admin/categories/' + category.id, '#category-' + category.id) }}
+      </div>
+    </div>
+
+    <form
+      x-show="editing"
+      x-cloak
+      hx-patch="/admin/categories/{{ category.id }}"
+      hx-target="#category-{{ category.id }}"
+      hx-swap="outerHTML"
+      class="flex flex-wrap items-end gap-3"
+    >
+      <div class="flex flex-col gap-1.5">
+        <label for="category-{{ category.id }}-nameAr" class="text-sm font-medium text-text">{{ labels.form.nameAr }}</label>
+        <input id="category-{{ category.id }}-nameAr" name="nameAr" type="text" value="{{ category.nameAr }}" dir="rtl" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label for="category-{{ category.id }}-nameEn" class="text-sm font-medium text-text">{{ labels.form.nameEn }}</label>
+        <input id="category-{{ category.id }}-nameEn" name="nameEn" type="text" value="{{ category.nameEn }}" dir="ltr" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
+      </div>
+      {{ button(labels.form.save, 'primary', 'sm', 'submit') }}
+      {{ button(labels.form.cancel, 'ghost', 'sm', 'button', 'x-on:click="editing = false"') }}
+    </form>
+
+    <div class="mt-3 divide-y divide-border">
+      {% if category.items.length %}
+        {% for item in category.items %}
+          {{ itemRow(item, labels, loop.first, loop.last) }}
+        {% endfor %}
+      {% else %}
+        {{ emptyState(labels.items.emptyTitle, labels.items.emptyDescription) }}
+      {% endif %}
+    </div>
+
+    <div class="mt-3">
+      <button
+        type="button"
+        x-show="!addingItem"
+        x-on:click="addingItem = true"
+        class="inline-flex min-h-11 items-center gap-2 rounded-md border border-dashed border-border-strong px-4 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
+        {{ labels.items.addItem }}
+      </button>
+
+      <form
+        x-show="addingItem"
+        x-cloak
+        hx-post="/admin/categories/{{ category.id }}/items"
+        hx-target="#category-{{ category.id }}"
+        hx-swap="outerHTML"
+        class="flex flex-col gap-3 rounded-md border border-border bg-muted-surface p-3"
+      >
+        <div class="grid gap-3 sm:grid-cols-2">
+          <div class="flex flex-col gap-1.5">
+            <label for="new-item-{{ category.id }}-nameAr" class="text-sm font-medium text-text">{{ labels.form.nameAr }}</label>
+            <input id="new-item-{{ category.id }}-nameAr" name="nameAr" type="text" dir="rtl" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="new-item-{{ category.id }}-nameEn" class="text-sm font-medium text-text">{{ labels.form.nameEn }}</label>
+            <input id="new-item-{{ category.id }}-nameEn" name="nameEn" type="text" dir="ltr" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="new-item-{{ category.id }}-price" class="text-sm font-medium text-text">{{ labels.form.price }}</label>
+            <input id="new-item-{{ category.id }}-price" name="price" type="number" min="0" step="0.01" dir="ltr" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="new-item-{{ category.id }}-currency" class="text-sm font-medium text-text">{{ labels.form.currency }}</label>
+            <input id="new-item-{{ category.id }}-currency" name="currency" type="text" dir="ltr" value="ILS" maxlength="3" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          {{ button(labels.form.add, 'primary', 'sm', 'submit') }}
+          {{ button(labels.form.cancel, 'ghost', 'sm', 'button', 'x-on:click="addingItem = false"') }}
+        </div>
+      </form>
+    </div>
+  </section>
+{% endmacro %}

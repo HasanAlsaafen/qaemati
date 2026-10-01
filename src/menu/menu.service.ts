@@ -3,21 +3,8 @@ import { ItemTag } from '@prisma/client';
 import { I18nService } from 'nestjs-i18n';
 import { Locale } from '../common/middleware/locale-view.middleware';
 import { normalizeSearchText } from '../common/text/normalize-search-text';
+import { TAG_I18N_KEY, TAG_VARIANT } from '../common/tags';
 import { PrismaService } from '../prisma/prisma.service';
-
-const TAG_VARIANT: Record<ItemTag, string> = {
-  SPICY: 'danger',
-  VEGETARIAN: 'primary',
-  NEW: 'secondary',
-  POPULAR: 'popular',
-};
-
-const TAG_I18N_KEY: Record<ItemTag, string> = {
-  SPICY: 'common.tags.spicy',
-  VEGETARIAN: 'common.tags.vegetarian',
-  NEW: 'common.tags.new',
-  POPULAR: 'common.tags.popular',
-};
 
 export interface MenuItemView {
   id: string;

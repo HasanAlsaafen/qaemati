@@ -30,5 +30,68 @@
     "whatsapp": "واتساب",
     "instagram": "إنستغرام",
     "viewMenu": "عرض القائمة"
+  },
+  "admin": {
+    "auth": {
+      "title": "تسجيل دخول الإدارة",
+      "emailLabel": "البريد الإلكتروني",
+      "passwordLabel": "كلمة المرور",
+      "submit": "تسجيل الدخول",
+      "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+      "tooManyAttempts": "محاولات كثيرة جدًا. يرجى المحاولة مرة أخرى بعد عدة دقائق.",
+      "logout": "تسجيل الخروج",
+      "loggedInAs": "مسجّل الدخول باسم {name}"
+    },
+    "nav": {
+      "dashboard": "لوحة التحكم",
+      "categories": "الأقسام",
+      "previewMenu": "معاينة القائمة"
+    },
+    "form": {
+      "required": "هذا الحقل مطلوب.",
+      "invalidPrice": "أدخل سعرًا صحيحًا.",
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "add": "إضافة",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "nameArLabel": "الاسم (عربي)",
+      "nameEnLabel": "الاسم (إنجليزي)",
+      "descriptionArLabel": "الوصف (عربي)",
+      "descriptionEnLabel": "الوصف (إنجليزي)",
+      "priceLabel": "السعر",
+      "currencyLabel": "العملة",
+      "availableLabel": "متوفر",
+      "imageLabel": "الصورة",
+      "tagsLabel": "الوسوم",
+      "moveUp": "نقل لأعلى",
+      "moveDown": "نقل لأسفل"
+    },
+    "categories": {
+      "title": "الأقسام",
+      "addCategory": "إضافة قسم",
+      "emptyTitle": "لا توجد أقسام بعد",
+      "emptyDescription": "أضف أول قسم لبدء بناء القائمة.",
+      "deleteConfirmTitle": "حذف هذا القسم؟",
+      "deleteConfirmBody": "سيؤدي هذا أيضًا إلى حذف جميع العناصر فيه. لا يمكن التراجع عن هذا.",
+      "savedToast": "تم حفظ القسم",
+      "deletedToast": "تم حذف القسم",
+      "addedToast": "تمت إضافة القسم"
+    },
+    "items": {
+      "addItem": "إضافة عنصر",
+      "emptyTitle": "لا توجد عناصر في هذا القسم بعد",
+      "emptyDescription": "أضف أول عنصر لهذا القسم.",
+      "deleteConfirmTitle": "حذف هذا العنصر؟",
+      "deleteConfirmBody": "لا يمكن التراجع عن هذا.",
+      "savedToast": "تم حفظ العنصر",
+      "deletedToast": "تم حذف العنصر",
+      "addedToast": "تمت إضافة العنصر",
+      "availabilityOnToast": "تم التحديد كمتوفر",
+      "availabilityOffToast": "تم التحديد كغير متوفر",
+      "imageUpdatedToast": "تم تحديث الصورة",
+      "imageTooLarge": "يجب أن يكون حجم الصورة أقل من 5 ميجابايت.",
+      "invalidImageType": "يرجى رفع صورة بصيغة JPG أو PNG أو WebP."
+    }
   }
 }

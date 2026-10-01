@@ -3,10 +3,17 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
+import session from 'express-session';
+import connectPgSimple from 'connect-pg-simple';
+import express from 'express';
 import { join } from 'path';
+import { mkdirSync } from 'fs';
 import { AppModule } from './app.module';
 import { configureNunjucks } from './common/view/nunjucks';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { doubleCsrfProtection } from './auth/csrf';
+import { ITEM_IMAGE_UPLOAD_DIR } from './admin/upload.config';
+import { LocaleViewMiddleware } from './common/middleware/locale-view.middleware';
+import './auth/session.types';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -42,8 +49,58 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '..', 'public'));
 
+  // Nest applies its own default body parsers (express.json/urlencoded)
+  // later than these explicit app.use() calls -- the same "module
+  // middleware runs after main.ts's own app.use() calls" ordering noted
+  // elsewhere in this file. doubleCsrfProtection below reads req.body for
+  // the login/create/etc forms' csrf_token field, so it needs urlencoded
+  // parsing to have already run; without this, req.body was still `{}`
+  // when CSRF checked it, failing every plain-form POST with "invalid csrf
+  // token" even when the token was correct.
+  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json());
+
+  // Applied here, directly, rather than left to AppModule's Nest-managed
+  // middleware chain (which runs *after* everything below): session and
+  // CSRF setup can themselves throw (invalid/expired CSRF token), and the
+  // global exception filter's error page needs `t` from this middleware to
+  // render at all. If this ran later, an error here would itself crash
+  // trying to render the error page -- found exactly that way, as a 500
+  // whose own error page failed with "Unable to call `t`".
+  app.use(app.get(LocaleViewMiddleware).use.bind(app.get(LocaleViewMiddleware)));
+
+  const PgSession = connectPgSimple(session);
+  app.use(
+    session({
+      store: new PgSession({
+        conString: process.env.DATABASE_URL,
+        tableName: 'session',
+        createTableIfMissing: true,
+      }),
+      secret: process.env.SESSION_SECRET ?? 'change-me-in-production',
+      resave: false,
+      // CSRF validation ties a token to req.session.id (see auth/csrf.ts).
+      // With saveUninitialized: false, an anonymous visitor's session is
+      // never persisted, so express-session hands out a fresh, unstable id
+      // on every request until something saves it -- meaning the id used
+      // to generate a token when the login page is rendered never matches
+      // the id seen when that form is submitted, and CSRF validation fails
+      // on the login form itself every time. true establishes a stable,
+      // cookied session from the first request.
+      saveUninitialized: true,
+      name: 'qaemati_session',
+      cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      },
+    }),
+  );
+  app.use(doubleCsrfProtection);
+
   configureNunjucks(app);
-  app.useGlobalFilters(new HttpExceptionFilter());
+  mkdirSync(ITEM_IMAGE_UPLOAD_DIR, { recursive: true });
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);

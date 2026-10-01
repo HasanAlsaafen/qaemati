@@ -1,0 +1,16 @@
+{% extends "layouts/admin.njk" %}
+
+{% from "admin/components/categories-list.njk" import categoriesList %}
+{% from "admin/components/admin-confirm-dialog.njk" import adminConfirmDialog %}
+
+{% block title %}{{ t('common.admin.categories.title') }}{% endblock %}
+
+{% block content %}
+<h1 class="font-sans text-2xl font-bold text-text">{{ t('common.admin.categories.title') }}</h1>
+
+<div class="mt-4">
+  {{ categoriesList(categories, labels) }}
+</div>
+
+{{ adminConfirmDialog() }}
+{% endblock %}
