@@ -6,6 +6,13 @@ import { normalizeSearchText } from '../common/text/normalize-search-text';
 import { TAG_I18N_KEY, TAG_VARIANT } from '../common/tags';
 import { PrismaService } from '../prisma/prisma.service';
 
+export interface MenuOptionView {
+  id: string;
+  name: string;
+  price: number;
+  priceFormatted: string;
+}
+
 export interface MenuItemView {
   id: string;
   name: string;
@@ -18,6 +25,12 @@ export interface MenuItemView {
   tags: { code: ItemTag; label: string; variant: string }[];
   searchText: string;
   addAriaLabel: string;
+  variants: MenuOptionView[];
+  addons: MenuOptionView[];
+  /** priceFormatted of the cheapest variant, for the "From X" card price
+   *  when variants exist -- null when the item has no variants, in which
+   *  case the card shows the plain price as before. */
+  fromPriceFormatted: string | null;
 }
 
 export interface MenuCategoryView {
@@ -52,7 +65,13 @@ export class MenuService {
         categories: {
           orderBy: { sortOrder: 'asc' },
           include: {
-            items: { orderBy: { sortOrder: 'asc' } },
+            items: {
+              orderBy: { sortOrder: 'asc' },
+              include: {
+                variants: { orderBy: { sortOrder: 'asc' } },
+                addons: { orderBy: { sortOrder: 'asc' } },
+              },
+            },
           },
         },
       },
@@ -84,6 +103,23 @@ export class MenuService {
             .filter((part): part is string => Boolean(part))
             .map(normalizeSearchText);
 
+          const variants = item.variants.map((variant) => ({
+            id: variant.id,
+            name: pick(variant.nameAr, variant.nameEn),
+            price: Number(variant.price),
+            priceFormatted: Number(variant.price).toFixed(2),
+          }));
+          const addons = item.addons.map((addon) => ({
+            id: addon.id,
+            name: pick(addon.nameAr, addon.nameEn),
+            price: Number(addon.price),
+            priceFormatted: Number(addon.price).toFixed(2),
+          }));
+          const cheapestVariant = variants.reduce<MenuOptionView | null>(
+            (min, variant) => (!min || variant.price < min.price ? variant : min),
+            null,
+          );
+
           return {
             id: item.id,
             name,
@@ -103,6 +139,9 @@ export class MenuService {
               lang: locale,
               args: { name },
             }),
+            variants,
+            addons,
+            fromPriceFormatted: cheapestVariant ? cheapestVariant.priceFormatted : null,
           };
         }),
       })),

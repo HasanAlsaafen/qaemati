@@ -1,0 +1,80 @@
+{#
+  A2: shared editor for an item's variants (sizes) or add-ons (extras) --
+  both are just a name pair + a price, so one macro renders either list,
+  parameterized by the submitted field-name prefix ("variants"/"addons").
+  Local Alpine state only; the whole list is submitted as indexed fields
+  (variants[0][nameAr], variants[0][nameEn], variants[0][price], ...) when
+  the surrounding item form saves -- see items.controller.ts's
+  parseOptions(), which reconstructs the list server-side from exactly
+  this shape.
+#}
+{% macro optionsEditor(fieldName, options, label, hint, addLabel, nameArLabel, nameEnLabel, priceLabel, removeLabel) %}
+  <div
+    x-data="{
+      rows: {{ options | dump }},
+    }"
+    class="flex flex-col gap-2"
+  >
+    <div>
+      <p class="text-sm font-medium text-text">{{ label }}</p>
+      <p class="text-xs text-muted-text">{{ hint }}</p>
+    </div>
+
+    <template x-for="(row, index) in rows" x-bind:key="index">
+      <div class="grid grid-cols-2 gap-2 rounded-md border border-border p-2 sm:grid-cols-[1fr_1fr_100px_auto] sm:items-end">
+        <div class="flex flex-col gap-1">
+          <label class="text-xs text-muted-text" x-bind:for="'{{ fieldName }}-' + index + '-ar'">{{ nameArLabel }}</label>
+          <input
+            x-bind:id="'{{ fieldName }}-' + index + '-ar'"
+            x-bind:name="'{{ fieldName }}[' + index + '][nameAr]'"
+            type="text"
+            dir="rtl"
+            x-model="row.nameAr"
+            class="min-h-11 rounded-md border border-border-strong bg-surface px-2 text-sm text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-xs text-muted-text" x-bind:for="'{{ fieldName }}-' + index + '-en'">{{ nameEnLabel }}</label>
+          <input
+            x-bind:id="'{{ fieldName }}-' + index + '-en'"
+            x-bind:name="'{{ fieldName }}[' + index + '][nameEn]'"
+            type="text"
+            dir="ltr"
+            x-model="row.nameEn"
+            class="min-h-11 rounded-md border border-border-strong bg-surface px-2 text-sm text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-xs text-muted-text" x-bind:for="'{{ fieldName }}-' + index + '-price'">{{ priceLabel }}</label>
+          <input
+            x-bind:id="'{{ fieldName }}-' + index + '-price'"
+            x-bind:name="'{{ fieldName }}[' + index + '][price]'"
+            type="number"
+            min="0"
+            step="0.01"
+            dir="ltr"
+            x-model="row.price"
+            class="min-h-11 rounded-md border border-border-strong bg-surface px-2 text-sm text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+        </div>
+        <button
+          type="button"
+          x-on:click="rows.splice(index, 1)"
+          aria-label="{{ removeLabel }}"
+          class="inline-flex h-9 w-9 items-center justify-center self-end justify-self-end rounded-full text-danger hover:bg-danger/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </template>
+
+    <button
+      type="button"
+      x-on:click="rows.push({ nameAr: '', nameEn: '', price: 0 })"
+      class="inline-flex min-h-11 items-center gap-2 self-start rounded-md border border-dashed border-border-strong px-3 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    >
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
+      {{ addLabel }}
+    </button>
+  </div>
+{% endmacro %}

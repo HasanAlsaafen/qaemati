@@ -18,15 +18,45 @@ import { I18nService } from 'nestjs-i18n';
 import { ItemTag } from '@prisma/client';
 import { ALL_TAGS } from '../common/tags';
 import { CategoryService } from './category.service';
-import { ItemService } from './item.service';
+import { ItemOption, ItemService } from './item.service';
 import { buildAdminLabels } from './admin-labels';
-import { toCategoryViewList } from './admin-view-model';
+import { toCategoryViewList, toItemView } from './admin-view-model';
 import { triggerToast } from './htmx-toast';
 import { itemImageMulterOptions } from './upload.config';
 
 function parseTags(raw: string | string[] | undefined): ItemTag[] {
   const values = Array.isArray(raw) ? raw : raw ? [raw] : [];
   return values.filter((value): value is ItemTag => (ALL_TAGS as string[]).includes(value));
+}
+
+/**
+ * The variant/addon editors in the item edit form (item-row.njk) submit
+ * indexed fields -- variants[0][nameAr], variants[0][nameEn],
+ * variants[0][price], variants[1][nameAr], ... -- which Express's
+ * urlencoded parser (extended: true, configured in bootstrap.ts) already
+ * collects into `{ '0': { nameAr, nameEn, price }, '1': {...} }` by the
+ * time it reaches here. Rows with no name on either side are dropped
+ * (an empty trailing row left by the "add row" button, not submitted
+ * intentionally); a row missing just the price is treated as free (0),
+ * same tolerance as the base item price field.
+ */
+export function parseOptions(raw: unknown): ItemOption[] {
+  if (!raw || typeof raw !== 'object') return [];
+  return Object.values(raw as Record<string, unknown>)
+    .map((row): ItemOption | null => {
+      if (!row || typeof row !== 'object') return null;
+      const { nameAr, nameEn, price } = row as Record<string, unknown>;
+      const trimmedAr = typeof nameAr === 'string' ? nameAr.trim() : '';
+      const trimmedEn = typeof nameEn === 'string' ? nameEn.trim() : '';
+      if (!trimmedAr && !trimmedEn) return null;
+      const priceValue = Number(price);
+      return {
+        nameAr: trimmedAr,
+        nameEn: trimmedEn,
+        price: Number.isFinite(priceValue) && priceValue >= 0 ? priceValue : 0,
+      };
+    })
+    .filter((option): option is ItemOption => option !== null);
 }
 
 @Controller('admin')
@@ -85,6 +115,8 @@ export class ItemsController {
     @Body('price') price: string,
     @Body('currency') currency: string,
     @Body('tags') tags: string | string[] | undefined,
+    @Body('variants') variants: unknown,
+    @Body('addons') addons: unknown,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
@@ -100,12 +132,14 @@ export class ItemsController {
       price: Number.isFinite(priceValue) && priceValue >= 0 ? priceValue : 0,
       currency: (currency || 'ILS').trim(),
       tags: parseTags(tags),
+      variants: parseOptions(variants),
+      addons: parseOptions(addons),
     });
     triggerToast(res, this.i18n.t('common.admin.items.savedToast', { lang: locale }));
 
     const item = await this.items.assertOwnership(restaurantId, id);
     return {
-      item: { ...item, priceFormatted: Number(item.price).toFixed(2) },
+      item: toItemView(item),
       labels: buildAdminLabels(this.i18n, locale),
     };
   }
@@ -130,7 +164,7 @@ export class ItemsController {
       ),
     );
     return {
-      item: { ...item, priceFormatted: Number(item.price).toFixed(2) },
+      item: toItemView(item),
       labels: buildAdminLabels(this.i18n, locale),
     };
   }
@@ -155,7 +189,7 @@ export class ItemsController {
     triggerToast(res, this.i18n.t('common.admin.items.imageUpdatedToast', { lang: locale }));
 
     return {
-      item: { ...item, priceFormatted: Number(item.price).toFixed(2) },
+      item: toItemView(item),
       labels: buildAdminLabels(this.i18n, locale),
     };
   }

@@ -2,6 +2,12 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { ItemTag } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
+export interface ItemOption {
+  nameAr: string;
+  nameEn: string;
+  price: number;
+}
+
 export interface ItemInput {
   nameAr: string;
   nameEn: string;
@@ -10,6 +16,8 @@ export interface ItemInput {
   price: number;
   currency: string;
   tags: ItemTag[];
+  variants?: ItemOption[];
+  addons?: ItemOption[];
 }
 
 @Injectable()
@@ -40,18 +48,58 @@ export class ItemService {
 
   async update(restaurantId: string, itemId: string, input: ItemInput) {
     await this.assertOwnership(restaurantId, itemId);
-    return this.prisma.item.update({
-      where: { id: itemId },
-      data: {
-        nameAr: input.nameAr,
-        nameEn: input.nameEn,
-        descriptionAr: input.descriptionAr,
-        descriptionEn: input.descriptionEn,
-        price: input.price,
-        currency: input.currency,
-        tags: input.tags,
-      },
-    });
+
+    // Variants/addons are replaced wholesale on every save (delete all,
+    // recreate from the submitted list) rather than diffed row-by-row --
+    // the admin form submits its whole current list as a flat indexed
+    // array each time (variants[0][nameAr], variants[1][nameAr], ...),
+    // so there's no stable "this row is the same row as before" identity
+    // to diff against without inventing one. Simple and correct; the
+    // tradeoff is new cuid()s for every variant/addon on every item save,
+    // which is harmless since nothing else references them by id across
+    // requests.
+    const [item] = await this.prisma.$transaction([
+      this.prisma.item.update({
+        where: { id: itemId },
+        data: {
+          nameAr: input.nameAr,
+          nameEn: input.nameEn,
+          descriptionAr: input.descriptionAr,
+          descriptionEn: input.descriptionEn,
+          price: input.price,
+          currency: input.currency,
+          tags: input.tags,
+        },
+      }),
+      this.prisma.itemVariant.deleteMany({ where: { itemId } }),
+      this.prisma.itemAddon.deleteMany({ where: { itemId } }),
+      ...(input.variants ?? []).map((variant, index) =>
+        this.prisma.itemVariant.create({
+          data: {
+            restaurantId,
+            itemId,
+            nameAr: variant.nameAr,
+            nameEn: variant.nameEn,
+            price: variant.price,
+            sortOrder: index,
+          },
+        }),
+      ),
+      ...(input.addons ?? []).map((addon, index) =>
+        this.prisma.itemAddon.create({
+          data: {
+            restaurantId,
+            itemId,
+            nameAr: addon.nameAr,
+            nameEn: addon.nameEn,
+            price: addon.price,
+            sortOrder: index,
+          },
+        }),
+      ),
+    ]);
+
+    return item;
   }
 
   async toggleAvailability(restaurantId: string, itemId: string) {
@@ -59,12 +107,23 @@ export class ItemService {
     return this.prisma.item.update({
       where: { id: itemId },
       data: { available: !item.available },
+      include: {
+        variants: { orderBy: { sortOrder: 'asc' } },
+        addons: { orderBy: { sortOrder: 'asc' } },
+      },
     });
   }
 
   async setImage(restaurantId: string, itemId: string, imagePath: string) {
     await this.assertOwnership(restaurantId, itemId);
-    return this.prisma.item.update({ where: { id: itemId }, data: { imagePath } });
+    return this.prisma.item.update({
+      where: { id: itemId },
+      data: { imagePath },
+      include: {
+        variants: { orderBy: { sortOrder: 'asc' } },
+        addons: { orderBy: { sortOrder: 'asc' } },
+      },
+    });
   }
 
   async remove(restaurantId: string, itemId: string): Promise<void> {
@@ -90,7 +149,13 @@ export class ItemService {
   }
 
   async assertOwnership(restaurantId: string, itemId: string) {
-    const item = await this.prisma.item.findUnique({ where: { id: itemId } });
+    const item = await this.prisma.item.findUnique({
+      where: { id: itemId },
+      include: {
+        variants: { orderBy: { sortOrder: 'asc' } },
+        addons: { orderBy: { sortOrder: 'asc' } },
+      },
+    });
     if (!item) throw new NotFoundException('Item not found');
     if (item.restaurantId !== restaurantId) {
       throw new ForbiddenException('Item does not belong to this restaurant');

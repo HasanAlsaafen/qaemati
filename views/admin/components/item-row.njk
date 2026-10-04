@@ -1,6 +1,7 @@
 {% from "components/toggle.njk" import toggle %}
 {% from "components/button.njk" import button %}
 {% from "admin/components/delete-trigger.njk" import deleteTrigger %}
+{% from "admin/components/options-editor.njk" import optionsEditor %}
 
 {#
   item: { id, categoryId, nameAr, nameEn, descriptionAr, descriptionEn,
@@ -35,6 +36,16 @@
           <p class="break-words text-sm font-bold text-text" dir="ltr">{{ item.nameEn }}</p>
           <p class="break-words text-sm text-muted-text" dir="rtl">{{ item.nameAr }}</p>
           <p class="text-sm text-muted-text" dir="ltr">{{ item.priceFormatted }} {{ item.currency }}</p>
+          {% if item.variants.length or item.addons.length %}
+            <p class="mt-1 flex flex-wrap gap-1">
+              {% if item.variants.length %}
+                <span class="inline-flex items-center rounded-sm bg-primary-soft px-1.5 py-0.5 text-xs text-primary">{{ labels.items.variantsLabel }} ({{ item.variants.length }})</span>
+              {% endif %}
+              {% if item.addons.length %}
+                <span class="inline-flex items-center rounded-sm bg-secondary-soft px-1.5 py-0.5 text-xs text-secondary-text">{{ labels.items.addonsLabel }} ({{ item.addons.length }})</span>
+              {% endif %}
+            </p>
+          {% endif %}
           {% if item.tags.length %}
             <p class="mt-1 flex flex-wrap gap-1">
               {% for tag in item.tags %}
@@ -131,6 +142,9 @@
           </label>
         {% endfor %}
       </fieldset>
+
+      {{ optionsEditor('variants', item.variants, labels.items.variantsLabel, labels.items.variantsHint, labels.items.addVariant, labels.form.nameAr, labels.form.nameEn, labels.form.price, labels.items.removeOption) }}
+      {{ optionsEditor('addons', item.addons, labels.items.addonsLabel, labels.items.addonsHint, labels.items.addAddon, labels.form.nameAr, labels.form.nameEn, labels.form.price, labels.items.removeOption) }}
 
       <div class="flex items-center gap-2">
         {{ button(labels.form.save, 'primary', 'sm', 'submit') }}

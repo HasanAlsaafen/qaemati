@@ -56,7 +56,11 @@
       "messageNoteLine": "ملاحظة: {note}",
       "messageTotalLine": "الإجمالي: {total} {currency}",
       "messageItemLine": "{qty}x {name} — {price} {currency}"
-    }
+    },
+    "fromPrice": "يبدأ من",
+    "selectVariant": "اختر الحجم",
+    "addonsTitle": "الإضافات",
+    "selectVariantPrompt": "اختر الحجم لإضافة هذا إلى طلبك"
   },
   "admin": {
     "auth": {
@@ -120,7 +124,14 @@
       "availabilityOffToast": "تم التحديد كغير متوفر",
       "imageUpdatedToast": "تم تحديث الصورة",
       "imageTooLarge": "يجب أن يكون حجم الصورة أقل من 5 ميجابايت.",
-      "invalidImageType": "يرجى رفع صورة بصيغة JPG أو PNG أو WebP."
+      "invalidImageType": "يرجى رفع صورة بصيغة JPG أو PNG أو WebP.",
+      "variantsLabel": "الأحجام / الخيارات",
+      "variantsHint": "لكل حجم سعره الكامل الخاص به. اتركه فارغًا إذا لم يكن لهذا العنصر أحجام.",
+      "addVariant": "إضافة حجم",
+      "addonsLabel": "الإضافات",
+      "addonsHint": "إضافات اختيارية تُضاف فوق السعر، مثل \"جبنة إضافية\".",
+      "addAddon": "إضافة مكوّن إضافي",
+      "removeOption": "إزالة"
     },
     "qr": {
       "title": "رموز QR والطباعة",

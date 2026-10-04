@@ -6,11 +6,59 @@
   listens and renders whatever it receives. Tag color mapping duplicates
   components/badge.njk's variant classes, since this content is rendered
   client-side from dynamic data rather than by Nunjucks.
+
+  A2 (variants/add-ons): when the item has variants (sizes), one must be
+  picked before it can be added -- there's no sensible default size to
+  assume, so the add button stays disabled with selectVariantPrompt
+  explaining why. Add-ons are optional multi-select. The composed name
+  (base + chosen size + chosen extras) and computed price become a single
+  flat line item when added to the selection (A1), keeping that feature's
+  cart model simple rather than teaching it about nested modifiers.
 #}
-{% macro itemDetailSheet(unavailableLabel, hasWhatsapp, addButtonLabel, addedToastMessage) %}
+{% macro itemDetailSheet(unavailableLabel, hasWhatsapp, addButtonLabel, addedToastMessage, selectVariantLabel, addonsTitleLabel, selectVariantPromptLabel) %}
   <div
-    x-data="{ open: false, item: null, unavailableLabel: {{ unavailableLabel | dump }}, hasWhatsapp: {{ hasWhatsapp | dump }}, addButtonLabel: {{ addButtonLabel | dump }}, addedToastMessage: {{ addedToastMessage | dump }} }"
-    x-on:open-item-sheet.window="item = $event.detail; open = true"
+    x-data="{
+      open: false,
+      item: null,
+      unavailableLabel: {{ unavailableLabel | dump }},
+      hasWhatsapp: {{ hasWhatsapp | dump }},
+      addButtonLabel: {{ addButtonLabel | dump }},
+      addedToastMessage: {{ addedToastMessage | dump }},
+      selectVariantLabel: {{ selectVariantLabel | dump }},
+      addonsTitleLabel: {{ addonsTitleLabel | dump }},
+      selectVariantPromptLabel: {{ selectVariantPromptLabel | dump }},
+      selectedVariantId: null,
+      selectedAddonIds: [],
+      get selectedVariant() {
+        if (!this.item || !this.item.variants) return null;
+        return this.item.variants.find((v) => v.id === this.selectedVariantId) || null;
+      },
+      get selectedAddons() {
+        if (!this.item || !this.item.addons) return [];
+        return this.item.addons.filter((a) => this.selectedAddonIds.includes(a.id));
+      },
+      get computedPrice() {
+        if (!this.item) return 0;
+        const base = this.selectedVariant ? this.selectedVariant.price : this.item.price;
+        return base + this.selectedAddons.reduce((sum, a) => sum + a.price, 0);
+      },
+      get composedName() {
+        if (!this.item) return '';
+        let name = this.item.name;
+        if (this.selectedVariant) name += ' (' + this.selectedVariant.name + ')';
+        if (this.selectedAddons.length) name += ' + ' + this.selectedAddons.map((a) => a.name).join(', ');
+        return name;
+      },
+      get needsVariant() {
+        return this.item && this.item.variants && this.item.variants.length > 0 && !this.selectedVariantId;
+      },
+      toggleAddon(id) {
+        const index = this.selectedAddonIds.indexOf(id);
+        if (index === -1) this.selectedAddonIds.push(id);
+        else this.selectedAddonIds.splice(index, 1);
+      },
+    }"
+    x-on:open-item-sheet.window="item = $event.detail; open = true; selectedVariantId = null; selectedAddonIds = []"
     x-on:keydown.escape.window="open = false"
     x-show="open"
     x-cloak
@@ -84,22 +132,66 @@
             </div>
 
             <p class="mt-4 text-lg font-bold text-text" dir="ltr">
-              <span x-text="item.priceFormatted"></span> <span x-text="item.currency"></span>
+              <span x-text="computedPrice.toFixed(2)"></span> <span x-text="item.currency"></span>
             </p>
+
+            <div class="mt-4" x-show="item.variants && item.variants.length">
+              <p class="text-sm font-medium text-text" x-text="selectVariantLabel"></p>
+              <div class="mt-2 flex flex-col gap-2">
+                <template x-for="variant in (item.variants || [])" x-bind:key="variant.id">
+                  <label class="flex min-h-11 items-center justify-between gap-3 rounded-md border border-border-strong px-3 py-2 text-sm text-text has-[:checked]:border-primary has-[:checked]:bg-primary-soft">
+                    <span class="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="item-sheet-variant"
+                        x-bind:value="variant.id"
+                        x-model="selectedVariantId"
+                        class="h-4 w-4 text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                      >
+                      <span x-text="variant.name"></span>
+                    </span>
+                    <span dir="ltr" class="shrink-0 text-muted-text" x-text="variant.priceFormatted + ' ' + item.currency"></span>
+                  </label>
+                </template>
+              </div>
+            </div>
+
+            <div class="mt-4" x-show="item.addons && item.addons.length">
+              <p class="text-sm font-medium text-text" x-text="addonsTitleLabel"></p>
+              <div class="mt-2 flex flex-col gap-2">
+                <template x-for="addon in (item.addons || [])" x-bind:key="addon.id">
+                  <label class="flex min-h-11 items-center justify-between gap-3 rounded-md border border-border-strong px-3 py-2 text-sm text-text has-[:checked]:border-primary has-[:checked]:bg-primary-soft">
+                    <span class="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        x-bind:checked="selectedAddonIds.includes(addon.id)"
+                        x-on:change="toggleAddon(addon.id)"
+                        class="h-4 w-4 rounded text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                      >
+                      <span x-text="addon.name"></span>
+                    </span>
+                    <span dir="ltr" class="shrink-0 text-muted-text" x-text="'+' + addon.priceFormatted + ' ' + item.currency"></span>
+                  </label>
+                </template>
+              </div>
+            </div>
+
+            <p class="mt-3 text-xs text-muted-text" x-show="hasWhatsapp && item.available && needsVariant" x-text="selectVariantPromptLabel"></p>
 
             <button
               type="button"
               x-show="hasWhatsapp && item.available"
+              x-bind:disabled="needsVariant"
               x-on:click="$store.selection.add({
-                id: item.id,
-                name: item.name,
-                price: item.price,
-                priceFormatted: item.priceFormatted,
+                id: item.id + (selectedVariant ? ':' + selectedVariant.id : '') + (selectedAddons.length ? ':' + selectedAddons.map((a) => a.id).sort().join(',') : ''),
+                name: composedName,
+                price: computedPrice,
+                priceFormatted: computedPrice.toFixed(2),
                 currency: item.currency,
                 addedToastMessage: addedToastMessage,
               }); open = false"
               x-bind:aria-label="item.addAriaLabel"
-              class="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              class="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
               <span x-text="addButtonLabel"></span>

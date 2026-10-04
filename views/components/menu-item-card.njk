@@ -15,7 +15,7 @@
   unavailable -- there'd be nothing to add it *to* send, and nothing to
   add if it can't be served.
 #}
-{% macro menuItemCard(item, unavailableLabel, selectionLabels, hasWhatsapp) %}
+{% macro menuItemCard(item, unavailableLabel, selectionLabels, hasWhatsapp, fromPriceLabel) %}
   <div
     class="flex w-full items-start gap-3 rounded-lg border border-border bg-surface p-3 {{ 'opacity-60' if not item.available }}"
     data-menu-item="true"
@@ -42,7 +42,11 @@
       <span class="flex min-w-0 flex-1 flex-col gap-1">
         <span class="flex items-start justify-between gap-2">
           <span class="truncate font-sans text-base font-bold leading-heading text-text">{{ item.name }}</span>
-          <span dir="ltr" class="shrink-0 text-base font-bold text-text">{{ item.priceFormatted }} {{ item.currency }}</span>
+          {% if item.fromPriceFormatted %}
+            <span dir="ltr" class="shrink-0 text-base font-bold text-text">{{ fromPriceLabel }} {{ item.fromPriceFormatted }} {{ item.currency }}</span>
+          {% else %}
+            <span dir="ltr" class="shrink-0 text-base font-bold text-text">{{ item.priceFormatted }} {{ item.currency }}</span>
+          {% endif %}
         </span>
         {% if item.description %}
           <span class="line-clamp-2 text-sm leading-body text-muted-text">{{ item.description }}</span>
@@ -61,22 +65,37 @@
     </button>
 
     {% if hasWhatsapp and item.available %}
-      <button
-        type="button"
-        x-data
-        x-on:click="$store.selection.add({
-          id: {{ item.id | dump }},
-          name: {{ item.name | dump }},
-          price: {{ item.price | dump }},
-          priceFormatted: {{ item.priceFormatted | dump }},
-          currency: {{ item.currency | dump }},
-          addedToastMessage: {{ selectionLabels.addedToast | dump }},
-        })"
-        aria-label="{{ item.addAriaLabel }}"
-        class="inline-flex h-11 w-11 shrink-0 items-center justify-center self-center rounded-full border border-border-strong text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-      >
-        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
-      </button>
+      {% if item.variants.length %}
+        {# A2: an item with sizes has no single price to quick-add at --
+           tapping "+" opens the detail sheet to pick one instead, same
+           destination as tapping the card itself. #}
+        <button
+          type="button"
+          x-data
+          x-on:click="$dispatch('open-item-sheet', JSON.parse($el.closest('[data-menu-item]').querySelector('[data-item]').dataset.item))"
+          aria-label="{{ item.addAriaLabel }}"
+          class="inline-flex h-11 w-11 shrink-0 items-center justify-center self-center rounded-full border border-border-strong text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
+        </button>
+      {% else %}
+        <button
+          type="button"
+          x-data
+          x-on:click="$store.selection.add({
+            id: {{ item.id | dump }},
+            name: {{ item.name | dump }},
+            price: {{ item.price | dump }},
+            priceFormatted: {{ item.priceFormatted | dump }},
+            currency: {{ item.currency | dump }},
+            addedToastMessage: {{ selectionLabels.addedToast | dump }},
+          })"
+          aria-label="{{ item.addAriaLabel }}"
+          class="inline-flex h-11 w-11 shrink-0 items-center justify-center self-center rounded-full border border-border-strong text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
+        </button>
+      {% endif %}
     {% endif %}
   </div>
 {% endmacro %}

@@ -40,6 +40,8 @@ model Restaurant {
   categories Category[]
   items      Item[]
   tables     RestaurantTable[]
+  itemVariants ItemVariant[]
+  itemAddons   ItemAddon[]
 }
 
 model AdminUser {
@@ -105,8 +107,66 @@ model Item {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  variants ItemVariant[]
+  addons   ItemAddon[]
+
   @@index([restaurantId])
   @@index([categoryId])
+}
+
+/// A2: a size/option with its own absolute price (not a delta) -- "Small
+/// 15 ILS, Large 22 ILS" rather than "+3 ILS for Large", simpler for an
+/// owner to enter correctly and for a customer to read. An item with no
+/// variants just sells at its own `price`; one with variants requires
+/// picking one in the detail sheet before it can be added to the
+/// selection (A1) -- there's no sensible default size to assume.
+model ItemVariant {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  itemId String
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  nameAr String
+  nameEn String
+
+  price Decimal @db.Decimal(10, 2)
+
+  sortOrder Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([restaurantId])
+  @@index([itemId])
+}
+
+/// A2: an optional extra added on top of the item's (or its chosen
+/// variant's) price -- "Extra cheese +3 ILS". Multiple add-ons can be
+/// selected at once, unlike variants (pick exactly one size).
+model ItemAddon {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  itemId String
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  nameAr String
+  nameEn String
+
+  price Decimal @db.Decimal(10, 2)
+
+  sortOrder Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([restaurantId])
+  @@index([itemId])
 }
 
 /// A printable QR target: scanning it opens the public menu with

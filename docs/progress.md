@@ -986,3 +986,53 @@ What was built:
   open) against WCAG 2.0/2.2 A+AA tags.
 - `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
   pass; demo data re-seeded clean after testing.
+
+### A2: Variants and add-ons (done)
+
+Sizes with their own full price (not a delta), plus optional multi-select extras, handled in
+the admin item form and the public item detail sheet.
+
+What was built:
+
+- **Migration** (`20261004085807_add_item_variants_and_addons`): `ItemVariant` and `ItemAddon`
+  models, each with its own `restaurantId` (not just reachable via `itemId` → `categoryId` →
+  `restaurantId`) per the brief's rule, `nameAr`/`nameEn`/`price`/`sortOrder`, cascading delete
+  from `Item`. A variant is an absolute price ("Small 10 ILS, Large 15 ILS"), not a delta —
+  simpler for an owner to enter correctly and a customer to read than "+5 ILS for Large".
+- **Admin** (`ItemService.update`): variants/addons are replaced wholesale on every item save
+  (delete all, recreate from the submitted list) rather than diffed row-by-row, since the form
+  submits its whole current list as a flat indexed array
+  (`variants[0][nameAr]`, `variants[1][nameAr]`, ...) with no stable per-row identity to diff
+  against. `views/admin/components/options-editor.njk`: one shared Alpine-driven macro renders
+  either list (parameterized by field-name prefix), used twice in `item-row.njk`'s edit form.
+  `items.controller.ts`'s `parseOptions()` reconstructs the list server-side, dropping a row
+  with no name on either side (an empty trailing "add row" left unused, not submitted
+  intentionally) — unit tested directly (7 cases: parsing, empty-row dropping, partial names,
+  missing/negative price defaulting, whitespace trimming, non-object input).
+- **Public menu**: an item with variants shows "From {cheapest price}" on its card instead of a
+  single price, and its quick `+` button opens the detail sheet instead of quick-adding (there's
+  no single price to add at). In the sheet: a radio list for variants (one required, "Add to my
+  selection" stays disabled with an explanatory hint until one is picked) and a checkbox list
+  for addons, with the displayed price recomputed live as either changes. Adding to the
+  selection (A1) composes one flat line item — name becomes `"Arabic Coffee (Large) + Extra
+  cardamom"`, price becomes the sum — rather than teaching A1's cart model about nested
+  modifiers; the cart key includes the chosen variant/addon ids, so different combinations of
+  the same base item become separate, independently-adjustable cart lines.
+
+### Verified
+
+- Unit: 7 new `parseOptions` tests (in `items.controller.spec.ts`) — 27 unit tests total.
+- E2E: `test/variants.e2e-spec.ts` — saves variants/addons through the real PATCH endpoint and
+  confirms they persist correctly in the database; confirms a second save *replaces* the list
+  rather than appending to it (submitting addons as empty cleared the previous save's addon);
+  confirms the public menu shows the "From" price once an item has variants.
+- Interactive (Playwright, both admin and public sides): added two variants and one add-on to a
+  real item through the admin UI, reopened the edit form and confirmed the values reloaded
+  correctly; on the public menu, confirmed "Add to my selection" is disabled until a size is
+  picked, confirmed the live price recomputes correctly when selecting "Large" (15) + "Extra
+  cardamom" (+2) → 17.00, and confirmed the resulting cart line read exactly
+  `"Arabic Coffee (Large) + Extra cardamom — 17.00 ILS"`.
+- axe-core: 0 violations on the item detail sheet with the variant/addon UI open.
+- `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
+  pass; migration applied to both the dev and test databases; demo data re-seeded clean after
+  testing.

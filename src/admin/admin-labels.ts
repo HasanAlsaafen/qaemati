@@ -47,6 +47,13 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale) {
       emptyDescription: t('common.admin.items.emptyDescription'),
       deleteConfirmTitle: t('common.admin.items.deleteConfirmTitle'),
       deleteConfirmBody: t('common.admin.items.deleteConfirmBody'),
+      variantsLabel: t('common.admin.items.variantsLabel'),
+      variantsHint: t('common.admin.items.variantsHint'),
+      addVariant: t('common.admin.items.addVariant'),
+      addonsLabel: t('common.admin.items.addonsLabel'),
+      addonsHint: t('common.admin.items.addonsHint'),
+      addAddon: t('common.admin.items.addAddon'),
+      removeOption: t('common.admin.items.removeOption'),
     },
     tags: {
       SPICY: t('common.tags.spicy'),

@@ -14,14 +14,30 @@ export class CategoryService {
     return this.prisma.category.findMany({
       where: { restaurantId },
       orderBy: { sortOrder: 'asc' },
-      include: { items: { orderBy: { sortOrder: 'asc' } } },
+      include: {
+        items: {
+          orderBy: { sortOrder: 'asc' },
+          include: {
+            variants: { orderBy: { sortOrder: 'asc' } },
+            addons: { orderBy: { sortOrder: 'asc' } },
+          },
+        },
+      },
     });
   }
 
   findOneWithItems(categoryId: string) {
     return this.prisma.category.findUniqueOrThrow({
       where: { id: categoryId },
-      include: { items: { orderBy: { sortOrder: 'asc' } } },
+      include: {
+        items: {
+          orderBy: { sortOrder: 'asc' },
+          include: {
+            variants: { orderBy: { sortOrder: 'asc' } },
+            addons: { orderBy: { sortOrder: 'asc' } },
+          },
+        },
+      },
     });
   }
 

@@ -56,7 +56,11 @@
       "messageNoteLine": "Note: {note}",
       "messageTotalLine": "Total: {total} {currency}",
       "messageItemLine": "{qty}x {name} — {price} {currency}"
-    }
+    },
+    "fromPrice": "From",
+    "selectVariant": "Choose a size",
+    "addonsTitle": "Add-ons",
+    "selectVariantPrompt": "Choose a size to add this to your selection"
   },
   "admin": {
     "auth": {
@@ -120,7 +124,14 @@
       "availabilityOffToast": "Marked as unavailable",
       "imageUpdatedToast": "Image updated",
       "imageTooLarge": "Image must be smaller than 5 MB.",
-      "invalidImageType": "Please upload a JPG, PNG, or WebP image."
+      "invalidImageType": "Please upload a JPG, PNG, or WebP image.",
+      "variantsLabel": "Sizes / variants",
+      "variantsHint": "Each size has its own full price. Leave empty if this item has no sizes.",
+      "addVariant": "Add size",
+      "addonsLabel": "Add-ons",
+      "addonsHint": "Optional extras added on top of the price, e.g. \"Extra cheese\".",
+      "addAddon": "Add extra",
+      "removeOption": "Remove"
     },
     "qr": {
       "title": "QR codes & printing",

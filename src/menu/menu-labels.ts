@@ -14,6 +14,10 @@ export function buildMenuLabels(i18n: I18nService, locale: Locale) {
   const t = (key: string, args?: Record<string, unknown>) => i18n.t(key, { lang: locale, args });
 
   return {
+    fromPrice: t('common.menu.fromPrice'),
+    selectVariant: t('common.menu.selectVariant'),
+    addonsTitle: t('common.menu.addonsTitle'),
+    selectVariantPrompt: t('common.menu.selectVariantPrompt'),
     selection: {
       addButton: t('common.menu.selection.addButton'),
       barLabel: t('common.menu.selection.barLabel'),
