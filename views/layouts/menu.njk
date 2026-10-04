@@ -14,6 +14,19 @@
     <script defer src="/js/selection.js"></script>
   {% endif %}
   {% include "partials/head.njk" %}
+  {# A4: a restaurant's own brand color overrides the Zaytoun default
+     tokens (src/styles/tokens.css) for this page only -- scoped here
+     via inline :root, not by editing the shared stylesheet, so every
+     other restaurant's menu keeps the default palette. #}
+  {% if menu.primaryColorCss %}
+    <style>
+      :root {
+        --color-primary: {{ menu.primaryColorCss.primary }};
+        --color-primary-hover: {{ menu.primaryColorCss.primaryHover }};
+        --color-primary-soft: {{ menu.primaryColorCss.primarySoft }};
+      }
+    </style>
+  {% endif %}
 </head>
 <body class="min-h-screen bg-bg text-text font-sans antialiased" data-restaurant-slug="{{ menu.slug }}">
   {% block content %}{% endblock %}

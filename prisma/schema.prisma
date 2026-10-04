@@ -25,7 +25,23 @@ model Restaurant {
   descriptionAr String?
   descriptionEn String?
 
-  logoPath String?
+  logoPath        String?
+  coverImagePath  String?
+
+  /// A4: hex color, e.g. "#44603C". Null means "use the default Zaytoun
+  /// palette" (src/styles/tokens.css's own --color-primary), not black
+  /// or an empty string -- consistent with every other "unset means use
+  /// the house default" field in this schema. Must pass
+  /// meetsPrimaryColorContrast (src/common/color.ts) before being saved
+  /// -- enforced in RestaurantService, not at the DB level, matching
+  /// every other cross-field validation in this app.
+  primaryColor String?
+
+  /// A4: the default currency new items are created with (restaurant-
+  /// level, not per-item -- each Item still stores its own `currency`
+  /// so a restaurant could in principle mix currencies, but the admin
+  /// "add item" form defaults to this rather than a hardcoded "ILS").
+  currency String @default("ILS")
 
   whatsapp        String?
   instagramHandle String?

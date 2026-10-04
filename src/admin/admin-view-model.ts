@@ -1,4 +1,4 @@
-import { Category, Item, ItemAddon, ItemVariant } from '@prisma/client';
+import { Category, Item, ItemAddon, ItemVariant, Restaurant } from '@prisma/client';
 
 export interface ItemOptionView {
   id: string;
@@ -57,5 +57,16 @@ export function toItemView(
     priceFormatted: Number(item.price).toFixed(2),
     variants: item.variants.map(toOptionView),
     addons: item.addons.map(toOptionView),
+  };
+}
+
+/** A4: the raw Restaurant row is almost entirely admin-form-shaped
+ *  already (every field is directly editable text/hex/HH:MM) -- this
+ *  only adds the one derived field the template needs that isn't a
+ *  plain column. */
+export function toRestaurantSettingsView(restaurant: Restaurant) {
+  return {
+    ...restaurant,
+    hasStructuredHours: Boolean(restaurant.openTime && restaurant.closeTime),
   };
 }

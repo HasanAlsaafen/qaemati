@@ -83,7 +83,8 @@
       "categories": "الأقسام",
       "previewMenu": "معاينة القائمة",
       "qr": "رمز QR والطباعة",
-      "toggleMenu": "القائمة"
+      "toggleMenu": "القائمة",
+      "branding": "الهوية التجارية"
     },
     "form": {
       "required": "هذا الحقل مطلوب.",
@@ -160,6 +161,35 @@
       "printButton": "طباعة",
       "scanToView": "امسح لعرض قائمتنا",
       "downloadLinkLabel": "فتح رابط القائمة"
+    },
+    "branding": {
+      "title": "الهوية التجارية",
+      "detailsTitle": "تفاصيل المطعم",
+      "whatsappLabel": "رقم واتساب",
+      "instagramLabel": "حساب إنستغرام",
+      "workingHoursArLabel": "نص ساعات العمل (عربي)",
+      "workingHoursEnLabel": "نص ساعات العمل (إنجليزي)",
+      "openTimeLabel": "يفتح عند",
+      "closeTimeLabel": "يُغلق عند",
+      "hoursHint": "اترك كلا الحقلين فارغين لإخفاء شارة الفتح/الإغلاق المباشرة في القائمة العامة. عبّئ كليهما لإظهارها.",
+      "currencyLabel": "رمز العملة",
+      "currencyHint": "يُستخدم كقيمة افتراضية للعناصر الجديدة، مثل ILS أو JOD أو USD.",
+      "appearanceTitle": "المظهر",
+      "primaryColorLabel": "اللون الأساسي",
+      "primaryColorHint": "يُستخدم للأزرار والتمييز في قائمتك العامة. يجب أن يبقى واضحًا مع نص أبيض.",
+      "contrastPassLabel": "تباين {ratio}:1 مع النص الأبيض -- يحقق معيار AA",
+      "contrastFailLabel": "تباين {ratio}:1 مع النص الأبيض -- فاتح جدًا، اختر درجة أغمق",
+      "resetColor": "إعادة إلى الافتراضي",
+      "previewLabel": "معاينة",
+      "previewButtonText": "أضف إلى اختياراتي",
+      "logoLabel": "الشعار",
+      "coverImageLabel": "صورة الغلاف",
+      "savedToast": "تم حفظ الهوية التجارية",
+      "invalidColorToast": "أدخل لونًا صحيحًا.",
+      "colorContrastToast": "هذا اللون فاتح جدًا ليبقى واضحًا مع نص أبيض. اختر درجة أغمق.",
+      "logoUpdatedToast": "تم تحديث الشعار",
+      "coverImageUpdatedToast": "تم تحديث صورة الغلاف",
+      "bothHoursRequiredToast": "حدّد وقت الفتح والإغلاق معًا، أو اتركهما فارغين."
     }
   }
 }

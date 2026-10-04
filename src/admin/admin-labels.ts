@@ -11,10 +11,11 @@ import { Locale } from '../common/middleware/locale-view.middleware';
  * simpler than threading a dozen individual string parameters through
  * every macro signature.
  */
-export function buildAdminLabels(i18n: I18nService, locale: Locale) {
+export function buildAdminLabels(i18n: I18nService, locale: Locale, defaultCurrency = 'ILS') {
   const t = (key: string, args?: Record<string, unknown>) => i18n.t(key, { lang: locale, args });
 
   return {
+    defaultCurrency,
     form: {
       save: t('common.admin.form.save'),
       cancel: t('common.admin.form.cancel'),
@@ -83,6 +84,32 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale) {
       printButton: t('common.admin.qr.printButton'),
       scanToView: t('common.admin.qr.scanToView'),
       downloadLinkLabel: t('common.admin.qr.downloadLinkLabel'),
+    },
+    branding: {
+      title: t('common.admin.branding.title'),
+      detailsTitle: t('common.admin.branding.detailsTitle'),
+      whatsappLabel: t('common.admin.branding.whatsappLabel'),
+      instagramLabel: t('common.admin.branding.instagramLabel'),
+      workingHoursArLabel: t('common.admin.branding.workingHoursArLabel'),
+      workingHoursEnLabel: t('common.admin.branding.workingHoursEnLabel'),
+      openTimeLabel: t('common.admin.branding.openTimeLabel'),
+      closeTimeLabel: t('common.admin.branding.closeTimeLabel'),
+      hoursHint: t('common.admin.branding.hoursHint'),
+      currencyLabel: t('common.admin.branding.currencyLabel'),
+      currencyHint: t('common.admin.branding.currencyHint'),
+      appearanceTitle: t('common.admin.branding.appearanceTitle'),
+      primaryColorLabel: t('common.admin.branding.primaryColorLabel'),
+      primaryColorHint: t('common.admin.branding.primaryColorHint'),
+      resetColor: t('common.admin.branding.resetColor'),
+      previewLabel: t('common.admin.branding.previewLabel'),
+      previewButtonText: t('common.admin.branding.previewButtonText'),
+      logoLabel: t('common.admin.branding.logoLabel'),
+      coverImageLabel: t('common.admin.branding.coverImageLabel'),
+      // Raw, uninterpolated templates for the client-side live contrast
+      // check (public/js/color-contrast.js) -- same pattern as
+      // menu-labels.ts's openStatus templates.
+      contrastPassTemplate: t('common.admin.branding.contrastPassLabel'),
+      contrastFailTemplate: t('common.admin.branding.contrastFailLabel'),
     },
     unavailable: t('common.menu.unavailable'),
   };

@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Param, Patch, Post, Req, Res, Render } from '
 import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 import { CategoryService } from './category.service';
+import { RestaurantService } from './restaurant.service';
 import { buildAdminLabels } from './admin-labels';
 import { toCategoryViewList } from './admin-view-model';
 import { triggerToast } from './htmx-toast';
@@ -10,6 +11,7 @@ import { triggerToast } from './htmx-toast';
 export class CategoriesController {
   constructor(
     private readonly categories: CategoryService,
+    private readonly restaurants: RestaurantService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -32,9 +34,10 @@ export class CategoriesController {
     }
 
     const categories = await this.categories.listForRestaurant(restaurantId);
+    const restaurant = await this.restaurants.findById(restaurantId);
     return {
       categories: toCategoryViewList(categories),
-      labels: buildAdminLabels(this.i18n, locale),
+      labels: buildAdminLabels(this.i18n, locale, restaurant.currency),
     };
   }
 
@@ -67,9 +70,10 @@ export class CategoriesController {
     triggerToast(res, this.i18n.t('common.admin.categories.savedToast', { lang: locale }));
 
     const category = await this.categories.findOneWithItems(id);
+    const restaurant = await this.restaurants.findById(restaurantId);
     return {
       category: toCategoryViewList([category])[0],
-      labels: buildAdminLabels(this.i18n, locale),
+      labels: buildAdminLabels(this.i18n, locale, restaurant.currency),
     };
   }
 
@@ -93,9 +97,10 @@ export class CategoriesController {
     const locale = req.locale ?? 'ar';
     await this.categories.move(restaurantId, id, direction);
     const categories = await this.categories.listForRestaurant(restaurantId);
+    const restaurant = await this.restaurants.findById(restaurantId);
     return {
       categories: toCategoryViewList(categories),
-      labels: buildAdminLabels(this.i18n, locale),
+      labels: buildAdminLabels(this.i18n, locale, restaurant.currency),
     };
   }
 }

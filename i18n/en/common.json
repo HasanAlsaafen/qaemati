@@ -83,7 +83,8 @@
       "categories": "Categories",
       "previewMenu": "Preview menu",
       "qr": "QR & print",
-      "toggleMenu": "Menu"
+      "toggleMenu": "Menu",
+      "branding": "Branding"
     },
     "form": {
       "required": "This field is required.",
@@ -160,6 +161,35 @@
       "printButton": "Print",
       "scanToView": "Scan to view our menu",
       "downloadLinkLabel": "Open menu link"
+    },
+    "branding": {
+      "title": "Branding",
+      "detailsTitle": "Restaurant details",
+      "whatsappLabel": "WhatsApp number",
+      "instagramLabel": "Instagram handle",
+      "workingHoursArLabel": "Working hours text (Arabic)",
+      "workingHoursEnLabel": "Working hours text (English)",
+      "openTimeLabel": "Opens at",
+      "closeTimeLabel": "Closes at",
+      "hoursHint": "Leave both empty to hide the live open/closed badge on the public menu. Set both to show it.",
+      "currencyLabel": "Currency code",
+      "currencyHint": "Used as the default for new items, e.g. ILS, JOD, USD.",
+      "appearanceTitle": "Appearance",
+      "primaryColorLabel": "Primary color",
+      "primaryColorHint": "Used for buttons and highlights on your public menu. Must stay readable with white text.",
+      "contrastPassLabel": "{ratio}:1 contrast with white text -- passes AA",
+      "contrastFailLabel": "{ratio}:1 contrast with white text -- too light, pick a darker color",
+      "resetColor": "Reset to default",
+      "previewLabel": "Preview",
+      "previewButtonText": "Add to selection",
+      "logoLabel": "Logo",
+      "coverImageLabel": "Cover image",
+      "savedToast": "Branding saved",
+      "invalidColorToast": "Enter a valid color.",
+      "colorContrastToast": "That color is too light to stay readable with white text. Pick a darker shade.",
+      "logoUpdatedToast": "Logo updated",
+      "coverImageUpdatedToast": "Cover image updated",
+      "bothHoursRequiredToast": "Set both an opening and a closing time, or leave both empty."
     }
   }
 }

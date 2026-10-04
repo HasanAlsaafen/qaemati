@@ -1110,3 +1110,80 @@ cost real debugging time before being ruled out)
   instead of the expected 1 — the name legitimately appears multiple times (its own category
   row's visible text, plus that row's embedded JSON `data-item` payload used for the detail-sheet
   dispatch). Fixed by scoping the check to the banner section's own markup specifically.
+
+### A4: Branding settings, white-label (done)
+
+An admin "Branding" page covering restaurant details, logo/cover image uploads, a primary-color
+picker that live-checks WCAG AA contrast, and a currency code -- plus wiring the saved color
+through to actually change the public menu's palette per restaurant, not just store it inertly.
+`src/styles/tokens.css`'s own header comment ("Exposed on :root so a restaurant can later
+override `--color-primary`...") already anticipated this from Phase 1.
+
+What was built:
+
+- **Migration** (`20261004133432_add_branding_fields`): `Restaurant.coverImagePath`,
+  `Restaurant.primaryColor` (nullable hex; null means "use the default Zaytoun palette", the
+  same convention as every other optional field in this schema), `Restaurant.currency` (defaults
+  to `"ILS"`, used as the new-item form's default rather than a hardcoded literal).
+- **`src/common/color.ts`** (new, unit-tested, 17 cases): `hexToRgb`, `contrastRatio`,
+  `meetsPrimaryColorContrast` (contrast against white >= 4.5:1 -- the design system's
+  `--color-on-primary` stays fixed white rather than flipping per restaurant, so the constraint
+  is "which primary colors stay readable with white text," not "pick readable text for this
+  color"), `darken`/`lighten` (for the hover/soft shades a chosen color needs, mirroring how the
+  default pair relates). `scripts/check-contrast.ts` (the Phase 1 palette gate) was refactored to
+  import this instead of keeping its own copy of the same luminance/contrast math -- one
+  canonical implementation instead of two silently drifting apart.
+- **`RestaurantService`** (new): re-validates the color server-side (`meetsPrimaryColorContrast`)
+  even though the form's own JS already blocks a bad submission client-side -- the form can be
+  bypassed, and a failing color would make every button label unreadable for every diner, not
+  just a cosmetic nit. Same both-or-neither validation for `openTime`/`closeTime` as A3's
+  category windows.
+- **`BrandingController`** (new, `/admin/branding`): a details-save endpoint and two image-upload
+  endpoints (logo, cover), reusing `itemImageMulterOptions`'s rules (jpeg/png/webp, 5MB cap) via a
+  new `restaurantImageMulterOptions` writing to its own `public/uploads/restaurants/` directory
+  rather than mixing with item photos.
+- **Public menu**: `MenuService` derives `primaryColorCss` ("R G B" triplets for `--color-primary`
+  / `-hover` / `-soft`) from the restaurant's hex when set; `layouts/menu.njk` injects them as an
+  inline `:root` override scoped to that one page load, so every other restaurant's menu keeps
+  the Zaytoun default untouched. `restaurant-header.njk` renders the cover image as a banner above
+  the existing logo/name block when set.
+- **Admin dashboard**: the "add item" form's currency field now defaults to the restaurant's own
+  `currency` (threaded through `buildAdminLabels`'s new optional third argument) instead of a
+  hardcoded `"ILS"` literal, so a JOD restaurant's admin isn't quietly fighting the form every
+  time they add an item.
+- **Live contrast check**: `public/js/color-contrast.js` mirrors `src/common/color.ts`'s formula
+  client-side (same duplication tradeoff as A3's `open-status.js`) so the branding form shows a
+  pass/fail ratio as the owner drags the color picker, before ever submitting.
+
+### Verified
+
+- Unit: 17 new `color` tests (hex parsing/formatting, contrast ratio against known values, the
+  AA threshold boundary, darken/lighten) -- 59 unit tests total.
+- E2E: `test/branding.e2e-spec.ts` -- saving valid details and a passing color persists and
+  returns a success toast; a color too light for white text is rejected with a danger toast and
+  does *not* overwrite the previously-saved valid color; a one-sided open/close time is rejected;
+  the saved color actually appears as a `--color-primary` override on the public menu response; a
+  non-image file upload for the logo is rejected with 400.
+- Interactive (Playwright, both demo restaurants): logged into Al-Sanabel's admin, confirmed the
+  branding page's live contrast indicator correctly flips from pass to fail as the color input
+  changes (tested with a pastel color, ratio 1.41:1); confirmed the server independently rejects
+  that same bad color on submit; confirmed a real detail change (WhatsApp number) and a real logo
+  upload (PNG) both persisted correctly to the database; confirmed Al-Sanabel's seeded brand color
+  (`#1E5F74`) renders as the actual button/badge color on its public menu while Bayt Al-Zaytoun
+  (no `primaryColor` set) correctly keeps the default Zaytoun green -- proving the override is
+  scoped per restaurant, not global.
+- axe-core: 0 violations on the branding admin page (Arabic and English) and on both restaurants'
+  public menus after the cover-image and color-override changes.
+- `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
+  pass; migration applied to both the dev and test databases; demo data re-seeded clean after
+  testing (including re-uploading Al-Sanabel's seed logo, which a manual upload test had
+  temporarily overwritten with a throwaway test PNG).
+
+### Bug found during the axe-core pass (fixed before commit)
+
+- The branding page's two file-upload inputs and its primary-color hex text input had no
+  accessible label (axe: `label`, critical, "Form elements must have labels") -- the visible
+  `<label>` text sat as a sibling with no `for`/`id` association for the file inputs, and the hex
+  input had no label at all (only the adjacent color swatch did). Fixed by adding `id`/`for`
+  pairs to the file inputs and an `aria-label` to the hex input; re-ran axe-core afterward and
+  confirmed 0 violations in both languages.

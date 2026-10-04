@@ -1,0 +1,138 @@
+{#
+  restaurant: Restaurant row + hasStructuredHours (admin-view-model.ts)
+  Rendered both as the initial page content (admin/branding.njk) and as
+  the htmx re-render target after a successful/failed save -- so this
+  partial owns the whole <form>, matching category-block.njk's pattern
+  of "the thing that gets swapped is exactly the thing with the form in
+  it."
+#}
+<div
+  id="branding-form"
+  x-data="{
+    color: {{ (restaurant.primaryColor or '#44603C') | dump }},
+    defaultColor: '#44603C',
+    contrast: null,
+    passTemplate: {{ labels.branding.contrastPassTemplate | dump }},
+    failTemplate: {{ labels.branding.contrastFailTemplate | dump }},
+    recomputeContrast() {
+      const result = window.checkPrimaryColorContrast ? window.checkPrimaryColorContrast(this.color) : null;
+      this.contrast = result;
+    },
+  }"
+  x-init="recomputeContrast()"
+>
+  <form
+    hx-patch="/admin/branding"
+    hx-target="#branding-form"
+    hx-swap="outerHTML"
+    class="flex flex-col gap-6"
+  >
+    <section class="rounded-lg border border-border bg-surface p-4">
+      <h2 class="font-sans text-lg font-bold text-text">{{ labels.branding.detailsTitle }}</h2>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        <div class="flex flex-col gap-1.5">
+          <label for="branding-nameAr" class="text-sm font-medium text-text">{{ labels.form.nameAr }}</label>
+          <input id="branding-nameAr" name="nameAr" type="text" value="{{ restaurant.nameAr }}" dir="rtl" required class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="branding-nameEn" class="text-sm font-medium text-text">{{ labels.form.nameEn }}</label>
+          <input id="branding-nameEn" name="nameEn" type="text" value="{{ restaurant.nameEn }}" dir="ltr" required class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="branding-descriptionAr" class="text-sm font-medium text-text">{{ labels.form.descriptionAr }}</label>
+          <textarea id="branding-descriptionAr" name="descriptionAr" dir="rtl" rows="2" class="rounded-md border border-border-strong bg-surface px-3 py-2 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ restaurant.descriptionAr or '' }}</textarea>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="branding-descriptionEn" class="text-sm font-medium text-text">{{ labels.form.descriptionEn }}</label>
+          <textarea id="branding-descriptionEn" name="descriptionEn" dir="ltr" rows="2" class="rounded-md border border-border-strong bg-surface px-3 py-2 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ restaurant.descriptionEn or '' }}</textarea>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="branding-whatsapp" class="text-sm font-medium text-text">{{ labels.branding.whatsappLabel }}</label>
+          <input id="branding-whatsapp" name="whatsapp" type="tel" dir="ltr" value="{{ restaurant.whatsapp or '' }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="branding-instagramHandle" class="text-sm font-medium text-text">{{ labels.branding.instagramLabel }}</label>
+          <input id="branding-instagramHandle" name="instagramHandle" type="text" dir="ltr" value="{{ restaurant.instagramHandle or '' }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="branding-workingHoursAr" class="text-sm font-medium text-text">{{ labels.branding.workingHoursArLabel }}</label>
+          <input id="branding-workingHoursAr" name="workingHoursAr" type="text" dir="rtl" value="{{ restaurant.workingHoursAr or '' }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="branding-workingHoursEn" class="text-sm font-medium text-text">{{ labels.branding.workingHoursEnLabel }}</label>
+          <input id="branding-workingHoursEn" name="workingHoursEn" type="text" dir="ltr" value="{{ restaurant.workingHoursEn or '' }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        </div>
+      </div>
+
+      <div class="mt-4 grid gap-4 sm:grid-cols-3">
+        <div class="flex flex-col gap-1.5">
+          <label for="branding-openTime" class="text-sm font-medium text-text">{{ labels.branding.openTimeLabel }}</label>
+          <input id="branding-openTime" name="openTime" type="time" dir="ltr" value="{{ restaurant.openTime or '' }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="branding-closeTime" class="text-sm font-medium text-text">{{ labels.branding.closeTimeLabel }}</label>
+          <input id="branding-closeTime" name="closeTime" type="time" dir="ltr" value="{{ restaurant.closeTime or '' }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="branding-currency" class="text-sm font-medium text-text">{{ labels.branding.currencyLabel }}</label>
+          <input id="branding-currency" name="currency" type="text" dir="ltr" maxlength="8" value="{{ restaurant.currency }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        </div>
+      </div>
+      <p class="mt-2 text-sm text-muted-text">{{ labels.branding.hoursHint }}</p>
+      <p class="mt-1 text-sm text-muted-text">{{ labels.branding.currencyHint }}</p>
+    </section>
+
+    <section class="rounded-lg border border-border bg-surface p-4">
+      <h2 class="font-sans text-lg font-bold text-text">{{ labels.branding.appearanceTitle }}</h2>
+      <div class="mt-4 flex flex-wrap items-start gap-6">
+        <div class="flex flex-col gap-1.5">
+          <label for="branding-primaryColor" class="text-sm font-medium text-text">{{ labels.branding.primaryColorLabel }}</label>
+          <div class="flex items-center gap-2">
+            <input
+              id="branding-primaryColor"
+              type="color"
+              x-model="color"
+              x-on:input="recomputeContrast()"
+              class="h-11 w-14 cursor-pointer rounded-md border border-border-strong bg-surface"
+            >
+            <input
+              type="text"
+              dir="ltr"
+              x-model="color"
+              x-on:input="recomputeContrast()"
+              maxlength="7"
+              aria-label="{{ labels.branding.primaryColorLabel }}"
+              class="min-h-11 w-28 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+            <input type="hidden" name="primaryColor" x-bind:value="color">
+            <button
+              type="button"
+              x-on:click="color = defaultColor; recomputeContrast()"
+              class="min-h-11 rounded-md border border-border px-3 text-sm text-text hover:bg-muted-surface"
+            >{{ labels.branding.resetColor }}</button>
+          </div>
+          <p class="mt-1 text-sm" x-show="contrast" x-bind:class="contrast && contrast.passes ? 'text-success' : 'text-danger'">
+            <span x-text="contrast ? (contrast.passes ? passTemplate : failTemplate).replace('{ratio}', contrast.ratio.toFixed(2)) : ''"></span>
+          </p>
+          <p class="mt-1 text-sm text-muted-text">{{ labels.branding.primaryColorHint }}</p>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <span class="text-sm font-medium text-text">{{ labels.branding.previewLabel }}</span>
+          <button
+            type="button"
+            tabindex="-1"
+            class="inline-flex min-h-11 items-center justify-center rounded-md px-4 text-sm font-medium"
+            x-bind:style="'background-color: ' + color + '; color: white'"
+          >{{ labels.branding.previewButtonText }}</button>
+        </div>
+      </div>
+    </section>
+
+    <div>
+      <button type="submit" class="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        {{ labels.form.save }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -10,6 +10,7 @@ import {
   nowInHebronMinutes,
 } from '../common/open-status';
 import { PrismaService } from '../prisma/prisma.service';
+import { darken, hexToRgb, lighten, rgbToTriplet } from '../common/color';
 
 export interface MenuOptionView {
   id: string;
@@ -62,12 +63,19 @@ export interface MenuView {
   name: string;
   description: string | null;
   logoUrl: string | null;
+  coverImageUrl: string | null;
   whatsappUrl: string | null;
   instagramUrl: string | null;
   workingHours: string | null;
   openStatus: OpenStatusView | null;
   categories: MenuCategoryView[];
   todaysSpecials: MenuItemView[];
+  /** A4: "R G B" triplets to override --color-primary (and friends) for
+   *  a restaurant that picked its own brand color -- null when the
+   *  restaurant hasn't set one, in which case the layout falls back to
+   *  src/styles/tokens.css's own Zaytoun default, same "unset means use
+   *  the house default" convention as every other optional field here. */
+  primaryColorCss: { primary: string; primaryHover: string; primarySoft: string } | null;
 }
 
 @Injectable()
@@ -196,12 +204,14 @@ export class MenuService {
       name: pick(restaurant.nameAr, restaurant.nameEn),
       description: pickNullable(restaurant.descriptionAr, restaurant.descriptionEn),
       logoUrl: restaurant.logoPath,
+      coverImageUrl: restaurant.coverImagePath,
       whatsappUrl: restaurant.whatsapp ? toWhatsappUrl(restaurant.whatsapp) : null,
       instagramUrl: restaurant.instagramHandle ? toInstagramUrl(restaurant.instagramHandle) : null,
       workingHours: pickNullable(restaurant.workingHoursAr, restaurant.workingHoursEn),
       openStatus,
       categories,
       todaysSpecials,
+      primaryColorCss: toPrimaryColorCss(restaurant.primaryColor),
     };
   }
 }
@@ -214,4 +224,17 @@ function toWhatsappUrl(rawPhone: string): string {
 function toInstagramUrl(handle: string): string {
   const username = handle.replace(/^@/, '');
   return `https://instagram.com/${username}`;
+}
+
+function toPrimaryColorCss(
+  primaryColor: string | null,
+): { primary: string; primaryHover: string; primarySoft: string } | null {
+  if (!primaryColor) return null;
+  const rgb = hexToRgb(primaryColor);
+  if (!rgb) return null;
+  return {
+    primary: rgbToTriplet(rgb),
+    primaryHover: rgbToTriplet(darken(rgb)),
+    primarySoft: rgbToTriplet(lighten(rgb)),
+  };
 }

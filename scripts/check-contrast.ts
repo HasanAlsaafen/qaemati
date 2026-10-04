@@ -4,6 +4,8 @@
  * Run with `npm run contrast:check`. Exits non-zero if anything fails.
  */
 
+import { contrastRatio as sharedContrastRatio, hexToRgb } from '../src/common/color';
+
 interface Pair {
   name: string;
   fg: string;
@@ -156,29 +158,8 @@ const pairs: Pair[] = [
   },
 ];
 
-function hexToRgb(hex: string): [number, number, number] {
-  const normalized = hex.replace('#', '');
-  const r = parseInt(normalized.substring(0, 2), 16);
-  const g = parseInt(normalized.substring(2, 4), 16);
-  const b = parseInt(normalized.substring(4, 6), 16);
-  return [r, g, b];
-}
-
-function relativeLuminance([r, g, b]: [number, number, number]): number {
-  const channel = (value: number) => {
-    const srgb = value / 255;
-    return srgb <= 0.03928 ? srgb / 12.92 : Math.pow((srgb + 0.055) / 1.055, 2.4);
-  };
-  const [rl, gl, bl] = [channel(r), channel(g), channel(b)];
-  return 0.2126 * rl + 0.7152 * gl + 0.0722 * bl;
-}
-
 function contrastRatio(hexA: string, hexB: string): number {
-  const lumA = relativeLuminance(hexToRgb(hexA));
-  const lumB = relativeLuminance(hexToRgb(hexB));
-  const lighter = Math.max(lumA, lumB);
-  const darker = Math.min(lumA, lumB);
-  return (lighter + 0.05) / (darker + 0.05);
+  return sharedContrastRatio(hexToRgb(hexA)!, hexToRgb(hexB)!);
 }
 
 let hasFailure = false;

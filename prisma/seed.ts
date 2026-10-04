@@ -60,6 +60,8 @@ async function main() {
         workingHoursEn: restaurantData.workingHoursEn,
         openTime: restaurantData.openTime,
         closeTime: restaurantData.closeTime,
+        currency: restaurantData.currency,
+        primaryColor: restaurantData.primaryColor,
       },
     });
 

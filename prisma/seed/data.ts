@@ -36,6 +36,9 @@ export interface SeedRestaurant {
    *  the free-text workingHoursAr/En above. */
   openTime?: string;
   closeTime?: string;
+  /** A4: hex color overriding the default Zaytoun palette for this
+   *  restaurant's own public menu. Omitted means "use the default." */
+  primaryColor?: string;
   adminEmail: string;
   adminName: string;
   categories: SeedCategory[];
@@ -353,6 +356,7 @@ export const seedRestaurants: SeedRestaurant[] = [
     workingHoursEn: 'Daily, 12:00 PM - 12:00 AM',
     openTime: '12:00',
     closeTime: '00:00',
+    primaryColor: '#1E5F74',
     adminEmail: 'admin@alsanabel.example.com',
     adminName: 'Omar Haddad',
     categories: [
