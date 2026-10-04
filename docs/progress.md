@@ -624,3 +624,134 @@ What was built:
 - Left no test data behind: both tables added during testing were deleted before finishing, and
   the general-QR/table-QR feature itself needs no seed data (it's generated from a restaurant's
   existing slug, not stored).
+
+## Phase 6 (interrupted, partially done)
+
+A second instruction arrived (the UX/new-features track below) while Phase 6 "Hardening" was
+mid-flight, with a brief that stated Phases 0–6 were already complete. They weren't — only the
+start of a dependency audit had landed. Recorded here so the gap is visible rather than silently
+implied-done by the phase numbering.
+
+- **Done:** applied `npm overrides` for three transitive CVEs pulled in via
+  `@nestjs/platform-express` — `body-parser` 1.20.4→1.20.8, `qs` 6.14.2→6.16.0, and a
+  platform-express-scoped override pinning its internal `multer` to 2.4.0 (matching the app's
+  own direct dependency, which was already patched). Dropped `npm audit` from 24 to 22
+  vulnerabilities; the remaining 22 are entirely in the `@nestjs/cli` dev-tooling chain
+  (`@angular-devkit/*`, `webpack`, `tar`, `tmp`, `inquirer`, `glob`) — build-time only, never
+  shipped or executed in the running app, left as-is rather than force-upgrading `@nestjs/cli`
+  to a major version with no time budget to regression-test the switch.
+- **Not done:** no automated test harness (Jest/`@nestjs/testing`/Supertest are installed but
+  unconfigured, zero test files exist), no DTO/`class-validator` wiring (also installed, also
+  unused — `ValidationPipe` was planned but not started), no systematic error-handling/edge-case
+  pass.
+- **Resolution:** the Jest+Supertest harness is a hard prerequisite for Phase 9's "tests passing"
+  acceptance criterion, so it gets built there instead of being revisited as a standalone phase.
+  The DTO/validation gap is tracked as finding P1-4 in `docs/ux/audit.md` instead of being fixed
+  here.
+
+## Phase 7: Skills report, research, and audit (done)
+
+Second track begins: raise the UX to a professional level, remove AI-generated-looking design
+patterns, and add new features (Packs A/B) over Phases 7–11. Phase 7 is research and audit only
+— no product code changed.
+
+**Step 0 (skills/tools):** checked `~/.claude/skills`, `~/.agents/skills`, and the skills listed
+at the time, for anything relevant to frontend design, UX, accessibility, browser testing,
+performance, or documentation. Initially none existed — the available skills were all
+document/productivity-oriented (`docx`, `pdf`, `pptx`, `xlsx`, `google-workspace`, `docs` [the
+Claude Docs artifact connector, not repo documentation], `morning`, `humanize`,
+`import-memory`, `skill-creator`, `cv-hasan`) or unrelated tooling (`schedule`,
+`artifact-capabilities`, `dataviz`, `claude-api`, etc.). **Correction, mid-phase:** a
+`/reload-skills` run partway through this phase synced three newly-relevant skills into the
+project-local (gitignored) `.agents/skills/` — `frontend-design`, `web-design-guidelines`
+(fetches and applies Vercel's Web Interface Guidelines), and `ui-ux-pro-max` (a local searchable
+UX-rule set), plus `design-mobile-apps` (a third-party paid design-generation API, unusable here
+— no `SLEEK_API_KEY` configured, and not needed given Qaemati's own Phase 1 design system). All
+four were read and the three relevant ones applied retroactively — see `audit.md`'s "skills that
+became available mid-audit" addendum for what each contributed (confirmation on `frontend-
+design`'s specific tell list, one new minor finding from `web-design-guidelines`, reinforcement
+of the existing P0 nav finding from `ui-ux-pro-max`). Used own knowledge plus
+`WebSearch` (web access confirmed available) for competitor/principles research, Playwright +
+`@axe-core/playwright` (installed as new dev dependencies per the brief) for scripted
+screenshot capture and accessibility scanning, and `npx lighthouse` (already used in Phase 3).
+
+**Step 1 (research docs, all in `docs/ux/`):**
+- `references.md` — Wolt/Talabat/Uber Eats, Toast/Square/Flipdish/Menu Tiger/Popmenu,
+  Shopify mobile admin/Square Dashboard, Dishoom/Blue Bottle, grounded in actual `WebSearch`
+  results (sourced and linked), not generic knowledge — each pattern paired with a concrete
+  Qaemati adaptation and, where relevant, a named competitor weakness (Arabic-as-an-afterthought
+  across every researched QR-menu platform is the standout one).
+- `principles.md` — Nielsen's heuristics, Laws of UX, mobile ergonomics, WCAG 2.2 AA, Core Web
+  Vitals, form design, state design, microcopy, and Arabic/bidi specifics, each rule paired with
+  what it actually means for this codebase (e.g. "Fitts's Law → the existing `min-h-11` 44px
+  touch-target convention", not just the law restated).
+- `ai-tells.md` — 27-item checklist extending the brief's seed list (researched via `WebSearch`),
+  each with a "what to do instead."
+- `glossary.md` — locks one Arabic term per concept for every string the existing product
+  already uses (pulled from the real `i18n/*/common.json` files, not invented) plus every new
+  term Packs A/B will need, decided now so Phase 9/10 doesn't improvise terminology mid-build.
+  One deliberate choice worth flagging: A1's "selection" list is labeled "طلبي" (my request) —
+  considered and rejected "سلتي" (my basket/cart) as reading too much like e-commerce for a
+  WhatsApp message that explicitly isn't an order.
+
+**Step 2 audit (no fixes yet, those are Phase 8):**
+- `scripts/ux-screenshots.js` (Playwright, one-off tool, not part of the app build): 36
+  screenshots in `docs/ux/screenshots/before/` — 4 viewports (360/390/768/1280) × 2 locales for
+  the public menu and admin dashboard, plus targeted states (empty search, item detail sheet,
+  404, admin login error, category edit mode, QR page empty/populated, QR print page, delete
+  confirm dialog).
+- `scripts/ux-axe-audit.js`: axe-core against 8 pages (public menu AR/EN, admin login AR/EN,
+  admin dashboard AR/EN, admin QR AR/EN) — **0 violations on every page.**
+- Lighthouse (mobile) against the public menu (AR/EN) and the authenticated admin dashboard
+  (AR): accessibility 100 on all three (already past Phase 8's ≥95 bar before any fixes),
+  best-practices/SEO 100, performance 89–97 (raw JSON saved in `docs/ux/lighthouse/`).
+- `audit.md`: every one of the 27 AI-tells items checked against the actual product (not
+  assumed) — 2 genuine tells found (a uniform-card-weight pattern judged justified for a menu
+  listing, logged P2; and the home page's literal "Welcome to Qaemati" headline, P1/AI-tell,
+  fixed in Phase 8), the other 25 either absent or a legitimate non-default use. Two P0 findings
+  (admin nav doesn't respond to phone width, admin item names truncate illegibly at 390px — both
+  directly undercut the "owner manages the menu from a phone" use case the research in
+  `references.md` says is central) and four P1 findings (the home headline; a measured
+  Arabic-vs-English LCP gap on the public menu, 3.5s vs 1.8s, hypothesis noted but not yet
+  diagnosed; a possibly-cosmetic bidi input-scroll artifact on the admin login error state,
+  flagged unverified rather than guessed-and-fixed; and the known gap from Phase 6's interruption
+  about create-form validation feedback).
+
+### Bugs found and fixed while doing this (tooling, not product code)
+
+- **Disk full (310MB free, then down to 310→1.2G→506M→479M across the session) blocked the
+  Playwright Chromium download outright** (`ENOSPC`) on the first attempt. Not a problem with
+  this task specifically — `df -h /` showed 100% usage system-wide. Cleared only
+  `~/.cache/ms-playwright`'s own failed-download remnants (686MB, unambiguously this task's own
+  mess) rather than touching anything else on the machine (Chrome's cache, pip, snap, Downloads)
+  without asking — that bought enough headroom (1.2GB) to complete the install. Flagged the
+  broader disk-space situation to the user rather than continuing to silently scavenge space.
+- **The screenshot script's reused single `page` object crashed Chromium consistently at the
+  same spot** (`page.goto: Page crashed`) after roughly 9 navigations in a row, in this
+  memory-constrained environment (~700MB free RAM alongside several other Chrome instances and
+  stale `nest start --watch` processes left running from earlier phases in other terminals —
+  left those alone since they weren't started by this session and might still be in use).
+  Fixed by closing and recreating the Playwright `page` (same browser context, so the admin
+  login session cookie persists) before every single screenshot instead of reusing one page for
+  the whole run.
+
+### Verified
+
+- `npx tsc --noEmit`, `npm run lint`, and a full production build all pass (only `docs/ux/`,
+  two new one-off scripts, and `package.json`'s dependency overrides/additions changed — no
+  product code touched, per this phase's own acceptance criterion).
+- All three research documents and `audit.md` are specific to Qaemati throughout — grounded in
+  real screenshots, real axe/Lighthouse output, real grep results against the actual codebase,
+  and real `i18n/*.json` content, not generic UX advice with Qaemati's name substituted in.
+
+### Known gaps / follow-ups
+
+- Lighthouse performance numbers were measured under shared-machine background load; worth a
+  clean re-run once Phase 8 lands for a trustworthy before/after comparison, per `audit.md`'s P2
+  notes.
+- The Arabic LCP regression (P1 in `audit.md`) has a hypothesis (font-loading priority) but
+  wasn't profiled down to a root cause in this pass — Phase 8 needs to actually diagnose it
+  before fixing it, not guess.
+- The bidi input-scroll artifact (P1-3 in `audit.md`) is explicitly unverified — needs
+  interactive confirmation (focus/cursor behavior, not just a static screenshot) before deciding
+  whether it's a real bug or just how the screenshot happened to capture an unfocused field.
