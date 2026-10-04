@@ -52,7 +52,11 @@ export class ItemsController {
     const locale = req.locale ?? 'ar';
     const priceValue = Number(price);
 
-    if (nameAr?.trim() && nameEn?.trim() && Number.isFinite(priceValue) && priceValue >= 0) {
+    if (!nameAr?.trim() || !nameEn?.trim()) {
+      triggerToast(res, this.i18n.t('common.admin.form.required', { lang: locale }), 'danger');
+    } else if (!Number.isFinite(priceValue) || priceValue < 0) {
+      triggerToast(res, this.i18n.t('common.admin.form.invalidPrice', { lang: locale }), 'danger');
+    } else {
       await this.items.create(restaurantId, categoryId, {
         nameAr: nameAr.trim(),
         nameEn: nameEn.trim(),

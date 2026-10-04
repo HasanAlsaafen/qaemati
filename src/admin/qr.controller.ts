@@ -94,6 +94,8 @@ export class QrController {
     if (label?.trim()) {
       await this.tables.create(restaurantId, label.trim());
       triggerToast(res, this.i18n.t('common.admin.qr.addedToast', { lang: locale }));
+    } else {
+      triggerToast(res, this.i18n.t('common.admin.form.required', { lang: locale }), 'danger');
     }
 
     return {

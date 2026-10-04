@@ -3,9 +3,9 @@
     "name": "Qaemati"
   },
   "home": {
-    "title": "Welcome to Qaemati",
-    "subtitle": "Beautiful digital menus for cafes and restaurants in Palestine",
-    "description": "This is a demo. Try one of the menus below:"
+    "title": "Qaemati demo restaurants",
+    "subtitle": "Two sample menus, built to show what a restaurant’s own Qaemati menu looks like.",
+    "description": "Pick a restaurant to open its live menu:"
   },
   "nav": {
     "language": "العربية"
@@ -47,7 +47,8 @@
       "dashboard": "Dashboard",
       "categories": "Categories",
       "previewMenu": "Preview menu",
-      "qr": "QR & print"
+      "qr": "QR & print",
+      "toggleMenu": "Menu"
     },
     "form": {
       "required": "This field is required.",

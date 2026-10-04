@@ -1,3 +1,14 @@
+{#
+  Inherently Latin/ASCII content -- email, password, phone, URL, number --
+  stays dir="ltr" regardless of the active UI language. Without this, these
+  fields inherit dir="rtl" from <html> on the Arabic locale, which
+  right-aligns the text and anchors the scroll position from the wrong
+  side: a long value (e.g. an email address) visually loses its first
+  character even though the underlying form value is correct. Found via
+  the Phase 8 audit (`docs/ux/audit.md`, P1-3) after a failed-login
+  screenshot appeared to show a truncated email address.
+#}
+{% set LTR_TYPES = ['email', 'password', 'tel', 'url', 'number'] %}
 {% macro input(name, label, type='text', value='', placeholder='', error=none, hint=none, attrs='') %}
   {% set inputId = 'field-' + name %}
   <div class="flex flex-col gap-1.5">
@@ -8,6 +19,7 @@
       type="{{ type }}"
       value="{{ value }}"
       placeholder="{{ placeholder }}"
+      {% if type in LTR_TYPES %}dir="ltr"{% endif %}
       class="min-h-11 rounded-md border bg-surface px-3 text-base text-text placeholder:text-muted-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'border-danger' if error else 'border-border-strong' }}"
       {% if error %}aria-invalid="true" aria-describedby="{{ inputId }}-error"{% elif hint %}aria-describedby="{{ inputId }}-hint"{% endif %}
       {{ attrs | safe }}

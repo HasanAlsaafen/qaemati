@@ -755,3 +755,80 @@ screenshot capture and accessibility scanning, and `npx lighthouse` (already use
 - The bidi input-scroll artifact (P1-3 in `audit.md`) is explicitly unverified — needs
   interactive confirmation (focus/cursor behavior, not just a static screenshot) before deciding
   whether it's a real bug or just how the screenshot happened to capture an unfocused field.
+
+## Phase 8: UX fixes and AI-tells cleanup (done)
+
+Fixed every P0 and P1 finding from `docs/ux/audit.md`, plus the one real AI-tell (#20, the
+generic home headline). All fix details, verification method, and before/after evidence are
+inline in `audit.md` itself (each finding now has a `✅ Fixed` note) rather than duplicated here
+— this entry covers what's notable about *how* they were found and fixed.
+
+What was fixed:
+
+- **P0-1 (admin nav not responsive at phone width):** `views/layouts/admin.njk` now shows nav
+  links + logout inline from the `sm` breakpoint up; below it, a single hamburger/close toggle
+  button (`aria-label`, `aria-expanded`, `aria-controls`) reveals a stacked full-width mobile
+  panel. Verified both visually (screenshots) and interactively (Playwright: clicked the toggle,
+  confirmed `aria-expanded` flips and the panel's links render).
+- **P0-2 (admin item names illegible at phone width) — turned out to be two separate bugs, not
+  one.** The audit's working theory was a bidi-direction truncation bug (mixing an LTR English
+  run and an RTL Arabic run on one `truncate` line inside an RTL document cuts from the wrong
+  side). Fixing *that* alone (splitting into two `dir`-tagged lines) was step one — but
+  re-screenshotting to verify caught a second, independent cause: the *English*-locale
+  screenshot was just as badly truncated, which the bidi theory doesn't explain at all. The real
+  second cause was spatial: the row's action-button column (move ×2, toggle, edit, delete) left
+  only ~120px for the name regardless of text direction. Fixed by restructuring
+  `item-row.njk` to stack vertically below `sm` (name gets the full row width, actions wrap onto
+  their own row beneath) and stay side-by-side above it. Worth noting as a reminder that a
+  screenshot-driven audit's first hypothesis for *why* something looks wrong isn't automatically
+  the whole story — re-verifying after the "fix" is what caught the second bug.
+- **P1-1 (Arabic LCP regression):** root-caused, not guessed. The original audit pass used
+  `--only-categories=performance`, which drops Lighthouse's diagnostic/insight audits — re-ran
+  with the full audit and found `network-dependency-tree-insight` showing two Bold-weight
+  Thmanyah webfonts discovered only *after* `app.css` parses (not preloaded), each adding a full
+  round trip neither the already-preloaded Regular/Medium nor English's Inter ever pay. Confirmed
+  both Bold files are genuinely used above the fold before preloading them (not a blind
+  preload-everything fix). The AR/EN performance gap closed from 7-8 points to ~1 point on a
+  clean before/after comparison.
+- **P1-2 (generic home headline):** `home.title`/`subtitle`/`description` rewritten in both
+  locales to describe what the page does (a picker into the demo's seeded restaurants) instead
+  of greeting the visitor.
+- **P1-3 (email field appearing to lose its first character) — confirmed as a real bug, not a
+  screenshot artifact.** A Playwright check of the focused field's computed style showed
+  `direction: rtl` on an input holding an email address, inherited from `<html dir="rtl">` with
+  no override. Fixed at the shared `input.njk` macro: `email`/`password`/`tel`/`url`/`number`
+  inputs now force `dir="ltr"` regardless of UI locale, covering every current and future caller,
+  not just the login form that surfaced it.
+- **P1-4 (silent validation failures on create forms):** the category/item/table "add" endpoints
+  previously just re-rendered the unchanged list with zero feedback when server-side validation
+  rejected a submission. Now they fire a specific `danger` toast (reusing the existing bilingual
+  `common.admin.form.required`/`invalidPrice` strings). Field-level (per-input) error display is
+  explicitly deferred to Phase 9, when A2/A4's more complex forms will actually need it.
+
+### Verified
+
+- `npx tsc --noEmit`, `npm run lint`, and a full production build all pass.
+- axe-core re-run: still 0 violations across all 8 pages tested (no regression from the fixes).
+- Lighthouse re-run: accessibility/best-practices/SEO hold at 100 across public menu (AR/EN) and
+  authenticated admin dashboard; the AR/EN performance gap on the public menu closed from
+  7-8 points to ~1 point.
+- `docs/ux/screenshots/after/` holds the same 36-shot matrix as `before/`, re-captured post-fix;
+  spot-checked the admin dashboard (both locales, 390px), the login error state, and the
+  desktop nav (1280px, confirming no regression there) directly.
+- Interactively verified (not just visually) that the new mobile nav toggle actually works:
+  `aria-expanded` flips on click, the panel becomes visible, and its links render correctly.
+- Production smoke test caught its own false alarm: starting the server with
+  `NODE_ENV=production` locally makes session/CSRF cookies `Secure`-only, which don't survive
+  over plain HTTP — produced a misleading "invalid csrf token" 500 that looked like a Phase 8
+  regression but was just the smoke-test command's own flag; restarting without it confirmed
+  everything worked. Not a code bug, logged so the same red herring doesn't cost time again.
+
+### Known gaps / follow-ups
+
+- P2 items from `audit.md` (uniform card/row visual weight, spacing/icon-style spot-checks not
+  exhaustively re-verified, the `item-detail-sheet.njk` image missing explicit `width`/`height`
+  attributes) remain unfixed by design — logged as polish, not required for this phase's
+  acceptance bar.
+- Field-level inline validation errors (vs. the toast-level fix shipped here) deferred to
+  Phase 9, where A2 (variants/add-ons) and A4 (branding) introduce forms complex enough to need
+  it.

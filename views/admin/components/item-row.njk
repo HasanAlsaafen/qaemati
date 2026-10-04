@@ -15,26 +15,37 @@
     x-data="{ editing: false }"
     class="border-b border-border py-3 last:border-b-0"
   >
-    <div x-show="!editing" class="flex items-start gap-3">
-      <span class="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-muted-surface">
-        {% if item.imagePath %}
-          <img src="{{ item.imagePath }}" alt="" width="56" height="56" class="h-full w-full object-cover">
-        {% endif %}
-      </span>
+    {#
+      Stacked on narrow screens, side-by-side from sm: up: the name column
+      and the action-button column used to always compete for the same
+      row's width, which left almost nothing for the name once every
+      control (move x2, toggle, edit, delete) was accounted for -- names
+      were truncating to 1-2 characters even in English, not just the
+      bidi-direction bug this was first mistaken for (Phase 8 audit, P0-2).
+    #}
+    <div x-show="!editing" class="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-3">
+      <div class="flex min-w-0 items-start gap-3 sm:flex-1">
+        <span class="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-muted-surface">
+          {% if item.imagePath %}
+            <img src="{{ item.imagePath }}" alt="" width="56" height="56" class="h-full w-full object-cover">
+          {% endif %}
+        </span>
 
-      <div class="min-w-0 flex-1">
-        <p class="truncate text-sm font-bold text-text">{{ item.nameEn }} <span class="font-normal text-muted-text">/ {{ item.nameAr }}</span></p>
-        <p class="text-sm text-muted-text" dir="ltr">{{ item.priceFormatted }} {{ item.currency }}</p>
-        {% if item.tags.length %}
-          <p class="mt-1 flex flex-wrap gap-1">
-            {% for tag in item.tags %}
-              <span class="inline-flex items-center rounded-sm bg-muted-surface px-1.5 py-0.5 text-xs text-muted-text">{{ labels.tags[tag] }}</span>
-            {% endfor %}
-          </p>
-        {% endif %}
+        <div class="min-w-0 flex-1">
+          <p class="break-words text-sm font-bold text-text" dir="ltr">{{ item.nameEn }}</p>
+          <p class="break-words text-sm text-muted-text" dir="rtl">{{ item.nameAr }}</p>
+          <p class="text-sm text-muted-text" dir="ltr">{{ item.priceFormatted }} {{ item.currency }}</p>
+          {% if item.tags.length %}
+            <p class="mt-1 flex flex-wrap gap-1">
+              {% for tag in item.tags %}
+                <span class="inline-flex items-center rounded-sm bg-muted-surface px-1.5 py-0.5 text-xs text-muted-text">{{ labels.tags[tag] }}</span>
+              {% endfor %}
+            </p>
+          {% endif %}
+        </div>
       </div>
 
-      <div class="flex shrink-0 flex-col items-end gap-1">
+      <div class="flex flex-wrap items-center gap-1 ps-[68px] sm:shrink-0 sm:flex-col sm:items-end sm:gap-1 sm:ps-0">
         <div class="flex items-center gap-1">
           <button
             type="button"

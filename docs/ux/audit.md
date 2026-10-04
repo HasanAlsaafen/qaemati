@@ -1,5 +1,10 @@
 # Phase 7 audit
 
+**Phase 8 status: all P0 and P1 findings fixed, all 27 AI-tells items resolved or justified
+(2 present: one fixed, one justified — see the checklist below). "After" screenshots in
+`docs/ux/screenshots/after/`, re-run axe/Lighthouse results in `docs/ux/lighthouse/after/`.**
+Each P0/P1 item below is annotated inline with what changed and the verified outcome.
+
 Screenshots: `docs/ux/screenshots/before/` (36 images — 4 viewports × 2 locales for the public
 menu and admin dashboard, plus targeted states: empty search, item detail sheet, 404, login
 error, category edit mode, QR page empty/populated, QR print page, delete confirm dialog).
@@ -10,24 +15,27 @@ Captured with `scripts/ux-screenshots.js` (Playwright). Accessibility: `scripts/
 ## Automated results
 
 **axe-core** (8 pages: public menu AR/EN, admin login AR/EN, admin dashboard AR/EN, admin QR
-AR/EN): **0 violations on every page.** Clean baseline — no serious/critical accessibility
-issues found by automated scanning going into Phase 8.
+AR/EN): **0 violations on every page, before and after Phase 8's fixes** (re-run confirmed).
 
-**Lighthouse** (mobile form factor):
+**Lighthouse** (mobile form factor), before → after Phase 8:
 
 | Page | Performance | Accessibility | Best Practices | SEO |
 |---|---|---|---|---|
-| Public menu (AR) | 90 | 100 | 100 | 100 |
-| Public menu (EN) | 97 | 100 | 100 | 100 |
-| Admin dashboard (AR, authenticated) | 89 | 100 | 100 | 100 |
+| Public menu (AR) | 90 → 91 | 100 → 100 | 100 → 100 | 100 → 100 |
+| Public menu (EN) | 97 → 92 | 100 → 100 | 100 → 100 | 100 → 100 |
+| Admin dashboard (AR, authenticated) | 89 → 87 | 100 → 100 | 100 → 100 | 100 → 100 |
 
-Accessibility is already at 100 everywhere tested — ahead of the Phase 8 acceptance bar (≥95).
-Performance sits in the high 80s/90s; the Arabic/English gap on the public menu (90 vs 97) is a
-real, specific finding below, not noise — same page, same data, only the locale differs.
-Scores were measured on a shared dev machine under background load (other processes competing
-for CPU/memory — see the Phase 7 interruption notes in `docs/progress.md`), so treat the exact
-numbers as directional; the accessibility/best-practices/SEO scores (100, deterministic) are
-solid regardless.
+Accessibility, best-practices, and SEO hold at 100 before and after. Performance numbers move
+run-to-run with this shared machine's background load (see the caveat below) — the number that
+matters, the AR/EN *gap* on the public menu, closed from 7-8 points to ~1 point after the font-
+preload fix (P1-1). Raw JSON for both passes: `docs/ux/lighthouse/` (before) and
+`docs/ux/lighthouse/after/` (after).
+
+Accessibility was already at 100 everywhere tested before any Phase 8 work — ahead of the
+acceptance bar (≥95) from the start. Scores were measured on a shared dev machine under
+background load (other processes competing for CPU/memory — see the Phase 7 interruption notes
+in `docs/progress.md`), so treat the exact performance numbers as directional; the
+accessibility/best-practices/SEO scores (100, deterministic) are solid regardless.
 
 ## AI-tells checklist — findings
 
@@ -88,8 +96,9 @@ Each item from `ai-tells.md`, stated against the actual product.
     (`مرحبا بك في قائمتي` in Arabic), rendered as the `<h1>` on `views/pages/home.njk`. This is
     the exact pattern called out in the brief's seed list. The subtitle
     ("Beautiful digital menus for cafes and restaurants in Palestine") is also generic-SaaS-
-    adjacent, though less severe. **Fix in Phase 8:** replace with copy that names what the page
-    actually does (it's a restaurant picker for this demo instance) rather than a greeting.
+    adjacent, though less severe. **✅ Fixed in Phase 8:** replaced with copy that names what the
+    page actually does ("Qaemati demo restaurants" / "مطاعم قائمتي التجريبية" — a restaurant
+    picker for this demo instance, not a greeting). See P1-2 below for details.
 21. **Generic/translated-feeling Arabic microcopy** — not found as a systemic issue; the existing
     admin/menu strings read as natively written (verified by the glossary-building pass in
     `glossary.md`, which found zero awkward word-for-word translations in the existing 60+
@@ -135,6 +144,13 @@ not just one screen.
 toggle revealing nav links, with "Signed in as X" and Log Out moved into that panel) below a
 breakpoint, rather than letting the flex row wrap.
 
+**✅ Fixed.** `views/layouts/admin.njk` now shows the nav links + logout inline only from the
+`sm` breakpoint up; below it, a single icon-only hamburger/close toggle button (with
+`aria-label`, `aria-expanded`, `aria-controls`) reveals a stacked full-width mobile panel.
+Verified in `admin-qr-en-1280.png` (desktop nav unchanged) vs
+`admin-dashboard-ar-390.png`/`admin-dashboard-en-390.png` (clean single-line header, logo +
+hamburger only).
+
 ### P0-2: Admin item/category names truncate illegibly at phone width
 **Where:** `views/admin/components/item-row.njk` (and the equivalent category display),
 visible in `admin-dashboard-ar-390.png` — English names render as `"Coffee..."`,
@@ -147,6 +163,21 @@ before acting on it.
 truncating, or reduce competing horizontal space (icon size, button count shown by default) so
 the name gets enough room; truncation (if kept at all) needs a `title` attribute or similar for
 the full value, not a bare CSS `text-overflow` cutoff with no recovery.
+
+**✅ Fixed, in two steps (the second step found while verifying the first).** Step 1: the
+bilingual name was one `truncate` (`white-space: nowrap`) line mixing an LTR English run and an
+RTL Arabic run with no explicit `dir` on either — inside an `<html dir="rtl">` document, that
+made the ellipsis cut from the *start* of the English text instead of the end, explaining the
+`"...dwich"`-style fragments. Split into two separate lines, each with its own `dir="ltr"`/
+`dir="rtl"`. Step 2: re-screenshotting after step 1 showed the *English-locale* screenshot was
+*also* badly truncated (`"Ar..."`, `"T..."`) — a second, separate root cause: the row's
+action-button column (move ×2, availability toggle, edit, delete) was eating most of a 390px
+row, leaving ~120px for the name regardless of truncation direction. Restructured
+`views/admin/components/item-row.njk` to stack vertically (`flex-col`) below the `sm` breakpoint
+— image+name gets the full row width, action buttons wrap onto their own full-width row below,
+indented to align with the name — and stay side-by-side as before from `sm:` up. Verified in
+`admin-dashboard-ar-390.png`/`admin-dashboard-en-390.png`: every name (e.g. "Arabic Coffee" /
+"قهوة عربية") now reads in full on one or two natural lines, in both locales.
 
 ## P1 — hurts the experience
 
@@ -164,9 +195,29 @@ real, measured, locale-specific regression for the Arabic-first primary audience
 kind of "secondary locale as an afterthought" failure `references.md` calls out as a competitor
 weakness to beat, so letting it stand would undercut Qaemati's actual differentiator.
 
+**✅ Fixed — root cause confirmed, not guessed.** Re-ran Lighthouse with the full audit trail
+(the original pass only had `--only-categories=performance`, which drops the diagnostic/insight
+audits). The `network-dependency-tree-insight` audit showed `thmanyahsans-Bold.woff2` and
+`thmanyahserifdisplay-Bold.woff2` both being discovered *after* `app.css` parses — a full extra
+round trip neither Regular/Medium (already preloaded) nor English (Inter, already preloaded)
+ever pays. Confirmed both Bold files are genuinely used above-the-fold (`restaurant-header.njk`'s
+`<h1>` uses the serif-display bold; every `menu-item-card.njk` item title uses the sans bold)
+before adding the preload, not blindly. Added both to `views/partials/head.njk`'s preload list.
+**Verified:** re-ran Lighthouse performance back-to-back for both locales before and after — the
+AR/EN gap closed from 7-8 points (90 vs 97, then 89 vs 97 on a repeat run) down to ~1 point (91
+vs 92; raw JSON in `docs/ux/lighthouse/after/`). Absolute scores still move run-to-run with this
+machine's background load (noted throughout this audit), but the *locale-specific* gap — the
+actual finding — is gone.
+
 ### P1-2: Generic "Welcome to Qaemati" home page headline
 Covered under AI-tells #20 above — included here as a P1 item since it also hurts first
 impression/clarity, not purely a stylistic tell. Fix: same, in Phase 8.
+
+**✅ Fixed.** `home.title`/`subtitle`/`description` in both `i18n/en/common.json` and
+`i18n/ar/common.json` rewritten to name what the page actually does (a picker into this demo
+instance's two seeded restaurant menus) instead of a greeting: "Qaemati demo restaurants" /
+"مطاعم قائمتي التجريبية", with the subtitle and description rewritten to match. Verified via
+`curl` against both locales.
 
 ### P1-3: Possible bidi scroll artifact on the email field after a failed login
 **Where:** `admin-login-error-ar-390.png` — the re-displayed email value appears to show
@@ -180,6 +231,18 @@ loss bug. **Phase 8 action:** confirm by focusing the field and checking cursor/
 interactively (not just a static screenshot) before deciding whether a fix (e.g. forcing
 `scrollLeft = 0` on render, or a CSS/dir adjustment) is actually needed.
 
+**✅ Verified and fixed — it was a real bug, not a scroll artifact.** A Playwright check
+(`getComputedStyle(el).direction`) on the focused email field in the Arabic locale showed
+`direction: rtl` — the input had no explicit `dir` and was inheriting `rtl` straight from
+`<html dir="rtl">`. For a Latin string like an email address, an RTL-direction input right-
+aligns and anchors its overflow from the wrong side, which is exactly what the screenshot
+showed — not a scroll-position quirk, a missing `dir="ltr"`. Fixed at the source:
+`views/components/input.njk` now sets `dir="ltr"` automatically for `email`, `password`, `tel`,
+`url`, and `number` input types, regardless of the active UI locale — covers every current and
+future caller of the macro, not just the login form. Re-verified in
+`admin-login-error-ar-390.png`: the full email now reads correctly, truncating normally at the
+end if it overflows at all.
+
 ### P1-4: No rich inline server-side validation messages on create forms
 **Where:** category/item/table "add" forms (Phase 4/5) rely on HTML5 `required`/`min`/`type`
 constraints only; a request that bypasses client-side validation (or a future feature with more
@@ -190,6 +253,16 @@ gap, and Pack A's A2 (variants/add-ons) and A4 (branding) both introduce more co
 where "which field is wrong" matters more than it has so far. **Fix direction for Phase 8:**
 wire real field-level error display (the removed-as-dead-code `validation.ts` helpers from the
 Phase 6 cleanup were a reasonable shape for this — worth revisiting, not resurrecting as-is).
+
+**✅ Fixed, scoped.** The three "create" endpoints that previously failed completely silently
+(category, item, table — `categories.controller.ts`, `items.controller.ts`, `qr.controller.ts`)
+now fire a specific `danger`-variant toast (`common.admin.form.required` /
+`common.admin.form.invalidPrice`, both already-existing bilingual strings) when server-side
+validation rejects the submission, instead of just re-rendering the unchanged list with zero
+feedback. This closes the "silent failure" gap without a deeper redesign. **Not done, deferred
+to Phase 9 alongside A2/A4's more complex forms:** true field-level (per-input) inline error
+display — the toast tells you *what* was wrong, not *which field*. Revisit once A2/A4 actually
+need it, per the original fix direction above.
 
 ## P2 — polish (logged, not fixed in Phase 8)
 

@@ -27,6 +27,8 @@ export class CategoriesController {
     if (nameAr?.trim() && nameEn?.trim()) {
       await this.categories.create(restaurantId, { nameAr: nameAr.trim(), nameEn: nameEn.trim() });
       triggerToast(res, this.i18n.t('common.admin.categories.addedToast', { lang: locale }));
+    } else {
+      triggerToast(res, this.i18n.t('common.admin.form.required', { lang: locale }), 'danger');
     }
 
     const categories = await this.categories.listForRestaurant(restaurantId);
