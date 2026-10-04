@@ -11,7 +11,12 @@
 {% macro categoryBlock(category, labels, isFirst, isLast) %}
   <section id="category-{{ category.id }}" x-data="{ editing: false, addingItem: false }" class="rounded-lg border border-border bg-surface p-4">
     <div x-show="!editing" class="flex items-start justify-between gap-3">
-      <h2 class="font-sans text-lg font-bold text-text">{{ category.nameEn }} <span class="font-normal text-muted-text">/ {{ category.nameAr }}</span></h2>
+      <div>
+        <h2 class="font-sans text-lg font-bold text-text">{{ category.nameEn }} <span class="font-normal text-muted-text">/ {{ category.nameAr }}</span></h2>
+        {% if category.availableFrom and category.availableTo %}
+          <p dir="ltr" class="mt-0.5 text-xs text-muted-text">{{ category.availableFrom }}&ndash;{{ category.availableTo }}</p>
+        {% endif %}
+      </div>
       <div class="flex shrink-0 items-center gap-1">
         <button
           type="button"
@@ -64,6 +69,17 @@
       <div class="flex flex-col gap-1.5">
         <label for="category-{{ category.id }}-nameEn" class="text-sm font-medium text-text">{{ labels.form.nameEn }}</label>
         <input id="category-{{ category.id }}-nameEn" name="nameEn" type="text" value="{{ category.nameEn }}" dir="ltr" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
+      </div>
+      <div class="flex w-full flex-wrap items-end gap-3">
+        <div class="flex flex-col gap-1.5">
+          <label for="category-{{ category.id }}-availableFrom" class="text-sm font-medium text-text">{{ labels.categories.availableFromLabel }}</label>
+          <input id="category-{{ category.id }}-availableFrom" name="availableFrom" type="time" dir="ltr" value="{{ category.availableFrom or '' }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="category-{{ category.id }}-availableTo" class="text-sm font-medium text-text">{{ labels.categories.availableToLabel }}</label>
+          <input id="category-{{ category.id }}-availableTo" name="availableTo" type="time" dir="ltr" value="{{ category.availableTo or '' }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        </div>
+        <p class="w-full text-xs text-muted-text">{{ labels.categories.availabilityHint }}</p>
       </div>
       {{ button(labels.form.save, 'primary', 'sm', 'submit') }}
       {{ button(labels.form.cancel, 'ghost', 'sm', 'button', 'x-on:click="editing = false"') }}

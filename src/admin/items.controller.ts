@@ -117,6 +117,7 @@ export class ItemsController {
     @Body('tags') tags: string | string[] | undefined,
     @Body('variants') variants: unknown,
     @Body('addons') addons: unknown,
+    @Body('isTodaysSpecial') isTodaysSpecial: string | undefined,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
@@ -134,6 +135,7 @@ export class ItemsController {
       tags: parseTags(tags),
       variants: parseOptions(variants),
       addons: parseOptions(addons),
+      isTodaysSpecial: isTodaysSpecial === 'on' || isTodaysSpecial === 'true',
     });
     triggerToast(res, this.i18n.t('common.admin.items.savedToast', { lang: locale }));
 

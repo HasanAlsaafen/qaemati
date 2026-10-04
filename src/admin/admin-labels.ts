@@ -40,6 +40,9 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale) {
       emptyDescription: t('common.admin.categories.emptyDescription'),
       deleteConfirmTitle: t('common.admin.categories.deleteConfirmTitle'),
       deleteConfirmBody: t('common.admin.categories.deleteConfirmBody'),
+      availableFromLabel: t('common.admin.categories.availableFromLabel'),
+      availableToLabel: t('common.admin.categories.availableToLabel'),
+      availabilityHint: t('common.admin.categories.availabilityHint'),
     },
     items: {
       addItem: t('common.admin.items.addItem'),
@@ -54,6 +57,7 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale) {
       addonsHint: t('common.admin.items.addonsHint'),
       addAddon: t('common.admin.items.addAddon'),
       removeOption: t('common.admin.items.removeOption'),
+      todaysSpecialLabel: t('common.admin.items.todaysSpecialLabel'),
     },
     tags: {
       SPICY: t('common.tags.spicy'),

@@ -44,15 +44,25 @@ export class CategoriesController {
     @Param('id') id: string,
     @Body('nameAr') nameAr: string,
     @Body('nameEn') nameEn: string,
+    @Body('availableFrom') availableFrom: string | undefined,
+    @Body('availableTo') availableTo: string | undefined,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
 
+    // Both-or-neither: a one-sided time (e.g. only availableFrom set,
+    // left blank by mistake) is treated the same as "always available"
+    // rather than silently producing a window that never closes or
+    // never opens.
+    const hasWindow = Boolean(availableFrom?.trim()) && Boolean(availableTo?.trim());
+
     await this.categories.update(restaurantId, id, {
       nameAr: nameAr?.trim() || '',
       nameEn: nameEn?.trim() || '',
+      availableFrom: hasWindow ? availableFrom!.trim() : null,
+      availableTo: hasWindow ? availableTo!.trim() : null,
     });
     triggerToast(res, this.i18n.t('common.admin.categories.savedToast', { lang: locale }));
 

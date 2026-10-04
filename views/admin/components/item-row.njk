@@ -36,8 +36,11 @@
           <p class="break-words text-sm font-bold text-text" dir="ltr">{{ item.nameEn }}</p>
           <p class="break-words text-sm text-muted-text" dir="rtl">{{ item.nameAr }}</p>
           <p class="text-sm text-muted-text" dir="ltr">{{ item.priceFormatted }} {{ item.currency }}</p>
-          {% if item.variants.length or item.addons.length %}
+          {% if item.isTodaysSpecial or item.variants.length or item.addons.length %}
             <p class="mt-1 flex flex-wrap gap-1">
+              {% if item.isTodaysSpecial %}
+                <span class="inline-flex items-center rounded-sm bg-gold px-1.5 py-0.5 text-xs text-on-gold">{{ labels.items.todaysSpecialLabel }}</span>
+              {% endif %}
               {% if item.variants.length %}
                 <span class="inline-flex items-center rounded-sm bg-primary-soft px-1.5 py-0.5 text-xs text-primary">{{ labels.items.variantsLabel }} ({{ item.variants.length }})</span>
               {% endif %}
@@ -142,6 +145,11 @@
           </label>
         {% endfor %}
       </fieldset>
+
+      <label class="inline-flex min-h-11 w-fit items-center gap-1.5 text-sm text-text">
+        <input type="checkbox" name="isTodaysSpecial" {% if item.isTodaysSpecial %}checked{% endif %} class="h-4 w-4 rounded border-border-strong text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        {{ labels.items.todaysSpecialLabel }}
+      </label>
 
       {{ optionsEditor('variants', item.variants, labels.items.variantsLabel, labels.items.variantsHint, labels.items.addVariant, labels.form.nameAr, labels.form.nameEn, labels.form.price, labels.items.removeOption) }}
       {{ optionsEditor('addons', item.addons, labels.items.addonsLabel, labels.items.addonsHint, labels.items.addAddon, labels.form.nameAr, labels.form.nameEn, labels.form.price, labels.items.removeOption) }}

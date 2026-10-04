@@ -58,6 +58,8 @@ async function main() {
         instagramHandle: restaurantData.instagramHandle,
         workingHoursAr: restaurantData.workingHoursAr,
         workingHoursEn: restaurantData.workingHoursEn,
+        openTime: restaurantData.openTime,
+        closeTime: restaurantData.closeTime,
       },
     });
 
@@ -77,6 +79,8 @@ async function main() {
           restaurantId: restaurant.id,
           nameAr: categoryData.nameAr,
           nameEn: categoryData.nameEn,
+          availableFrom: categoryData.availableFrom,
+          availableTo: categoryData.availableTo,
           sortOrder: categorySortOrder++,
         },
       });
@@ -100,6 +104,7 @@ async function main() {
             imagePath: `/uploads/seed/items/${imageFilename}`,
             tags: itemData.tags ?? [],
             available: itemData.available ?? true,
+            isTodaysSpecial: itemData.isTodaysSpecial ?? false,
             sortOrder: itemSortOrder++,
           },
         });

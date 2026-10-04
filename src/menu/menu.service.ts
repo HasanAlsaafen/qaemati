@@ -4,6 +4,11 @@ import { I18nService } from 'nestjs-i18n';
 import { Locale } from '../common/middleware/locale-view.middleware';
 import { normalizeSearchText } from '../common/text/normalize-search-text';
 import { TAG_I18N_KEY, TAG_VARIANT } from '../common/tags';
+import {
+  computeOpenStatus,
+  isCategoryAvailableNow,
+  nowInHebronMinutes,
+} from '../common/open-status';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface MenuOptionView {
@@ -31,6 +36,18 @@ export interface MenuItemView {
    *  when variants exist -- null when the item has no variants, in which
    *  case the card shows the plain price as before. */
   fromPriceFormatted: string | null;
+  isTodaysSpecial: boolean;
+}
+
+export interface OpenStatusView {
+  isOpen: boolean;
+  label: string;
+  /** Raw "HH:MM" for the client-side ticking recomputation in
+   *  public/js/open-status.js -- the server-rendered label is correct at
+   *  render time, but without this the badge would only ever update on
+   *  the next page load, not live across a closing/opening time. */
+  openTime: string;
+  closeTime: string;
 }
 
 export interface MenuCategoryView {
@@ -48,7 +65,9 @@ export interface MenuView {
   whatsappUrl: string | null;
   instagramUrl: string | null;
   workingHours: string | null;
+  openStatus: OpenStatusView | null;
   categories: MenuCategoryView[];
+  todaysSpecials: MenuItemView[];
 }
 
 @Injectable()
@@ -83,16 +102,35 @@ export class MenuService {
 
     const pick = (ar: string, en: string) => (locale === 'ar' ? ar : en);
     const pickNullable = (ar: string | null, en: string | null) => (locale === 'ar' ? ar : en);
+    const nowMinutes = nowInHebronMinutes();
 
-    return {
-      slug: restaurant.slug,
-      name: pick(restaurant.nameAr, restaurant.nameEn),
-      description: pickNullable(restaurant.descriptionAr, restaurant.descriptionEn),
-      logoUrl: restaurant.logoPath,
-      whatsappUrl: restaurant.whatsapp ? toWhatsappUrl(restaurant.whatsapp) : null,
-      instagramUrl: restaurant.instagramHandle ? toInstagramUrl(restaurant.instagramHandle) : null,
-      workingHours: pickNullable(restaurant.workingHoursAr, restaurant.workingHoursEn),
-      categories: restaurant.categories.map((category) => ({
+    const openStatus: OpenStatusView | null =
+      restaurant.openTime && restaurant.closeTime
+        ? (() => {
+            const status = computeOpenStatus(
+              restaurant.openTime!,
+              restaurant.closeTime!,
+              nowMinutes,
+            );
+            const labelKey = status.isOpen
+              ? 'common.menu.openStatus.openUntil'
+              : 'common.menu.openStatus.closedUntil';
+            return {
+              isOpen: status.isOpen,
+              label: this.i18n.t(labelKey, { lang: locale, args: { time: status.nextChangeTime } }),
+              openTime: restaurant.openTime!,
+              closeTime: restaurant.closeTime!,
+            };
+          })()
+        : null;
+
+    const todaysSpecials: MenuItemView[] = [];
+
+    const categories = restaurant.categories
+      .filter((category) =>
+        isCategoryAvailableNow(category.availableFrom, category.availableTo, nowMinutes),
+      )
+      .map((category) => ({
         id: category.id,
         name: pick(category.nameAr, category.nameEn),
         anchor: `category-${category.id}`,
@@ -120,7 +158,7 @@ export class MenuService {
             null,
           );
 
-          return {
+          const itemView: MenuItemView = {
             id: item.id,
             name,
             description,
@@ -142,9 +180,28 @@ export class MenuService {
             variants,
             addons,
             fromPriceFormatted: cheapestVariant ? cheapestVariant.priceFormatted : null,
+            isTodaysSpecial: item.isTodaysSpecial,
           };
+
+          if (item.isTodaysSpecial && item.available) {
+            todaysSpecials.push(itemView);
+          }
+
+          return itemView;
         }),
-      })),
+      }));
+
+    return {
+      slug: restaurant.slug,
+      name: pick(restaurant.nameAr, restaurant.nameEn),
+      description: pickNullable(restaurant.descriptionAr, restaurant.descriptionEn),
+      logoUrl: restaurant.logoPath,
+      whatsappUrl: restaurant.whatsapp ? toWhatsappUrl(restaurant.whatsapp) : null,
+      instagramUrl: restaurant.instagramHandle ? toInstagramUrl(restaurant.instagramHandle) : null,
+      workingHours: pickNullable(restaurant.workingHoursAr, restaurant.workingHoursEn),
+      openStatus,
+      categories,
+      todaysSpecials,
     };
   }
 }

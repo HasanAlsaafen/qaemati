@@ -60,7 +60,12 @@
     "fromPrice": "يبدأ من",
     "selectVariant": "اختر الحجم",
     "addonsTitle": "الإضافات",
-    "selectVariantPrompt": "اختر الحجم لإضافة هذا إلى طلبك"
+    "selectVariantPrompt": "اختر الحجم لإضافة هذا إلى طلبك",
+    "openStatus": {
+      "openUntil": "مفتوح الآن، يُغلق {time}",
+      "closedUntil": "مغلق الآن، يفتح {time}"
+    },
+    "todaysSpecial": "عرض اليوم"
   },
   "admin": {
     "auth": {
@@ -109,7 +114,10 @@
       "deleteConfirmBody": "سيؤدي هذا أيضًا إلى حذف جميع العناصر فيه. لا يمكن التراجع عن هذا.",
       "savedToast": "تم حفظ القسم",
       "deletedToast": "تم حذف القسم",
-      "addedToast": "تمت إضافة القسم"
+      "addedToast": "تمت إضافة القسم",
+      "availableFromLabel": "متاح من",
+      "availableToLabel": "متاح حتى",
+      "availabilityHint": "اترك الحقلين فارغين لعرض هذا القسم طوال اليوم، مثلاً لقسم فطور متاح من 07:00 إلى 11:00."
     },
     "items": {
       "addItem": "إضافة عنصر",
@@ -131,7 +139,8 @@
       "addonsLabel": "الإضافات",
       "addonsHint": "إضافات اختيارية تُضاف فوق السعر، مثل \"جبنة إضافية\".",
       "addAddon": "إضافة مكوّن إضافي",
-      "removeOption": "إزالة"
+      "removeOption": "إزالة",
+      "todaysSpecialLabel": "عرض اليوم"
     },
     "qr": {
       "title": "رموز QR والطباعة",

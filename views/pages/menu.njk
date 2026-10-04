@@ -14,7 +14,39 @@
 {% block meta_description %}{{ menu.description or menu.name }}{% endblock %}
 
 {% block content %}
-{{ restaurantHeader(menu, t('common.menu.whatsapp'), t('common.menu.instagram')) }}
+{{ restaurantHeader(menu, t('common.menu.whatsapp'), t('common.menu.instagram'), labels.openStatus) }}
+
+{% if menu.todaysSpecials.length %}
+  {#
+    A3: "Today's special" banner. A horizontally-scrolling strip rather
+    than full menuItemCard instances -- these are a teaser/highlight, not
+    a second full listing of the same items (which already appear in
+    their normal category below); tapping one opens the same shared
+    detail sheet as everywhere else, so "add to selection" still works
+    from here without duplicating that logic.
+  #}
+  <div class="print:hidden border-b border-border bg-gold/10">
+    <div class="mx-auto max-w-2xl px-4 py-3">
+      <h2 class="font-sans text-sm font-bold text-on-gold">{{ labels.todaysSpecial }}</h2>
+      <div class="mt-2 flex gap-3 overflow-x-auto pb-1">
+        {% for item in menu.todaysSpecials %}
+          <button
+            type="button"
+            x-data
+            x-on:click="$dispatch('open-item-sheet', {{ item | dump }})"
+            class="flex w-40 shrink-0 flex-col items-start gap-1 rounded-md border border-gold bg-surface p-2 text-start focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            <span class="relative h-16 w-full shrink-0 overflow-hidden rounded-sm bg-muted-surface">
+              <img src="{{ item.imageUrl }}" alt="" loading="lazy" width="160" height="64" class="h-full w-full object-cover">
+            </span>
+            <span class="truncate text-xs font-bold text-text">{{ item.name }}</span>
+            <span dir="ltr" class="text-xs text-muted-text">{{ item.priceFormatted }} {{ item.currency }}</span>
+          </button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endif %}
 
 {% if tableLabel %}
   <div class="print:hidden mx-auto max-w-2xl px-4 pt-3">
@@ -76,4 +108,7 @@
 
 {% block scripts %}
   <script defer src="/js/menu.js"></script>
+  {% if menu.openStatus %}
+    <script defer src="/js/open-status.js"></script>
+  {% endif %}
 {% endblock %}

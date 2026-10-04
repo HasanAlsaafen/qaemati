@@ -60,7 +60,12 @@
     "fromPrice": "From",
     "selectVariant": "Choose a size",
     "addonsTitle": "Add-ons",
-    "selectVariantPrompt": "Choose a size to add this to your selection"
+    "selectVariantPrompt": "Choose a size to add this to your selection",
+    "openStatus": {
+      "openUntil": "Open now, closes {time}",
+      "closedUntil": "Closed, opens {time}"
+    },
+    "todaysSpecial": "Today's special"
   },
   "admin": {
     "auth": {
@@ -109,7 +114,10 @@
       "deleteConfirmBody": "This will also delete every item in it. This cannot be undone.",
       "savedToast": "Category saved",
       "deletedToast": "Category deleted",
-      "addedToast": "Category added"
+      "addedToast": "Category added",
+      "availableFromLabel": "Available from",
+      "availableToLabel": "Available until",
+      "availabilityHint": "Leave both empty to show this category all day, e.g. for a Breakfast category available 07:00-11:00."
     },
     "items": {
       "addItem": "Add item",
@@ -131,7 +139,8 @@
       "addonsLabel": "Add-ons",
       "addonsHint": "Optional extras added on top of the price, e.g. \"Extra cheese\".",
       "addAddon": "Add extra",
-      "removeOption": "Remove"
+      "removeOption": "Remove",
+      "todaysSpecialLabel": "Today's special"
     },
     "qr": {
       "title": "QR codes & printing",

@@ -1036,3 +1036,77 @@ What was built:
 - `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
   pass; migration applied to both the dev and test databases; demo data re-seeded clean after
   testing.
+
+### A3: Specials and schedules (done)
+
+A "Today's special" banner, time-gated categories (e.g. a Breakfast section only shown
+07:00-11:00), and a live "Open now / Closes at" badge, all computed in Asia/Hebron time.
+
+What was built:
+
+- **Migration** (`20261004090948_add_specials_and_schedules`): `Restaurant.openTime`/`closeTime`
+  (structured "HH:MM" daily hours, separate from the existing free-text `workingHoursAr`/`En`
+  display string, since free text can't be parsed back into a live computation),
+  `Category.availableFrom`/`availableTo` (optional daily window), `Item.isTodaysSpecial`
+  (owner-toggled boolean, not date-scoped — there's no "which day" concept in this app).
+- **`src/common/open-status.ts`**: pure, unit-tested (16 cases) functions —
+  `computeOpenStatus(openTime, closeTime, nowMinutes)` (same-day *and* overnight ranges, e.g.
+  "20:00-02:00"), `isCategoryAvailableNow(...)`, and `nowInHebronMinutes()` (uses
+  `Intl.DateTimeFormat` with `timeZone: 'Asia/Hebron'` — no new date library needed; verified
+  Node's ICU build resolves the zone correctly, including the midnight-as-"00:00"-not-"24:00"
+  edge case). Mirrored client-side in `public/js/open-status.js` for the live-ticking badge
+  (same duplication tradeoff as `normalize-search-text.ts`/`menu.js`) — deliberately re-queries
+  Asia/Hebron time on every tick rather than the browser's own local timezone, so a diner
+  viewing from outside Palestine still sees the status the restaurant itself would recognize.
+- **`MenuService`**: categories outside their availability window are filtered out of the
+  response entirely (not shown-but-disabled) — matches the real-world pattern of e.g. a
+  breakfast menu disappearing from an ordering app after 11am. `todaysSpecials` is built from
+  items actually visible after that filter, not every `isTodaysSpecial` row in the database — an
+  item whose category is currently hidden never appears in the banner either, even if flagged,
+  since showing a "special" the diner can't actually reach anywhere else would be misleading.
+- **Admin**: `CategoryService`/`CategoriesController` validate availability as both-or-neither —
+  a one-sided time left blank by mistake is treated as "always available," not a window that
+  never opens or never closes. `ItemService`/`ItemsController` add the "Today's special"
+  checkbox alongside the existing availability toggle. Both show a small indicator in their
+  collapsed (non-editing) row — the time range for a category, a gold badge for a special item —
+  consistent with the existing variants/addons count badges from A2.
+- **Public menu**: `restaurant-header.njk` shows the open/closed badge (a 60-second client tick,
+  not just the value from page load) right under the working-hours text; a horizontally-
+  scrolling "Today's special" strip sits above the sticky search bar when any items qualify,
+  reusing the same shared item-detail-sheet as the regular listing (tapping a special opens it
+  exactly like tapping a normal card, so "add to selection" works identically from either path).
+
+### Verified
+
+- Unit: 16 new `open-status` tests (same-day ranges, overnight ranges, boundary minutes,
+  category-window edge cases, a `nowInHebronMinutes` sanity check against a known UTC instant) —
+  42 unit tests total.
+- E2E: `test/specials.e2e-spec.ts` — the open/closed badge renders when structured hours are
+  set; an always-available item appears in the specials banner; a non-special item does not; a
+  category outside its window is absent from the response entirely; a special item whose
+  category is hidden is correctly excluded from the banner too (the "filter before building
+  todaysSpecials" ordering, covered directly).
+- Interactive (Playwright + direct `curl`, both demo restaurants): confirmed the Breakfast
+  category (07:00-11:00) was correctly absent from the menu at the actual time of testing
+  (mid-afternoon) while the open/closed badge correctly read "Open now, closes 23:00"; confirmed
+  Al-Sanabel's noon-to-midnight hours exercise the overnight-range branch of the computation, not
+  just the same-day one; tapped a "Today's special" banner card and confirmed it opens the same
+  shared detail sheet as a normal item; reopened the Breakfast category's edit form and confirmed
+  its saved `07:00`/`11:00` values reloaded correctly.
+- axe-core: 0 violations on the menu page with the specials banner and open-status badge both
+  rendered (Arabic/RTL).
+- `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
+  pass; migration applied to both the dev and test databases; demo data re-seeded clean after
+  testing.
+
+### Bugs found and fixed while building this (test-script bugs, not app bugs — logged since they
+cost real debugging time before being ruled out)
+
+- An e2e assertion checked for the literal string `"Today's special"`, but Nunjucks
+  HTML-escapes the apostrophe to `&#39;` in its output — confirmed via a direct `curl` request
+  before touching the test, not assumed. Not an app bug (the escaping is correct and expected);
+  fixed the assertion to match the actual escaped output.
+- A second assertion counted every occurrence of an item's name across the whole page and got 5
+  instead of the expected 1 — the name legitimately appears multiple times (its own category
+  row's visible text, plus that row's embedded JSON `data-item` payload used for the detail-sheet
+  dispatch). Fixed by scoping the check to the banner section's own markup specifically.

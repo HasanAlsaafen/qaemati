@@ -18,6 +18,7 @@ export interface ItemInput {
   tags: ItemTag[];
   variants?: ItemOption[];
   addons?: ItemOption[];
+  isTodaysSpecial?: boolean;
 }
 
 @Injectable()
@@ -69,6 +70,7 @@ export class ItemService {
           price: input.price,
           currency: input.currency,
           tags: input.tags,
+          isTodaysSpecial: input.isTodaysSpecial ?? false,
         },
       }),
       this.prisma.itemVariant.deleteMany({ where: { itemId } }),

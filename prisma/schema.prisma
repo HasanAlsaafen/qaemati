@@ -33,6 +33,18 @@ model Restaurant {
   workingHoursAr String?
   workingHoursEn String?
 
+  /// A3: structured daily hours, "HH:MM" 24h, Asia/Hebron -- separate from
+  /// the free-text workingHoursAr/En above (which stays the human-written
+  /// display string, e.g. "Daily, 7:00 AM - 11:00 PM"; free text can't be
+  /// parsed back into a live open/closed computation). Single daily range
+  /// rather than per-weekday, matching how every seeded restaurant's own
+  /// display text already describes its hours ("Daily, ..."). Null means
+  /// "no structured hours set" -- the open/closed badge is hidden
+  /// entirely rather than guessing, consistent with A1's "hide gracefully
+  /// when the data isn't there" precedent.
+  openTime  String?
+  closeTime String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -71,6 +83,15 @@ model Category {
 
   sortOrder Int @default(0)
 
+  /// A3: optional daily availability window, "HH:MM" 24h, Asia/Hebron --
+  /// "Breakfast" might only make sense 07:00-11:00. Both null (the
+  /// default) means always available, matching every category's
+  /// behavior before this feature existed. Set independently of each
+  /// other is invalid (enforced in CategoryService, not at the DB level,
+  /// same pattern as every other cross-field validation in this app).
+  availableFrom String?
+  availableTo   String?
+
   items Item[]
 
   createdAt DateTime @default(now())
@@ -102,6 +123,10 @@ model Item {
   tags ItemTag[]
 
   available Boolean @default(true)
+  /// A3: "Today's special" banner flag -- owner-toggled, not date-scoped
+  /// (there's no "which day" concept in this app), so it's exactly as
+  /// current as the owner keeps it, same honesty tradeoff as `available`.
+  isTodaysSpecial Boolean @default(false)
   sortOrder Int     @default(0)
 
   createdAt DateTime @default(now())

@@ -8,11 +8,15 @@ export interface SeedItem {
   price: number;
   tags?: SeedTag[];
   available?: boolean;
+  isTodaysSpecial?: boolean;
 }
 
 export interface SeedCategory {
   nameAr: string;
   nameEn: string;
+  /** A3: optional daily window, "HH:MM" 24h. Both set or both omitted. */
+  availableFrom?: string;
+  availableTo?: string;
   items: SeedItem[];
 }
 
@@ -27,6 +31,11 @@ export interface SeedRestaurant {
   instagramHandle: string;
   workingHoursAr: string;
   workingHoursEn: string;
+  /** A3: structured daily hours, "HH:MM" 24h, Asia/Hebron -- see the
+   *  schema comment on Restaurant.openTime for why this is separate from
+   *  the free-text workingHoursAr/En above. */
+  openTime?: string;
+  closeTime?: string;
   adminEmail: string;
   adminName: string;
   categories: SeedCategory[];
@@ -44,6 +53,8 @@ export const seedRestaurants: SeedRestaurant[] = [
     instagramHandle: '@baytalzaytoun',
     workingHoursAr: 'يوميًا من 7 صباحًا حتى 11 مساءً',
     workingHoursEn: 'Daily, 7:00 AM - 11:00 PM',
+    openTime: '07:00',
+    closeTime: '23:00',
     adminEmail: 'admin@baytalzaytoun.example.com',
     adminName: 'Lina Qasem',
     categories: [
@@ -138,6 +149,8 @@ export const seedRestaurants: SeedRestaurant[] = [
       {
         nameAr: 'فطور',
         nameEn: 'Breakfast',
+        availableFrom: '07:00',
+        availableTo: '11:00',
         items: [
           {
             nameAr: 'شكشوكة',
@@ -146,6 +159,7 @@ export const seedRestaurants: SeedRestaurant[] = [
             descriptionEn: 'Eggs poached in a spiced tomato and pepper sauce, served with bread.',
             price: 28,
             tags: ['SPICY', 'VEGETARIAN', 'POPULAR'],
+            isTodaysSpecial: true,
           },
           {
             nameAr: 'بانكيك بالعسل',
@@ -337,6 +351,8 @@ export const seedRestaurants: SeedRestaurant[] = [
     instagramHandle: '@alsanabel.restaurant',
     workingHoursAr: 'يوميًا من 12 ظهرًا حتى 12 منتصف الليل',
     workingHoursEn: 'Daily, 12:00 PM - 12:00 AM',
+    openTime: '12:00',
+    closeTime: '00:00',
     adminEmail: 'admin@alsanabel.example.com',
     adminName: 'Omar Haddad',
     categories: [
@@ -375,6 +391,7 @@ export const seedRestaurants: SeedRestaurant[] = [
             descriptionEn: 'Bulgur shells filled with minced meat and pine nuts.',
             price: 6,
             tags: ['POPULAR'],
+            isTodaysSpecial: true,
           },
         ],
       },

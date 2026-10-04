@@ -18,6 +18,17 @@ export function buildMenuLabels(i18n: I18nService, locale: Locale) {
     selectVariant: t('common.menu.selectVariant'),
     addonsTitle: t('common.menu.addonsTitle'),
     selectVariantPrompt: t('common.menu.selectVariantPrompt'),
+    todaysSpecial: t('common.menu.todaysSpecial'),
+    // Raw templates (the literal "{time}" placeholder left
+    // uninterpolated) for the client-side ticking open/closed badge
+    // (restaurant-header.njk + public/js/open-status.js) to substitute
+    // into on its own every 60s -- the server-rendered label passed via
+    // menu.openStatus.label is already interpolated for the moment the
+    // page was rendered.
+    openStatus: {
+      openUntil: t('common.menu.openStatus.openUntil'),
+      closedUntil: t('common.menu.openStatus.closedUntil'),
+    },
     selection: {
       addButton: t('common.menu.selection.addButton'),
       barLabel: t('common.menu.selection.barLabel'),

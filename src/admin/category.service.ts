@@ -4,6 +4,11 @@ import { PrismaService } from '../prisma/prisma.service';
 export interface CategoryInput {
   nameAr: string;
   nameEn: string;
+  /** A3: optional daily availability window, "HH:MM" 24h. Both null or
+   *  both set; one-sided input is normalized to "both null" by the
+   *  controller before reaching here (see CategoriesController.update). */
+  availableFrom?: string | null;
+  availableTo?: string | null;
 }
 
 @Injectable()
@@ -60,7 +65,12 @@ export class CategoryService {
     await this.assertOwnership(restaurantId, categoryId);
     return this.prisma.category.update({
       where: { id: categoryId },
-      data: { nameAr: input.nameAr, nameEn: input.nameEn },
+      data: {
+        nameAr: input.nameAr,
+        nameEn: input.nameEn,
+        availableFrom: input.availableFrom ?? null,
+        availableTo: input.availableTo ?? null,
+      },
     });
   }
 
