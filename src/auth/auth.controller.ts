@@ -34,8 +34,16 @@ export class AuthController {
     const safeRedirect = redirect && redirect.startsWith('/admin') ? redirect : '/admin';
     const rateLimitKey = `${req.ip}:${(email ?? '').toLowerCase()}`;
 
+    // Nest pre-sets the response status to 201 for every @Post() handler
+    // (its REST convention) before the handler body runs, even when using
+    // the raw @Res() escape hatch -- and Express's res.render() does not
+    // reset an already-set status code. Without the explicit 200 here,
+    // every failed login response (used throughout this handler) sent 201
+    // Created, which is wrong for a page re-render that created nothing.
+    // Found by the Phase 9 e2e suite checking response status, not by
+    // manual browser testing (browsers don't surface this to a human).
     const renderError = (error: string) =>
-      res.render('admin/login', { redirect: safeRedirect, email, error });
+      res.status(200).render('admin/login', { redirect: safeRedirect, email, error });
 
     if (this.rateLimiter.isBlocked(rateLimitKey)) {
       renderError(this.i18n.t('common.admin.auth.tooManyAttempts', { lang: locale }));

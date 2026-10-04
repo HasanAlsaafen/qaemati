@@ -62,10 +62,35 @@ Nunjucks templates, Tailwind CSS, Prisma/PostgreSQL, and bilingual (Arabic/Engli
 - `npm run start` - run the production build
 - `npm run lint` / `npm run lint:fix` - ESLint
 - `npm run format` - Prettier on TypeScript sources
+- `npm run test` - unit tests (Jest, colocated `*.spec.ts` files)
+- `npm run test:e2e` - end-to-end tests (Supertest, against a dedicated `qaemati_test`
+  database — see "Running the e2e tests" below)
 - `npm run prisma:generate` - generate the Prisma client
 - `npm run prisma:migrate` - run Prisma migrations
 - `npm run prisma:seed` - wipe and reseed demo data (one cafe, one restaurant; see
   `prisma/seed.ts`). Prints the shared demo admin password when it finishes.
+
+## Running the e2e tests
+
+The e2e suite runs against its own database (`qaemati_test`), never the dev `qaemati` one, so
+tests can freely create/delete data without touching anything you're looking at in the browser.
+
+1. Copy the test environment file and create the database once:
+
+   ```bash
+   cp .env.test.example .env.test
+   psql -h localhost -p 5435 -U qaemati -d postgres -c "CREATE DATABASE qaemati_test OWNER qaemati;"
+   DATABASE_URL="postgresql://qaemati:qaemati@localhost:5435/qaemati_test?schema=public" npx prisma migrate deploy
+   ```
+
+2. Run the suite:
+
+   ```bash
+   npm run test:e2e
+   ```
+
+Each spec file creates its own restaurant/admin fixture (a unique slug per file) and tears it
+down in `afterAll`, so files can run back-to-back without clobbering each other's data.
 
 ## Project layout
 

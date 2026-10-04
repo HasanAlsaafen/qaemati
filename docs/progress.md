@@ -832,3 +832,68 @@ What was fixed:
 - Field-level inline validation errors (vs. the toast-level fix shipped here) deferred to
   Phase 9, where A2 (variants/add-ons) and A4 (branding) introduce forms complex enough to need
   it.
+
+## Phase 9: test infrastructure + Pack A (in progress)
+
+Second track continues: Pack A features (A1–A5), each required to ship with bilingual UI,
+RTL/LTR correctness, empty/loading/error states, accessibility, a migration where needed, and
+tests for its critical flow. Before any feature work: built the Jest+Supertest harness flagged
+as a prerequisite back in the Phase 6 interruption notes, since Phase 9's acceptance criterion
+("tests passing") has nothing to run against without it.
+
+### Test infrastructure
+
+- **Dedicated `qaemati_test` database**, separate from dev data, with its own `.env.test`
+  (`.env.test.example` tracked, `.env.test` itself gitignored, matching the existing
+  `.env`/`.env.example` pattern) and migrations applied via `prisma migrate deploy`.
+- **`src/bootstrap.ts`**: extracted everything `main.ts` did to the app instance (helmet,
+  compression, body-parsing order, the locale/session/CSRF middleware sequencing that took real
+  debugging effort in Phase 4) into a `configureApp()` function, so e2e tests exercise the exact
+  same middleware stack production does instead of a thinner approximation that could silently
+  drift from it. `main.ts` now just calls it and `listen()`.
+- **`jest.config.js`** (unit, colocated `*.spec.ts`) and **`test/jest-e2e.json`** (e2e,
+  `*.e2e-spec.ts`), matching Nest CLI convention. `test/utils/test-app.ts` provides
+  `createTestApp()` (boots a full app via `configureApp()`), `createTestRestaurant()`/
+  `deleteTestRestaurant()` (a minimal fixture independent of `prisma/seed.ts`'s larger demo
+  dataset, unique slug per test file so files don't clobber each other), and `loginAsAdmin()`
+  (logs in through a real HTTP round trip — GET the login page for a CSRF token, POST
+  credentials — rather than forging a session, matching the project's "test through the real
+  stack" approach).
+- `npm run test:e2e` runs with `--runInBand` (tests share one database) and `--forceExit`
+  (connect-pg-simple's raw `pg.Pool` for the session store isn't a Nest provider, so
+  `app.close()` doesn't close it — a one-line, well-understood tradeoff, not a bug).
+
+### Two real bugs found while building the harness, not by inspection
+
+- **Every Arabic-locale toast crashed its request with a 500.** `triggerToast()` and
+  `HttpExceptionFilter` both set the `HX-Trigger` response header to `JSON.stringify({ toast:
+  {message, variant} })` — but HTTP header values must be Latin-1/ASCII, and Node's `http`
+  module throws `ERR_INVALID_CHAR` on anything outside that range. Any Arabic message (this
+  app's default locale) crashed outright. Invisible in every manual browser test across Phases
+  4–9 so far: Chrome's `Accept-Language: en` header always won locale resolution for the htmx
+  calls that fire toasts (no `?lang=` query param on those requests, and no `qaemati_locale`
+  cookie set unless the language switcher was actually clicked), regardless of what language the
+  *page* was displayed in. Real users with an Arabic-preferring browser — i.e. the actual target
+  audience — would have hit this on every single admin action. Fixed by `encodeURIComponent`-ing
+  the message before it goes in the header, and `decodeURIComponent`-ing it in `toast.njk`'s
+  client-side handler (a no-op on already-ASCII text, so plain English toasts are unaffected).
+  Added `test/admin-crud.e2e-spec.ts` as permanent regression coverage, asserting both locales
+  roundtrip correctly.
+- **Nest defaults every `@Post()` handler's status to 201**, even when the handler uses the raw
+  `@Res()` escape hatch and never creates anything — and Express's `res.render()` doesn't reset
+  an already-set status code. Every failed login attempt (`AuthController.login`'s `renderError`
+  path) was returning `201 Created` for a page that created nothing. Harmless to a browser (it
+  doesn't surface HTTP status to the user) but wrong, and exactly the kind of thing an
+  HTTP-level e2e assertion catches that visual browser testing structurally can't. Fixed with an
+  explicit `res.status(200)` before `res.render()`.
+- Along the way, also gave `HttpExceptionFilter` a fallback for non-`HttpException` errors that
+  still carry a `.statusCode` (the shape `csrf-csrf`'s `ForbiddenError` uses) — without it, a
+  legitimate CSRF rejection (a stale tab, an expired session, not just an actual attack) surfaced
+  as a generic 500 instead of a 403, caught by `auth.e2e-spec.ts`'s "no CSRF token" test.
+
+### Verified
+
+- 12 unit tests, 13 e2e tests, all passing. `npx tsc --noEmit`, `npm run lint`, and a full
+  production build all pass.
+- Re-verified the Arabic-toast fix against the actual running dev server with `curl` (not just
+  the test suite) before trusting it.

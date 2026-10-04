@@ -11,7 +11,14 @@
       toasts: [],
       add(detail) {
         const id = Date.now() + Math.random();
-        this.toasts.push({ id, message: detail.message, variant: detail.variant || 'neutral' });
+        // Server-triggered toasts (triggerToast in htmx-toast.ts) arrive
+        // URI-encoded, since HTTP header values can't carry raw non-ASCII
+        // bytes (every Arabic message would otherwise crash the request).
+        // decodeURIComponent is a no-op on already-plain ASCII text, so
+        // this is safe for a client-dispatched toast too.
+        let message = detail.message;
+        try { message = decodeURIComponent(message); } catch (e) { /* not encoded, use as-is */ }
+        this.toasts.push({ id, message, variant: detail.variant || 'neutral' });
         setTimeout(() => { this.toasts = this.toasts.filter((t) => t.id !== id); }, 4000);
       },
     }"

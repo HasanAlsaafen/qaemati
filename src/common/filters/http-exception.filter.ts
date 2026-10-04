@@ -10,6 +10,15 @@ import {
 import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 
+function hasHttpStatusCode(error: unknown): error is { statusCode: number } {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'statusCode' in error &&
+    typeof (error as { statusCode: unknown }).statusCode === 'number'
+  );
+}
+
 @Catch()
 @Injectable()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -22,8 +31,20 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
+    // Not every thrown error is a Nest HttpException: doubleCsrfProtection
+    // (applied as raw Express middleware, before Nest's own exception
+    // layer) throws a plain `http-errors`-style ForbiddenError with a
+    // `.statusCode`, not an HttpException. Without this fallback, every
+    // CSRF rejection -- including the ordinary kind (a stale tab, an
+    // expired session), not just an actual attack -- surfaced as a
+    // generic 500 "Something went wrong" instead of a clear 403. Found by
+    // the Phase 9 e2e test suite, not by inspection.
     const status =
-      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : hasHttpStatusCode(exception)
+          ? exception.statusCode
+          : HttpStatus.INTERNAL_SERVER_ERROR;
 
     if (status !== HttpStatus.NOT_FOUND) {
       this.logger.error(
@@ -40,7 +61,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (request.headers['hx-request'] === 'true') {
       const locale = request.locale ?? 'ar';
       const message = this.i18n.t('common.errors.serverErrorTitle', { lang: locale });
-      response.setHeader('HX-Trigger', JSON.stringify({ toast: { message, variant: 'danger' } }));
+      // See htmx-toast.ts: header values can't carry raw non-ASCII bytes.
+      response.setHeader(
+        'HX-Trigger',
+        JSON.stringify({ toast: { message: encodeURIComponent(message), variant: 'danger' } }),
+      );
       response.status(status).send('');
       return;
     }
