@@ -897,3 +897,92 @@ as a prerequisite back in the Phase 6 interruption notes, since Phase 9's accept
   production build all pass.
 - Re-verified the Arabic-toast fix against the actual running dev server with `curl` (not just
   the test suite) before trusting it.
+
+### A1: "My selection" list with WhatsApp send (done)
+
+Customer-side tap-to-build list, localStorage-backed (no account), with an optional note and a
+"Send on WhatsApp" button that opens a pre-filled `wa.me` link. Hidden entirely — not just
+disabled — when the restaurant has no WhatsApp number.
+
+What was built:
+
+- **`public/js/selection.js`**: a global Alpine store (`Alpine.store('selection', ...)`), not a
+  per-component `x-data`, since the item cards' `+` buttons, the floating bar, and the summary
+  sheet are independent DOM subtrees that all need to read/write the same state. Persists to
+  `localStorage` under a restaurant-slug-scoped key (`qaemati:selection:<slug>`, read from
+  `document.body.dataset.restaurantSlug`), so switching between the two demo restaurants in one
+  browser doesn't mix their selections — verified directly (added an item, reloaded, switched
+  restaurants, confirmed it reset).
+- **`src/common/text/build-whatsapp-message.ts`** (unit tested, 11 cases) + its client-side
+  mirror `public/js/whatsapp-message.js`: builds the plain-text message (restaurant name, table
+  number if present, itemized list, note, total, and an explicit disclaimer that this is a
+  WhatsApp message, not an online order or a payment — the brief's own wording, not
+  paraphrased). Same server/client duplication tradeoff already established for
+  `normalize-search-text.ts`/`menu.js`, documented the same way.
+- **`src/menu/menu-labels.ts`**: resolves every selection-related string server-side into one
+  `labels` object, same reasoning as `admin/admin-labels.ts` (a macro imported via `{% from %}`
+  can't see the calling template's `t` global).
+- `views/components/menu-item-card.njk`: root changed from a single `<button>` to a `<div>` so a
+  separate `+` button can sit beside the existing "open details" button without nesting one
+  button inside another. Both the card's `+` and the item-detail-sheet's "Add to selection"
+  button are gated on `hasWhatsapp && item.available` — hidden server-side (not rendered at all)
+  when there's no WhatsApp number, not just disabled.
+- `views/components/selection-bar.njk`: the floating bar (shown once the selection has ≥1 item)
+  and its bottom sheet — quantity +/- per item, a note field, the total, the disclaimer, and the
+  "Send on WhatsApp"/"Clear selection" buttons. Entirely Alpine-driven against the global store;
+  no server round trip for anything in this feature.
+
+### Bugs found and fixed while building this
+
+- **Alpine's CDN build starts via a queued microtask right after its own script executes, not
+  on `DOMContentLoaded`.** `public/js/selection.js` registered its store via
+  `document.addEventListener('alpine:init', ...)`, loaded as a `<script defer>` *after*
+  `alpine.min.js` in document order — the pattern every other script on this project's pages
+  already followed. That turned out to be too late: Alpine's own script, once it finishes
+  executing (itself a deferred task), immediately queues a microtask to call `start()`, which
+  runs before the browser even gets to the *next* deferred script, let alone
+  `DOMContentLoaded`. Every `$store.selection.*` reference threw `Cannot read properties of
+  undefined`. Fixed by loading `whatsapp-message.js`/`selection.js` before `alpine.min.js` in
+  the HTML — which, mechanically, meant injecting them from `views/layouts/menu.njk` *before*
+  its `{% include "partials/head.njk" %}` line (the include is where `alpine.min.js` actually
+  lives), not from `views/pages/menu.njk` via a block.
+- **That fix's first attempt didn't work, for a reason specific to this codebase**: a `{% block
+  pre_alpine_scripts %}` defined *inside* `partials/head.njk` (an included partial) is not
+  reachable by `{% block %}` overrides from `pages/menu.njk`, even though `pages/menu.njk`
+  extends `layouts/menu.njk` which includes that partial. Verified empirically (rendered output
+  simply didn't contain the override) rather than assumed — this project already has one
+  documented Nunjucks scoping surprise (macro imports can't see caller globals, from Phase 4);
+  this is a second, different one: a block's reachability depends on the direct `extends` chain,
+  not on what an ancestor template happens to `{% include %}`. Resolved by injecting the script
+  tags directly in `layouts/menu.njk`'s own markup instead of through a block.
+- **A toast fired by the `+` button visually overlapped the selection sheet's own Send/Clear
+  buttons.** Both the toast host and the sheet's action buttons dock to the bottom of the
+  viewport (`bottom-4`); tapping `+` then immediately opening the sheet (very plausible — that's
+  the obvious next action) showed the "Added to your selection" toast sitting on top of the
+  real buttons for its full 4-second lifetime. Found visually (a screenshot comparison), not by
+  a failing test — the buttons were still present and clickable underneath, just visually
+  obscured, which no DOM-presence check would catch. Fixed by moving the shared toast host from
+  `bottom-4`/`z-50` to `bottom-24`/`z-[60]`, clearing the floating bar and the sheet's bottom
+  button area in the common case (a lesser residual overlap remains if a user adds several items
+  in rapid succession, stacking multiple toasts — acceptable, not fixed further given it's a
+  secondary/rare path).
+
+### Verified
+
+- Unit: 11 new `build-whatsapp-message` tests (message formatting, table-line
+  presence/absence, note trimming, multi-item listing, URL encoding including Arabic text) —
+  31 unit tests total now, all passing.
+- E2E: `test/selection.e2e-spec.ts` covers what an HTTP-level test actually can for a
+  client-side feature — the scripts and add-button markup are present when a WhatsApp number
+  exists, absent (not just hidden) when it doesn't, load in the correct order relative to
+  Alpine, and the Arabic labels render under the Arabic locale.
+- Interactive (Playwright, both locales): added an item via a card's `+` button, opened the
+  floating bar, adjusted quantity, added a note, confirmed the generated `wa.me` link's
+  decoded message text was correctly formatted (table number, itemized list, note, total,
+  disclaimer) in both English and Arabic; confirmed the feature is completely absent (no
+  scripts loaded, no `+` buttons rendered) when a restaurant's WhatsApp number is cleared, then
+  restored the seed data afterward.
+- axe-core: 0 violations on the selection sheet (Arabic/RTL, with items added and the sheet
+  open) against WCAG 2.0/2.2 A+AA tags.
+- `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
+  pass; demo data re-seeded clean after testing.

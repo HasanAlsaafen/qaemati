@@ -23,7 +23,19 @@
       },
     }"
     x-on:toast.window="add($event.detail)"
-    class="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex flex-col items-center gap-2 px-4"
+    {#
+      bottom-24 rather than bottom-4: on the public menu, both the
+      floating selection bar and the selection sheet's Send/Clear
+      buttons also dock to the bottom of the viewport. A toast at
+      bottom-4 visually sat directly on top of them -- most noticeable
+      right after tapping "+" and then immediately opening the sheet,
+      since the "Added to your selection" toast (4s) outlasts the sheet's
+      open transition. Found visually, not by a failing test (both
+      elements are still present and clickable underneath; this is a
+      layering/legibility issue a DOM-level check wouldn't catch). z-[60]
+      so the toast is unambiguously above the sheet's own z-50 overlay.
+    #}
+    class="pointer-events-none fixed inset-x-0 bottom-24 z-[60] flex flex-col items-center gap-2 px-4"
     aria-live="polite"
     aria-atomic="true"
   >

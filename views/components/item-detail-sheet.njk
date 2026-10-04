@@ -7,9 +7,9 @@
   components/badge.njk's variant classes, since this content is rendered
   client-side from dynamic data rather than by Nunjucks.
 #}
-{% macro itemDetailSheet(unavailableLabel) %}
+{% macro itemDetailSheet(unavailableLabel, hasWhatsapp, addButtonLabel, addedToastMessage) %}
   <div
-    x-data="{ open: false, item: null, unavailableLabel: {{ unavailableLabel | dump }} }"
+    x-data="{ open: false, item: null, unavailableLabel: {{ unavailableLabel | dump }}, hasWhatsapp: {{ hasWhatsapp | dump }}, addButtonLabel: {{ addButtonLabel | dump }}, addedToastMessage: {{ addedToastMessage | dump }} }"
     x-on:open-item-sheet.window="item = $event.detail; open = true"
     x-on:keydown.escape.window="open = false"
     x-show="open"
@@ -86,6 +86,24 @@
             <p class="mt-4 text-lg font-bold text-text" dir="ltr">
               <span x-text="item.priceFormatted"></span> <span x-text="item.currency"></span>
             </p>
+
+            <button
+              type="button"
+              x-show="hasWhatsapp && item.available"
+              x-on:click="$store.selection.add({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                priceFormatted: item.priceFormatted,
+                currency: item.currency,
+                addedToastMessage: addedToastMessage,
+              }); open = false"
+              x-bind:aria-label="item.addAriaLabel"
+              class="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
+              <span x-text="addButtonLabel"></span>
+            </button>
           </div>
         </div>
       </template>

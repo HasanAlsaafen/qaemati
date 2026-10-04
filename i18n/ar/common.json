@@ -30,7 +30,33 @@
     "whatsapp": "واتساب",
     "instagram": "إنستغرام",
     "viewMenu": "عرض القائمة",
-    "tableLabel": "طاولة {name}"
+    "tableLabel": "طاولة {name}",
+    "selection": {
+      "addAriaLabel": "إضافة {name} إلى طلبي",
+      "addButton": "إضافة إلى طلبي",
+      "barLabel": "طلبي",
+      "barCount": "{count} عناصر",
+      "barCountOne": "عنصر واحد",
+      "title": "طلبي",
+      "emptyTitle": "طلبك فارغ",
+      "emptyDescription": "اضغط \"+\" على أي عنصر في القائمة لإضافته هنا.",
+      "quantityLabel": "الكمية",
+      "decreaseAriaLabel": "إنقاص الكمية",
+      "increaseAriaLabel": "زيادة الكمية",
+      "removeAriaLabel": "إزالة من الطلب",
+      "noteLabel": "ملاحظة (اختياري)",
+      "notePlaceholder": "مثال: حار إضافي، بدون بصل...",
+      "totalLabel": "الإجمالي",
+      "sendButton": "إرسال عبر واتساب",
+      "disclaimer": "هذا يرسل رسالة واتساب إلى المطعم للسؤال عن طلبك. هذا ليس طلبًا إلكترونيًا ولا يتم الدفع هنا.",
+      "clearButton": "إفراغ الطلب",
+      "noWhatsappNotice": "لم يضف هذا المطعم رقم واتساب بعد، لذلك لا يمكن إرسال الطلبات من هنا.",
+      "addedToast": "أُضيف إلى طلبك",
+      "messageTableLine": "طاولة: {name}",
+      "messageNoteLine": "ملاحظة: {note}",
+      "messageTotalLine": "الإجمالي: {total} {currency}",
+      "messageItemLine": "{qty}x {name} — {price} {currency}"
+    }
   },
   "admin": {
     "auth": {

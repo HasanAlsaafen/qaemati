@@ -4,9 +4,18 @@
 <head>
   <title>{% block title %}{{ t('common.app.name') }}{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}{{ t('common.home.subtitle') }}{% endblock %}">
+  {# Must load before partials/head.njk's alpine.min.js tag -- Alpine's
+     CDN build starts on a queued microtask right after its own script
+     runs, not on DOMContentLoaded, so a store registered any later than
+     this finds Alpine already started. See the comment in
+     partials/head.njk for the full explanation. #}
+  {% if menu.whatsappUrl %}
+    <script defer src="/js/whatsapp-message.js"></script>
+    <script defer src="/js/selection.js"></script>
+  {% endif %}
   {% include "partials/head.njk" %}
 </head>
-<body class="min-h-screen bg-bg text-text font-sans antialiased">
+<body class="min-h-screen bg-bg text-text font-sans antialiased" data-restaurant-slug="{{ menu.slug }}">
   {% block content %}{% endblock %}
 
   {{ toastHost() }}

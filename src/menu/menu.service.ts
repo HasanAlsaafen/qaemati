@@ -10,12 +10,14 @@ export interface MenuItemView {
   id: string;
   name: string;
   description: string | null;
+  price: number;
   priceFormatted: string;
   currency: string;
   imageUrl: string | null;
   available: boolean;
   tags: { code: ItemTag; label: string; variant: string }[];
   searchText: string;
+  addAriaLabel: string;
 }
 
 export interface MenuCategoryView {
@@ -86,6 +88,7 @@ export class MenuService {
             id: item.id,
             name,
             description,
+            price: Number(item.price),
             priceFormatted: Number(item.price).toFixed(2),
             currency: item.currency,
             imageUrl: item.imagePath,
@@ -96,6 +99,10 @@ export class MenuService {
               variant: TAG_VARIANT[tag],
             })),
             searchText: searchParts.join(' '),
+            addAriaLabel: this.i18n.t('common.menu.selection.addAriaLabel', {
+              lang: locale,
+              args: { name },
+            }),
           };
         }),
       })),

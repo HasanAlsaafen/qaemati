@@ -30,7 +30,33 @@
     "whatsapp": "WhatsApp",
     "instagram": "Instagram",
     "viewMenu": "View menu",
-    "tableLabel": "Table {name}"
+    "tableLabel": "Table {name}",
+    "selection": {
+      "addAriaLabel": "Add {name} to my selection",
+      "addButton": "Add to my selection",
+      "barLabel": "My selection",
+      "barCount": "{count} items",
+      "barCountOne": "1 item",
+      "title": "My selection",
+      "emptyTitle": "Your selection is empty",
+      "emptyDescription": "Tap \"+\" on a menu item to add it here.",
+      "quantityLabel": "Quantity",
+      "decreaseAriaLabel": "Decrease quantity",
+      "increaseAriaLabel": "Increase quantity",
+      "removeAriaLabel": "Remove from selection",
+      "noteLabel": "Note (optional)",
+      "notePlaceholder": "E.g. extra spicy, no onions...",
+      "totalLabel": "Total",
+      "sendButton": "Send on WhatsApp",
+      "disclaimer": "This sends a WhatsApp message to the restaurant to ask about your order. It is not an online order and no payment is made here.",
+      "clearButton": "Clear selection",
+      "noWhatsappNotice": "This restaurant has not added a WhatsApp number yet, so selections can’t be sent here.",
+      "addedToast": "Added to your selection",
+      "messageTableLine": "Table: {name}",
+      "messageNoteLine": "Note: {note}",
+      "messageTotalLine": "Total: {total} {currency}",
+      "messageItemLine": "{qty}x {name} — {price} {currency}"
+    }
   },
   "admin": {
     "auth": {

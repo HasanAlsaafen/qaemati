@@ -22,5 +22,17 @@
 
 <link rel="stylesheet" href="/css/app.css">
 <script defer src="/js/vendor/htmx.min.js"></script>
+{# Alpine's CDN build starts via a queued microtask right after its own
+   script executes, not on DOMContentLoaded -- so a later <script defer>
+   that calls Alpine.store()/registers an alpine:init listener runs too
+   late and finds Alpine already started (every $store.* reference then
+   throws "Cannot read properties of undefined"). Any page that needs to
+   register a store or plugin before Alpine scans the DOM must inject its
+   script tags earlier via a `pre_alpine_scripts` block defined directly
+   in that page's *layout* file (e.g. layouts/menu.njk), not here --
+   a block defined inside this included partial isn't reachable from a
+   page template that extends a different layout (verified empirically;
+   Nunjucks blocks resolve against the direct extends chain only, not
+   through an unrelated {% include %}). #}
 <script defer src="/js/vendor/alpine.min.js"></script>
 <style>[x-cloak] { display: none !important; }</style>
