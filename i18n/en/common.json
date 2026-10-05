@@ -101,6 +101,7 @@
     "nav": {
       "dashboard": "Dashboard",
       "categories": "Categories",
+      "analytics": "Analytics",
       "previewMenu": "Preview menu",
       "qr": "QR & print",
       "toggleMenu": "Menu",
@@ -186,6 +187,17 @@
       "printButton": "Print",
       "scanToView": "Scan to view our menu",
       "downloadLinkLabel": "Open menu link"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "menuViewsLabel": "Menu views",
+      "last7Days": "Last 7 days",
+      "last30Days": "Last 30 days",
+      "mostViewedLabel": "Most viewed",
+      "viewsCount": "{count} views",
+      "viewsCountOne": "1 view",
+      "emptyTitle": "No views yet",
+      "emptyDescription": "Once people start opening your menu, you'll see your numbers here."
     },
     "branding": {
       "title": "Branding",

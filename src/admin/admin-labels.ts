@@ -74,6 +74,15 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale, defaultCurre
       CONTAINS_NUTS: t('common.tags.containsNuts'),
       CONTAINS_DAIRY: t('common.tags.containsDairy'),
     },
+    analytics: {
+      title: t('common.admin.analytics.title'),
+      menuViewsLabel: t('common.admin.analytics.menuViewsLabel'),
+      last7Days: t('common.admin.analytics.last7Days'),
+      last30Days: t('common.admin.analytics.last30Days'),
+      mostViewedLabel: t('common.admin.analytics.mostViewedLabel'),
+      emptyTitle: t('common.admin.analytics.emptyTitle'),
+      emptyDescription: t('common.admin.analytics.emptyDescription'),
+    },
     qr: {
       title: t('common.admin.qr.title'),
       generalTitle: t('common.admin.qr.generalTitle'),

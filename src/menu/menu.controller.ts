@@ -1,14 +1,16 @@
-import { Controller, Get, Param, Query, Render, Req } from '@nestjs/common';
-import { Request } from 'express';
+import { Controller, Get, HttpCode, Param, Query, Render, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 import { MenuService } from './menu.service';
 import { buildMenuLabels } from './menu-labels';
+import { AnalyticsService } from '../admin/analytics.service';
 
 @Controller('m')
 export class MenuController {
   constructor(
     private readonly menuService: MenuService,
     private readonly i18n: I18nService,
+    private readonly analytics: AnalyticsService,
   ) {}
 
   @Get(':slug')
@@ -66,5 +68,30 @@ export class MenuController {
       embed: embed === '1',
       labels: buildMenuLabels(this.i18n, locale),
     };
+  }
+
+  /** B2: a GET beacon (not POST) deliberately -- doubleCsrfProtection
+   *  (applied globally in bootstrap.ts) ignores GET/HEAD/OPTIONS by
+   *  default, so this stays a plain unauthenticated fetch from
+   *  item-detail-sheet.njk with no CSRF plumbing needed, same as any
+   *  other page-view beacon. 204 with no body; the client ignores the
+   *  response either way. */
+  @Get(':slug/items/:itemId/view')
+  @HttpCode(204)
+  async recordItemView(
+    @Param('slug') slug: string,
+    @Param('itemId') itemId: string,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    const restaurantId = await this.menuService.getRestaurantIdBySlug(slug);
+    // Same owner exclusion as the whole-menu view in show() above -- the
+    // restaurant's own admin opening an item on their own menu shouldn't
+    // inflate their own "most viewed" stats either.
+    const isOwner = req.session.restaurantId === restaurantId;
+    if (restaurantId && !isOwner) {
+      await this.analytics.recordItemView(restaurantId, itemId);
+    }
+    res.setHeader('Cache-Control', 'no-store');
   }
 }

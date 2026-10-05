@@ -154,6 +154,7 @@ model Restaurant {
   tables     RestaurantTable[]
   itemVariants ItemVariant[]
   itemAddons   ItemAddon[]
+  menuViews    MenuView[]
 }
 
 model AdminUser {
@@ -248,9 +249,31 @@ model Item {
 
   variants ItemVariant[]
   addons   ItemAddon[]
+  menuViews MenuView[]
 
   @@index([restaurantId])
   @@index([categoryId])
+}
+
+/// B2: a single view event -- a null itemId is a whole-menu page load
+/// (GET /m/:slug), a set itemId is an item detail sheet open (a
+/// client-side fetch beacon, since that's not a page navigation). Never
+/// recorded for the restaurant's own admin viewing/previewing their own
+/// menu (see MenuController), so an owner checking their own page
+/// doesn't inflate their own analytics.
+model MenuView {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  itemId String?
+  item   Item?   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([restaurantId, createdAt])
+  @@index([itemId, createdAt])
 }
 
 /// A2: a size/option with its own absolute price (not a delta) -- "Small

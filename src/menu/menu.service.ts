@@ -11,6 +11,7 @@ import {
 } from '../common/open-status';
 import { PrismaService } from '../prisma/prisma.service';
 import { darken, hexToRgb, lighten, rgbToTriplet, toSecondaryPalette } from '../common/color';
+import { AnalyticsService } from '../admin/analytics.service';
 
 export interface MenuOptionView {
   id: string;
@@ -165,6 +166,7 @@ export class MenuService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly i18n: I18nService,
+    private readonly analytics: AnalyticsService,
   ) {}
 
   async getMenu(slug: string, locale: Locale, preview?: MenuPreviewOverrides): Promise<MenuView> {
@@ -191,6 +193,9 @@ export class MenuService {
     }
 
     const isPreviewOwner = Boolean(preview && preview.restaurantId === restaurant.id);
+    if (!isPreviewOwner) {
+      await this.analytics.recordMenuView(restaurant.id);
+    }
     const effectiveName = isPreviewOwner && preview!.name ? preview!.name : null;
     const effectivePrimaryColor =
       isPreviewOwner && preview!.primaryColor ? preview!.primaryColor : restaurant.primaryColor;
@@ -348,6 +353,18 @@ export class MenuService {
       backgroundImageUrl: restaurant.backgroundImagePath,
       sectionSpacing: effectiveSectionSpacing,
     };
+  }
+
+  /** B2: resolves a slug to its restaurant id for the item-view beacon
+   *  endpoint (MenuController), which needs it to validate the itemId
+   *  belongs to this restaurant before recording -- a tiny lookup, not
+   *  worth pulling in the whole getMenu() query. */
+  async getRestaurantIdBySlug(slug: string): Promise<string | null> {
+    const restaurant = await this.prisma.restaurant.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+    return restaurant?.id ?? null;
   }
 }
 

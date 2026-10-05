@@ -1553,3 +1553,58 @@ infrastructure (view-tracking, CSV parsing, a service worker) like B2–B4 would
 
 - B2 (analytics), B3 (bulk tools), and B4 (share + PWA) remain unbuilt -- scoped (see above) but
   not started, each its own phase given the new infrastructure each needs.
+
+## Phase 15: Pack B2 -- menu + item view analytics (done)
+
+### What was built
+
+- **`MenuView` table** (new model, new migration): one row per view event. A null `itemId` is a
+  whole-menu page load (`GET /m/:slug`); a set `itemId` is an item detail sheet open. Both
+  `Restaurant` and `Item` cascade-delete their `MenuView` rows, so a deleted item never leaves
+  orphaned analytics rows for `AnalyticsService.topItems()` to filter out defensively.
+- **`AnalyticsService`** (`src/admin/analytics.service.ts`): `recordMenuView`/`recordItemView`
+  (the latter validates the itemId actually belongs to the given restaurant before writing,
+  since its public endpoint is unauthenticated) and `getStats()` -- counts for the last 7/30
+  days plus a top-5 most-viewed-items list per window via `groupBy`.
+- **Owner exclusion**: neither a whole-menu view nor an item view is recorded when the viewer's
+  admin session belongs to that exact restaurant (`req.session.restaurantId === restaurant.id`,
+  the same `isPreviewOwner` check the branding live-preview already relied on) -- an owner
+  browsing or testing their own menu doesn't inflate their own analytics. Caught as a real
+  inconsistency during manual verification: the item-view beacon initially skipped this check
+  entirely (only the whole-menu view had it), which would have let an owner's own item clicks
+  skew "most viewed" even though their own page loads were correctly excluded. Fixed and covered
+  by a dedicated e2e case.
+- **Item-view beacon** (`GET /m/:slug/items/:itemId/view`, `MenuController`): deliberately GET,
+  not POST -- `doubleCsrfProtection` (applied globally in `bootstrap.ts`) ignores GET/HEAD/
+  OPTIONS by default, so a plain `fetch(..., { keepalive: true })` from
+  `item-detail-sheet.njk`'s `open-item-sheet` handler needs no CSRF plumbing, same as any other
+  page-view pixel/beacon. 204, no body, fire-and-forget (errors swallowed client-side).
+- **`/admin/analytics` page** (new controller + `views/admin/analytics.njk`): two stat cards
+  (menu views, last 7/30 days) and two "most viewed" lists, each with the item's bilingual name
+  and a pluralized view count ("1 view" / "N views"). Added to the sidebar nav between
+  Categories and QR & print, using the glossary's locked terms (`الإحصائيات`, `مشاهدات القائمة`,
+  `الأكثر مشاهدة`).
+
+### Verified
+
+- E2e: new `test/analytics.e2e-spec.ts` (5 cases) -- anonymous menu loads and item-view beacons
+  are recorded; an admin session viewing or opening an item on their own restaurant records
+  nothing (both the whole-menu and the item-view case, the latter added after the bug above was
+  found); a beacon for an item belonging to a different restaurant than the slug is silently
+  ignored; the admin analytics page renders the recorded counts and the most-viewed item. 50 e2e
+  tests total (72 unit, unchanged).
+- Interactive (Claude-in-Chrome): opened an item on the real public menu (confirmed the beacon
+  fires via direct `fetch` from the page's own JS console, since Chrome's `keepalive: true`
+  requests don't surface correctly through the extension's network-request inspector --
+  independently confirmed with `curl` that the endpoint itself returns a clean 204), then
+  logged in as that restaurant's own admin and confirmed the view count held steady across a
+  repeat visit/item-open, demonstrating the owner-exclusion fix.
+- `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
+  pass. Migration applied to both the dev and test databases.
+
+### Known gaps / follow-ups
+
+- B3 (bulk tools) and B4 (share + PWA) remain unbuilt -- scoped, not started.
+- Analytics has no CSV export or date-range picker beyond the fixed 7/30-day windows; not
+  requested, and B3's "bulk tools" scope is a separate, already-named place for export-style
+  features if wanted later.

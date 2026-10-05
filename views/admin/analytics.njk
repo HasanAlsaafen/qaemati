@@ -1,0 +1,72 @@
+{% extends "layouts/admin.njk" %}
+
+{% from "components/empty-state.njk" import emptyState %}
+
+{% block title %}{{ labels.analytics.title }}{% endblock %}
+
+{% block content %}
+<h1 class="font-sans text-2xl font-bold text-text">{{ labels.analytics.title }}</h1>
+
+<div class="mt-4 grid gap-4 sm:grid-cols-2">
+  <div class="rounded-lg border border-border bg-surface p-4">
+    <p class="text-sm font-medium text-muted-text">{{ labels.analytics.last7Days }}</p>
+    <p class="mt-1 font-sans text-3xl font-bold text-text" dir="ltr">{{ stats.menuViews7d }}</p>
+    <p class="mt-1 text-sm text-muted-text">{{ labels.analytics.menuViewsLabel }}</p>
+  </div>
+  <div class="rounded-lg border border-border bg-surface p-4">
+    <p class="text-sm font-medium text-muted-text">{{ labels.analytics.last30Days }}</p>
+    <p class="mt-1 font-sans text-3xl font-bold text-text" dir="ltr">{{ stats.menuViews30d }}</p>
+    <p class="mt-1 text-sm text-muted-text">{{ labels.analytics.menuViewsLabel }}</p>
+  </div>
+</div>
+
+<div class="mt-6 grid gap-4 sm:grid-cols-2">
+  <section class="rounded-lg border border-border bg-surface p-4">
+    <h2 class="font-sans text-lg font-bold text-text">{{ labels.analytics.mostViewedLabel }}</h2>
+    <p class="text-sm text-muted-text">{{ labels.analytics.last7Days }}</p>
+    {% if stats.topItems7d.length %}
+      <ol class="mt-3 flex flex-col divide-y divide-border">
+        {% for stat in stats.topItems7d %}
+          <li class="flex items-center justify-between gap-3 py-2 text-sm">
+            <span class="min-w-0 flex-1">
+              <span class="truncate font-medium text-text" dir="ltr">{{ stat.nameEn }}</span>
+              <span class="block truncate text-muted-text" dir="rtl">{{ stat.nameAr }}</span>
+            </span>
+            <span dir="ltr" class="shrink-0 font-medium text-text">
+              {% if stat.viewCount == 1 %}{{ t('common.admin.analytics.viewsCountOne') }}{% else %}{{ t('common.admin.analytics.viewsCount', { count: stat.viewCount }) }}{% endif %}
+            </span>
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <div class="mt-3">
+        {{ emptyState(labels.analytics.emptyTitle, labels.analytics.emptyDescription) }}
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="rounded-lg border border-border bg-surface p-4">
+    <h2 class="font-sans text-lg font-bold text-text">{{ labels.analytics.mostViewedLabel }}</h2>
+    <p class="text-sm text-muted-text">{{ labels.analytics.last30Days }}</p>
+    {% if stats.topItems30d.length %}
+      <ol class="mt-3 flex flex-col divide-y divide-border">
+        {% for stat in stats.topItems30d %}
+          <li class="flex items-center justify-between gap-3 py-2 text-sm">
+            <span class="min-w-0 flex-1">
+              <span class="truncate font-medium text-text" dir="ltr">{{ stat.nameEn }}</span>
+              <span class="block truncate text-muted-text" dir="rtl">{{ stat.nameAr }}</span>
+            </span>
+            <span dir="ltr" class="shrink-0 font-medium text-text">
+              {% if stat.viewCount == 1 %}{{ t('common.admin.analytics.viewsCountOne') }}{% else %}{{ t('common.admin.analytics.viewsCount', { count: stat.viewCount }) }}{% endif %}
+            </span>
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <div class="mt-3">
+        {{ emptyState(labels.analytics.emptyTitle, labels.analytics.emptyDescription) }}
+      </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

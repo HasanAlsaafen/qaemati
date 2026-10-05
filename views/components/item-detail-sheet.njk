@@ -58,8 +58,17 @@
         if (index === -1) this.selectedAddonIds.push(id);
         else this.selectedAddonIds.splice(index, 1);
       },
+      // B2: fire-and-forget view beacon (GET, see MenuController.recordItemView
+      // for why GET and not POST) -- failures (offline, ad blocker) are
+      // silently ignored since this is analytics, not a feature the page
+      // depends on.
+      recordView(itemId) {
+        var slug = document.body.getAttribute('data-restaurant-slug');
+        if (!slug) return;
+        fetch('/m/' + slug + '/items/' + itemId + '/view', { keepalive: true }).catch(function () {});
+      },
     }"
-    x-on:open-item-sheet.window="item = $event.detail; open = true; selectedVariantId = null; selectedAddonIds = []"
+    x-on:open-item-sheet.window="item = $event.detail; open = true; selectedVariantId = null; selectedAddonIds = []; recordView(item.id)"
     x-on:keydown.escape.window="open = false"
     x-show="open"
     x-cloak

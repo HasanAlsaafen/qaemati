@@ -101,6 +101,7 @@
     "nav": {
       "dashboard": "لوحة التحكم",
       "categories": "الأقسام",
+      "analytics": "الإحصائيات",
       "previewMenu": "معاينة القائمة",
       "qr": "رمز QR والطباعة",
       "toggleMenu": "القائمة",
@@ -186,6 +187,17 @@
       "printButton": "طباعة",
       "scanToView": "امسح لعرض قائمتنا",
       "downloadLinkLabel": "فتح رابط القائمة"
+    },
+    "analytics": {
+      "title": "الإحصائيات",
+      "menuViewsLabel": "مشاهدات القائمة",
+      "last7Days": "آخر 7 أيام",
+      "last30Days": "آخر 30 يومًا",
+      "mostViewedLabel": "الأكثر مشاهدة",
+      "viewsCount": "{count} مشاهدة",
+      "viewsCountOne": "مشاهدة واحدة",
+      "emptyTitle": "لا توجد مشاهدات بعد",
+      "emptyDescription": "بمجرد أن يبدأ الناس بفتح قائمتك، ستظهر أرقامك هنا."
     },
     "branding": {
       "title": "الهوية التجارية",
