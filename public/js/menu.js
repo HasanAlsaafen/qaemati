@@ -1,9 +1,10 @@
 /**
  * Public menu interactions: instant client-side search (with Arabic
- * normalization) and category scroll-spy. Plain vanilla JS, not Alpine,
- * because this runs over every item card on the page and Alpine's
- * reactivity overhead isn't worth it for a scroll listener and a text
- * filter. The item detail bottom sheet (Alpine) is unaffected by this file.
+ * normalization), a dietary/tag filter (B1), and category scroll-spy.
+ * Plain vanilla JS, not Alpine, because this runs over every item card
+ * on the page and Alpine's reactivity overhead isn't worth it for a
+ * scroll listener and a text/tag filter. The item detail bottom sheet
+ * (Alpine) is unaffected by this file.
  */
 (function () {
   // Mirrors src/common/text/normalize-search-text.ts. Keep both in sync.
@@ -24,6 +25,9 @@
   var sectionsContainer = document.querySelector('[data-menu-sections]');
   var emptyState = document.querySelector('[data-menu-empty-state]');
   var categoryBar = document.querySelector('[data-category-bar]');
+  var filterCheckboxes = Array.prototype.slice.call(document.querySelectorAll('[data-filter-tag]'));
+  var filterCount = document.querySelector('[data-filter-count]');
+  var filterClear = document.querySelector('[data-filter-clear]');
 
   var ACTIVE_CLASSES = ['bg-primary', 'text-primary-on'];
   var INACTIVE_CLASSES = ['bg-muted-surface', 'text-text', 'hover:bg-primary-soft'];
@@ -47,33 +51,87 @@
     })[0];
   }
 
-  // --- Search -------------------------------------------------------
+  // --- Search + tag filter --------------------------------------------
+  //
+  // One combined pass so the two compose correctly (a search for "latte"
+  // with "Vegan" checked shows only vegan lattes, not either match on
+  // its own) -- an item must pass both to stay visible. Tag filtering is
+  // OR within itself (checking Vegan + Gluten-free shows items matching
+  // either, the usual multi-select-filter convention), AND'd with search.
 
-  if (searchInput) {
-    searchInput.addEventListener('input', function () {
-      var query = normalize(searchInput.value);
-      var totalVisible = 0;
+  function activeTagFilters() {
+    return filterCheckboxes
+      .filter(function (cb) {
+        return cb.checked;
+      })
+      .map(function (cb) {
+        return cb.getAttribute('data-filter-tag');
+      });
+  }
 
-      sections.forEach(function (section) {
-        var items = Array.prototype.slice.call(section.querySelectorAll('[data-menu-item]'));
-        var visibleInSection = 0;
+  function updateFilterCount(activeTags) {
+    if (!filterCount) return;
+    if (activeTags.length > 0) {
+      filterCount.textContent = String(activeTags.length);
+      filterCount.classList.remove('hidden');
+      filterCount.classList.add('flex');
+    } else {
+      filterCount.classList.add('hidden');
+      filterCount.classList.remove('flex');
+    }
+  }
 
-        items.forEach(function (item) {
-          var matches = query === '' || (item.getAttribute('data-search-text') || '').indexOf(query) !== -1;
-          item.classList.toggle('hidden', !matches);
-          if (matches) visibleInSection++;
-        });
+  function applyFilters() {
+    var query = searchInput ? normalize(searchInput.value) : '';
+    var activeTags = activeTagFilters();
+    updateFilterCount(activeTags);
+    var totalVisible = 0;
 
-        section.classList.toggle('hidden', visibleInSection === 0);
-        var chip = chipForSection(section);
-        if (chip) chip.classList.toggle('hidden', query !== '' && visibleInSection === 0);
+    sections.forEach(function (section) {
+      var items = Array.prototype.slice.call(section.querySelectorAll('[data-menu-item]'));
+      var visibleInSection = 0;
 
-        totalVisible += visibleInSection;
+      items.forEach(function (item) {
+        var matchesSearch =
+          query === '' || (item.getAttribute('data-search-text') || '').indexOf(query) !== -1;
+        var itemTags = (item.getAttribute('data-tags') || '').split(',');
+        var matchesTags =
+          activeTags.length === 0 ||
+          activeTags.some(function (tag) {
+            return itemTags.indexOf(tag) !== -1;
+          });
+        var matches = matchesSearch && matchesTags;
+        item.classList.toggle('hidden', !matches);
+        if (matches) visibleInSection++;
       });
 
-      var hasQuery = query !== '';
-      emptyState.classList.toggle('hidden', !(hasQuery && totalVisible === 0));
-      sectionsContainer.classList.toggle('hidden', hasQuery && totalVisible === 0);
+      var sectionHasFilter = query !== '' || activeTags.length > 0;
+      section.classList.toggle('hidden', visibleInSection === 0);
+      var chip = chipForSection(section);
+      if (chip) chip.classList.toggle('hidden', sectionHasFilter && visibleInSection === 0);
+
+      totalVisible += visibleInSection;
+    });
+
+    var isFiltering = query !== '' || activeTags.length > 0;
+    emptyState.classList.toggle('hidden', !(isFiltering && totalVisible === 0));
+    sectionsContainer.classList.toggle('hidden', isFiltering && totalVisible === 0);
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', applyFilters);
+  }
+
+  filterCheckboxes.forEach(function (checkbox) {
+    checkbox.addEventListener('change', applyFilters);
+  });
+
+  if (filterClear) {
+    filterClear.addEventListener('click', function () {
+      filterCheckboxes.forEach(function (checkbox) {
+        checkbox.checked = false;
+      });
+      applyFilters();
     });
   }
 

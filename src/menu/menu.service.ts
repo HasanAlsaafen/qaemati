@@ -29,6 +29,14 @@ export interface MenuItemView {
   imageUrl: string | null;
   available: boolean;
   tags: { code: ItemTag; label: string; variant: string }[];
+  /** B1: the allergen note, picked by locale -- null when the owner
+   *  hasn't set one, shown on the item detail sheet alongside tags. */
+  allergenNote: string | null;
+  /** B1: comma-joined ItemTag codes (e.g. "VEGAN,SPICY") for the public
+   *  menu's client-side tag filter (public/js/menu.js) to check against
+   *  -- a plain string attribute is simpler to read off the DOM than
+   *  re-deriving it from the already-localized `tags` array above. */
+  tagCodes: string;
   searchText: string;
   addAriaLabel: string;
   variants: MenuOptionView[];
@@ -293,6 +301,8 @@ export class MenuService {
               label: this.i18n.t(TAG_I18N_KEY[tag], { lang: locale }),
               variant: TAG_VARIANT[tag],
             })),
+            allergenNote: pickNullable(item.allergenNoteAr, item.allergenNoteEn),
+            tagCodes: item.tags.join(','),
             searchText: searchParts.join(' '),
             addAriaLabel: this.i18n.t('common.menu.selection.addAriaLabel', {
               lang: locale,

@@ -31,7 +31,11 @@
     "spicy": "Spicy",
     "vegetarian": "Vegetarian",
     "new": "New",
-    "popular": "Popular"
+    "popular": "Popular",
+    "vegan": "Vegan",
+    "glutenFree": "Gluten-free",
+    "containsNuts": "Contains nuts",
+    "containsDairy": "Contains dairy"
   },
   "menu": {
     "searchPlaceholder": "Search the menu",
@@ -75,7 +79,13 @@
       "openUntil": "Open now, closes {time}",
       "closedUntil": "Closed, opens {time}"
     },
-    "todaysSpecial": "Today's special"
+    "todaysSpecial": "Today's special",
+    "allergenNoteLabel": "Allergen note",
+    "filter": {
+      "buttonLabel": "Filter",
+      "title": "Filter",
+      "clearButton": "Clear filters"
+    }
   },
   "admin": {
     "auth": {
@@ -114,6 +124,9 @@
       "availableLabel": "Available",
       "imageLabel": "Image",
       "tagsLabel": "Tags",
+      "allergenNoteArLabel": "Allergen note (Arabic)",
+      "allergenNoteEnLabel": "Allergen note (English)",
+      "allergenNoteHint": "Optional -- for anything the tags above don't cover, e.g. \"fried in the same oil as shellfish.\"",
       "moveUp": "Move up",
       "moveDown": "Move down",
       "dragToReorder": "Drag to reorder"

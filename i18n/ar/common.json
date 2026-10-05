@@ -31,7 +31,11 @@
     "spicy": "حار",
     "vegetarian": "نباتي",
     "new": "جديد",
-    "popular": "الأكثر طلبًا"
+    "popular": "الأكثر طلبًا",
+    "vegan": "نباتي صرف",
+    "glutenFree": "خالٍ من الغلوتين",
+    "containsNuts": "يحتوي على مكسرات",
+    "containsDairy": "يحتوي على منتجات الألبان"
   },
   "menu": {
     "searchPlaceholder": "ابحث في القائمة",
@@ -75,7 +79,13 @@
       "openUntil": "مفتوح الآن، يُغلق {time}",
       "closedUntil": "مغلق الآن، يفتح {time}"
     },
-    "todaysSpecial": "عرض اليوم"
+    "todaysSpecial": "عرض اليوم",
+    "allergenNoteLabel": "ملاحظة حول الحساسية الغذائية",
+    "filter": {
+      "buttonLabel": "تصفية",
+      "title": "تصفية",
+      "clearButton": "مسح التصفية"
+    }
   },
   "admin": {
     "auth": {
@@ -114,6 +124,9 @@
       "availableLabel": "متوفر",
       "imageLabel": "الصورة",
       "tagsLabel": "الوسوم",
+      "allergenNoteArLabel": "ملاحظة حول الحساسية الغذائية (عربي)",
+      "allergenNoteEnLabel": "ملاحظة حول الحساسية الغذائية (إنجليزي)",
+      "allergenNoteHint": "اختياري -- لأي شيء لا تغطيه الوسوم أعلاه، مثل \"يُقلى بنفس الزيت المستخدم للمأكولات البحرية\".",
       "moveUp": "نقل لأعلى",
       "moveDown": "نقل لأسفل",
       "dragToReorder": "اسحب لإعادة الترتيب"

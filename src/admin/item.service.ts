@@ -13,6 +13,8 @@ export interface ItemInput {
   nameEn: string;
   descriptionAr?: string | null;
   descriptionEn?: string | null;
+  allergenNoteAr?: string | null;
+  allergenNoteEn?: string | null;
   price: number;
   currency: string;
   tags: ItemTag[];
@@ -67,6 +69,8 @@ export class ItemService {
           nameEn: input.nameEn,
           descriptionAr: input.descriptionAr,
           descriptionEn: input.descriptionEn,
+          allergenNoteAr: input.allergenNoteAr,
+          allergenNoteEn: input.allergenNoteEn,
           price: input.price,
           currency: input.currency,
           tags: input.tags,

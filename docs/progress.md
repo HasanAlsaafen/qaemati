@@ -1499,3 +1499,57 @@ unchanged counts since this reused an existing test rather than adding a new one
 interactively that "Spacious" visibly widens the gap between category sections in the live
 preview (screenshot comparison) without affecting item-card spacing; reset to default and saved.
 `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all pass.
+
+## Phase 14: Pack B scoped, B1 built -- dietary tags, allergen note, filter (done)
+
+Pack B's scope was never written down (flagged as a known gap since Phase 10) -- found it,
+instead of guessing: `docs/ux/glossary.md` (Phase 7) had already coined terminology for four
+not-yet-built feature groups ("New terms needed for Phases 9–11"), none of which existed in the
+codebase (verified by grep before trusting it): dietary tags + filter (B1), analytics (B2), bulk
+tools (B3), share + PWA (B4). Confirmed the breakdown and build order with the user; B1 first as
+the smallest/lowest-risk, extending the existing tag system directly rather than introducing new
+infrastructure (view-tracking, CSV parsing, a service worker) like B2–B4 would.
+
+### What was built
+
+- **Four new `ItemTag` values** (migration `20261005143025_add_dietary_tags_and_allergen_note`):
+  `VEGAN`, `GLUTEN_FREE`, `CONTAINS_NUTS`, `CONTAINS_DAIRY`, using the glossary's exact locked
+  Arabic terms. `src/common/tags.ts`'s three lookup maps (`TAG_VARIANT`/`TAG_I18N_KEY`/
+  `ALL_TAGS`) are the single source every tag-rendering surface already read from (item cards,
+  the detail sheet, admin checkboxes, and now the filter sheet) -- extending them was the whole
+  change; no surface needed its own new tag-handling logic. `CONTAINS_NUTS`/`CONTAINS_DAIRY` get
+  the existing `'warning'` badge variant (a caution, not a selling point like `VEGAN`/
+  `VEGETARIAN`'s `'primary'`) -- which `item-detail-sheet.njk`'s hand-duplicated tag color map
+  (noted in its own header comment as a client-side duplicate of `badge.njk`) was missing
+  entirely before this, so `CONTAINS_NUTS`/`CONTAINS_DAIRY` would have rendered unstyled there.
+- **Allergen note** (`Item.allergenNoteAr`/`allergenNoteEn`, same migration): optional free text
+  for anything the fixed tags can't express (e.g. "fried in the same oil as shellfish"), editable
+  in the admin item form next to description, shown on the public item detail sheet when set.
+- **Filter sheet** (`views/components/menu-filter-sheet.njk`, new): a checkbox list of all 8
+  tags, reusing `bottom-sheet.njk`'s open/close chrome. Deliberately plain checkboxes, not
+  Alpine-bound -- same reasoning `public/js/menu.js`'s own header comment already gives for the
+  search box (it runs over every item card; Alpine's reactivity overhead isn't worth it there).
+  `menu.js`'s search handler became a combined `applyFilters()`: an item must match both the
+  search text AND (if any tags are checked) at least one checked tag -- multi-select-within-the-
+  filter is OR, composed with search via AND, the standard filter-UI convention. A small count
+  badge on the filter button updates from the same pass. `MenuItemView` gained a plain
+  `tagCodes` string (comma-joined `ItemTag`s) for the filter to read off each card's
+  `data-tags` attribute, parallel to the existing `data-search-text`.
+
+### Verified
+
+- E2e: new `test/dietary-tags.e2e-spec.ts` -- the four new tags and an allergen note save
+  through the real item PATCH endpoint and persist; the public menu reflects the tag badges, the
+  `data-tags` attribute, and the allergen note text; all 8 tags appear as filter checkboxes. 45
+  e2e tests total (72 unit, unchanged -- no new pure-function logic this phase).
+- Interactive (Claude-in-Chrome): opened the filter sheet on the real public menu, checked "New"
+  and confirmed the menu instantly narrowed to only new items across every category (chips for
+  categories with no matches hid too); clicked "Clear filters" and confirmed the full menu
+  returned; closed the sheet cleanly.
+- `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
+  pass. Migration applied to both the dev and test databases.
+
+### Known gaps / follow-ups
+
+- B2 (analytics), B3 (bulk tools), and B4 (share + PWA) remain unbuilt -- scoped (see above) but
+  not started, each its own phase given the new infrastructure each needs.

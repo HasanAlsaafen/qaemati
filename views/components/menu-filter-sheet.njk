@@ -1,0 +1,44 @@
+{% from "components/bottom-sheet.njk" import bottomSheet %}
+
+{#
+  filterLabels: { buttonLabel, title, clearButton, tagOptions: [{code, label}] }
+  Plain checkboxes (not Alpine-bound), read directly by public/js/menu.js
+  alongside the search box -- same vanilla-JS reasoning as that file's
+  own header comment: this runs a filter pass over every item card, and
+  Alpine's reactivity overhead isn't worth it for a checkbox list. Only
+  the sheet's own open/close chrome is Alpine (bottom-sheet.njk).
+  Filtering applies instantly on change, matching the search box's own
+  "no submit button" feel -- no separate Apply step.
+#}
+{% macro menuFilterSheet(filterLabels) %}
+  <button
+    type="button"
+    x-data
+    x-on:click="$dispatch('open-sheet-menu-filter')"
+    aria-label="{{ filterLabels.buttonLabel }}"
+    class="relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border-strong bg-surface text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+  >
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4" stroke-linecap="round"/></svg>
+    <span data-filter-count class="absolute -end-1 -top-1 hidden h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-on"></span>
+  </button>
+
+  {% call bottomSheet('menu-filter', filterLabels.title) %}
+    <div data-filter-options class="flex flex-col gap-1">
+      {% for tag in filterLabels.tagOptions %}
+        <label class="flex min-h-11 items-center gap-2 text-sm text-text">
+          <input
+            type="checkbox"
+            data-filter-tag="{{ tag.code }}"
+            class="h-4 w-4 rounded border-border-strong text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+          {{ tag.label }}
+        </label>
+      {% endfor %}
+    </div>
+    <button
+      type="button"
+      data-filter-clear
+      class="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-md border border-border px-4 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    >{{ filterLabels.clearButton }}</button>
+  {% endcall %}
+{% endmacro %}

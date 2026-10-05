@@ -1,0 +1,9 @@
+-- AlterEnum
+ALTER TYPE "ItemTag" ADD VALUE 'VEGAN';
+ALTER TYPE "ItemTag" ADD VALUE 'GLUTEN_FREE';
+ALTER TYPE "ItemTag" ADD VALUE 'CONTAINS_NUTS';
+ALTER TYPE "ItemTag" ADD VALUE 'CONTAINS_DAIRY';
+
+-- AlterTable
+ALTER TABLE "Item" ADD COLUMN     "allergenNoteAr" TEXT,
+ADD COLUMN     "allergenNoteEn" TEXT;

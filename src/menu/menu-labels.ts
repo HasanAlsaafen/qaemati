@@ -1,5 +1,6 @@
 import { I18nService } from 'nestjs-i18n';
 import { Locale } from '../common/middleware/locale-view.middleware';
+import { ALL_TAGS, TAG_I18N_KEY } from '../common/tags';
 
 /**
  * Public-menu strings needed inside imported Nunjucks macros (the
@@ -19,6 +20,17 @@ export function buildMenuLabels(i18n: I18nService, locale: Locale) {
     addonsTitle: t('common.menu.addonsTitle'),
     selectVariantPrompt: t('common.menu.selectVariantPrompt'),
     todaysSpecial: t('common.menu.todaysSpecial'),
+    allergenNoteLabel: t('common.menu.allergenNoteLabel'),
+    filter: {
+      buttonLabel: t('common.menu.filter.buttonLabel'),
+      title: t('common.menu.filter.title'),
+      clearButton: t('common.menu.filter.clearButton'),
+      // B1: every ItemTag, for the filter sheet's checkbox list --
+      // built from the same ALL_TAGS/TAG_I18N_KEY source item cards
+      // and the admin tag checkboxes already use, so a new tag added
+      // there automatically gets a filter option here too.
+      tagOptions: ALL_TAGS.map((code) => ({ code, label: t(TAG_I18N_KEY[code]) })),
+    },
     // Raw templates (the literal "{time}" placeholder left
     // uninterpolated) for the client-side ticking open/closed badge
     // (restaurant-header.njk + public/js/open-status.js) to substitute

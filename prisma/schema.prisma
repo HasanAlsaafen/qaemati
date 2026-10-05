@@ -12,6 +12,10 @@ enum ItemTag {
   VEGETARIAN
   NEW
   POPULAR
+  VEGAN
+  GLUTEN_FREE
+  CONTAINS_NUTS
+  CONTAINS_DAIRY
 }
 
 model Restaurant {
@@ -224,6 +228,13 @@ model Item {
   imagePath String?
 
   tags ItemTag[]
+
+  /// B1: owner-editable free text for allergy/ingredient caveats the
+  /// fixed CONTAINS_NUTS/CONTAINS_DAIRY/etc. tags can't express on their
+  /// own (e.g. "fried in the same oil as shellfish") -- shown on the
+  /// public item detail sheet when set, optional like description.
+  allergenNoteAr String?
+  allergenNoteEn String?
 
   available Boolean @default(true)
   /// A3: "Today's special" banner flag -- owner-toggled, not date-scoped

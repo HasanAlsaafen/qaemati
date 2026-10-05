@@ -15,7 +15,7 @@
   flat line item when added to the selection (A1), keeping that feature's
   cart model simple rather than teaching it about nested modifiers.
 #}
-{% macro itemDetailSheet(unavailableLabel, hasWhatsapp, addButtonLabel, addedToastMessage, selectVariantLabel, addonsTitleLabel, selectVariantPromptLabel) %}
+{% macro itemDetailSheet(unavailableLabel, hasWhatsapp, addButtonLabel, addedToastMessage, selectVariantLabel, addonsTitleLabel, selectVariantPromptLabel, allergenNoteLabel) %}
   <div
     x-data="{
       open: false,
@@ -27,6 +27,7 @@
       selectVariantLabel: {{ selectVariantLabel | dump }},
       addonsTitleLabel: {{ addonsTitleLabel | dump }},
       selectVariantPromptLabel: {{ selectVariantPromptLabel | dump }},
+      allergenNoteLabel: {{ allergenNoteLabel | dump }},
       selectedVariantId: null,
       selectedAddonIds: [],
       get selectedVariant() {
@@ -134,11 +135,17 @@
                     'bg-secondary-soft text-secondary-text': tag.variant === 'secondary',
                     'bg-gold text-on-gold': tag.variant === 'popular',
                     'bg-danger text-white': tag.variant === 'danger',
+                    'bg-warning text-white': tag.variant === 'warning',
                   }"
                   x-text="tag.label"
                 ></span>
               </template>
             </div>
+
+            <p class="mt-2 text-xs text-muted-text" x-show="item.allergenNote">
+              <span class="font-medium" x-text="allergenNoteLabel"></span>
+              <span x-text="': ' + item.allergenNote"></span>
+            </p>
 
             <p class="mt-4 text-lg font-bold text-text" dir="ltr">
               <span x-text="computedPrice.toFixed(2)"></span> <span x-text="item.currency"></span>

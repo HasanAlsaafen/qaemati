@@ -7,6 +7,7 @@
 {% from "components/item-detail-sheet.njk" import itemDetailSheet %}
 {% from "components/empty-state.njk" import emptyState %}
 {% from "components/selection-bar.njk" import selectionBar %}
+{% from "components/menu-filter-sheet.njk" import menuFilterSheet %}
 
 {% set hasWhatsapp = menu.whatsappUrl %}
 
@@ -67,6 +68,7 @@
       data-menu-search
       autocomplete="off"
     >
+    {{ menuFilterSheet(labels.filter) }}
     {{ languageSwitcher(otherLocale, t('common.nav.language'), 'data-preserve-scroll') }}
   </div>
   <div class="mx-auto flex max-w-2xl gap-2 overflow-x-auto px-4 py-3" data-category-bar>
@@ -96,7 +98,7 @@
 </main>
 
 <div class="print:hidden">
-  {{ itemDetailSheet(t('common.menu.unavailable'), hasWhatsapp, labels.selection.addButton, labels.selection.addedToast, labels.selectVariant, labels.addonsTitle, labels.selectVariantPrompt) }}
+  {{ itemDetailSheet(t('common.menu.unavailable'), hasWhatsapp, labels.selection.addButton, labels.selection.addedToast, labels.selectVariant, labels.addonsTitle, labels.selectVariantPrompt, labels.allergenNoteLabel) }}
 </div>
 
 {% if hasWhatsapp %}
