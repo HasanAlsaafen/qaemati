@@ -5,7 +5,17 @@
   "home": {
     "title": "Qaemati demo restaurants",
     "subtitle": "Two sample menus, built to show what a restaurant’s own Qaemati menu looks like.",
-    "description": "Pick a restaurant to open its live menu:"
+    "description": "Pick a restaurant to open its live menu:",
+    "demo": {
+      "panelTitle": "Try the admin panel",
+      "panelDescription": "This is a demo environment. Sign in to either restaurant's admin panel with the credentials below -- no account needed.",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "loginLink": "Go to admin login",
+      "resetButton": "Reset demo data",
+      "resetConfirm": "This restores both demo restaurants to their original sample menus and undoes any changes made in the admin panel. Continue?",
+      "resetSuccessMessage": "Demo data has been reset."
+    }
   },
   "nav": {
     "language": "العربية"
@@ -190,6 +200,21 @@
       "logoUpdatedToast": "Logo updated",
       "coverImageUpdatedToast": "Cover image updated",
       "bothHoursRequiredToast": "Set both an opening and a closing time, or leave both empty."
+    },
+    "tour": {
+      "skip": "Skip",
+      "back": "Back",
+      "next": "Next",
+      "done": "Done",
+      "stepLabel": "Step {current} of {total}",
+      "step1Title": "Welcome to your menu",
+      "step1Body": "This dashboard is where you manage your categories and items. Add a category, then add items to it -- every change appears on your public menu immediately.",
+      "step2Title": "Specials, variants, and add-ons",
+      "step2Body": "Open any item to set sizes (variants), extras (add-ons), or mark it as today's special. Categories can also have their own time window, e.g. a Breakfast category shown only in the morning.",
+      "step3Title": "QR codes",
+      "step3Body": "The QR codes page generates a printable code for your tables and a general one for your door or receipts -- each one opens your public menu directly.",
+      "step4Title": "Branding",
+      "step4Body": "The Branding page is where you set your logo, cover image, primary color, and currency -- your public menu picks these up automatically."
     }
   }
 }

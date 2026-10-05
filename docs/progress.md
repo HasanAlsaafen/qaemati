@@ -1187,3 +1187,90 @@ What was built:
   input had no label at all (only the adjacent color swatch did). Fixed by adding `id`/`for`
   pairs to the file inputs and an `aria-label` to the hex input; re-ran axe-core afterward and
   confirmed 0 violations in both languages.
+
+## Pack A complete (A1-A5)
+
+### A5: Demo mode (done)
+
+A `DEMO_MODE`-gated "Try the admin panel" panel on the home page (credentials + a one-click link
+to the real login screen, not a bypass login), a "Reset demo data" action that restores both
+seeded restaurants to their clean sample state, and a skippable 4-step guided tour shown once on
+an admin's first login.
+
+What was built:
+
+- **`src/common/demo-mode.ts`**: `isDemoModeEnabled()` reads `process.env.DEMO_MODE === 'true'`
+  exactly -- unit tested to confirm it's not fooled by `'1'` or `'TRUE'`. Gates both the home
+  page's demo panel and the `/demo/reset` endpoint (which throws 403 when disabled, re-checked
+  server-side even though the panel that links to it is itself hidden).
+- **Seed logic moved into `src/`**: `tsconfig.build.json` excludes the whole `prisma/` directory
+  from the Nest build, so the running app couldn't import the seeding logic while it lived at
+  `prisma/seed/data.ts`+`prisma/seed.ts`. Moved the actual logic to
+  `src/prisma-seed/run-seed.ts` (`runSeed(prisma)`, now returning a summary instead of only
+  logging it) plus `seed-data.ts`/`placeholder-image.ts`; `prisma/seed.ts` (the path Prisma's own
+  CLI config requires) is now a thin wrapper that imports from `src/` and supplies its own
+  standalone `PrismaClient`. One implementation either way calls, instead of a second copy
+  reachable only from the app.
+- **`DemoController`** (`POST /demo/reset`, new): calls `runSeed` through the app's own
+  `PrismaService` rather than shelling out to `npx prisma db seed` as a child process. Wipes and
+  recreates *every* restaurant, not a scoped single-tenant reset -- deliberate, since this
+  endpoint only exists in a demo environment to begin with, and "reset" there means "back to the
+  clean two-restaurant demo state."
+- **Home page**: `HomeController` now also fetches each restaurant's first admin's email (only
+  when demo mode is on) and exposes the shared `DEMO_ADMIN_PASSWORD` constant; the panel links to
+  the real `/admin/login` screen rather than a shortcut session-creating endpoint, so trying the
+  demo exercises the actual login flow (rate limiting, CSRF, session regeneration) like anyone
+  else would.
+- **`AdminUser.hasSeenTour`** (migration `20261004135144_add_has_seen_tour`): checked once at
+  login (`AuthController`) and cached on the session (`AdminLocalsMiddleware`'s existing
+  "resolve once per login, not per request" pattern for `restaurantSlug`/`adminName`) rather than
+  queried on every admin page load.
+- **`views/admin/components/guided-tour.njk`**: a 4-step sequential dialog (categories/items,
+  specials/variants, QR codes, branding) rather than a spotlight overlay pinned to specific
+  page elements -- simpler to keep correct as the admin UI evolves, and inherently
+  keyboard/screen-reader accessible as just another dialog, reusing
+  `admin-confirm-dialog.njk`'s `role="dialog"`/focus pattern. Wrapped in a server-side `{% if
+  showTour %}` (not just an Alpine `x-show`) so a dismissed tour's markup -- and its "Welcome to
+  your menu" text an e2e test checks for -- isn't shipped to every admin page load at all, not
+  merely hidden.
+- **`TourController`** (`POST /admin/tour/dismiss`, new): updates both the DB (stays dismissed on
+  the next login, weeks later) and the session (doesn't reappear on the very next page load in
+  the same session without a fresh login re-reading the DB).
+
+### Verified
+
+- Unit: 3 new `demo-mode` tests (enabled, unset, and non-`'true'` values like `'1'`/`'TRUE'`) --
+  62 unit tests total.
+- E2E: `test/demo.e2e-spec.ts` (home page shows the panel; reset actually wipes an unrelated
+  throwaway restaurant and recreates exactly the two demo restaurants; the success banner and
+  demo credentials render after the redirect) and `test/guided-tour.e2e-spec.ts` (tour markup
+  present on a fresh login; dismissing persists to the DB and stops showing it in the same
+  session without a new login; a subsequent fresh login still doesn't show it) -- 36 e2e tests
+  total.
+- Interactive (Playwright): clicked through every tour step (Next x3, Done), confirmed the
+  dismiss request fires and the tour stays gone after a page reload within the same session;
+  confirmed `hasSeenTour` flips to `true` in the database; ran the actual "Reset demo data"
+  button including its native confirm() dialog, confirmed the redirect, the success banner, and
+  that both restaurants came back with `hasSeenTour` reset to `false` on their admin accounts
+  (proving it's a real from-scratch reseed, not a partial patch).
+- axe-core: 0 violations on the home page (with the demo panel visible) and on the tour dialog
+  (open, mid-flow) in both languages.
+- `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
+  pass, including confirming the moved seed logic (`src/prisma-seed/`) actually compiles into
+  `dist/` where the running app can reach it -- the whole point of the move. Migration applied to
+  both the dev and test databases; demo data re-seeded clean after testing.
+
+### Bugs found while testing (both test-script bugs, not app bugs)
+
+- The first interactive tour check used `?lang=en` on the login page's URL and expected the
+  post-login dashboard to render in English, but got Arabic -- the query param only sets the
+  locale for that one request, not a persistent cookie, so it doesn't survive the redirect to
+  `/admin`. Same root cause as two similar false negatives in A3/A4's testing; fixed by setting
+  the `qaemati_locale` cookie directly instead.
+- An e2e assertion for "the tour doesn't show again" initially failed even after a correct
+  dismiss, because the tour's full 4-step markup was always present in the server-rendered HTML
+  regardless of `showTour` (only hidden via Alpine's `x-show`, which Alpine applies client-side,
+  not something `supertest`'s raw HTML response reflects). Not a bug in the dismiss logic itself
+  -- fixed properly by wrapping the whole component in a server-side `{% if showTour %}` (see
+  above), which is also strictly better than what was there before: a dismissed tour's markup no
+  longer ships to the browser at all.

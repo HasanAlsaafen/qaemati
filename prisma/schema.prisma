@@ -82,6 +82,13 @@ model AdminUser {
   passwordHash String
   name         String
 
+  /// A5: whether this admin has dismissed (or clicked through) the
+  /// first-login guided tour. Checked once at login (AuthController) and
+  /// cached on the session rather than re-queried on every admin page
+  /// request, same "read once, cache on the session" pattern as
+  /// restaurantSlug/adminName in AdminLocalsMiddleware.
+  hasSeenTour Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

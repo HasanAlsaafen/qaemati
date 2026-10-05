@@ -348,7 +348,8 @@ export const seedRestaurants: SeedRestaurant[] = [
     nameAr: 'السنابل',
     nameEn: 'Al-Sanabel',
     descriptionAr: 'مطعم عائلي يقدم أطباقًا شامية أصيلة من المشاوي والأرز والمقبلات.',
-    descriptionEn: 'A family restaurant serving authentic Levantine grills, rice dishes, and mezze.',
+    descriptionEn:
+      'A family restaurant serving authentic Levantine grills, rice dishes, and mezze.',
     currency: 'JOD',
     whatsapp: '+962799000222',
     instagramHandle: '@alsanabel.restaurant',

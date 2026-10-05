@@ -27,4 +27,45 @@
     </ul>
   {% endif %}
 </div>
+
+{% if demoMode %}
+  <div class="mt-6 rounded-xl border border-border bg-surface p-6">
+    {% if demoResetSucceeded %}
+      <p role="status" class="mb-4 rounded-md bg-success/10 px-3 py-2 text-sm text-success">{{ t('common.home.demo.resetSuccessMessage') }}</p>
+    {% endif %}
+    <h2 class="font-sans text-xl font-bold text-text">{{ t('common.home.demo.panelTitle') }}</h2>
+    <p class="mt-2 text-sm text-muted-text">{{ t('common.home.demo.panelDescription') }}</p>
+
+    <ul class="mt-4 flex flex-col gap-3">
+      {% for restaurant in restaurants %}
+        {% if restaurant.demoAdminEmail %}
+          <li class="rounded-md border border-border bg-muted-surface p-3">
+            <p class="text-sm font-medium text-text">{{ restaurant.name }}</p>
+            <p class="mt-1 text-sm text-muted-text" dir="ltr">
+              {{ t('common.home.demo.emailLabel') }}: <span class="font-mono">{{ restaurant.demoAdminEmail }}</span>
+            </p>
+            <p class="text-sm text-muted-text" dir="ltr">
+              {{ t('common.home.demo.passwordLabel') }}: <span class="font-mono">{{ demoAdminPassword }}</span>
+            </p>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+
+    <div class="mt-4 flex flex-wrap items-center gap-3">
+      <a
+        href="/admin/login"
+        class="inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      >{{ t('common.home.demo.loginLink') }}</a>
+
+      <form method="post" action="/demo/reset" onsubmit="return confirm({{ t('common.home.demo.resetConfirm') | dump }})">
+        <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+        <button
+          type="submit"
+          class="inline-flex min-h-11 items-center rounded-md border border-border px-4 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >{{ t('common.home.demo.resetButton') }}</button>
+      </form>
+    </div>
+  </div>
+{% endif %}
 {% endblock %}

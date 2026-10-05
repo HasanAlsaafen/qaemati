@@ -1,0 +1,87 @@
+{#
+  A5: a 4-step walkthrough shown once, the first time an admin logs in
+  (showTour comes from AdminLocalsMiddleware, based on
+  AdminUser.hasSeenTour). A sequential dialog rather than a spotlight
+  overlay pinned to specific page elements -- simpler to keep correct as
+  the admin UI evolves, and inherently keyboard/screen-reader accessible
+  as just another dialog, matching admin-confirm-dialog.njk's existing
+  role="alertdialog" pattern.
+
+  Included directly in layouts/admin.njk (not macro-imported), so the
+  `t` global is reachable without threading it through buildAdminLabels
+  -- this is the layout itself, not an imported macro, so the Nunjucks
+  macro-scoping limitation documented elsewhere in this app doesn't
+  apply here.
+#}
+{% if showTour %}
+{% set tourSteps = [
+  { title: t('common.admin.tour.step1Title'), body: t('common.admin.tour.step1Body') },
+  { title: t('common.admin.tour.step2Title'), body: t('common.admin.tour.step2Body') },
+  { title: t('common.admin.tour.step3Title'), body: t('common.admin.tour.step3Body') },
+  { title: t('common.admin.tour.step4Title'), body: t('common.admin.tour.step4Body') }
+] %}
+<div
+  x-data="{
+    open: true,
+    step: 1,
+    total: {{ tourSteps.length }},
+    dismiss() {
+      this.open = false;
+      fetch('/admin/tour/dismiss', {
+        method: 'POST',
+        headers: { 'X-CSRF-Token': {{ csrfToken | dump }} },
+      });
+    },
+  }"
+  x-show="open"
+  x-cloak
+  x-on:keydown.escape.window="dismiss()"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4"
+  role="presentation"
+>
+  <div class="absolute inset-0 bg-text/40"></div>
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="tour-title"
+    class="relative w-full max-w-sm rounded-lg bg-surface p-5 shadow-overlay"
+  >
+    {% for tourStep in tourSteps %}
+      <div x-show="step === {{ loop.index }}">
+        <p class="text-xs font-medium text-muted-text">{{ t('common.admin.tour.stepLabel', { current: loop.index, total: tourSteps.length }) }}</p>
+        <h2 id="tour-title" class="mt-1 font-sans text-lg font-bold text-text">{{ tourStep.title }}</h2>
+        <p class="mt-2 text-sm text-muted-text">{{ tourStep.body }}</p>
+      </div>
+    {% endfor %}
+
+    <div class="mt-5 flex items-center justify-between gap-2">
+      <button
+        type="button"
+        class="text-sm font-medium text-muted-text hover:text-text"
+        x-on:click="dismiss()"
+      >{{ t('common.admin.tour.skip') }}</button>
+
+      <div class="flex gap-2">
+        <button
+          type="button"
+          x-show="step > 1"
+          x-on:click="step -= 1"
+          class="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >{{ t('common.admin.tour.back') }}</button>
+        <button
+          type="button"
+          x-show="step < total"
+          x-on:click="step += 1"
+          class="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >{{ t('common.admin.tour.next') }}</button>
+        <button
+          type="button"
+          x-show="step === total"
+          x-on:click="dismiss()"
+          class="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >{{ t('common.admin.tour.done') }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}

@@ -4,6 +4,7 @@ import { CategoriesController } from './categories.controller';
 import { ItemsController } from './items.controller';
 import { QrController } from './qr.controller';
 import { BrandingController } from './branding.controller';
+import { TourController } from './tour.controller';
 import { CategoryService } from './category.service';
 import { ItemService } from './item.service';
 import { TableService } from './table.service';
@@ -16,6 +17,7 @@ import { RestaurantService } from './restaurant.service';
     ItemsController,
     QrController,
     BrandingController,
+    TourController,
   ],
   providers: [CategoryService, ItemService, TableService, RestaurantService],
 })

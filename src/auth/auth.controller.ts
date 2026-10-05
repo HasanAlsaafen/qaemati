@@ -86,6 +86,7 @@ export class AuthController {
     req.session.restaurantId = admin.restaurantId;
     req.session.restaurantSlug = admin.restaurant.slug;
     req.session.adminName = admin.name;
+    req.session.hasSeenTour = admin.hasSeenTour;
 
     req.session.save((err) => {
       if (err) throw err;
