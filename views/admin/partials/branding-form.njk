@@ -75,14 +75,14 @@
               id="branding-primaryColor"
               type="color"
               x-model="color"
-              x-on:input="recomputeContrast()"
+              x-on:input="primaryColorErrorDismissed = true; recomputeContrast()"
               class="h-11 w-14 cursor-pointer rounded-md border border-border-strong bg-surface"
             >
             <input
               type="text"
               dir="ltr"
               x-model="color"
-              x-on:input="recomputeContrast()"
+              x-on:input="primaryColorErrorDismissed = true; recomputeContrast()"
               maxlength="7"
               aria-label="{{ labels.branding.primaryColorLabel }}"
               {% if fieldErrors.primaryColor %}aria-invalid="true" aria-describedby="field-primaryColor-error"{% endif %}
@@ -91,12 +91,12 @@
             <input type="hidden" name="primaryColor" x-bind:value="color">
             <button
               type="button"
-              x-on:click="color = defaultColor; recomputeContrast()"
+              x-on:click="color = defaultColor; primaryColorErrorDismissed = true; recomputeContrast()"
               class="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-3 text-sm font-medium text-text transition-colors duration-fast ease-standard hover:bg-muted-surface active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >{{ labels.branding.resetColor }}</button>
           </div>
           {% if fieldErrors.primaryColor %}
-            <p id="field-primaryColor-error" class="mt-1 text-sm text-danger">{{ fieldErrors.primaryColor }}</p>
+            <p id="field-primaryColor-error" class="mt-1 text-sm text-danger" x-show="!primaryColorErrorDismissed">{{ fieldErrors.primaryColor }}</p>
           {% endif %}
           <p class="mt-1 text-sm" x-show="contrast" x-bind:class="contrast && contrast.passes ? 'text-success' : 'text-danger'">
             <span x-text="contrast ? (contrast.passes ? passTemplate : failTemplate).replace('{ratio}', contrast.ratio.toFixed(2)) : ''"></span>
@@ -111,14 +111,14 @@
               id="branding-secondaryColor"
               type="color"
               x-model="secondaryColor"
-              x-on:input="recomputeSecondaryContrast()"
+              x-on:input="secondaryColorErrorDismissed = true; recomputeSecondaryContrast()"
               class="h-11 w-14 cursor-pointer rounded-md border border-border-strong bg-surface"
             >
             <input
               type="text"
               dir="ltr"
               x-model="secondaryColor"
-              x-on:input="recomputeSecondaryContrast()"
+              x-on:input="secondaryColorErrorDismissed = true; recomputeSecondaryContrast()"
               maxlength="7"
               aria-label="{{ labels.branding.secondaryColorLabel }}"
               {% if fieldErrors.secondaryColor %}aria-invalid="true" aria-describedby="field-secondaryColor-error"{% endif %}
@@ -127,12 +127,12 @@
             <input type="hidden" name="secondaryColor" x-bind:value="secondaryColor">
             <button
               type="button"
-              x-on:click="secondaryColor = defaultSecondaryColor; recomputeSecondaryContrast()"
+              x-on:click="secondaryColor = defaultSecondaryColor; secondaryColorErrorDismissed = true; recomputeSecondaryContrast()"
               class="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-3 text-sm font-medium text-text transition-colors duration-fast ease-standard hover:bg-muted-surface active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >{{ labels.branding.resetColor }}</button>
           </div>
           {% if fieldErrors.secondaryColor %}
-            <p id="field-secondaryColor-error" class="mt-1 text-sm text-danger">{{ fieldErrors.secondaryColor }}</p>
+            <p id="field-secondaryColor-error" class="mt-1 text-sm text-danger" x-show="!secondaryColorErrorDismissed">{{ fieldErrors.secondaryColor }}</p>
           {% endif %}
           <p class="mt-1 text-sm" x-show="secondaryContrast" x-bind:class="secondaryContrast && secondaryContrast.passes ? 'text-success' : 'text-danger'">
             <span x-text="secondaryContrast ? (secondaryContrast.passes ? passTemplate : failTemplate).replace('{ratio}', secondaryContrast.ratio.toFixed(2)) : ''"></span>

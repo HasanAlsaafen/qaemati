@@ -30,6 +30,14 @@
     secondaryColor: {{ (restaurant.secondaryColor or '#C4622D') | dump }},
     defaultSecondaryColor: '#C4622D',
     secondaryContrast: null,
+    // Whether to still show the server-rendered fieldErrors.primary/
+    // secondaryColor message (set from a rejected save). Starts shown
+    // (false) when that error exists, and is dismissed the moment the
+    // admin actually edits the field again -- the live pass/fail message
+    // below it already updates instantly either way, so once they've
+    // touched the field the static one is redundant, not just stale.
+    primaryColorErrorDismissed: false,
+    secondaryColorErrorDismissed: false,
     fontTheme: {{ (restaurant.fontTheme or 'classic') | dump }},
     menuDensity: {{ (restaurant.menuDensity or 'comfortable') | dump }},
     cornerStyle: {{ (restaurant.cornerStyle or 'rounded') | dump }},

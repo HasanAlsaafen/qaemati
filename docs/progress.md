@@ -1364,15 +1364,16 @@ What was built:
   session's `restaurantId` matches the restaurant being viewed, and that `cornerStyleCss`'s
   `--radius-*` overrides appear in the rendered `/m/:slug` HTML when requested.
 
+**Addendum (same session):** the primary/secondary color field error's staleness noted above was
+fixed immediately after, not left as a gap -- `branding.njk` gained
+`primaryColorErrorDismissed`/`secondaryColorErrorDismissed` (default `false`, so the
+server-rendered error still shows on load), set `true` by the same `x-on:input`/reset-button
+handlers that already call `recomputeContrast()`/`recomputeSecondaryContrast()`. The static
+error `<p>` is now `x-show="!xDismissed"`, so it disappears the moment the admin actually edits
+the field again instead of waiting for the next save round-trip.
+
 ### Known gaps / follow-ups
 
-- The field-level error for primary/secondary color can go stale-but-not-wrong: if the admin
-  edits the color again after a failed save without re-submitting, the live client-side contrast
-  check (already existed, unchanged) updates immediately, but the static server-rendered error
-  paragraph only clears on the next save. Not a regression (same characteristic the plain
-  `nameAr`/`nameEn` required-error already had) and not confusing in practice since the two
-  messages never disagree, but worth a reactive dismiss (e.g. clearing `fieldErrors.primaryColor`
-  client-side on input) if this pattern gets reused for a form with more error-prone fields.
 - Pack B (a second feature pack, referenced in Phase 7's "Phases 7-11" framing alongside Pack A)
   was deliberately not started this phase -- its scope was never written down in this repo (only
   in whatever the original brief said), and the choice this phase was explicitly to close known
