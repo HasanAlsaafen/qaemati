@@ -25,6 +25,9 @@ export class MenuController {
     @Query('previewBackgroundColor') previewBackgroundColor: string | undefined,
     @Query('previewCardStyle') previewCardStyle: string | undefined,
     @Query('previewButtonShape') previewButtonShape: string | undefined,
+    @Query('previewCategoryDivider') previewCategoryDivider: string | undefined,
+    @Query('previewBackgroundStyle') previewBackgroundStyle: string | undefined,
+    @Query('previewBackgroundPattern') previewBackgroundPattern: string | undefined,
     @Query('embed') embed: string | undefined,
     @Req() req: Request,
   ) {
@@ -45,6 +48,9 @@ export class MenuController {
           backgroundColor: previewBackgroundColor?.trim() || undefined,
           cardStyle: previewCardStyle?.trim() || undefined,
           buttonShape: previewButtonShape?.trim() || undefined,
+          categoryDivider: previewCategoryDivider?.trim() || undefined,
+          backgroundStyle: previewBackgroundStyle?.trim() || undefined,
+          backgroundPattern: previewBackgroundPattern?.trim() || undefined,
         }
       : undefined;
     const menu = await this.menuService.getMenu(slug, locale, preview);

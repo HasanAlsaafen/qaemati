@@ -1432,3 +1432,51 @@ colors, spacing, shadows, button shape" (not per-category colors or a layout/sec
   click, briefly setting an unintended accent/background color) before saving over it.
 - `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
   pass. Migration applied to both the dev and test databases.
+
+## Phase 12: category separators + a patterned/photo background (done)
+
+Requested directly, continuing the same theme-editor track: "enrich the choices" and add
+separators between categories plus a background pattern or static image option.
+
+### What was built
+
+Three more restaurant-level fields (migration
+`20261005112853_add_dividers_and_background_style`), same validated/scoped-CSS/live-preview
+pattern as every customization field before it:
+
+- **`categoryDivider`** (`none` | `line` | `dashed`) adds a `border-top` (plus matching padding)
+  between `[data-category-section]` elements on the public menu -- that attribute already existed
+  on each category's `<section>` (`views/pages/menu.njk`), so no markup change was needed, only
+  the new `body[data-category-divider]` CSS rule.
+- **`backgroundStyle`** (`solid` | `pattern` | `image`) with two dependent fields:
+  - **`backgroundPattern`** (`dots` | `grid` | `diagonal`) when `pattern` -- three CSS
+    `background-image` rules (radial-gradient, crossed linear-gradients, repeating-linear-gradient)
+    tinted with `rgb(var(--color-primary) / alpha)`, not a fixed gray, so the texture reads as
+    branded and automatically follows a restaurant's own primary color.
+  - **`backgroundImagePath`** when `image` -- an uploaded photo (new
+    `POST /admin/branding/background`, `RestaurantService.setBackgroundImage`, same
+    `restaurantImageMulterOptions` as logo/cover), applied as an inline `background-image` style
+    on `<body>` (scroll-position `cover`/`top center`, deliberately **not**
+    `background-attachment: fixed`, which has a well-known rendering bug on mobile Safari --
+    this app is mobile-first per every prior phase's research).
+- **Admin UI**: two more 3-option `choice-card.njk` groups (category separators; background
+  style), with the pattern sub-choice and the background-photo upload control both shown only
+  when relevant (`x-show`, same shared Alpine scope) rather than always-visible-but-irrelevant.
+  The background-photo upload (a separate htmx request, not part of the save-that-reloads-the-
+  preview flow the other fields use) now dispatches a `qaemati-preview-refresh` window event on
+  completion so the live preview iframe picks up a freshly uploaded photo immediately instead of
+  only on the next full save.
+
+### Verified
+
+- E2e: `test/branding.e2e-spec.ts` gained 2 cases -- saving categoryDivider/backgroundStyle/
+  backgroundPattern and confirming all three as `data-*` attributes in the public menu's rendered
+  HTML; uploading a background image and confirming the resulting `background-image: url(...)`
+  inline style appears. 42 e2e tests total (unit tests unchanged at 72, no new pure-function logic
+  this phase).
+- Interactive (Claude-in-Chrome): toggled background style to "Pattern" and confirmed the
+  dependent pattern sub-choice appeared/disappeared reactively; selected "Diagonal" and confirmed
+  (zoomed screenshot) the tinted stripe texture actually renders in the live preview's card gaps;
+  reset every changed field back to its default and saved before finishing.
+- `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
+  pass. Migration applied to both the dev and test databases.

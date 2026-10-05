@@ -47,4 +47,36 @@
       </div>
     </div>
   </div>
+
+  {#
+    Only relevant once "Photo" is picked as the background style
+    (branding-form.njk's choice-card group, same shared Alpine scope as
+    branding.njk's x-data) -- shown/hidden client-side rather than a
+    separate server round trip, consistent with how the rest of this
+    form reacts to its own choice groups. The upload itself still always
+    happens over its own htmx request, same as logo/cover.
+  #}
+  <div class="mt-6 border-t border-border pt-6" x-show="backgroundStyle === 'image'" x-cloak>
+    <label for="branding-background-input" class="text-sm font-medium text-text">{{ labels.branding.backgroundImageLabel }}</label>
+    <div class="mt-2 flex items-center gap-3">
+      <span class="h-16 w-28 shrink-0 overflow-hidden rounded-md bg-muted-surface">
+        {% if restaurant.backgroundImagePath %}
+          <img src="{{ restaurant.backgroundImagePath }}" alt="" width="112" height="64" class="h-full w-full object-cover">
+        {% endif %}
+      </span>
+      <input
+        id="branding-background-input"
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        name="image"
+        class="block text-sm text-text"
+        hx-post="/admin/branding/background"
+        hx-trigger="change"
+        hx-target="#branding-images"
+        hx-swap="outerHTML"
+        hx-encoding="multipart/form-data"
+        hx-on::after-request="window.dispatchEvent(new Event('qaemati-preview-refresh'))"
+      >
+    </div>
+  </div>
 </section>

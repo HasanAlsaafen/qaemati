@@ -104,6 +104,20 @@ export interface MenuView {
    *  cornerStyleCss too, see tokens.css) for 'rounded'. See
    *  Restaurant.buttonShape. */
   buttonShapeCss: { radiusButton: string } | null;
+  /** Admin customization: 'none' | 'line' | 'dashed' between category
+   *  sections -- see Restaurant.categoryDivider. */
+  categoryDivider: string;
+  /** Admin customization: 'solid' | 'pattern' | 'image' -- see
+   *  Restaurant.backgroundStyle. */
+  backgroundStyle: string;
+  /** Which pattern to apply when backgroundStyle is 'pattern':
+   *  'dots' | 'grid' | 'diagonal'. See Restaurant.backgroundPattern. */
+  backgroundPattern: string;
+  /** Set when backgroundStyle is 'image' -- not part of
+   *  MenuPreviewOverrides (an uploaded file can't be previewed via a
+   *  query param), so the live preview only reflects a background image
+   *  after it's actually been uploaded and saved, same as logo/cover. */
+  backgroundImageUrl: string | null;
 }
 
 /**
@@ -128,6 +142,9 @@ export interface MenuPreviewOverrides {
   backgroundColor?: string;
   cardStyle?: string;
   buttonShape?: string;
+  categoryDivider?: string;
+  backgroundStyle?: string;
+  backgroundPattern?: string;
 }
 
 @Injectable()
@@ -182,6 +199,18 @@ export class MenuService {
       isPreviewOwner && preview!.cardStyle ? preview!.cardStyle : restaurant.cardStyle;
     const effectiveButtonShape =
       isPreviewOwner && preview!.buttonShape ? preview!.buttonShape : restaurant.buttonShape;
+    const effectiveCategoryDivider =
+      isPreviewOwner && preview!.categoryDivider
+        ? preview!.categoryDivider
+        : restaurant.categoryDivider;
+    const effectiveBackgroundStyle =
+      isPreviewOwner && preview!.backgroundStyle
+        ? preview!.backgroundStyle
+        : restaurant.backgroundStyle;
+    const effectiveBackgroundPattern =
+      isPreviewOwner && preview!.backgroundPattern
+        ? preview!.backgroundPattern
+        : restaurant.backgroundPattern;
 
     const pick = (ar: string, en: string) => (locale === 'ar' ? ar : en);
     const pickNullable = (ar: string | null, en: string | null) => (locale === 'ar' ? ar : en);
@@ -294,6 +323,10 @@ export class MenuService {
       backgroundColorCss: toBackgroundColorCss(effectiveBackgroundColor),
       cardStyle: effectiveCardStyle,
       buttonShapeCss: toButtonShapeCss(effectiveButtonShape),
+      categoryDivider: effectiveCategoryDivider,
+      backgroundStyle: effectiveBackgroundStyle,
+      backgroundPattern: effectiveBackgroundPattern,
+      backgroundImageUrl: restaurant.backgroundImagePath,
     };
   }
 }

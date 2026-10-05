@@ -56,7 +56,18 @@
     </style>
   {% endif %}
 </head>
-<body class="min-h-screen bg-bg text-text font-sans antialiased {{ 'embed-frame' if embed }}" data-restaurant-slug="{{ menu.slug }}" data-menu-density="{{ menu.menuDensity }}" data-card-style="{{ menu.cardStyle }}">
+<body
+  class="min-h-screen bg-bg text-text font-sans antialiased {{ 'embed-frame' if embed }}"
+  data-restaurant-slug="{{ menu.slug }}"
+  data-menu-density="{{ menu.menuDensity }}"
+  data-card-style="{{ menu.cardStyle }}"
+  data-category-divider="{{ menu.categoryDivider }}"
+  data-background-style="{{ menu.backgroundStyle }}"
+  data-background-pattern="{{ menu.backgroundPattern }}"
+  {% if menu.backgroundStyle == 'image' and menu.backgroundImageUrl %}
+  style="background-image: url('{{ menu.backgroundImageUrl }}'); background-size: cover; background-position: top center; background-repeat: no-repeat;"
+  {% endif %}
+>
   {% block content %}{% endblock %}
 
   {{ toastHost() }}

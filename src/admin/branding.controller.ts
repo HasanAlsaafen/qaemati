@@ -62,6 +62,9 @@ export class BrandingController {
     @Body('backgroundColor') backgroundColor: string,
     @Body('cardStyle') cardStyle: string,
     @Body('buttonShape') buttonShape: string,
+    @Body('categoryDivider') categoryDivider: string,
+    @Body('backgroundStyle') backgroundStyle: string,
+    @Body('backgroundPattern') backgroundPattern: string,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
@@ -104,6 +107,9 @@ export class BrandingController {
         backgroundColor: backgroundColor?.trim() || null,
         cardStyle: cardStyle?.trim(),
         buttonShape: buttonShape?.trim(),
+        categoryDivider: categoryDivider?.trim(),
+        backgroundStyle: backgroundStyle?.trim(),
+        backgroundPattern: backgroundPattern?.trim(),
       });
       triggerToast(res, this.i18n.t('common.admin.branding.savedToast', { lang: locale }));
       return {
@@ -159,6 +165,9 @@ export class BrandingController {
         case 'INVALID_CORNER_STYLE':
         case 'INVALID_CARD_STYLE':
         case 'INVALID_BUTTON_SHAPE':
+        case 'INVALID_CATEGORY_DIVIDER':
+        case 'INVALID_BACKGROUND_STYLE':
+        case 'INVALID_BACKGROUND_PATTERN':
           // Only reachable via a tampered request (the form only ever
           // submits one of the two radio values per group) -- a toast is
           // enough, no specific input to point at.
@@ -217,6 +226,32 @@ export class BrandingController {
     triggerToast(
       res,
       this.i18n.t('common.admin.branding.coverImageUpdatedToast', { lang: locale }),
+    );
+    return {
+      restaurant: toRestaurantSettingsView(restaurant),
+      labels: buildAdminLabels(this.i18n, locale),
+    };
+  }
+
+  @Post('background')
+  @Render('admin/partials/branding-images')
+  @UseInterceptors(FileInterceptor('image', restaurantImageMulterOptions))
+  async uploadBackground(
+    @UploadedFile() file: Express.Multer.File | undefined,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const restaurantId = req.session.restaurantId as string;
+    const locale = req.locale ?? 'ar';
+    if (!file) throw new BadRequestException('No image uploaded');
+
+    const restaurant = await this.restaurants.setBackgroundImage(
+      restaurantId,
+      `/uploads/restaurants/${file.filename}`,
+    );
+    triggerToast(
+      res,
+      this.i18n.t('common.admin.branding.backgroundImageUpdatedToast', { lang: locale }),
     );
     return {
       restaurant: toRestaurantSettingsView(restaurant),

@@ -86,6 +86,31 @@ model Restaurant {
   /// floating selection bar, which stay as they are regardless.
   buttonShape String @default("rounded")
 
+  /// Admin customization: 'none' (the original gap-only spacing) |
+  /// 'line' (a solid border-top) | 'dashed' between category sections
+  /// on the public menu. A pure CSS rule keyed off this value (see
+  /// src/styles/app.css's body[data-category-divider] block), no markup
+  /// change needed per category.
+  categoryDivider String @default("none")
+
+  /// Admin customization: 'solid' (the original flat --color-bg,
+  /// possibly itself overridden by backgroundColor) | 'pattern' (a
+  /// subtle repeating CSS pattern tinted with --color-primary, see
+  /// backgroundPattern) | 'image' (a restaurant-uploaded photo, see
+  /// backgroundImagePath). 'pattern' and 'image' are mutually exclusive
+  /// with each other but layer on top of backgroundColor/the default.
+  backgroundStyle String @default("solid")
+
+  /// Which pattern to use when backgroundStyle is 'pattern':
+  /// 'dots' | 'grid' | 'diagonal'. Ignored otherwise.
+  backgroundPattern String @default("dots")
+
+  /// Set when backgroundStyle is 'image' -- an uploaded photo used as
+  /// the page background (cover, centered, scrolls with the page so it
+  /// never fights mobile Safari's background-attachment:fixed quirks).
+  /// Same upload mechanism as logoPath/coverImagePath.
+  backgroundImagePath String?
+
   /// A4: the default currency new items are created with (restaurant-
   /// level, not per-item -- each Item still stores its own `currency`
   /// so a restaurant could in principle mix currencies, but the admin

@@ -223,6 +223,75 @@ describe('Branding settings (e2e)', () => {
     expect(restaurant?.backgroundColor).toBe('#F0F0F0');
   });
 
+  it('saves category divider and a pattern background, applied to the public menu', async () => {
+    const token = await csrfToken('/admin/branding?lang=en');
+    const res = await agent
+      .patch('/admin/branding')
+      .set('X-CSRF-Token', token)
+      .set('Cookie', 'qaemati_locale=en')
+      .type('form')
+      .send({
+        nameAr: 'مطعم تجريبي محدث',
+        nameEn: 'Updated Test Restaurant',
+        currency: 'JOD',
+        categoryDivider: 'dashed',
+        backgroundStyle: 'pattern',
+        backgroundPattern: 'grid',
+      });
+
+    expect(res.status).toBe(200);
+    const { toast } = JSON.parse(res.headers['hx-trigger']);
+    expect(decodeURIComponent(toast.message)).toBe('Branding saved');
+
+    const restaurant = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+    expect(restaurant?.categoryDivider).toBe('dashed');
+    expect(restaurant?.backgroundStyle).toBe('pattern');
+    expect(restaurant?.backgroundPattern).toBe('grid');
+
+    const menuRes = await request(app.getHttpServer()).get(`/m/test-restaurant-branding?lang=en`);
+    expect(menuRes.status).toBe(200);
+    expect(menuRes.text).toContain('data-category-divider="dashed"');
+    expect(menuRes.text).toContain('data-background-style="pattern"');
+    expect(menuRes.text).toContain('data-background-pattern="grid"');
+  });
+
+  it('uploads a background image and applies it as an inline style when backgroundStyle is image', async () => {
+    const saveToken = await csrfToken('/admin/branding?lang=en');
+    await agent
+      .patch('/admin/branding')
+      .set('X-CSRF-Token', saveToken)
+      .set('Cookie', 'qaemati_locale=en')
+      .type('form')
+      .send({
+        nameAr: 'مطعم تجريبي محدث',
+        nameEn: 'Updated Test Restaurant',
+        currency: 'JOD',
+        backgroundStyle: 'image',
+      });
+
+    const uploadToken = await csrfToken('/admin/branding?lang=en');
+    const pngBytes = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+      'base64',
+    );
+    const res = await agent
+      .post('/admin/branding/background')
+      .set('X-CSRF-Token', uploadToken)
+      .set('Cookie', 'qaemati_locale=en')
+      .attach('image', pngBytes, { filename: 'bg.png', contentType: 'image/png' });
+
+    expect(res.status).toBe(201);
+    const { toast } = JSON.parse(res.headers['hx-trigger']);
+    expect(decodeURIComponent(toast.message)).toBe('Background image updated');
+
+    const restaurant = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+    expect(restaurant?.backgroundImagePath).toMatch(/^\/uploads\/restaurants\//);
+
+    const menuRes = await request(app.getHttpServer()).get(`/m/test-restaurant-branding?lang=en`);
+    expect(menuRes.status).toBe(200);
+    expect(menuRes.text).toContain(`background-image: url('${restaurant?.backgroundImagePath}')`);
+  });
+
   it('rejects a non-image file upload for the logo', async () => {
     const token = await csrfToken('/admin/branding?lang=en');
     const res = await agent

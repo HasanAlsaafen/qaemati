@@ -57,6 +57,52 @@ body[data-card-style='raised'] .menu-item-card {
 }
 
 /*
+  Admin customization: categoryDivider (views/layouts/menu.njk sets
+  data-category-divider on <body>). "none" (the default) is the original
+  gap-only spacing between category sections (views/pages/menu.njk's
+  data-category-section elements, flex flex-col gap-8) -- left alone
+  here. "line"/"dashed" add a border-top plus matching extra padding so
+  the rule doesn't sit flush against the previous category's last card.
+*/
+body[data-category-divider='line'] [data-category-section]:not(:first-child) {
+  padding-top: 2rem;
+  border-top: 1px solid rgb(var(--color-border));
+}
+body[data-category-divider='dashed'] [data-category-section]:not(:first-child) {
+  padding-top: 2rem;
+  border-top: 1px dashed rgb(var(--color-border-strong));
+}
+
+/*
+  Admin customization: backgroundStyle/backgroundPattern (views/layouts/
+  menu.njk sets data-background-style/data-background-pattern on <body>).
+  Only applied when backgroundStyle is 'pattern' -- 'solid' (the default)
+  and 'image' (a separate inline background-image, see menu.njk) leave
+  these alone. Tinted with --color-primary at low opacity (not a fixed
+  gray) so the pattern reads as "branded texture", not just noise, and
+  automatically follows a restaurant's own primary color override.
+*/
+body[data-background-style='pattern'][data-background-pattern='dots'] {
+  background-image: radial-gradient(rgb(var(--color-primary) / 0.14) 1.5px, transparent 1.5px);
+  background-size: 18px 18px;
+}
+body[data-background-style='pattern'][data-background-pattern='grid'] {
+  background-image:
+    linear-gradient(rgb(var(--color-primary) / 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--color-primary) / 0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+body[data-background-style='pattern'][data-background-pattern='diagonal'] {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgb(var(--color-primary) / 0.08),
+    rgb(var(--color-primary) / 0.08) 1px,
+    transparent 1px,
+    transparent 14px
+  );
+}
+
+/*
   Branding page live preview (views/admin/partials/branding-preview.njk):
   the iframe carries ?embed=1, which menu.controller.ts turns into this
   class. Hides the scrollbar chrome so the phone-frame mockup doesn't

@@ -47,6 +47,9 @@
     cornerStyle: {{ (restaurant.cornerStyle or 'rounded') | dump }},
     cardStyle: {{ (restaurant.cardStyle or 'flat') | dump }},
     buttonShape: {{ (restaurant.buttonShape or 'rounded') | dump }},
+    categoryDivider: {{ (restaurant.categoryDivider or 'none') | dump }},
+    backgroundStyle: {{ (restaurant.backgroundStyle or 'solid') | dump }},
+    backgroundPattern: {{ (restaurant.backgroundPattern or 'dots') | dump }},
     nameAr: {{ restaurant.nameAr | dump }},
     nameEn: {{ restaurant.nameEn | dump }},
     openTime: {{ (restaurant.openTime or '') | dump }},
@@ -91,11 +94,15 @@
         previewBackgroundColor: this.backgroundColor,
         previewCardStyle: this.cardStyle,
         previewButtonShape: this.buttonShape,
+        previewCategoryDivider: this.categoryDivider,
+        previewBackgroundStyle: this.backgroundStyle,
+        previewBackgroundPattern: this.backgroundPattern,
       });
       this.previewUrl = '/m/' + this.slug + '?' + params.toString();
     },
   }"
   x-init="recomputeContrast(); recomputeSecondaryContrast(); recomputeBackgroundContrast(); updatePreviewUrl()"
+  x-on:qaemati-preview-refresh.window="updatePreviewUrl()"
 >
   <div class="flex min-w-0 flex-col gap-6">
     {% include "admin/partials/branding-images.njk" %}

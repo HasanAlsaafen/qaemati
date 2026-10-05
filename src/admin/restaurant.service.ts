@@ -12,6 +12,9 @@ const MENU_DENSITIES = new Set(['comfortable', 'compact']);
 const CORNER_STYLES = new Set(['rounded', 'sharp']);
 const CARD_STYLES = new Set(['flat', 'raised']);
 const BUTTON_SHAPES = new Set(['rounded', 'pill']);
+const CATEGORY_DIVIDERS = new Set(['none', 'line', 'dashed']);
+const BACKGROUND_STYLES = new Set(['solid', 'pattern', 'image']);
+const BACKGROUND_PATTERNS = new Set(['dots', 'grid', 'diagonal']);
 
 export interface RestaurantDetailsInput {
   nameAr: string;
@@ -35,6 +38,9 @@ export interface RestaurantDetailsInput {
   backgroundColor?: string | null;
   cardStyle?: string;
   buttonShape?: string;
+  categoryDivider?: string;
+  backgroundStyle?: string;
+  backgroundPattern?: string;
 }
 
 @Injectable()
@@ -88,6 +94,24 @@ export class RestaurantService {
       'rounded',
       'INVALID_BUTTON_SHAPE',
     );
+    const categoryDivider = this.validateChoice(
+      input.categoryDivider,
+      CATEGORY_DIVIDERS,
+      'none',
+      'INVALID_CATEGORY_DIVIDER',
+    );
+    const backgroundStyle = this.validateChoice(
+      input.backgroundStyle,
+      BACKGROUND_STYLES,
+      'solid',
+      'INVALID_BACKGROUND_STYLE',
+    );
+    const backgroundPattern = this.validateChoice(
+      input.backgroundPattern,
+      BACKGROUND_PATTERNS,
+      'dots',
+      'INVALID_BACKGROUND_PATTERN',
+    );
 
     return this.prisma.restaurant.update({
       where: { id: restaurantId },
@@ -111,6 +135,9 @@ export class RestaurantService {
         backgroundColor,
         cardStyle,
         buttonShape,
+        categoryDivider,
+        backgroundStyle,
+        backgroundPattern,
       },
     });
   }
@@ -125,6 +152,14 @@ export class RestaurantService {
     return this.prisma.restaurant.update({
       where: { id: restaurantId },
       data: { coverImagePath },
+    });
+  }
+
+  async setBackgroundImage(restaurantId: string, backgroundImagePath: string) {
+    await this.findById(restaurantId);
+    return this.prisma.restaurant.update({
+      where: { id: restaurantId },
+      data: { backgroundImagePath },
     });
   }
 
