@@ -4,9 +4,11 @@ import {
   hexToRgb,
   lighten,
   meetsPrimaryColorContrast,
+  meetsSecondaryColorContrast,
   relativeLuminance,
   rgbToHex,
   rgbToTriplet,
+  toSecondaryPalette,
   WHITE,
 } from './color';
 
@@ -100,5 +102,22 @@ describe('darken / lighten', () => {
   it('darken never produces a negative channel', () => {
     const darker = darken({ r: 10, g: 10, b: 10 }, 0.9);
     expect(darker.r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('toSecondaryPalette / meetsSecondaryColorContrast', () => {
+  it('accepts the existing Zaytoun secondary color', () => {
+    expect(meetsSecondaryColorContrast(hexToRgb('#C4622D')!)).toBe(true);
+  });
+
+  it('derives a soft tint lighter than the base and a text shade darker than the base', () => {
+    const rgb = hexToRgb('#C4622D')!;
+    const palette = toSecondaryPalette(rgb);
+    expect(relativeLuminance(palette.secondarySoft)).toBeGreaterThan(relativeLuminance(rgb));
+    expect(relativeLuminance(palette.secondaryText)).toBeLessThan(relativeLuminance(rgb));
+  });
+
+  it('rejects a color too close to white to produce a readable text/soft pair', () => {
+    expect(meetsSecondaryColorContrast(hexToRgb('#FDF6EF')!)).toBe(false);
   });
 });

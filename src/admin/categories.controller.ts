@@ -6,6 +6,7 @@ import { RestaurantService } from './restaurant.service';
 import { buildAdminLabels } from './admin-labels';
 import { toCategoryViewList } from './admin-view-model';
 import { triggerToast } from './htmx-toast';
+import { parseIds } from './parse-ids';
 
 @Controller('admin/categories')
 export class CategoriesController {
@@ -84,6 +85,20 @@ export class CategoriesController {
     await this.categories.remove(restaurantId, id);
     triggerToast(res, this.i18n.t('common.admin.categories.deletedToast', { lang: locale }));
     res.status(200).send('');
+  }
+
+  @Post('reorder')
+  @Render('admin/partials/categories-list')
+  async reorder(@Body('ids') ids: string | string[] | undefined, @Req() req: Request) {
+    const restaurantId = req.session.restaurantId as string;
+    const locale = req.locale ?? 'ar';
+    await this.categories.reorder(restaurantId, parseIds(ids));
+    const categories = await this.categories.listForRestaurant(restaurantId);
+    const restaurant = await this.restaurants.findById(restaurantId);
+    return {
+      categories: toCategoryViewList(categories),
+      labels: buildAdminLabels(this.i18n, locale, restaurant.currency),
+    };
   }
 
   @Post(':id/move')

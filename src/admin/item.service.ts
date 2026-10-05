@@ -150,6 +150,22 @@ export class ItemService {
     ]);
   }
 
+  /** Drag-and-drop reorder within one category -- same "drop ids that
+   *  aren't actually ours" tolerance as CategoryService.reorder(). */
+  async reorder(restaurantId: string, categoryId: string, orderedIds: string[]): Promise<void> {
+    await this.assertCategoryOwnership(restaurantId, categoryId);
+    const owned = await this.prisma.item.findMany({ where: { categoryId }, select: { id: true } });
+    const ownedIds = new Set(owned.map((item) => item.id));
+    const ids = orderedIds.filter((id) => ownedIds.has(id));
+    if (!ids.length) return;
+
+    await this.prisma.$transaction(
+      ids.map((id, index) =>
+        this.prisma.item.update({ where: { id }, data: { sortOrder: index } }),
+      ),
+    );
+  }
+
   async assertOwnership(restaurantId: string, itemId: string) {
     const item = await this.prisma.item.findUnique({
       where: { id: itemId },

@@ -94,7 +94,8 @@
       "previewMenu": "معاينة القائمة",
       "qr": "رمز QR والطباعة",
       "toggleMenu": "القائمة",
-      "branding": "الهوية التجارية"
+      "branding": "الهوية التجارية",
+      "toggleSidebar": "طي الشريط الجانبي"
     },
     "form": {
       "required": "هذا الحقل مطلوب.",
@@ -114,7 +115,8 @@
       "imageLabel": "الصورة",
       "tagsLabel": "الوسوم",
       "moveUp": "نقل لأعلى",
-      "moveDown": "نقل لأسفل"
+      "moveDown": "نقل لأسفل",
+      "dragToReorder": "اسحب لإعادة الترتيب"
     },
     "categories": {
       "title": "الأقسام",
@@ -190,8 +192,6 @@
       "contrastPassLabel": "تباين {ratio}:1 مع النص الأبيض -- يحقق معيار AA",
       "contrastFailLabel": "تباين {ratio}:1 مع النص الأبيض -- فاتح جدًا، اختر درجة أغمق",
       "resetColor": "إعادة إلى الافتراضي",
-      "previewLabel": "معاينة",
-      "previewButtonText": "أضف إلى اختياراتي",
       "logoLabel": "الشعار",
       "coverImageLabel": "صورة الغلاف",
       "savedToast": "تم حفظ الهوية التجارية",
@@ -199,7 +199,19 @@
       "colorContrastToast": "هذا اللون فاتح جدًا ليبقى واضحًا مع نص أبيض. اختر درجة أغمق.",
       "logoUpdatedToast": "تم تحديث الشعار",
       "coverImageUpdatedToast": "تم تحديث صورة الغلاف",
-      "bothHoursRequiredToast": "حدّد وقت الفتح والإغلاق معًا، أو اتركهما فارغين."
+      "bothHoursRequiredToast": "حدّد وقت الفتح والإغلاق معًا، أو اتركهما فارغين.",
+      "secondaryColorLabel": "لون التمييز",
+      "secondaryColorHint": "لون ثانٍ للتمييزات الصغيرة، مثل زر رابط إنستغرام. يجب أن يبقى واضحًا كنص داكن على درجته الفاتحة.",
+      "fontThemeLabel": "الخط",
+      "fontThemeClassic": "كلاسيكي (ثمانية)",
+      "fontThemeModern": "عصري (آي بي إم بليكس سانس عربي)",
+      "menuDensityLabel": "كثافة القائمة",
+      "menuDensityComfortable": "مريحة",
+      "menuDensityCompact": "مدمجة",
+      "cornerStyleLabel": "نمط الزوايا",
+      "cornerStyleRounded": "مدورة",
+      "cornerStyleSharp": "حادة",
+      "previewFrameLabel": "معاينة مباشرة"
     },
     "tour": {
       "skip": "تخطّي",

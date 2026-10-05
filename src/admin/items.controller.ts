@@ -22,6 +22,7 @@ import { ItemOption, ItemService } from './item.service';
 import { buildAdminLabels } from './admin-labels';
 import { toCategoryViewList, toItemView } from './admin-view-model';
 import { triggerToast } from './htmx-toast';
+import { parseIds } from './parse-ids';
 import { itemImageMulterOptions } from './upload.config';
 
 function parseTags(raw: string | string[] | undefined): ItemTag[] {
@@ -97,6 +98,23 @@ export class ItemsController {
       triggerToast(res, this.i18n.t('common.admin.items.addedToast', { lang: locale }));
     }
 
+    const category = await this.categories.findOneWithItems(categoryId);
+    return {
+      category: toCategoryViewList([category])[0],
+      labels: buildAdminLabels(this.i18n, locale),
+    };
+  }
+
+  @Post('categories/:categoryId/items/reorder')
+  @Render('admin/partials/category')
+  async reorder(
+    @Param('categoryId') categoryId: string,
+    @Body('ids') ids: string | string[] | undefined,
+    @Req() req: Request,
+  ) {
+    const restaurantId = req.session.restaurantId as string;
+    const locale = req.locale ?? 'ar';
+    await this.items.reorder(restaurantId, categoryId, parseIds(ids));
     const category = await this.categories.findOneWithItems(categoryId);
     return {
       category: toCategoryViewList([category])[0],

@@ -33,6 +33,7 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale, defaultCurre
       tags: t('common.admin.form.tagsLabel'),
       moveUp: t('common.admin.form.moveUp'),
       moveDown: t('common.admin.form.moveDown'),
+      dragToReorder: t('common.admin.form.dragToReorder'),
     },
     categories: {
       title: t('common.admin.categories.title'),
@@ -101,8 +102,6 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale, defaultCurre
       primaryColorLabel: t('common.admin.branding.primaryColorLabel'),
       primaryColorHint: t('common.admin.branding.primaryColorHint'),
       resetColor: t('common.admin.branding.resetColor'),
-      previewLabel: t('common.admin.branding.previewLabel'),
-      previewButtonText: t('common.admin.branding.previewButtonText'),
       logoLabel: t('common.admin.branding.logoLabel'),
       coverImageLabel: t('common.admin.branding.coverImageLabel'),
       // Raw, uninterpolated templates for the client-side live contrast
@@ -110,6 +109,18 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale, defaultCurre
       // menu-labels.ts's openStatus templates.
       contrastPassTemplate: t('common.admin.branding.contrastPassLabel'),
       contrastFailTemplate: t('common.admin.branding.contrastFailLabel'),
+      secondaryColorLabel: t('common.admin.branding.secondaryColorLabel'),
+      secondaryColorHint: t('common.admin.branding.secondaryColorHint'),
+      fontThemeLabel: t('common.admin.branding.fontThemeLabel'),
+      fontThemeClassic: t('common.admin.branding.fontThemeClassic'),
+      fontThemeModern: t('common.admin.branding.fontThemeModern'),
+      menuDensityLabel: t('common.admin.branding.menuDensityLabel'),
+      menuDensityComfortable: t('common.admin.branding.menuDensityComfortable'),
+      menuDensityCompact: t('common.admin.branding.menuDensityCompact'),
+      cornerStyleLabel: t('common.admin.branding.cornerStyleLabel'),
+      cornerStyleRounded: t('common.admin.branding.cornerStyleRounded'),
+      cornerStyleSharp: t('common.admin.branding.cornerStyleSharp'),
+      previewFrameLabel: t('common.admin.branding.previewFrameLabel'),
     },
     unavailable: t('common.menu.unavailable'),
   };

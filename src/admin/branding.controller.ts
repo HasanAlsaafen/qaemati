@@ -54,6 +54,10 @@ export class BrandingController {
     @Body('closeTime') closeTime: string,
     @Body('currency') currency: string,
     @Body('primaryColor') primaryColor: string,
+    @Body('secondaryColor') secondaryColor: string,
+    @Body('fontTheme') fontTheme: string,
+    @Body('menuDensity') menuDensity: string,
+    @Body('cornerStyle') cornerStyle: string,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
@@ -83,6 +87,10 @@ export class BrandingController {
         closeTime: closeTime?.trim() || null,
         currency: (currency || 'ILS').trim(),
         primaryColor: primaryColor?.trim() || null,
+        secondaryColor: secondaryColor?.trim() || null,
+        fontTheme: fontTheme?.trim(),
+        menuDensity: menuDensity?.trim(),
+        cornerStyle: cornerStyle?.trim(),
       });
       triggerToast(res, this.i18n.t('common.admin.branding.savedToast', { lang: locale }));
       return {
@@ -98,7 +106,12 @@ export class BrandingController {
             ? this.i18n.t('common.admin.branding.invalidColorToast', { lang: locale })
             : error instanceof BadRequestException && error.message === 'OPEN_CLOSE_BOTH_REQUIRED'
               ? this.i18n.t('common.admin.branding.bothHoursRequiredToast', { lang: locale })
-              : null;
+              : error instanceof BadRequestException &&
+                  (error.message === 'INVALID_FONT_THEME' ||
+                    error.message === 'INVALID_MENU_DENSITY' ||
+                    error.message === 'INVALID_CORNER_STYLE')
+                ? this.i18n.t('common.admin.form.required', { lang: locale })
+                : null;
       if (!message) throw error;
       triggerToast(res, message, 'danger');
       return {

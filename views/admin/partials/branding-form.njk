@@ -1,26 +1,16 @@
+{% from "components/choice-card.njk" import choiceCard %}
+{% from "components/button.njk" import button %}
 {#
   restaurant: Restaurant row + hasStructuredHours (admin-view-model.ts)
   Rendered both as the initial page content (admin/branding.njk) and as
   the htmx re-render target after a successful/failed save -- so this
   partial owns the whole <form>, matching category-block.njk's pattern
   of "the thing that gets swapped is exactly the thing with the form in
-  it."
+  it." The reactive color/font/name state this form reads and writes
+  (x-model) lives one level up, in branding.njk's x-data -- see that
+  file's comment for why.
 #}
-<div
-  id="branding-form"
-  x-data="{
-    color: {{ (restaurant.primaryColor or '#44603C') | dump }},
-    defaultColor: '#44603C',
-    contrast: null,
-    passTemplate: {{ labels.branding.contrastPassTemplate | dump }},
-    failTemplate: {{ labels.branding.contrastFailTemplate | dump }},
-    recomputeContrast() {
-      const result = window.checkPrimaryColorContrast ? window.checkPrimaryColorContrast(this.color) : null;
-      this.contrast = result;
-    },
-  }"
-  x-init="recomputeContrast()"
->
+<div id="branding-form">
   <form
     hx-patch="/admin/branding"
     hx-target="#branding-form"
@@ -32,11 +22,11 @@
       <div class="mt-4 grid gap-4 sm:grid-cols-2">
         <div class="flex flex-col gap-1.5">
           <label for="branding-nameAr" class="text-sm font-medium text-text">{{ labels.form.nameAr }}</label>
-          <input id="branding-nameAr" name="nameAr" type="text" value="{{ restaurant.nameAr }}" dir="rtl" required class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+          <input id="branding-nameAr" name="nameAr" type="text" value="{{ restaurant.nameAr }}" x-model="nameAr" x-on:input="schedulePreview()" dir="rtl" required class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
         </div>
         <div class="flex flex-col gap-1.5">
           <label for="branding-nameEn" class="text-sm font-medium text-text">{{ labels.form.nameEn }}</label>
-          <input id="branding-nameEn" name="nameEn" type="text" value="{{ restaurant.nameEn }}" dir="ltr" required class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+          <input id="branding-nameEn" name="nameEn" type="text" value="{{ restaurant.nameEn }}" x-model="nameEn" x-on:input="schedulePreview()" dir="ltr" required class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
         </div>
         <div class="flex flex-col gap-1.5">
           <label for="branding-descriptionAr" class="text-sm font-medium text-text">{{ labels.form.descriptionAr }}</label>
@@ -108,7 +98,7 @@
             <button
               type="button"
               x-on:click="color = defaultColor; recomputeContrast()"
-              class="min-h-11 rounded-md border border-border px-3 text-sm text-text hover:bg-muted-surface"
+              class="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-3 text-sm font-medium text-text transition-colors duration-fast ease-standard hover:bg-muted-surface active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >{{ labels.branding.resetColor }}</button>
           </div>
           <p class="mt-1 text-sm" x-show="contrast" x-bind:class="contrast && contrast.passes ? 'text-success' : 'text-danger'">
@@ -118,21 +108,74 @@
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <span class="text-sm font-medium text-text">{{ labels.branding.previewLabel }}</span>
-          <button
-            type="button"
-            tabindex="-1"
-            class="inline-flex min-h-11 items-center justify-center rounded-md px-4 text-sm font-medium"
-            x-bind:style="'background-color: ' + color + '; color: white'"
-          >{{ labels.branding.previewButtonText }}</button>
+          <label for="branding-secondaryColor" class="text-sm font-medium text-text">{{ labels.branding.secondaryColorLabel }}</label>
+          <div class="flex items-center gap-2">
+            <input
+              id="branding-secondaryColor"
+              type="color"
+              x-model="secondaryColor"
+              x-on:input="recomputeSecondaryContrast()"
+              class="h-11 w-14 cursor-pointer rounded-md border border-border-strong bg-surface"
+            >
+            <input
+              type="text"
+              dir="ltr"
+              x-model="secondaryColor"
+              x-on:input="recomputeSecondaryContrast()"
+              maxlength="7"
+              aria-label="{{ labels.branding.secondaryColorLabel }}"
+              class="min-h-11 w-28 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+            <input type="hidden" name="secondaryColor" x-bind:value="secondaryColor">
+            <button
+              type="button"
+              x-on:click="secondaryColor = defaultSecondaryColor; recomputeSecondaryContrast()"
+              class="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-3 text-sm font-medium text-text transition-colors duration-fast ease-standard hover:bg-muted-surface active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >{{ labels.branding.resetColor }}</button>
+          </div>
+          <p class="mt-1 text-sm" x-show="secondaryContrast" x-bind:class="secondaryContrast && secondaryContrast.passes ? 'text-success' : 'text-danger'">
+            <span x-text="secondaryContrast ? (secondaryContrast.passes ? passTemplate : failTemplate).replace('{ratio}', secondaryContrast.ratio.toFixed(2)) : ''"></span>
+          </p>
+          <p class="mt-1 text-sm text-muted-text">{{ labels.branding.secondaryColorHint }}</p>
         </div>
+      </div>
+
+      <div class="mt-6 flex flex-col gap-5">
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text">{{ labels.branding.fontThemeLabel }}</legend>
+          <div class="grid max-w-sm grid-cols-2 gap-2">
+            {{ choiceCard('fontTheme', 'classic', labels.branding.fontThemeClassic, restaurant.fontTheme != 'modern', 'x-model="fontTheme" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('fontTheme', 'modern', labels.branding.fontThemeModern, restaurant.fontTheme == 'modern', 'x-model="fontTheme" x-on:change="schedulePreview()"') }}
+          </div>
+        </fieldset>
+
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text">{{ labels.branding.menuDensityLabel }}</legend>
+          <div class="grid max-w-sm grid-cols-2 gap-2">
+            {{ choiceCard('menuDensity', 'comfortable', labels.branding.menuDensityComfortable, restaurant.menuDensity != 'compact', 'x-model="menuDensity" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('menuDensity', 'compact', labels.branding.menuDensityCompact, restaurant.menuDensity == 'compact', 'x-model="menuDensity" x-on:change="schedulePreview()"') }}
+          </div>
+        </fieldset>
+
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text">{{ labels.branding.cornerStyleLabel }}</legend>
+          <div class="grid max-w-sm grid-cols-2 gap-2">
+            {{ choiceCard('cornerStyle', 'rounded', labels.branding.cornerStyleRounded, restaurant.cornerStyle != 'sharp', 'x-model="cornerStyle" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('cornerStyle', 'sharp', labels.branding.cornerStyleSharp, restaurant.cornerStyle == 'sharp', 'x-model="cornerStyle" x-on:change="schedulePreview()"') }}
+          </div>
+        </fieldset>
       </div>
     </section>
 
-    <div>
-      <button type="submit" class="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
-        {{ labels.form.save }}
-      </button>
+    {#
+      Sticky save bar: a long settings form (this one scrolls several
+      screens) otherwise makes "Save" a scroll-to-the-bottom hunt after
+      every edit -- a common dashboard pattern (Shopify admin, WordPress
+      customizer) pins the primary action to the viewport instead.
+      Blurred surface so content scrolling underneath it stays legible.
+    #}
+    <div class="sticky bottom-0 -mx-4 flex justify-end border-t border-border bg-surface/90 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
+      {{ button(labels.form.save, 'primary', 'md', 'submit') }}
     </div>
   </form>
 </div>

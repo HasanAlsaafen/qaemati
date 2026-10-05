@@ -84,3 +84,31 @@ export function lighten(rgb: Rgb, amount = 0.85): Rgb {
     b: rgb.b + (255 - rgb.b) * amount,
   };
 }
+
+export interface SecondaryPalette {
+  secondary: Rgb;
+  secondaryHover: Rgb;
+  secondaryText: Rgb;
+  secondarySoft: Rgb;
+}
+
+/** Unlike primary, this app never puts white text on a solid
+ *  --color-secondary background (grep confirms: every use is
+ *  text-secondary-text on bg-secondary-soft, a soft tint with a darker
+ *  text variant of the same hue -- see the Instagram button and the
+ *  "spicy"-style tag badges). So the derived text color is darkened
+ *  further than primary's hover shade, and the contrast check that
+ *  matters is secondaryText-against-secondarySoft, not white. */
+export function toSecondaryPalette(rgb: Rgb): SecondaryPalette {
+  return {
+    secondary: rgb,
+    secondaryHover: darken(rgb, 0.2),
+    secondaryText: darken(rgb, 0.35),
+    secondarySoft: lighten(rgb, 0.85),
+  };
+}
+
+export function meetsSecondaryColorContrast(rgb: Rgb): boolean {
+  const { secondaryText, secondarySoft } = toSecondaryPalette(rgb);
+  return contrastRatio(secondaryText, secondarySoft) >= 4.5;
+}

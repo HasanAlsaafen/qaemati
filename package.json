@@ -46,7 +46,8 @@
     "nunjucks": "^3.2.4",
     "qrcode": "^1.5.4",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "sortablejs": "^1.15.7"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
@@ -64,6 +65,7 @@
     "@types/node": "^22.10.1",
     "@types/nunjucks": "^3.2.6",
     "@types/qrcode": "^1.5.5",
+    "@types/sortablejs": "^1.15.9",
     "@types/supertest": "^7.2.1",
     "@typescript-eslint/eslint-plugin": "^8.17.0",
     "@typescript-eslint/parser": "^8.17.0",

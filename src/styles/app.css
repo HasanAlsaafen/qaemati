@@ -25,3 +25,42 @@
   --font-display: 'Thmanyah Serif Display', 'Thmanyah', 'Inter', 'IBM Plex Sans Arabic', 'Segoe UI',
     Tahoma, sans-serif;
 }
+
+/*
+  Admin customization: menuDensity (views/layouts/menu.njk sets
+  data-menu-density on <body>). "compact" shrinks the item card image and
+  hides the description line so more items fit per screen -- a restaurant
+  with long, simple menus (drinks, a bakery counter) can opt into this
+  instead of "comfortable" (the original card size, left alone here by
+  only overriding what compact needs).
+*/
+body[data-menu-density='compact'] .menu-item-card {
+  padding: 0.5rem;
+  gap: 0.5rem;
+}
+body[data-menu-density='compact'] .menu-item-card__image {
+  width: 3.25rem;
+  height: 3.25rem;
+}
+body[data-menu-density='compact'] .menu-item-card__description {
+  display: none;
+}
+
+/*
+  Branding page live preview (views/admin/partials/branding-preview.njk):
+  the iframe carries ?embed=1, which menu.controller.ts turns into this
+  class. Hides the scrollbar chrome so the phone-frame mockup doesn't
+  show a visible system scrollbar inside the screen area -- the page
+  stays scrollable (overflow is untouched), only the bar itself is
+  hidden. Never applied on the real public menu (embed is never set
+  there), so ordinary visitors keep their normal scrollbar.
+*/
+.embed-frame {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.embed-frame::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}

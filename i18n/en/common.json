@@ -94,7 +94,8 @@
       "previewMenu": "Preview menu",
       "qr": "QR & print",
       "toggleMenu": "Menu",
-      "branding": "Branding"
+      "branding": "Branding",
+      "toggleSidebar": "Collapse sidebar"
     },
     "form": {
       "required": "This field is required.",
@@ -114,7 +115,8 @@
       "imageLabel": "Image",
       "tagsLabel": "Tags",
       "moveUp": "Move up",
-      "moveDown": "Move down"
+      "moveDown": "Move down",
+      "dragToReorder": "Drag to reorder"
     },
     "categories": {
       "title": "Categories",
@@ -190,8 +192,6 @@
       "contrastPassLabel": "{ratio}:1 contrast with white text -- passes AA",
       "contrastFailLabel": "{ratio}:1 contrast with white text -- too light, pick a darker color",
       "resetColor": "Reset to default",
-      "previewLabel": "Preview",
-      "previewButtonText": "Add to selection",
       "logoLabel": "Logo",
       "coverImageLabel": "Cover image",
       "savedToast": "Branding saved",
@@ -199,7 +199,19 @@
       "colorContrastToast": "That color is too light to stay readable with white text. Pick a darker shade.",
       "logoUpdatedToast": "Logo updated",
       "coverImageUpdatedToast": "Cover image updated",
-      "bothHoursRequiredToast": "Set both an opening and a closing time, or leave both empty."
+      "bothHoursRequiredToast": "Set both an opening and a closing time, or leave both empty.",
+      "secondaryColorLabel": "Accent color",
+      "secondaryColorHint": "A second color for smaller highlights, like the Instagram link button. Must stay readable as dark text on its own light tint.",
+      "fontThemeLabel": "Typeface",
+      "fontThemeClassic": "Classic (Thmanyah)",
+      "fontThemeModern": "Modern (IBM Plex Sans Arabic)",
+      "menuDensityLabel": "Menu density",
+      "menuDensityComfortable": "Comfortable",
+      "menuDensityCompact": "Compact",
+      "cornerStyleLabel": "Corner style",
+      "cornerStyleRounded": "Rounded",
+      "cornerStyleSharp": "Sharp",
+      "previewFrameLabel": "Live preview"
     },
     "tour": {
       "skip": "Skip",

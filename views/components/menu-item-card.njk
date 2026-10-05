@@ -17,7 +17,7 @@
 #}
 {% macro menuItemCard(item, unavailableLabel, selectionLabels, hasWhatsapp, fromPriceLabel) %}
   <div
-    class="flex w-full items-start gap-3 rounded-lg border border-border bg-surface p-3 {{ 'opacity-60' if not item.available }}"
+    class="menu-item-card flex w-full items-start gap-3 rounded-lg border border-border bg-surface p-3 {{ 'opacity-60' if not item.available }}"
     data-menu-item="true"
     data-search-text="{{ item.searchText }}"
   >
@@ -29,7 +29,7 @@
       data-item="{{ item | dump }}"
       {% if not item.available %}aria-disabled="true"{% endif %}
     >
-      <span class="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-muted-surface">
+      <span class="menu-item-card__image relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-muted-surface">
         <img
           src="{{ item.imageUrl }}"
           alt=""
@@ -49,7 +49,7 @@
           {% endif %}
         </span>
         {% if item.description %}
-          <span class="line-clamp-2 text-sm leading-body text-muted-text">{{ item.description }}</span>
+          <span class="menu-item-card__description line-clamp-2 text-sm leading-body text-muted-text">{{ item.description }}</span>
         {% endif %}
         {% if item.tags and item.tags.length or not item.available %}
           <span class="mt-1 flex flex-wrap gap-1.5">

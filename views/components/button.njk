@@ -6,14 +6,14 @@
   attrs: raw extra attributes string (e.g. htmx attributes), inserted as-is
 #}
 {% macro button(label, variant='primary', size='md', type='button', attrs='', disabled=false) %}
-  {% set base = 'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors duration-fast ease-standard focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50' %}
+  {% set base = 'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-fast ease-standard active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100' %}
   {% set sizing = 'min-h-11 px-4 text-sm' if size == 'md' else 'min-h-11 px-3 text-xs' %}
   {% if variant == 'primary' %}
-    {% set look = 'bg-primary text-primary-on hover:bg-primary-hover' %}
+    {% set look = 'bg-primary text-primary-on shadow-raised hover:bg-primary-hover hover:shadow-overlay' %}
   {% elif variant == 'secondary' %}
     {% set look = 'bg-secondary-soft text-secondary-text hover:opacity-90 border border-border' %}
   {% elif variant == 'danger' %}
-    {% set look = 'bg-danger text-white hover:opacity-90' %}
+    {% set look = 'bg-danger text-white shadow-raised hover:opacity-90 hover:shadow-overlay' %}
   {% else %}
     {% set look = 'bg-transparent text-text hover:bg-muted-surface border border-border' %}
   {% endif %}

@@ -2,6 +2,10 @@
 
 {% block title %}{{ labels.branding.title }}{% endblock %}
 
+{# Needs room for the form + 400px live-preview phone side by side --
+   see layouts/admin.njk's mainWidth block comment. #}
+{% block mainWidth %}max-w-6xl{% endblock %}
+
 {% block scripts %}
   <script defer src="/js/color-contrast.js"></script>
 {% endblock %}
@@ -9,8 +13,72 @@
 {% block content %}
 <h1 class="font-sans text-2xl font-bold text-text">{{ labels.branding.title }}</h1>
 
-<div class="mt-4 flex flex-col gap-6">
-  {% include "admin/partials/branding-images.njk" %}
-  {% include "admin/partials/branding-form.njk" %}
+{#
+  The x-data lives here, one level above branding-form.njk's own
+  #branding-form div, so the live preview (a sibling of the form, not a
+  descendant) can read the same reactive color/font/name state. Only the
+  inner #branding-form div gets replaced on save (hx-swap="outerHTML"
+  there) -- this wrapper and its Alpine scope, and the preview reading
+  from it, survive that swap untouched.
+#}
+<div
+  class="mt-4 grid gap-6 lg:grid-cols-[1fr_400px] lg:items-start"
+  x-data="{
+    color: {{ (restaurant.primaryColor or '#44603C') | dump }},
+    defaultColor: '#44603C',
+    contrast: null,
+    secondaryColor: {{ (restaurant.secondaryColor or '#C4622D') | dump }},
+    defaultSecondaryColor: '#C4622D',
+    secondaryContrast: null,
+    fontTheme: {{ (restaurant.fontTheme or 'classic') | dump }},
+    menuDensity: {{ (restaurant.menuDensity or 'comfortable') | dump }},
+    cornerStyle: {{ (restaurant.cornerStyle or 'rounded') | dump }},
+    nameAr: {{ restaurant.nameAr | dump }},
+    nameEn: {{ restaurant.nameEn | dump }},
+    locale: {{ locale | dump }},
+    slug: {{ restaurant.slug | dump }},
+    previewUrl: '',
+    previewTimer: null,
+    passTemplate: {{ labels.branding.contrastPassTemplate | dump }},
+    failTemplate: {{ labels.branding.contrastFailTemplate | dump }},
+    recomputeContrast() {
+      this.contrast = window.checkPrimaryColorContrast ? window.checkPrimaryColorContrast(this.color) : null;
+      this.schedulePreview();
+    },
+    recomputeSecondaryContrast() {
+      this.secondaryContrast = window.checkSecondaryColorContrast ? window.checkSecondaryColorContrast(this.secondaryColor) : null;
+      this.schedulePreview();
+    },
+    // The preview is an iframe of the real /m/:slug route (see
+    // menu.controller.ts's preview* query params) -- 'live' here means
+    // 'reload that iframe shortly after the admin stops typing/dragging',
+    // not a client-side re-render, so every keystroke/drag tick is
+    // debounced into one navigation instead of one per input event.
+    schedulePreview() {
+      clearTimeout(this.previewTimer);
+      this.previewTimer = setTimeout(() => this.updatePreviewUrl(), 250);
+    },
+    updatePreviewUrl() {
+      const params = new URLSearchParams({
+        lang: this.locale,
+        embed: '1',
+        previewName: this.locale === 'ar' ? this.nameAr : this.nameEn,
+        previewPrimaryColor: this.color,
+        previewSecondaryColor: this.secondaryColor,
+        previewFontTheme: this.fontTheme,
+        previewMenuDensity: this.menuDensity,
+        previewCornerStyle: this.cornerStyle,
+      });
+      this.previewUrl = '/m/' + this.slug + '?' + params.toString();
+    },
+  }"
+  x-init="recomputeContrast(); recomputeSecondaryContrast(); updatePreviewUrl()"
+>
+  <div class="flex min-w-0 flex-col gap-6">
+    {% include "admin/partials/branding-images.njk" %}
+    {% include "admin/partials/branding-form.njk" %}
+  </div>
+
+  {% include "admin/partials/branding-preview.njk" %}
 </div>
 {% endblock %}

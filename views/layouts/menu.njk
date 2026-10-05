@@ -1,6 +1,6 @@
 {% from "components/toast.njk" import toastHost %}
 <!DOCTYPE html>
-<html lang="{{ locale }}" dir="{{ dir }}">
+<html lang="{{ locale }}" dir="{{ dir }}" class="{{ 'embed-frame' if embed }}">
 <head>
   <title>{% block title %}{{ t('common.app.name') }}{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}{{ t('common.home.subtitle') }}{% endblock %}">
@@ -18,17 +18,39 @@
      tokens (src/styles/tokens.css) for this page only -- scoped here
      via inline :root, not by editing the shared stylesheet, so every
      other restaurant's menu keeps the default palette. #}
-  {% if menu.primaryColorCss %}
+  {% if menu.primaryColorCss or menu.secondaryColorCss or menu.fontTheme == 'modern' or menu.cornerStyleCss %}
     <style>
       :root {
+        {% if menu.primaryColorCss %}
         --color-primary: {{ menu.primaryColorCss.primary }};
         --color-primary-hover: {{ menu.primaryColorCss.primaryHover }};
         --color-primary-soft: {{ menu.primaryColorCss.primarySoft }};
+        {% endif %}
+        {% if menu.secondaryColorCss %}
+        --color-secondary: {{ menu.secondaryColorCss.secondary }};
+        --color-secondary-hover: {{ menu.secondaryColorCss.secondaryHover }};
+        --color-secondary-text: {{ menu.secondaryColorCss.secondaryText }};
+        --color-secondary-soft: {{ menu.secondaryColorCss.secondarySoft }};
+        {% endif %}
+        {% if menu.fontTheme == 'modern' %}
+        {# IBM Plex Sans Arabic is already self-hosted as the Arabic
+           fallback face (src/styles/fonts.css); the "modern" theme just
+           promotes it ahead of Thmanyah rather than loading anything
+           new. It has no serif display face, so --font-display reuses
+           the same sans stack instead of falling back to Thmanyah's. #}
+        --font-sans: 'IBM Plex Sans Arabic', 'Inter', 'Thmanyah', 'Segoe UI', Tahoma, sans-serif;
+        --font-display: 'IBM Plex Sans Arabic', 'Inter', 'Segoe UI', Tahoma, sans-serif;
+        {% endif %}
+        {% if menu.cornerStyleCss %}
+        --radius-sm: {{ menu.cornerStyleCss.radiusSm }};
+        --radius-md: {{ menu.cornerStyleCss.radiusMd }};
+        --radius-lg: {{ menu.cornerStyleCss.radiusLg }};
+        {% endif %}
       }
     </style>
   {% endif %}
 </head>
-<body class="min-h-screen bg-bg text-text font-sans antialiased" data-restaurant-slug="{{ menu.slug }}">
+<body class="min-h-screen bg-bg text-text font-sans antialiased {{ 'embed-frame' if embed }}" data-restaurant-slug="{{ menu.slug }}" data-menu-density="{{ menu.menuDensity }}">
   {% block content %}{% endblock %}
 
   {{ toastHost() }}

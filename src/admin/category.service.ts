@@ -102,6 +102,28 @@ export class CategoryService {
     ]);
   }
 
+  /** Drag-and-drop reorder: sets sortOrder = index for each id, in the
+   *  order given. Ids that don't belong to this restaurant are dropped
+   *  rather than rejected outright -- the dragged list came from a
+   *  render of this restaurant's own categories, so a mismatch only
+   *  happens via a stale client or a tampered request, neither worth a
+   *  hard error over (same tolerance as move()'s "no neighbor, no-op"). */
+  async reorder(restaurantId: string, orderedIds: string[]): Promise<void> {
+    const owned = await this.prisma.category.findMany({
+      where: { restaurantId },
+      select: { id: true },
+    });
+    const ownedIds = new Set(owned.map((category) => category.id));
+    const ids = orderedIds.filter((id) => ownedIds.has(id));
+    if (!ids.length) return;
+
+    await this.prisma.$transaction(
+      ids.map((id, index) =>
+        this.prisma.category.update({ where: { id }, data: { sortOrder: index } }),
+      ),
+    );
+  }
+
   /** Throws if the category doesn't exist or belongs to a different restaurant. */
   private async assertOwnership(restaurantId: string, categoryId: string) {
     const category = await this.prisma.category.findUnique({ where: { id: categoryId } });

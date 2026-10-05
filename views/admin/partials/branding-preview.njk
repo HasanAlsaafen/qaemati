@@ -1,0 +1,38 @@
+{#
+  restaurant: Restaurant row (admin-view-model.ts toRestaurantSettingsView)
+  This is an <iframe> of the real public menu route (/m/:slug), not a
+  hand-built mockup -- it's the exact same template the real menu page
+  renders, so it's pixel-identical by construction instead of by upkeep.
+  "Live" means the iframe's src carries the current, unsaved color/font/
+  name state as preview* query params (branding.njk's x-data,
+  schedulePreview/updatePreviewUrl), which menu.controller.ts/
+  menu.service.ts only honor for the logged-in admin's own restaurant --
+  see MenuPreviewOverrides's comment in menu.service.ts.
+#}
+<aside class="flex flex-col items-center gap-2 lg:sticky lg:top-4">
+  <p class="text-sm font-medium text-text">{{ labels.branding.previewFrameLabel }}</p>
+
+  {# iPhone-style frame: rounded black bezel, side buttons, Dynamic
+     Island notch. Sized to roughly an iPhone 14/15 Pro Max's aspect
+     ratio, scaled up from the first pass per feedback that it read too
+     small next to the form. The iframe's own scrollbar is hidden (see
+     .embed-frame in src/styles/app.css, driven by the ?embed=1 the
+     preview URL always carries) -- scrolling inside the frame still
+     works via wheel/touch/drag, only the visible bar is gone, so it
+     reads like an actual phone screen rather than a web page in a box. #}
+  <div class="relative h-[760px] w-[360px] shrink-0 rounded-[3rem] bg-black p-[14px] shadow-overlay">
+    <span class="absolute -right-[2px] top-28 h-12 w-[3px] rounded-s-sm bg-black" aria-hidden="true"></span>
+    <span class="absolute -left-[2px] top-24 h-7 w-[3px] rounded-e-sm bg-black" aria-hidden="true"></span>
+    <span class="absolute -left-[2px] top-36 h-12 w-[3px] rounded-e-sm bg-black" aria-hidden="true"></span>
+
+    <div class="relative h-full w-full overflow-hidden rounded-[2.25rem] bg-bg">
+      <span class="absolute left-1/2 top-2.5 z-10 h-7 w-32 -translate-x-1/2 rounded-full bg-black" aria-hidden="true"></span>
+      <iframe
+        x-bind:src="previewUrl"
+        title="{{ labels.branding.previewFrameLabel }}"
+        class="h-full w-full border-0 bg-bg"
+        loading="lazy"
+      ></iframe>
+    </div>
+  </div>
+</aside>

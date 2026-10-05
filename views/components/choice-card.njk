@@ -1,0 +1,29 @@
+{#
+  A single option in a card-style radio group (fontTheme/menuDensity/
+  cornerStyle on the branding page) -- a bigger, more scannable tap
+  target than a plain radio+label row, with the selected state shown by
+  the whole card (border + tint + check), not just a 16px dot. Common
+  pattern in theme/appearance settings (Shopify, Webflow, Stripe
+  dashboards): grouped "swatch" choices read faster than a list of radio
+  rows once there are 2-3+ options per setting.
+
+  Built on :has() (Tailwind's has-[:checked] variant) rather than Alpine
+  state for the selected look, so it stays correct even before Alpine
+  hydrates and needs no extra wiring per group -- x-model/x-on:change
+  (attrs) are still passed through to the underlying input for the
+  groups that drive the live preview.
+#}
+{% macro choiceCard(name, value, label, checked, attrs='') %}
+  <label class="group relative flex min-h-11 cursor-pointer items-center justify-center rounded-md border border-border-strong bg-surface px-3 py-2.5 text-center text-sm font-medium text-text transition-colors duration-fast ease-standard hover:bg-muted-surface has-[:checked]:border-primary has-[:checked]:bg-primary-soft has-[:checked]:text-primary has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary">
+    <input
+      type="radio"
+      name="{{ name }}"
+      value="{{ value }}"
+      {% if checked %}checked{% endif %}
+      class="sr-only"
+      {{ attrs | safe }}
+    >
+    <svg class="me-1.5 hidden h-4 w-4 shrink-0 group-has-[:checked]:block" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 8.5l3 3 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    {{ label }}
+  </label>
+{% endmacro %}

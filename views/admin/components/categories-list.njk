@@ -8,7 +8,14 @@
   category is adjacent to which -- simplest to just re-render the list.
 #}
 {% macro categoriesList(categories, labels) %}
-  <div id="categories-list" x-data="{ adding: false }" class="flex flex-col gap-4">
+  <div
+    id="categories-list"
+    x-data="{ adding: false }"
+    class="flex flex-col gap-4"
+    data-sortable
+    data-sort-url="/admin/categories/reorder"
+    data-sort-target="#categories-list"
+  >
     {% if categories.length %}
       {% for category in categories %}
         {{ categoryBlock(category, labels, loop.first, loop.last) }}

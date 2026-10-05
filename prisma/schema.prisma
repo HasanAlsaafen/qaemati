@@ -37,6 +37,35 @@ model Restaurant {
   /// every other cross-field validation in this app.
   primaryColor String?
 
+  /// Admin customization: a second accent hex, used for the soft-tint
+  /// badge/button style (--color-secondary-text on --color-secondary-soft,
+  /// e.g. the Instagram link button) rather than as a solid background --
+  /// see RestaurantService's derivation for why its contrast check is
+  /// against the derived soft tint, not white, unlike primaryColor.
+  secondaryColor String?
+
+  /// Admin customization: 'classic' (Thmanyah Sans + Serif Display, the
+  /// original Phase 1 pairing) or 'modern' (IBM Plex Sans Arabic + Inter,
+  /// already self-hosted as the Arabic fallback face -- see
+  /// src/styles/fonts.css -- so offering it as a selectable pairing needs
+  /// no new font files). Never free text: the admin picks from these two,
+  /// both already licensed and vendored.
+  fontTheme String @default("classic")
+
+  /// Admin customization: 'comfortable' (the original card size/spacing)
+  /// or 'compact' (smaller item images, tighter padding) on the public
+  /// menu's item grid.
+  menuDensity String @default("comfortable")
+
+  /// Admin customization: 'rounded' (the original --radius-sm/md/lg
+  /// token values) or 'sharp' (the same three tokens overridden much
+  /// smaller -- see menu.service.ts's toCornerStyleCss). A pure CSS
+  /// custom-property swap, same mechanism as primaryColor/secondaryColor,
+  /// so it reaches every card/button/badge on the public menu that's
+  /// already built on the rounded-sm/md/lg Tailwind classes without
+  /// touching any of that markup.
+  cornerStyle String @default("rounded")
+
   /// A4: the default currency new items are created with (restaurant-
   /// level, not per-item -- each Item still stores its own `currency`
   /// so a restaurant could in principle mix currencies, but the admin

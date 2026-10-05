@@ -10,7 +10,7 @@ import {
   nowInHebronMinutes,
 } from '../common/open-status';
 import { PrismaService } from '../prisma/prisma.service';
-import { darken, hexToRgb, lighten, rgbToTriplet } from '../common/color';
+import { darken, hexToRgb, lighten, rgbToTriplet, toSecondaryPalette } from '../common/color';
 
 export interface MenuOptionView {
   id: string;
@@ -76,6 +76,44 @@ export interface MenuView {
    *  src/styles/tokens.css's own Zaytoun default, same "unset means use
    *  the house default" convention as every other optional field here. */
   primaryColorCss: { primary: string; primaryHover: string; primarySoft: string } | null;
+  /** Admin customization: a second accent override, same "null means
+   *  default" convention as primaryColorCss. */
+  secondaryColorCss: {
+    secondary: string;
+    secondaryHover: string;
+    secondaryText: string;
+    secondarySoft: string;
+  } | null;
+  /** Admin customization: 'classic' | 'modern' -- see Restaurant.fontTheme. */
+  fontTheme: string;
+  /** Admin customization: 'comfortable' | 'compact' -- see Restaurant.menuDensity. */
+  menuDensity: string;
+  /** "R G B"-triplet-free CSS text overriding --radius-sm/md/lg for
+   *  'sharp' -- null for 'rounded', the token defaults already in
+   *  src/styles/tokens.css, same "null means default" convention as
+   *  primaryColorCss/secondaryColorCss. See Restaurant.cornerStyle. */
+  cornerStyleCss: { radiusSm: string; radiusMd: string; radiusLg: string } | null;
+}
+
+/**
+ * The branding page's live preview is an iframe of this exact route (not
+ * a hand-built mockup) so it's pixel-identical to the real menu -- these
+ * are the as-you-type/drag values from that unsaved form, passed as
+ * query params (see MenuController.show and branding-preview.njk).
+ * restaurantId must match the fetched restaurant's own id (checked
+ * below) before anything here is trusted: without that check, a visitor
+ * on the *public* menu URL could pass the same query params and deface
+ * the live page for every other visitor, since this would otherwise be
+ * a plain unauthenticated reflected input.
+ */
+export interface MenuPreviewOverrides {
+  restaurantId: string;
+  name?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  fontTheme?: string;
+  menuDensity?: string;
+  cornerStyle?: string;
 }
 
 @Injectable()
@@ -85,7 +123,7 @@ export class MenuService {
     private readonly i18n: I18nService,
   ) {}
 
-  async getMenu(slug: string, locale: Locale): Promise<MenuView> {
+  async getMenu(slug: string, locale: Locale, preview?: MenuPreviewOverrides): Promise<MenuView> {
     const restaurant = await this.prisma.restaurant.findUnique({
       where: { slug },
       include: {
@@ -107,6 +145,21 @@ export class MenuService {
     if (!restaurant) {
       throw new NotFoundException(`No restaurant with slug "${slug}"`);
     }
+
+    const isPreviewOwner = Boolean(preview && preview.restaurantId === restaurant.id);
+    const effectiveName = isPreviewOwner && preview!.name ? preview!.name : null;
+    const effectivePrimaryColor =
+      isPreviewOwner && preview!.primaryColor ? preview!.primaryColor : restaurant.primaryColor;
+    const effectiveSecondaryColor =
+      isPreviewOwner && preview!.secondaryColor
+        ? preview!.secondaryColor
+        : restaurant.secondaryColor;
+    const effectiveFontTheme =
+      isPreviewOwner && preview!.fontTheme ? preview!.fontTheme : restaurant.fontTheme;
+    const effectiveMenuDensity =
+      isPreviewOwner && preview!.menuDensity ? preview!.menuDensity : restaurant.menuDensity;
+    const effectiveCornerStyle =
+      isPreviewOwner && preview!.cornerStyle ? preview!.cornerStyle : restaurant.cornerStyle;
 
     const pick = (ar: string, en: string) => (locale === 'ar' ? ar : en);
     const pickNullable = (ar: string | null, en: string | null) => (locale === 'ar' ? ar : en);
@@ -201,7 +254,7 @@ export class MenuService {
 
     return {
       slug: restaurant.slug,
-      name: pick(restaurant.nameAr, restaurant.nameEn),
+      name: effectiveName ?? pick(restaurant.nameAr, restaurant.nameEn),
       description: pickNullable(restaurant.descriptionAr, restaurant.descriptionEn),
       logoUrl: restaurant.logoPath,
       coverImageUrl: restaurant.coverImagePath,
@@ -211,7 +264,11 @@ export class MenuService {
       openStatus,
       categories,
       todaysSpecials,
-      primaryColorCss: toPrimaryColorCss(restaurant.primaryColor),
+      primaryColorCss: toPrimaryColorCss(effectivePrimaryColor),
+      secondaryColorCss: toSecondaryColorCss(effectiveSecondaryColor),
+      fontTheme: effectiveFontTheme,
+      menuDensity: effectiveMenuDensity,
+      cornerStyleCss: toCornerStyleCss(effectiveCornerStyle),
     };
   }
 }
@@ -237,4 +294,32 @@ function toPrimaryColorCss(
     primaryHover: rgbToTriplet(darken(rgb)),
     primarySoft: rgbToTriplet(lighten(rgb)),
   };
+}
+
+function toSecondaryColorCss(secondaryColor: string | null): {
+  secondary: string;
+  secondaryHover: string;
+  secondaryText: string;
+  secondarySoft: string;
+} | null {
+  if (!secondaryColor) return null;
+  const rgb = hexToRgb(secondaryColor);
+  if (!rgb) return null;
+  const palette = toSecondaryPalette(rgb);
+  return {
+    secondary: rgbToTriplet(palette.secondary),
+    secondaryHover: rgbToTriplet(palette.secondaryHover),
+    secondaryText: rgbToTriplet(palette.secondaryText),
+    secondarySoft: rgbToTriplet(palette.secondarySoft),
+  };
+}
+
+/** 'sharp' trades tokens.css's 6px/10px/16px for a crisp near-square
+ *  look; 'rounded' (and anything else) keeps the defaults by returning
+ *  null, same convention as the color overrides above. */
+function toCornerStyleCss(
+  cornerStyle: string,
+): { radiusSm: string; radiusMd: string; radiusLg: string } | null {
+  if (cornerStyle !== 'sharp') return null;
+  return { radiusSm: '2px', radiusMd: '4px', radiusLg: '6px' };
 }

@@ -1,6 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { hexToRgb, meetsPrimaryColorContrast } from '../common/color';
+import { hexToRgb, meetsPrimaryColorContrast, meetsSecondaryColorContrast } from '../common/color';
+
+const FONT_THEMES = new Set(['classic', 'modern']);
+const MENU_DENSITIES = new Set(['comfortable', 'compact']);
+const CORNER_STYLES = new Set(['rounded', 'sharp']);
 
 export interface RestaurantDetailsInput {
   nameAr: string;
@@ -16,6 +20,10 @@ export interface RestaurantDetailsInput {
   currency: string;
   /** Null clears back to the default Zaytoun palette. */
   primaryColor?: string | null;
+  secondaryColor?: string | null;
+  fontTheme?: string;
+  menuDensity?: string;
+  cornerStyle?: string;
 }
 
 @Injectable()
@@ -37,6 +45,25 @@ export class RestaurantService {
     }
 
     const primaryColor = this.validatePrimaryColor(input.primaryColor);
+    const secondaryColor = this.validateSecondaryColor(input.secondaryColor);
+    const fontTheme = this.validateChoice(
+      input.fontTheme,
+      FONT_THEMES,
+      'classic',
+      'INVALID_FONT_THEME',
+    );
+    const menuDensity = this.validateChoice(
+      input.menuDensity,
+      MENU_DENSITIES,
+      'comfortable',
+      'INVALID_MENU_DENSITY',
+    );
+    const cornerStyle = this.validateChoice(
+      input.cornerStyle,
+      CORNER_STYLES,
+      'rounded',
+      'INVALID_CORNER_STYLE',
+    );
 
     return this.prisma.restaurant.update({
       where: { id: restaurantId },
@@ -53,6 +80,10 @@ export class RestaurantService {
         closeTime: hasWindow ? input.closeTime : null,
         currency: input.currency,
         primaryColor,
+        secondaryColor,
+        fontTheme,
+        menuDensity,
+        cornerStyle,
       },
     });
   }
@@ -83,5 +114,26 @@ export class RestaurantService {
       throw new BadRequestException('COLOR_CONTRAST_TOO_LOW');
     }
     return input.startsWith('#') ? input : `#${input}`;
+  }
+
+  private validateSecondaryColor(input: string | null | undefined): string | null {
+    if (!input) return null;
+    const rgb = hexToRgb(input);
+    if (!rgb) throw new BadRequestException('INVALID_COLOR');
+    if (!meetsSecondaryColorContrast(rgb)) {
+      throw new BadRequestException('COLOR_CONTRAST_TOO_LOW');
+    }
+    return input.startsWith('#') ? input : `#${input}`;
+  }
+
+  private validateChoice(
+    input: string | undefined,
+    allowed: Set<string>,
+    fallback: string,
+    errorCode: string,
+  ): string {
+    const value = input || fallback;
+    if (!allowed.has(value)) throw new BadRequestException(errorCode);
+    return value;
   }
 }

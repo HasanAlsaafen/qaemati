@@ -15,6 +15,10 @@ const files = [
     from: 'node_modules/alpinejs/dist/cdn.min.js',
     to: 'public/js/vendor/alpine.min.js',
   },
+  {
+    from: 'node_modules/sortablejs/Sortable.min.js',
+    to: 'public/js/vendor/sortable.min.js',
+  },
 ];
 
 for (const file of files) {
