@@ -106,12 +106,16 @@ export class RestaurantService {
    *  (curl, a modified request), and a bad primary color isn't just a
    *  cosmetic nit, it would make every button/badge label unreadable
    *  for every diner on the public menu. */
+  /** Error codes name the field (INVALID_PRIMARY_COLOR, not INVALID_COLOR)
+   *  so BrandingController can attach the message to the one input that's
+   *  actually wrong instead of a form-wide toast -- see its fieldErrors
+   *  mapping. */
   private validatePrimaryColor(input: string | null | undefined): string | null {
     if (!input) return null;
     const rgb = hexToRgb(input);
-    if (!rgb) throw new BadRequestException('INVALID_COLOR');
+    if (!rgb) throw new BadRequestException('INVALID_PRIMARY_COLOR');
     if (!meetsPrimaryColorContrast(rgb)) {
-      throw new BadRequestException('COLOR_CONTRAST_TOO_LOW');
+      throw new BadRequestException('PRIMARY_COLOR_CONTRAST_TOO_LOW');
     }
     return input.startsWith('#') ? input : `#${input}`;
   }
@@ -119,9 +123,9 @@ export class RestaurantService {
   private validateSecondaryColor(input: string | null | undefined): string | null {
     if (!input) return null;
     const rgb = hexToRgb(input);
-    if (!rgb) throw new BadRequestException('INVALID_COLOR');
+    if (!rgb) throw new BadRequestException('INVALID_SECONDARY_COLOR');
     if (!meetsSecondaryColorContrast(rgb)) {
-      throw new BadRequestException('COLOR_CONTRAST_TOO_LOW');
+      throw new BadRequestException('SECONDARY_COLOR_CONTRAST_TOO_LOW');
     }
     return input.startsWith('#') ? input : `#${input}`;
   }

@@ -81,6 +81,54 @@ describe('Branding settings (e2e)', () => {
     // from the previous test.
     const restaurant = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
     expect(restaurant?.primaryColor).toBe('#1E5F74');
+
+    // The error is attached to the primary color field specifically (not
+    // just a toast) -- the P1-4 gap from docs/ux/audit.md.
+    expect(res.text).toContain('field-primaryColor-error');
+    expect(res.text).not.toContain('field-secondaryColor-error');
+  });
+
+  it('rejects a malformed primary color hex, distinctly from a contrast failure', async () => {
+    const token = await csrfToken('/admin/branding?lang=en');
+    const res = await agent
+      .patch('/admin/branding')
+      .set('X-CSRF-Token', token)
+      .set('Cookie', 'qaemati_locale=en')
+      .type('form')
+      .send({
+        nameAr: 'مطعم تجريبي محدث',
+        nameEn: 'Updated Test Restaurant',
+        currency: 'JOD',
+        primaryColor: 'not-a-color',
+      });
+
+    expect(res.status).toBe(200);
+    const { toast } = JSON.parse(res.headers['hx-trigger']);
+    expect(decodeURIComponent(toast.message)).toBe('Enter a valid color.');
+    expect(res.text).toContain('field-primaryColor-error');
+
+    const restaurant = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+    expect(restaurant?.primaryColor).toBe('#1E5F74');
+  });
+
+  it('requires both a nameAr and nameEn, flagging only the one left blank', async () => {
+    const token = await csrfToken('/admin/branding?lang=en');
+    const res = await agent
+      .patch('/admin/branding')
+      .set('X-CSRF-Token', token)
+      .set('Cookie', 'qaemati_locale=en')
+      .type('form')
+      .send({
+        nameAr: 'مطعم تجريبي محدث',
+        nameEn: '',
+        currency: 'JOD',
+      });
+
+    expect(res.status).toBe(200);
+    const { toast } = JSON.parse(res.headers['hx-trigger']);
+    expect(toast.variant).toBe('danger');
+    expect(res.text).toContain('field-nameEn-error');
+    expect(res.text).not.toContain('field-nameAr-error');
   });
 
   it('rejects a one-sided open/close time window', async () => {
@@ -104,6 +152,11 @@ describe('Branding settings (e2e)', () => {
 
     const restaurant = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
     expect(restaurant?.openTime).toBeNull();
+
+    // closeTime is the one left blank -- openTime (which was filled in)
+    // isn't the problem and shouldn't be flagged.
+    expect(res.text).toContain('field-closeTime-error');
+    expect(res.text).not.toContain('field-openTime-error');
   });
 
   it('applies the saved primary color to the public menu as a CSS override', async () => {

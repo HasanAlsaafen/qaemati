@@ -35,6 +35,8 @@
     cornerStyle: {{ (restaurant.cornerStyle or 'rounded') | dump }},
     nameAr: {{ restaurant.nameAr | dump }},
     nameEn: {{ restaurant.nameEn | dump }},
+    openTime: {{ (restaurant.openTime or '') | dump }},
+    closeTime: {{ (restaurant.closeTime or '') | dump }},
     locale: {{ locale | dump }},
     slug: {{ restaurant.slug | dump }},
     previewUrl: '',

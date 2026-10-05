@@ -1,5 +1,6 @@
 {% from "components/choice-card.njk" import choiceCard %}
 {% from "components/button.njk" import button %}
+{% from "components/input.njk" import input %}
 {#
   restaurant: Restaurant row + hasStructuredHours (admin-view-model.ts)
   Rendered both as the initial page content (admin/branding.njk) and as
@@ -9,6 +10,10 @@
   it." The reactive color/font/name state this form reads and writes
   (x-model) lives one level up, in branding.njk's x-data -- see that
   file's comment for why.
+
+  fieldErrors: { [name]: message } from BrandingController's catch block
+  -- which input (if any) a rejected save's error actually belongs to.
+  Empty on first load and on a successful save.
 #}
 <div id="branding-form">
   <form
@@ -20,14 +25,8 @@
     <section class="rounded-lg border border-border bg-surface p-4">
       <h2 class="font-sans text-lg font-bold text-text">{{ labels.branding.detailsTitle }}</h2>
       <div class="mt-4 grid gap-4 sm:grid-cols-2">
-        <div class="flex flex-col gap-1.5">
-          <label for="branding-nameAr" class="text-sm font-medium text-text">{{ labels.form.nameAr }}</label>
-          <input id="branding-nameAr" name="nameAr" type="text" value="{{ restaurant.nameAr }}" x-model="nameAr" x-on:input="schedulePreview()" dir="rtl" required class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
-        </div>
-        <div class="flex flex-col gap-1.5">
-          <label for="branding-nameEn" class="text-sm font-medium text-text">{{ labels.form.nameEn }}</label>
-          <input id="branding-nameEn" name="nameEn" type="text" value="{{ restaurant.nameEn }}" x-model="nameEn" x-on:input="schedulePreview()" dir="ltr" required class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
-        </div>
+        {{ input(name='nameAr', label=labels.form.nameAr, value=restaurant.nameAr, error=fieldErrors.nameAr, dir='rtl', attrs='x-model="nameAr" x-on:input="schedulePreview()" required') }}
+        {{ input(name='nameEn', label=labels.form.nameEn, value=restaurant.nameEn, error=fieldErrors.nameEn, dir='ltr', attrs='x-model="nameEn" x-on:input="schedulePreview()" required') }}
         <div class="flex flex-col gap-1.5">
           <label for="branding-descriptionAr" class="text-sm font-medium text-text">{{ labels.form.descriptionAr }}</label>
           <textarea id="branding-descriptionAr" name="descriptionAr" dir="rtl" rows="2" class="rounded-md border border-border-strong bg-surface px-3 py-2 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ restaurant.descriptionAr or '' }}</textarea>
@@ -55,14 +54,8 @@
       </div>
 
       <div class="mt-4 grid gap-4 sm:grid-cols-3">
-        <div class="flex flex-col gap-1.5">
-          <label for="branding-openTime" class="text-sm font-medium text-text">{{ labels.branding.openTimeLabel }}</label>
-          <input id="branding-openTime" name="openTime" type="time" dir="ltr" value="{{ restaurant.openTime or '' }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
-        </div>
-        <div class="flex flex-col gap-1.5">
-          <label for="branding-closeTime" class="text-sm font-medium text-text">{{ labels.branding.closeTimeLabel }}</label>
-          <input id="branding-closeTime" name="closeTime" type="time" dir="ltr" value="{{ restaurant.closeTime or '' }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
-        </div>
+        {{ input(name='openTime', label=labels.branding.openTimeLabel, type='time', value=restaurant.openTime or '', error=fieldErrors.openTime, dir='ltr', attrs='x-model="openTime"') }}
+        {{ input(name='closeTime', label=labels.branding.closeTimeLabel, type='time', value=restaurant.closeTime or '', error=fieldErrors.closeTime, dir='ltr', attrs='x-model="closeTime"') }}
         <div class="flex flex-col gap-1.5">
           <label for="branding-currency" class="text-sm font-medium text-text">{{ labels.branding.currencyLabel }}</label>
           <input id="branding-currency" name="currency" type="text" dir="ltr" maxlength="8" value="{{ restaurant.currency }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
@@ -92,7 +85,8 @@
               x-on:input="recomputeContrast()"
               maxlength="7"
               aria-label="{{ labels.branding.primaryColorLabel }}"
-              class="min-h-11 w-28 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              {% if fieldErrors.primaryColor %}aria-invalid="true" aria-describedby="field-primaryColor-error"{% endif %}
+              class="min-h-11 w-28 rounded-md border bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'border-danger' if fieldErrors.primaryColor else 'border-border-strong' }}"
             >
             <input type="hidden" name="primaryColor" x-bind:value="color">
             <button
@@ -101,6 +95,9 @@
               class="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-3 text-sm font-medium text-text transition-colors duration-fast ease-standard hover:bg-muted-surface active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >{{ labels.branding.resetColor }}</button>
           </div>
+          {% if fieldErrors.primaryColor %}
+            <p id="field-primaryColor-error" class="mt-1 text-sm text-danger">{{ fieldErrors.primaryColor }}</p>
+          {% endif %}
           <p class="mt-1 text-sm" x-show="contrast" x-bind:class="contrast && contrast.passes ? 'text-success' : 'text-danger'">
             <span x-text="contrast ? (contrast.passes ? passTemplate : failTemplate).replace('{ratio}', contrast.ratio.toFixed(2)) : ''"></span>
           </p>
@@ -124,7 +121,8 @@
               x-on:input="recomputeSecondaryContrast()"
               maxlength="7"
               aria-label="{{ labels.branding.secondaryColorLabel }}"
-              class="min-h-11 w-28 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              {% if fieldErrors.secondaryColor %}aria-invalid="true" aria-describedby="field-secondaryColor-error"{% endif %}
+              class="min-h-11 w-28 rounded-md border bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'border-danger' if fieldErrors.secondaryColor else 'border-border-strong' }}"
             >
             <input type="hidden" name="secondaryColor" x-bind:value="secondaryColor">
             <button
@@ -133,6 +131,9 @@
               class="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-3 text-sm font-medium text-text transition-colors duration-fast ease-standard hover:bg-muted-surface active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >{{ labels.branding.resetColor }}</button>
           </div>
+          {% if fieldErrors.secondaryColor %}
+            <p id="field-secondaryColor-error" class="mt-1 text-sm text-danger">{{ fieldErrors.secondaryColor }}</p>
+          {% endif %}
           <p class="mt-1 text-sm" x-show="secondaryContrast" x-bind:class="secondaryContrast && secondaryContrast.passes ? 'text-success' : 'text-danger'">
             <span x-text="secondaryContrast ? (secondaryContrast.passes ? passTemplate : failTemplate).replace('{ratio}', secondaryContrast.ratio.toFixed(2)) : ''"></span>
           </p>

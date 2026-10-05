@@ -1274,3 +1274,106 @@ What was built:
   -- fixed properly by wrapping the whole component in a server-side `{% if showTour %}` (see
   above), which is also strictly better than what was there before: a dismissed tour's markup no
   longer ships to the browser at all.
+
+## Phase 10: admin customization extensions + known-gaps closure (done)
+
+Two parts, same continuous session. First, more white-label/admin-UX work on top of Pack A's A4
+(branding) and the category/item reorder buttons: drag-and-drop reordering, a real live preview
+on the branding page, a new "corner style" customization, and a visual pass on buttons/choices.
+Second -- once asked whether to start a new feature pack or close out what was already on the
+books -- closing the two concrete items `docs/ux/audit.md` had explicitly deferred rather than
+fixed: P1-4's field-level inline validation (deferred from Phase 8 to "once A4's more complex
+forms actually need it," which they now do) and the P2 `item-detail-sheet.njk` image
+`width`/`height` attributes.
+
+### Admin customization extensions
+
+What was built:
+
+- **Drag-and-drop reorder**: `CategoryService.reorder`/`ItemService.reorder` (new, bulk
+  `sortOrder` rewrite in a transaction, silently dropping any id that doesn't belong to the
+  requesting restaurant/category rather than erroring -- the dragged list only ever came from
+  that restaurant's own render, so a mismatch only happens via a stale client or a tampered
+  request) plus `POST /admin/categories/reorder` and `POST /admin/categories/:id/items/reorder`.
+  `public/js/sortable-admin.js` wires SortableJS onto `[data-sortable]` containers via a drag
+  handle, debounced via `onEnd`'s index check; the existing keyboard-accessible up/down buttons
+  stay as-is, not replaced, since SortableJS has no keyboard path of its own.
+- **Live branding preview**: `views/admin/partials/branding-preview.njk` is an iPhone-style
+  frame around an `<iframe>` of the *real* `/m/:slug` page, not a hand-built mockup -- so it's
+  pixel-identical by construction. "Live" means the iframe's `src` carries the current, unsaved
+  form state as `preview*` query params (`MenuController.show`, debounced ~250ms), which
+  `MenuService.getMenu`'s new `MenuPreviewOverrides` only honors when the request's own session
+  `restaurantId` matches the restaurant being viewed -- without that check this would be a plain
+  unauthenticated reflected-input defacement vector on the public menu. A separate `embed=1`
+  param (unauthenticated, purely cosmetic) adds an `embed-frame` class that hides the iframe's
+  own scrollbar via `scrollbar-width`/`::-webkit-scrollbar` without touching `overflow`.
+- **Corner style** (new restaurant field, `rounded` | `sharp`, migration
+  `20261005103453_add_corner_style`): same "CSS custom-property override, scoped to one page
+  load" mechanism as `primaryColor`/`fontTheme`, overriding `--radius-sm/md/lg` so it reaches
+  every `rounded-sm/md/lg` class already in the public menu's markup for free.
+  `views/components/choice-card.njk` (new, built on the `has-[:checked]` CSS variant) replaces
+  plain radio+label rows for typeface/density/corner-style with card-style "swatch" choices --
+  the common theme-editor pattern (Shopify, Stripe dashboards), more scannable than a radio list
+  once a setting has more than one or two options.
+- **Layout/polish**: admin sidebar is now `sticky`; `views/components/button.njk` (shared
+  site-wide) gained shadows and a press animation; `layouts/admin.njk`'s `<main>` width became
+  an overridable `{% block mainWidth %}` (was hardcoded `max-w-3xl`, which squeezed the branding
+  page's new two-column form+preview layout into ~700px -- found from a user screenshot showing
+  a squashed form and a cut-off phone, not caught by automated checks since nothing here
+  regressed a test).
+
+### Known-gaps closure
+
+- **Field-level inline validation (A4's branding form).** `RestaurantService`'s color-validation
+  error codes are now field-specific (`INVALID_PRIMARY_COLOR` /
+  `PRIMARY_COLOR_CONTRAST_TOO_LOW` vs. the `SECONDARY_` equivalents -- previously one shared
+  `INVALID_COLOR`/`COLOR_CONTRAST_TOO_LOW` pair couldn't tell the controller which input was
+  actually wrong). `BrandingController.update` maps each code (plus the pre-existing
+  `OPEN_CLOSE_BOTH_REQUIRED` and a bare `nameAr`/`nameEn` required check) to a `fieldErrors: {
+  [name]: message }` object passed to the re-rendered form alongside the existing toast, not
+  instead of it. `views/components/input.njk` (previously only used by the login form) gained an
+  optional `dir` param so it could be reused for `nameAr`/`nameEn`/`openTime`/`closeTime` instead
+  of hand-rolling the same error-display markup a third time; the composite primary/secondary
+  color inputs (swatch + hex + reset button) keep their custom markup but get the same
+  `aria-invalid`/red-border/inline-message treatment by hand. `openTime`/`closeTime` and
+  `nameAr`/`nameEn` moved into the branding page's shared Alpine scope (`x-model`) so a rejected
+  save's typed-but-not-yet-saved value survives the htmx swap instead of snapping back to the
+  last-saved DB value right next to its own "required" error -- which would otherwise look
+  contradictory now that the field is visibly flagged.
+- **P2: `item-detail-sheet.njk` image `width`/`height`.** Added (`400`/`192`, matching the
+  `h-48 w-full` box the CSS already fixes) to match the letter of the Web Interface Guidelines
+  finding from the Phase 7 audit addendum -- confirmed inert for actual layout shift, since CSS
+  already reserves the exact box before the image loads either way, same conclusion the audit
+  itself reached.
+
+### Verified
+
+- `npx tsc --noEmit`, `npm run lint`, and a full production build all pass.
+- E2e: extended `test/branding.e2e-spec.ts` with 4 new cases -- a malformed primary-color hex
+  rejected distinctly from a too-light one (different toast text, same `fieldErrors.primaryColor`
+  anchor); a blank `nameEn` flags only `field-nameEn-error`, not `field-nameAr-error`; the
+  existing too-light-color and one-sided-hours cases now also assert the right (and only the
+  right) field's error anchor is present in the response HTML. 38 e2e tests total, all passing.
+- Interactive (Claude-in-Chrome): dragged a category and an item to confirm the new order
+  persists (then dragged back); toggled corner style live and confirmed `--radius-sm/md/lg`
+  actually change in the preview iframe's rendered HTML; typed an invalid hex into the primary
+  color field in the real browser UI and confirmed the inline "Enter a valid color." message
+  renders directly under the field (red border, same text as the toast), then fixed it and saved
+  to confirm the stale error clears.
+- Confirmed via `curl` (authenticated session) that `MenuPreviewOverrides` only applies when the
+  session's `restaurantId` matches the restaurant being viewed, and that `cornerStyleCss`'s
+  `--radius-*` overrides appear in the rendered `/m/:slug` HTML when requested.
+
+### Known gaps / follow-ups
+
+- The field-level error for primary/secondary color can go stale-but-not-wrong: if the admin
+  edits the color again after a failed save without re-submitting, the live client-side contrast
+  check (already existed, unchanged) updates immediately, but the static server-rendered error
+  paragraph only clears on the next save. Not a regression (same characteristic the plain
+  `nameAr`/`nameEn` required-error already had) and not confusing in practice since the two
+  messages never disagree, but worth a reactive dismiss (e.g. clearing `fieldErrors.primaryColor`
+  client-side on input) if this pattern gets reused for a form with more error-prone fields.
+- Pack B (a second feature pack, referenced in Phase 7's "Phases 7-11" framing alongside Pack A)
+  was deliberately not started this phase -- its scope was never written down in this repo (only
+  in whatever the original brief said), and the choice this phase was explicitly to close known
+  gaps instead of guessing at or re-deriving that scope.

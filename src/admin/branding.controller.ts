@@ -36,6 +36,7 @@ export class BrandingController {
     return {
       restaurant: toRestaurantSettingsView(restaurant),
       labels: buildAdminLabels(this.i18n, locale),
+      fieldErrors: {},
     };
   }
 
@@ -63,13 +64,19 @@ export class BrandingController {
   ) {
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
+    const requiredMessage = this.i18n.t('common.admin.form.required', { lang: locale });
 
-    if (!nameAr?.trim() || !nameEn?.trim()) {
-      triggerToast(res, this.i18n.t('common.admin.form.required', { lang: locale }), 'danger');
+    const fieldErrors: Record<string, string> = {};
+    if (!nameAr?.trim()) fieldErrors.nameAr = requiredMessage;
+    if (!nameEn?.trim()) fieldErrors.nameEn = requiredMessage;
+
+    if (Object.keys(fieldErrors).length > 0) {
+      triggerToast(res, requiredMessage, 'danger');
       const current = await this.restaurants.findById(restaurantId);
       return {
         restaurant: toRestaurantSettingsView(current),
         labels: buildAdminLabels(this.i18n, locale),
+        fieldErrors,
       };
     }
 
@@ -96,27 +103,58 @@ export class BrandingController {
       return {
         restaurant: toRestaurantSettingsView(restaurant),
         labels: buildAdminLabels(this.i18n, locale),
+        fieldErrors: {},
       };
     } catch (error) {
       const current = await this.restaurants.findById(restaurantId);
-      const message =
-        error instanceof BadRequestException && error.message === 'COLOR_CONTRAST_TOO_LOW'
-          ? this.i18n.t('common.admin.branding.colorContrastToast', { lang: locale })
-          : error instanceof BadRequestException && error.message === 'INVALID_COLOR'
-            ? this.i18n.t('common.admin.branding.invalidColorToast', { lang: locale })
-            : error instanceof BadRequestException && error.message === 'OPEN_CLOSE_BOTH_REQUIRED'
-              ? this.i18n.t('common.admin.branding.bothHoursRequiredToast', { lang: locale })
-              : error instanceof BadRequestException &&
-                  (error.message === 'INVALID_FONT_THEME' ||
-                    error.message === 'INVALID_MENU_DENSITY' ||
-                    error.message === 'INVALID_CORNER_STYLE')
-                ? this.i18n.t('common.admin.form.required', { lang: locale })
-                : null;
-      if (!message) throw error;
-      triggerToast(res, message, 'danger');
+      const code = error instanceof BadRequestException ? error.message : null;
+      // Maps each field-specific error code (see RestaurantService) to the
+      // one input it belongs to, so the form can point at exactly what's
+      // wrong instead of leaving the admin to guess from a toast alone --
+      // the P1-4 gap flagged in docs/ux/audit.md, deferred from Phase 8
+      // to here once a form with per-field rules (A4's colors/hours)
+      // actually needed it.
+      const t = (key: string): string => this.i18n.t(key, { lang: locale }) as string;
+      const errorFieldErrors: Record<string, string> = {};
+      let toastMessage: string | null = null;
+      switch (code) {
+        case 'PRIMARY_COLOR_CONTRAST_TOO_LOW':
+          toastMessage = t('common.admin.branding.colorContrastToast');
+          errorFieldErrors.primaryColor = toastMessage;
+          break;
+        case 'INVALID_PRIMARY_COLOR':
+          toastMessage = t('common.admin.branding.invalidColorToast');
+          errorFieldErrors.primaryColor = toastMessage;
+          break;
+        case 'SECONDARY_COLOR_CONTRAST_TOO_LOW':
+          toastMessage = t('common.admin.branding.colorContrastToast');
+          errorFieldErrors.secondaryColor = toastMessage;
+          break;
+        case 'INVALID_SECONDARY_COLOR':
+          toastMessage = t('common.admin.branding.invalidColorToast');
+          errorFieldErrors.secondaryColor = toastMessage;
+          break;
+        case 'OPEN_CLOSE_BOTH_REQUIRED':
+          toastMessage = t('common.admin.branding.bothHoursRequiredToast');
+          // Whichever one the admin left blank is the field to flag --
+          // the other one (the one they did fill in) isn't the problem.
+          errorFieldErrors[openTime?.trim() ? 'closeTime' : 'openTime'] = requiredMessage;
+          break;
+        case 'INVALID_FONT_THEME':
+        case 'INVALID_MENU_DENSITY':
+        case 'INVALID_CORNER_STYLE':
+          // Only reachable via a tampered request (the form only ever
+          // submits one of the two radio values per group) -- a toast is
+          // enough, no specific input to point at.
+          toastMessage = requiredMessage;
+          break;
+      }
+      if (!toastMessage) throw error;
+      triggerToast(res, toastMessage, 'danger');
       return {
         restaurant: toRestaurantSettingsView(current),
         labels: buildAdminLabels(this.i18n, locale),
+        fieldErrors: errorFieldErrors,
       };
     }
   }

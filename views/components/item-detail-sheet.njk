@@ -92,10 +92,19 @@
       <template x-if="item">
         <div>
           <div class="relative">
+            {#
+              width/height are inert for layout here (h-48 + w-full already
+              fix both box dimensions via CSS, so there's no CLS to
+              prevent either way) -- added only to match the letter of the
+              image-dimensions guideline flagged as a P2 in the Phase 7
+              audit (docs/ux/audit.md), not because it changes behavior.
+            #}
             <img
               x-show="item.imageUrl"
               x-bind:src="item.imageUrl"
               alt=""
+              width="400"
+              height="192"
               class="h-48 w-full object-cover"
             >
             <button
