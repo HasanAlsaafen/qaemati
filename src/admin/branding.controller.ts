@@ -59,6 +59,9 @@ export class BrandingController {
     @Body('fontTheme') fontTheme: string,
     @Body('menuDensity') menuDensity: string,
     @Body('cornerStyle') cornerStyle: string,
+    @Body('backgroundColor') backgroundColor: string,
+    @Body('cardStyle') cardStyle: string,
+    @Body('buttonShape') buttonShape: string,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
@@ -98,6 +101,9 @@ export class BrandingController {
         fontTheme: fontTheme?.trim(),
         menuDensity: menuDensity?.trim(),
         cornerStyle: cornerStyle?.trim(),
+        backgroundColor: backgroundColor?.trim() || null,
+        cardStyle: cardStyle?.trim(),
+        buttonShape: buttonShape?.trim(),
       });
       triggerToast(res, this.i18n.t('common.admin.branding.savedToast', { lang: locale }));
       return {
@@ -134,6 +140,14 @@ export class BrandingController {
           toastMessage = t('common.admin.branding.invalidColorToast');
           errorFieldErrors.secondaryColor = toastMessage;
           break;
+        case 'BACKGROUND_COLOR_CONTRAST_TOO_LOW':
+          toastMessage = t('common.admin.branding.backgroundColorContrastToast');
+          errorFieldErrors.backgroundColor = toastMessage;
+          break;
+        case 'INVALID_BACKGROUND_COLOR':
+          toastMessage = t('common.admin.branding.invalidColorToast');
+          errorFieldErrors.backgroundColor = toastMessage;
+          break;
         case 'OPEN_CLOSE_BOTH_REQUIRED':
           toastMessage = t('common.admin.branding.bothHoursRequiredToast');
           // Whichever one the admin left blank is the field to flag --
@@ -143,6 +157,8 @@ export class BrandingController {
         case 'INVALID_FONT_THEME':
         case 'INVALID_MENU_DENSITY':
         case 'INVALID_CORNER_STYLE':
+        case 'INVALID_CARD_STYLE':
+        case 'INVALID_BUTTON_SHAPE':
           // Only reachable via a tampered request (the form only ever
           // submits one of the two radio values per group) -- a toast is
           // enough, no specific input to point at.

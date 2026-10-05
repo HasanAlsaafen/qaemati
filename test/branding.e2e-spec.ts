@@ -166,6 +166,63 @@ describe('Branding settings (e2e)', () => {
     expect(res.text).toContain('--color-primary: 30 95 116');
   });
 
+  it('saves a background color, card style, and button shape, applied to the public menu', async () => {
+    const token = await csrfToken('/admin/branding?lang=en');
+    const res = await agent
+      .patch('/admin/branding')
+      .set('X-CSRF-Token', token)
+      .set('Cookie', 'qaemati_locale=en')
+      .type('form')
+      .send({
+        nameAr: 'مطعم تجريبي محدث',
+        nameEn: 'Updated Test Restaurant',
+        currency: 'JOD',
+        backgroundColor: '#F0F0F0',
+        cardStyle: 'raised',
+        buttonShape: 'pill',
+      });
+
+    expect(res.status).toBe(200);
+    const { toast } = JSON.parse(res.headers['hx-trigger']);
+    expect(decodeURIComponent(toast.message)).toBe('Branding saved');
+
+    const restaurant = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+    expect(restaurant?.backgroundColor).toBe('#F0F0F0');
+    expect(restaurant?.cardStyle).toBe('raised');
+    expect(restaurant?.buttonShape).toBe('pill');
+
+    const menuRes = await request(app.getHttpServer()).get(`/m/test-restaurant-branding?lang=en`);
+    expect(menuRes.status).toBe(200);
+    // #F0F0F0 -> "240 240 240"
+    expect(menuRes.text).toContain('--color-bg: 240 240 240');
+    expect(menuRes.text).toContain('--radius-button: 9999px');
+    expect(menuRes.text).toContain('data-card-style="raised"');
+  });
+
+  it('rejects a background color too dark for the fixed body text', async () => {
+    const token = await csrfToken('/admin/branding?lang=en');
+    const res = await agent
+      .patch('/admin/branding')
+      .set('X-CSRF-Token', token)
+      .set('Cookie', 'qaemati_locale=en')
+      .type('form')
+      .send({
+        nameAr: 'مطعم تجريبي محدث',
+        nameEn: 'Updated Test Restaurant',
+        currency: 'JOD',
+        backgroundColor: '#2B2622',
+      });
+
+    expect(res.status).toBe(200);
+    const { toast } = JSON.parse(res.headers['hx-trigger']);
+    expect(toast.variant).toBe('danger');
+    expect(res.text).toContain('field-backgroundColor-error');
+
+    // The rejected background must not overwrite the valid one saved above.
+    const restaurant = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+    expect(restaurant?.backgroundColor).toBe('#F0F0F0');
+  });
+
   it('rejects a non-image file upload for the logo', async () => {
     const token = await csrfToken('/admin/branding?lang=en');
     const res = await agent

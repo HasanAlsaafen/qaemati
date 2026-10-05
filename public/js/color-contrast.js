@@ -66,4 +66,16 @@
     const ratio = contrastRatio(text, soft);
     return { ratio: ratio, passes: ratio >= 4.5 };
   };
+
+  // Mirrors src/common/color.ts's DEFAULT_TEXT/meetsBackgroundContrast --
+  // the app's body text color is fixed (never customizable), so a chosen
+  // background only has to stay readable against this one known value.
+  var DEFAULT_TEXT = { r: 43, g: 38, b: 34 };
+
+  window.checkBackgroundColorContrast = function (hex) {
+    const rgb = hexToRgb(hex);
+    if (!rgb) return null;
+    const ratio = contrastRatio(rgb, DEFAULT_TEXT);
+    return { ratio: ratio, passes: ratio >= 4.5 };
+  };
 })();

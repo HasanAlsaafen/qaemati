@@ -112,3 +112,14 @@ export function meetsSecondaryColorContrast(rgb: Rgb): boolean {
   const { secondaryText, secondarySoft } = toSecondaryPalette(rgb);
   return contrastRatio(secondaryText, secondarySoft) >= 4.5;
 }
+
+/** tokens.css's fixed --color-text -- never itself customizable, so a
+ *  restaurant-chosen background only has to stay readable against this
+ *  one known value, not a second moving target. */
+export const DEFAULT_TEXT: Rgb = { r: 43, g: 38, b: 34 };
+
+/** A restaurant's chosen page background must still read clearly under
+ *  the app's fixed body text color. */
+export function meetsBackgroundContrast(rgb: Rgb): boolean {
+  return contrastRatio(rgb, DEFAULT_TEXT) >= 4.5;
+}

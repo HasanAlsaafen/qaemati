@@ -139,6 +139,42 @@
           </p>
           <p class="mt-1 text-sm text-muted-text">{{ labels.branding.secondaryColorHint }}</p>
         </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="branding-backgroundColor" class="text-sm font-medium text-text">{{ labels.branding.backgroundColorLabel }}</label>
+          <div class="flex items-center gap-2">
+            <input
+              id="branding-backgroundColor"
+              type="color"
+              x-model="backgroundColor"
+              x-on:input="backgroundColorErrorDismissed = true; recomputeBackgroundContrast()"
+              class="h-11 w-14 cursor-pointer rounded-md border border-border-strong bg-surface"
+            >
+            <input
+              type="text"
+              dir="ltr"
+              x-model="backgroundColor"
+              x-on:input="backgroundColorErrorDismissed = true; recomputeBackgroundContrast()"
+              maxlength="7"
+              aria-label="{{ labels.branding.backgroundColorLabel }}"
+              {% if fieldErrors.backgroundColor %}aria-invalid="true" aria-describedby="field-backgroundColor-error"{% endif %}
+              class="min-h-11 w-28 rounded-md border bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'border-danger' if fieldErrors.backgroundColor else 'border-border-strong' }}"
+            >
+            <input type="hidden" name="backgroundColor" x-bind:value="backgroundColor">
+            <button
+              type="button"
+              x-on:click="backgroundColor = defaultBackgroundColor; backgroundColorErrorDismissed = true; recomputeBackgroundContrast()"
+              class="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-3 text-sm font-medium text-text transition-colors duration-fast ease-standard hover:bg-muted-surface active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >{{ labels.branding.resetColor }}</button>
+          </div>
+          {% if fieldErrors.backgroundColor %}
+            <p id="field-backgroundColor-error" class="mt-1 text-sm text-danger" x-show="!backgroundColorErrorDismissed">{{ fieldErrors.backgroundColor }}</p>
+          {% endif %}
+          <p class="mt-1 text-sm" x-show="backgroundContrast" x-bind:class="backgroundContrast && backgroundContrast.passes ? 'text-success' : 'text-danger'">
+            <span x-text="backgroundContrast ? (backgroundContrast.passes ? passTemplate : failTemplate).replace('{ratio}', backgroundContrast.ratio.toFixed(2)) : ''"></span>
+          </p>
+          <p class="mt-1 text-sm text-muted-text">{{ labels.branding.backgroundColorHint }}</p>
+        </div>
       </div>
 
       <div class="mt-6 flex flex-col gap-5">
@@ -163,6 +199,22 @@
           <div class="grid max-w-sm grid-cols-2 gap-2">
             {{ choiceCard('cornerStyle', 'rounded', labels.branding.cornerStyleRounded, restaurant.cornerStyle != 'sharp', 'x-model="cornerStyle" x-on:change="schedulePreview()"') }}
             {{ choiceCard('cornerStyle', 'sharp', labels.branding.cornerStyleSharp, restaurant.cornerStyle == 'sharp', 'x-model="cornerStyle" x-on:change="schedulePreview()"') }}
+          </div>
+        </fieldset>
+
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text">{{ labels.branding.cardStyleLabel }}</legend>
+          <div class="grid max-w-sm grid-cols-2 gap-2">
+            {{ choiceCard('cardStyle', 'flat', labels.branding.cardStyleFlat, restaurant.cardStyle != 'raised', 'x-model="cardStyle" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('cardStyle', 'raised', labels.branding.cardStyleRaised, restaurant.cardStyle == 'raised', 'x-model="cardStyle" x-on:change="schedulePreview()"') }}
+          </div>
+        </fieldset>
+
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text">{{ labels.branding.buttonShapeLabel }}</legend>
+          <div class="grid max-w-sm grid-cols-2 gap-2">
+            {{ choiceCard('buttonShape', 'rounded', labels.branding.buttonShapeRounded, restaurant.buttonShape != 'pill', 'x-model="buttonShape" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('buttonShape', 'pill', labels.branding.buttonShapePill, restaurant.buttonShape == 'pill', 'x-model="buttonShape" x-on:change="schedulePreview()"') }}
           </div>
         </fieldset>
       </div>

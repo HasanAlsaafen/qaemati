@@ -52,6 +52,7 @@ module.exports = {
         sm: 'var(--radius-sm)',
         md: 'var(--radius-md)',
         lg: 'var(--radius-lg)',
+        button: 'var(--radius-button)',
       },
       boxShadow: {
         raised: 'var(--shadow-raised)',

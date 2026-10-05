@@ -1,10 +1,17 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { hexToRgb, meetsPrimaryColorContrast, meetsSecondaryColorContrast } from '../common/color';
+import {
+  hexToRgb,
+  meetsBackgroundContrast,
+  meetsPrimaryColorContrast,
+  meetsSecondaryColorContrast,
+} from '../common/color';
 
 const FONT_THEMES = new Set(['classic', 'modern']);
 const MENU_DENSITIES = new Set(['comfortable', 'compact']);
 const CORNER_STYLES = new Set(['rounded', 'sharp']);
+const CARD_STYLES = new Set(['flat', 'raised']);
+const BUTTON_SHAPES = new Set(['rounded', 'pill']);
 
 export interface RestaurantDetailsInput {
   nameAr: string;
@@ -24,6 +31,10 @@ export interface RestaurantDetailsInput {
   fontTheme?: string;
   menuDensity?: string;
   cornerStyle?: string;
+  /** Null clears back to the default Zaytoun cream. */
+  backgroundColor?: string | null;
+  cardStyle?: string;
+  buttonShape?: string;
 }
 
 @Injectable()
@@ -64,6 +75,19 @@ export class RestaurantService {
       'rounded',
       'INVALID_CORNER_STYLE',
     );
+    const backgroundColor = this.validateBackgroundColor(input.backgroundColor);
+    const cardStyle = this.validateChoice(
+      input.cardStyle,
+      CARD_STYLES,
+      'flat',
+      'INVALID_CARD_STYLE',
+    );
+    const buttonShape = this.validateChoice(
+      input.buttonShape,
+      BUTTON_SHAPES,
+      'rounded',
+      'INVALID_BUTTON_SHAPE',
+    );
 
     return this.prisma.restaurant.update({
       where: { id: restaurantId },
@@ -84,6 +108,9 @@ export class RestaurantService {
         fontTheme,
         menuDensity,
         cornerStyle,
+        backgroundColor,
+        cardStyle,
+        buttonShape,
       },
     });
   }
@@ -105,11 +132,10 @@ export class RestaurantService {
    *  blocks submission for a failing color -- the form can be bypassed
    *  (curl, a modified request), and a bad primary color isn't just a
    *  cosmetic nit, it would make every button/badge label unreadable
-   *  for every diner on the public menu. */
-  /** Error codes name the field (INVALID_PRIMARY_COLOR, not INVALID_COLOR)
-   *  so BrandingController can attach the message to the one input that's
-   *  actually wrong instead of a form-wide toast -- see its fieldErrors
-   *  mapping. */
+   *  for every diner on the public menu. Error codes name the field
+   *  (INVALID_PRIMARY_COLOR, not INVALID_COLOR) so BrandingController
+   *  can attach the message to the one input that's actually wrong
+   *  instead of a form-wide toast -- see its fieldErrors mapping. */
   private validatePrimaryColor(input: string | null | undefined): string | null {
     if (!input) return null;
     const rgb = hexToRgb(input);
@@ -126,6 +152,16 @@ export class RestaurantService {
     if (!rgb) throw new BadRequestException('INVALID_SECONDARY_COLOR');
     if (!meetsSecondaryColorContrast(rgb)) {
       throw new BadRequestException('SECONDARY_COLOR_CONTRAST_TOO_LOW');
+    }
+    return input.startsWith('#') ? input : `#${input}`;
+  }
+
+  private validateBackgroundColor(input: string | null | undefined): string | null {
+    if (!input) return null;
+    const rgb = hexToRgb(input);
+    if (!rgb) throw new BadRequestException('INVALID_BACKGROUND_COLOR');
+    if (!meetsBackgroundContrast(rgb)) {
+      throw new BadRequestException('BACKGROUND_COLOR_CONTRAST_TOO_LOW');
     }
     return input.startsWith('#') ? input : `#${input}`;
   }

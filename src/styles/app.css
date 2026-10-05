@@ -47,6 +47,16 @@ body[data-menu-density='compact'] .menu-item-card__description {
 }
 
 /*
+  Admin customization: cardStyle (views/layouts/menu.njk sets
+  data-card-style on <body>). "flat" (the default) is the original
+  border-only card, left untouched here; "raised" layers --shadow-raised
+  on top of that same border rather than replacing it.
+*/
+body[data-card-style='raised'] .menu-item-card {
+  box-shadow: var(--shadow-raised);
+}
+
+/*
   Branding page live preview (views/admin/partials/branding-preview.njk):
   the iframe carries ?embed=1, which menu.controller.ts turns into this
   class. Hides the scrollbar chrome so the phone-frame mockup doesn't

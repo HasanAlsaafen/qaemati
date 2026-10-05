@@ -3,6 +3,7 @@ import {
   darken,
   hexToRgb,
   lighten,
+  meetsBackgroundContrast,
   meetsPrimaryColorContrast,
   meetsSecondaryColorContrast,
   relativeLuminance,
@@ -119,5 +120,19 @@ describe('toSecondaryPalette / meetsSecondaryColorContrast', () => {
 
   it('rejects a color too close to white to produce a readable text/soft pair', () => {
     expect(meetsSecondaryColorContrast(hexToRgb('#FDF6EF')!)).toBe(false);
+  });
+});
+
+describe('meetsBackgroundContrast', () => {
+  it('accepts the existing Zaytoun background', () => {
+    expect(meetsBackgroundContrast(hexToRgb('#FAF6EF')!)).toBe(true);
+  });
+
+  it('accepts white', () => {
+    expect(meetsBackgroundContrast(WHITE)).toBe(true);
+  });
+
+  it('rejects a dark background that the fixed dark body text would disappear into', () => {
+    expect(meetsBackgroundContrast(hexToRgb('#2B2622')!)).toBe(false);
   });
 });

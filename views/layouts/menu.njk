@@ -18,7 +18,7 @@
      tokens (src/styles/tokens.css) for this page only -- scoped here
      via inline :root, not by editing the shared stylesheet, so every
      other restaurant's menu keeps the default palette. #}
-  {% if menu.primaryColorCss or menu.secondaryColorCss or menu.fontTheme == 'modern' or menu.cornerStyleCss %}
+  {% if menu.primaryColorCss or menu.secondaryColorCss or menu.fontTheme == 'modern' or menu.cornerStyleCss or menu.backgroundColorCss or menu.buttonShapeCss %}
     <style>
       :root {
         {% if menu.primaryColorCss %}
@@ -46,11 +46,17 @@
         --radius-md: {{ menu.cornerStyleCss.radiusMd }};
         --radius-lg: {{ menu.cornerStyleCss.radiusLg }};
         {% endif %}
+        {% if menu.backgroundColorCss %}
+        --color-bg: {{ menu.backgroundColorCss }};
+        {% endif %}
+        {% if menu.buttonShapeCss %}
+        --radius-button: {{ menu.buttonShapeCss.radiusButton }};
+        {% endif %}
       }
     </style>
   {% endif %}
 </head>
-<body class="min-h-screen bg-bg text-text font-sans antialiased {{ 'embed-frame' if embed }}" data-restaurant-slug="{{ menu.slug }}" data-menu-density="{{ menu.menuDensity }}">
+<body class="min-h-screen bg-bg text-text font-sans antialiased {{ 'embed-frame' if embed }}" data-restaurant-slug="{{ menu.slug }}" data-menu-density="{{ menu.menuDensity }}" data-card-style="{{ menu.cardStyle }}">
   {% block content %}{% endblock %}
 
   {{ toastHost() }}

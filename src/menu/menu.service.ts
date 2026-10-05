@@ -93,6 +93,17 @@ export interface MenuView {
    *  src/styles/tokens.css, same "null means default" convention as
    *  primaryColorCss/secondaryColorCss. See Restaurant.cornerStyle. */
   cornerStyleCss: { radiusSm: string; radiusMd: string; radiusLg: string } | null;
+  /** "R G B" triplet overriding --color-bg -- null means the default
+   *  Zaytoun cream, same convention as primaryColorCss. See
+   *  Restaurant.backgroundColor. */
+  backgroundColorCss: string | null;
+  /** Admin customization: 'flat' | 'raised' -- see Restaurant.cardStyle. */
+  cardStyle: string;
+  /** Overrides --radius-button to a full pill for 'pill' -- null (the
+   *  default) leaves it following --radius-md (and therefore
+   *  cornerStyleCss too, see tokens.css) for 'rounded'. See
+   *  Restaurant.buttonShape. */
+  buttonShapeCss: { radiusButton: string } | null;
 }
 
 /**
@@ -114,6 +125,9 @@ export interface MenuPreviewOverrides {
   fontTheme?: string;
   menuDensity?: string;
   cornerStyle?: string;
+  backgroundColor?: string;
+  cardStyle?: string;
+  buttonShape?: string;
 }
 
 @Injectable()
@@ -160,6 +174,14 @@ export class MenuService {
       isPreviewOwner && preview!.menuDensity ? preview!.menuDensity : restaurant.menuDensity;
     const effectiveCornerStyle =
       isPreviewOwner && preview!.cornerStyle ? preview!.cornerStyle : restaurant.cornerStyle;
+    const effectiveBackgroundColor =
+      isPreviewOwner && preview!.backgroundColor
+        ? preview!.backgroundColor
+        : restaurant.backgroundColor;
+    const effectiveCardStyle =
+      isPreviewOwner && preview!.cardStyle ? preview!.cardStyle : restaurant.cardStyle;
+    const effectiveButtonShape =
+      isPreviewOwner && preview!.buttonShape ? preview!.buttonShape : restaurant.buttonShape;
 
     const pick = (ar: string, en: string) => (locale === 'ar' ? ar : en);
     const pickNullable = (ar: string | null, en: string | null) => (locale === 'ar' ? ar : en);
@@ -269,6 +291,9 @@ export class MenuService {
       fontTheme: effectiveFontTheme,
       menuDensity: effectiveMenuDensity,
       cornerStyleCss: toCornerStyleCss(effectiveCornerStyle),
+      backgroundColorCss: toBackgroundColorCss(effectiveBackgroundColor),
+      cardStyle: effectiveCardStyle,
+      buttonShapeCss: toButtonShapeCss(effectiveButtonShape),
     };
   }
 }
@@ -322,4 +347,20 @@ function toCornerStyleCss(
 ): { radiusSm: string; radiusMd: string; radiusLg: string } | null {
   if (cornerStyle !== 'sharp') return null;
   return { radiusSm: '2px', radiusMd: '4px', radiusLg: '6px' };
+}
+
+function toBackgroundColorCss(backgroundColor: string | null): string | null {
+  if (!backgroundColor) return null;
+  const rgb = hexToRgb(backgroundColor);
+  if (!rgb) return null;
+  return rgbToTriplet(rgb);
+}
+
+/** 'pill' overrides --radius-button to a full pill; 'rounded' (and
+ *  anything else) returns null so the button stays on tokens.css's
+ *  default `--radius-button: var(--radius-md)` chain -- which already
+ *  tracks cornerStyleCss's own --radius-md override when set. */
+function toButtonShapeCss(buttonShape: string): { radiusButton: string } | null {
+  if (buttonShape !== 'pill') return null;
+  return { radiusButton: '9999px' };
 }

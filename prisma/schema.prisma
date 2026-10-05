@@ -66,6 +66,26 @@ model Restaurant {
   /// touching any of that markup.
   cornerStyle String @default("rounded")
 
+  /// Admin customization: overrides --color-bg (the page background)
+  /// -- null means the default Zaytoun cream. Unlike primary/secondary,
+  /// there's no derived hover/soft palette, just the one swap; validated
+  /// against the fixed (non-customizable) --color-text so body copy
+  /// stays readable, same AA bar as the other color fields.
+  backgroundColor String?
+
+  /// Admin customization: 'flat' (the original border-only card, no
+  /// shadow) or 'raised' (adds --shadow-raised on top of the same
+  /// border) on the public menu's item cards.
+  cardStyle String @default("flat")
+
+  /// Admin customization: 'rounded' (follows cornerStyle's
+  /// --radius-md, the original look) or 'pill' (fully rounded,
+  /// independent of cornerStyle) for the menu's CTA-style buttons
+  /// (WhatsApp/Instagram links, the selection sheet's send/cancel
+  /// buttons) -- not the circular icon buttons or the already-pill
+  /// floating selection bar, which stay as they are regardless.
+  buttonShape String @default("rounded")
+
   /// A4: the default currency new items are created with (restaurant-
   /// level, not per-item -- each Item still stores its own `currency`
   /// so a restaurant could in principle mix currencies, but the admin

@@ -211,6 +211,15 @@
       "cornerStyleLabel": "نمط الزوايا",
       "cornerStyleRounded": "مدورة",
       "cornerStyleSharp": "حادة",
+      "backgroundColorLabel": "لون الخلفية",
+      "backgroundColorHint": "خلفية الصفحة خلف كل شيء آخر. يجب أن تبقى واضحة مع نص القائمة.",
+      "backgroundColorContrastToast": "هذه الخلفية داكنة جدًا ليبقى نص القائمة واضحًا عليها. اختر درجة أفتح.",
+      "cardStyleLabel": "نمط بطاقة الصنف",
+      "cardStyleFlat": "مسطحة",
+      "cardStyleRaised": "بارزة",
+      "buttonShapeLabel": "شكل الأزرار",
+      "buttonShapeRounded": "مدور",
+      "buttonShapePill": "كبسولي",
       "previewFrameLabel": "معاينة مباشرة"
     },
     "tour": {

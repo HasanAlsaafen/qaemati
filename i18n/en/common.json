@@ -211,6 +211,15 @@
       "cornerStyleLabel": "Corner style",
       "cornerStyleRounded": "Rounded",
       "cornerStyleSharp": "Sharp",
+      "backgroundColorLabel": "Background color",
+      "backgroundColorHint": "The page background behind everything else. Must stay readable with the menu's text.",
+      "backgroundColorContrastToast": "That background is too dark for the menu's text to stay readable. Pick a lighter shade.",
+      "cardStyleLabel": "Item card style",
+      "cardStyleFlat": "Flat",
+      "cardStyleRaised": "Raised",
+      "buttonShapeLabel": "Button shape",
+      "buttonShapeRounded": "Rounded",
+      "buttonShapePill": "Pill",
       "previewFrameLabel": "Live preview"
     },
     "tour": {

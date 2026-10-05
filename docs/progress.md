@@ -1378,3 +1378,57 @@ the field again instead of waiting for the next save round-trip.
   was deliberately not started this phase -- its scope was never written down in this repo (only
   in whatever the original brief said), and the choice this phase was explicitly to close known
   gaps instead of guessing at or re-deriving that scope.
+
+## Phase 11: item photo UX + a deeper theme editor (done)
+
+Requested directly (not from the audit backlog): item photos needed to be easier to manage, and
+the admin needed more control over the public menu's look than color/font/density/corner-style
+already gave. Asked first which specific gaps to close rather than guessing -- the answer was
+"surface the upload control outside edit mode" (not multiple photos) and "a fuller theme editor:
+colors, spacing, shadows, button shape" (not per-category colors or a layout/section editor).
+
+### What was built
+
+- **Item photo upload, redesigned.** The 56px thumbnail in `item-row.njk` is now itself the
+  upload control (a `<label>` wrapping a hidden file input) instead of a separate file input
+  shown only in edit mode -- tapping the thumbnail opens the file picker directly, with an
+  always-visible camera badge in the corner (not a hover reveal, which a phone-first admin would
+  never discover) and a plain image-outline placeholder instead of a blank box when empty. The
+  old edit-mode-only upload control was removed as redundant.
+- **Three new restaurant-level theme fields** (migration `20261005111847_add_theme_editor_fields`),
+  following the exact pattern primaryColor/fontTheme/cornerStyle already established (validated
+  service-side, overridden as scoped `:root` CSS custom properties on the public menu only, wired
+  through the branding live preview's debounced query params):
+  - **`backgroundColor`** (nullable hex) overrides `--color-bg`. New `meetsBackgroundContrast` in
+    `src/common/color.ts` checks it against `DEFAULT_TEXT` (tokens.css's fixed, non-customizable
+    `--color-text`) at the same 4.5:1 AA bar the other color fields use -- there's only one text
+    color to stay readable against here, not a derived palette.
+  - **`cardStyle`** (`flat` | `raised`) toggles `--shadow-raised` on `.menu-item-card` via the
+    same `body[data-X]` CSS-attribute pattern `menuDensity` already uses.
+  - **`buttonShape`** (`rounded` | `pill`) overrides a new `--radius-button` token (default
+    `var(--radius-md)`, so it already tracks a `sharp` cornerStyle for free) consumed by the
+    menu's CTA-style buttons specifically -- the WhatsApp/Instagram links
+    (`restaurant-header.njk`) and the selection sheet's send/cancel buttons (`selection-bar.njk`).
+    Deliberately **not** applied to icon-only circular buttons or the already-pill floating
+    selection bar, which aren't "buttons" in the sense this setting means.
+- **Admin UI**: a background-color picker (same swatch+hex+reset+live-contrast pattern as
+  primary/secondary, including the same field-level error treatment from Phase 10) and two more
+  `choice-card.njk` groups (card style, button shape) alongside the existing three.
+
+### Verified
+
+- Unit: 3 new `meetsBackgroundContrast` cases (the Zaytoun default, white, and a dark background
+  the fixed body text would disappear into) -- 72 unit tests total.
+- E2e: `test/branding.e2e-spec.ts` gained 2 cases -- saving backgroundColor/cardStyle/buttonShape
+  and confirming all three appear correctly in the public menu's rendered HTML
+  (`--color-bg`, `--radius-button: 9999px`, `data-card-style="raised"`), and a too-dark background
+  rejected with a field-level error that doesn't overwrite the previously-saved valid one. 40 e2e
+  tests total.
+- Interactive (Claude-in-Chrome): confirmed the new camera-badge thumbnail is clickable outside
+  edit mode on the real dashboard; toggled card style and button shape live in the branding
+  preview and confirmed (zoomed screenshots) the WhatsApp/Instagram buttons actually went pill-
+  shaped and the item card actually gained a visible shadow; caught and corrected an accidental
+  misclick during this same pass (a coordinate drifted after the page reflowed from an earlier
+  click, briefly setting an unintended accent/background color) before saving over it.
+- `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
+  pass. Migration applied to both the dev and test databases.

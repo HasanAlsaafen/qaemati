@@ -38,9 +38,15 @@
     // touched the field the static one is redundant, not just stale.
     primaryColorErrorDismissed: false,
     secondaryColorErrorDismissed: false,
+    backgroundColorErrorDismissed: false,
+    backgroundColor: {{ (restaurant.backgroundColor or '#FAF6EF') | dump }},
+    defaultBackgroundColor: '#FAF6EF',
+    backgroundContrast: null,
     fontTheme: {{ (restaurant.fontTheme or 'classic') | dump }},
     menuDensity: {{ (restaurant.menuDensity or 'comfortable') | dump }},
     cornerStyle: {{ (restaurant.cornerStyle or 'rounded') | dump }},
+    cardStyle: {{ (restaurant.cardStyle or 'flat') | dump }},
+    buttonShape: {{ (restaurant.buttonShape or 'rounded') | dump }},
     nameAr: {{ restaurant.nameAr | dump }},
     nameEn: {{ restaurant.nameEn | dump }},
     openTime: {{ (restaurant.openTime or '') | dump }},
@@ -57,6 +63,10 @@
     },
     recomputeSecondaryContrast() {
       this.secondaryContrast = window.checkSecondaryColorContrast ? window.checkSecondaryColorContrast(this.secondaryColor) : null;
+      this.schedulePreview();
+    },
+    recomputeBackgroundContrast() {
+      this.backgroundContrast = window.checkBackgroundColorContrast ? window.checkBackgroundColorContrast(this.backgroundColor) : null;
       this.schedulePreview();
     },
     // The preview is an iframe of the real /m/:slug route (see
@@ -78,11 +88,14 @@
         previewFontTheme: this.fontTheme,
         previewMenuDensity: this.menuDensity,
         previewCornerStyle: this.cornerStyle,
+        previewBackgroundColor: this.backgroundColor,
+        previewCardStyle: this.cardStyle,
+        previewButtonShape: this.buttonShape,
       });
       this.previewUrl = '/m/' + this.slug + '?' + params.toString();
     },
   }"
-  x-init="recomputeContrast(); recomputeSecondaryContrast(); updatePreviewUrl()"
+  x-init="recomputeContrast(); recomputeSecondaryContrast(); recomputeBackgroundContrast(); updatePreviewUrl()"
 >
   <div class="flex min-w-0 flex-col gap-6">
     {% include "admin/partials/branding-images.njk" %}

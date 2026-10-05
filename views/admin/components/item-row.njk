@@ -35,11 +35,45 @@
         >
           <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="5" cy="4" r="1.3"/><circle cx="11" cy="4" r="1.3"/><circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/><circle cx="5" cy="12" r="1.3"/><circle cx="11" cy="12" r="1.3"/></svg>
         </span>
-        <span class="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-muted-surface">
+        {#
+          The whole thumbnail is the upload control (a label wrapping a
+          hidden file input), not just something shown inside edit mode --
+          clicking/tapping it opens the file picker directly, and the
+          corner camera badge is an always-visible affordance (not a
+          hover reveal, which phone-first admins would never discover).
+          An empty item starts with a plain image-outline icon instead of
+          a blank box, so "no photo yet" reads as a deliberate empty
+          state rather than a broken image.
+        #}
+        <label
+          for="item-{{ item.id }}-image-input"
+          class="relative block h-14 w-14 shrink-0 cursor-pointer overflow-hidden rounded-md bg-muted-surface focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary"
+          title="{{ labels.form.image }}"
+        >
           {% if item.imagePath %}
             <img src="{{ item.imagePath }}" alt="" width="56" height="56" class="h-full w-full object-cover">
+          {% else %}
+            <span class="flex h-full w-full items-center justify-center text-muted-text" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.3"/><path d="M21 16l-5.5-5.5-3 3-2.5-2.5L4 16.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
           {% endif %}
-        </span>
+          <span class="absolute bottom-0 end-0 inline-flex h-5 w-5 items-center justify-center rounded-ss-md bg-text/70 text-surface" aria-hidden="true">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7h3l2-2h6l2 2h3v12H4V7Z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="2.8"/></svg>
+          </span>
+          <span class="sr-only">{{ labels.form.image }}</span>
+          <input
+            id="item-{{ item.id }}-image-input"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            name="image"
+            class="sr-only"
+            hx-post="/admin/items/{{ item.id }}/image"
+            hx-trigger="change"
+            hx-target="#item-{{ item.id }}"
+            hx-swap="outerHTML"
+            hx-encoding="multipart/form-data"
+          >
+        </label>
 
         <div class="min-w-0 flex-1">
           <p class="break-words text-sm font-bold text-text" dir="ltr">{{ item.nameEn }}</p>
@@ -168,20 +202,5 @@
         {{ button(labels.form.cancel, 'ghost', 'sm', 'button', 'x-on:click="editing = false"') }}
       </div>
     </form>
-
-    <div x-show="editing" x-cloak class="mt-2">
-      <label class="text-sm font-medium text-text">{{ labels.form.image }}</label>
-      <input
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        name="image"
-        class="mt-1 block text-sm text-text"
-        hx-post="/admin/items/{{ item.id }}/image"
-        hx-trigger="change"
-        hx-target="#item-{{ item.id }}"
-        hx-swap="outerHTML"
-        hx-encoding="multipart/form-data"
-      >
-    </div>
   </div>
 {% endmacro %}

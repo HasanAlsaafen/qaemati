@@ -53,6 +53,15 @@
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-full: 9999px;
+  /* Admin customization (Restaurant.buttonShape): CTA-style buttons on
+     the public menu (WhatsApp/Instagram links, the selection sheet's
+     send/cancel buttons) use this instead of --radius-md directly, so
+     'pill' can override just this one token to 9999px -- 'rounded' (the
+     default) leaves it following --radius-md, which also means it
+     automatically tracks a 'sharp' cornerStyle override for free. Never
+     used by icon-only circular buttons or the already-pill floating
+     selection bar, which aren't part of this customization. */
+  --radius-button: var(--radius-md);
 
   /* Elevation (warm, low-opacity shadows, not pure black) */
   --shadow-raised: 0 1px 2px 0 rgb(43 38 34 / 0.06), 0 1px 3px 0 rgb(43 38 34 / 0.08);
