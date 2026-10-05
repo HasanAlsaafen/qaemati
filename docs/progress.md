@@ -1480,3 +1480,22 @@ pattern as every customization field before it:
   reset every changed field back to its default and saved before finishing.
 - `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
   pass. Migration applied to both the dev and test databases.
+
+## Phase 13: section spacing, closing out the theme editor's original scope (done)
+
+Phase 11's scoping question for "a fuller theme editor" was answered as "colors, spacing,
+shadows, button shape" -- colors/shadows/button-shape landed in Phase 11, categoryDivider/
+background in Phase 12, but spacing was deliberately deferred as its own dimension rather than
+conflated with menuDensity (which controls item-card sizing, a different axis). This phase adds
+it: `sectionSpacing` (migration `20261005140601_add_section_spacing`), `cozy` | `comfortable`
+(default, the original `gap-8`/`py-6`) | `spacious`, overriding the gap between
+`[data-menu-sections]` category sections and the page's vertical padding via the same
+`body[data-section-spacing]` CSS-attribute pattern every prior spacing/style toggle uses. Full
+pipeline (service validation, controller, menu service/controller preview override, admin
+choice-card UI, live preview wiring) follows the exact established shape -- no new mechanism.
+
+Verified: extended the Phase 12 e2e case with `sectionSpacing` assertions (72 unit + 42 e2e tests,
+unchanged counts since this reused an existing test rather than adding a new one); confirmed
+interactively that "Spacious" visibly widens the gap between category sections in the live
+preview (screenshot comparison) without affecting item-card spacing; reset to default and saved.
+`npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all pass.

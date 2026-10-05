@@ -103,6 +103,28 @@ body[data-background-style='pattern'][data-background-pattern='diagonal'] {
 }
 
 /*
+  Admin customization: sectionSpacing (views/layouts/menu.njk sets
+  data-section-spacing on <body>). "comfortable" (the default) is the
+  original gap-8/py-6 spacing from views/pages/menu.njk, left untouched;
+  "cozy"/"spacious" override just the category-section gap and the
+  page's vertical padding, independent of menuDensity's item-card sizing.
+*/
+body[data-section-spacing='cozy'] [data-menu-sections] {
+  gap: 1.25rem;
+}
+body[data-section-spacing='cozy'] main {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+body[data-section-spacing='spacious'] [data-menu-sections] {
+  gap: 3.5rem;
+}
+body[data-section-spacing='spacious'] main {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+/*
   Branding page live preview (views/admin/partials/branding-preview.njk):
   the iframe carries ?embed=1, which menu.controller.ts turns into this
   class. Hides the scrollbar chrome so the phone-frame mockup doesn't

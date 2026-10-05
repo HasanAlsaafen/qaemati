@@ -111,6 +111,12 @@ model Restaurant {
   /// Same upload mechanism as logoPath/coverImagePath.
   backgroundImagePath String?
 
+  /// Admin customization: 'cozy' | 'comfortable' (the original gap-8
+  /// spacing, left untouched) | 'spacious' -- the gap between category
+  /// sections on the public menu (not item-card internal spacing,
+  /// which is menuDensity's job; the two are independent dimensions).
+  sectionSpacing String @default("comfortable")
+
   /// A4: the default currency new items are created with (restaurant-
   /// level, not per-item -- each Item still stores its own `currency`
   /// so a restaurant could in principle mix currencies, but the admin

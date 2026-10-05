@@ -118,6 +118,10 @@ export interface MenuView {
    *  query param), so the live preview only reflects a background image
    *  after it's actually been uploaded and saved, same as logo/cover. */
   backgroundImageUrl: string | null;
+  /** Admin customization: 'cozy' | 'comfortable' | 'spacious' -- the gap
+   *  between category sections (not item-card spacing, which is
+   *  menuDensity's job). See Restaurant.sectionSpacing. */
+  sectionSpacing: string;
 }
 
 /**
@@ -145,6 +149,7 @@ export interface MenuPreviewOverrides {
   categoryDivider?: string;
   backgroundStyle?: string;
   backgroundPattern?: string;
+  sectionSpacing?: string;
 }
 
 @Injectable()
@@ -211,6 +216,10 @@ export class MenuService {
       isPreviewOwner && preview!.backgroundPattern
         ? preview!.backgroundPattern
         : restaurant.backgroundPattern;
+    const effectiveSectionSpacing =
+      isPreviewOwner && preview!.sectionSpacing
+        ? preview!.sectionSpacing
+        : restaurant.sectionSpacing;
 
     const pick = (ar: string, en: string) => (locale === 'ar' ? ar : en);
     const pickNullable = (ar: string | null, en: string | null) => (locale === 'ar' ? ar : en);
@@ -327,6 +336,7 @@ export class MenuService {
       backgroundStyle: effectiveBackgroundStyle,
       backgroundPattern: effectiveBackgroundPattern,
       backgroundImageUrl: restaurant.backgroundImagePath,
+      sectionSpacing: effectiveSectionSpacing,
     };
   }
 }

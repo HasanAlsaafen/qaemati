@@ -65,6 +65,7 @@ export class BrandingController {
     @Body('categoryDivider') categoryDivider: string,
     @Body('backgroundStyle') backgroundStyle: string,
     @Body('backgroundPattern') backgroundPattern: string,
+    @Body('sectionSpacing') sectionSpacing: string,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
@@ -110,6 +111,7 @@ export class BrandingController {
         categoryDivider: categoryDivider?.trim(),
         backgroundStyle: backgroundStyle?.trim(),
         backgroundPattern: backgroundPattern?.trim(),
+        sectionSpacing: sectionSpacing?.trim(),
       });
       triggerToast(res, this.i18n.t('common.admin.branding.savedToast', { lang: locale }));
       return {
@@ -168,6 +170,7 @@ export class BrandingController {
         case 'INVALID_CATEGORY_DIVIDER':
         case 'INVALID_BACKGROUND_STYLE':
         case 'INVALID_BACKGROUND_PATTERN':
+        case 'INVALID_SECTION_SPACING':
           // Only reachable via a tampered request (the form only ever
           // submits one of the two radio values per group) -- a toast is
           // enough, no specific input to point at.

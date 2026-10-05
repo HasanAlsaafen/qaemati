@@ -235,6 +235,10 @@
       "backgroundPatternDiagonal": "Diagonal",
       "backgroundImageLabel": "Background photo",
       "backgroundImageHint": "Upload a photo below to use as the page background.",
+      "sectionSpacingLabel": "Section spacing",
+      "sectionSpacingCozy": "Cozy",
+      "sectionSpacingComfortable": "Comfortable",
+      "sectionSpacingSpacious": "Spacious",
       "previewFrameLabel": "Live preview"
     },
     "tour": {

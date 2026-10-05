@@ -28,6 +28,7 @@ export class MenuController {
     @Query('previewCategoryDivider') previewCategoryDivider: string | undefined,
     @Query('previewBackgroundStyle') previewBackgroundStyle: string | undefined,
     @Query('previewBackgroundPattern') previewBackgroundPattern: string | undefined,
+    @Query('previewSectionSpacing') previewSectionSpacing: string | undefined,
     @Query('embed') embed: string | undefined,
     @Req() req: Request,
   ) {
@@ -51,6 +52,7 @@ export class MenuController {
           categoryDivider: previewCategoryDivider?.trim() || undefined,
           backgroundStyle: previewBackgroundStyle?.trim() || undefined,
           backgroundPattern: previewBackgroundPattern?.trim() || undefined,
+          sectionSpacing: previewSectionSpacing?.trim() || undefined,
         }
       : undefined;
     const menu = await this.menuService.getMenu(slug, locale, preview);

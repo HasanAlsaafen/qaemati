@@ -235,6 +235,10 @@
       "backgroundPatternDiagonal": "قطري",
       "backgroundImageLabel": "صورة الخلفية",
       "backgroundImageHint": "ارفع صورة أدناه لاستخدامها كخلفية للصفحة.",
+      "sectionSpacingLabel": "تباعد الأقسام",
+      "sectionSpacingCozy": "متقارب",
+      "sectionSpacingComfortable": "مريح",
+      "sectionSpacingSpacious": "واسع",
       "previewFrameLabel": "معاينة مباشرة"
     },
     "tour": {

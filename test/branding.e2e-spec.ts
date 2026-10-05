@@ -237,6 +237,7 @@ describe('Branding settings (e2e)', () => {
         categoryDivider: 'dashed',
         backgroundStyle: 'pattern',
         backgroundPattern: 'grid',
+        sectionSpacing: 'spacious',
       });
 
     expect(res.status).toBe(200);
@@ -247,12 +248,14 @@ describe('Branding settings (e2e)', () => {
     expect(restaurant?.categoryDivider).toBe('dashed');
     expect(restaurant?.backgroundStyle).toBe('pattern');
     expect(restaurant?.backgroundPattern).toBe('grid');
+    expect(restaurant?.sectionSpacing).toBe('spacious');
 
     const menuRes = await request(app.getHttpServer()).get(`/m/test-restaurant-branding?lang=en`);
     expect(menuRes.status).toBe(200);
     expect(menuRes.text).toContain('data-category-divider="dashed"');
     expect(menuRes.text).toContain('data-background-style="pattern"');
     expect(menuRes.text).toContain('data-background-pattern="grid"');
+    expect(menuRes.text).toContain('data-section-spacing="spacious"');
   });
 
   it('uploads a background image and applies it as an inline style when backgroundStyle is image', async () => {

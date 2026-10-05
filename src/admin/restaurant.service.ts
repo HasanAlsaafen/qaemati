@@ -15,6 +15,7 @@ const BUTTON_SHAPES = new Set(['rounded', 'pill']);
 const CATEGORY_DIVIDERS = new Set(['none', 'line', 'dashed']);
 const BACKGROUND_STYLES = new Set(['solid', 'pattern', 'image']);
 const BACKGROUND_PATTERNS = new Set(['dots', 'grid', 'diagonal']);
+const SECTION_SPACINGS = new Set(['cozy', 'comfortable', 'spacious']);
 
 export interface RestaurantDetailsInput {
   nameAr: string;
@@ -41,6 +42,7 @@ export interface RestaurantDetailsInput {
   categoryDivider?: string;
   backgroundStyle?: string;
   backgroundPattern?: string;
+  sectionSpacing?: string;
 }
 
 @Injectable()
@@ -112,6 +114,12 @@ export class RestaurantService {
       'dots',
       'INVALID_BACKGROUND_PATTERN',
     );
+    const sectionSpacing = this.validateChoice(
+      input.sectionSpacing,
+      SECTION_SPACINGS,
+      'comfortable',
+      'INVALID_SECTION_SPACING',
+    );
 
     return this.prisma.restaurant.update({
       where: { id: restaurantId },
@@ -138,6 +146,7 @@ export class RestaurantService {
         categoryDivider,
         backgroundStyle,
         backgroundPattern,
+        sectionSpacing,
       },
     });
   }

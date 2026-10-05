@@ -50,6 +50,7 @@
     categoryDivider: {{ (restaurant.categoryDivider or 'none') | dump }},
     backgroundStyle: {{ (restaurant.backgroundStyle or 'solid') | dump }},
     backgroundPattern: {{ (restaurant.backgroundPattern or 'dots') | dump }},
+    sectionSpacing: {{ (restaurant.sectionSpacing or 'comfortable') | dump }},
     nameAr: {{ restaurant.nameAr | dump }},
     nameEn: {{ restaurant.nameEn | dump }},
     openTime: {{ (restaurant.openTime or '') | dump }},
@@ -97,6 +98,7 @@
         previewCategoryDivider: this.categoryDivider,
         previewBackgroundStyle: this.backgroundStyle,
         previewBackgroundPattern: this.backgroundPattern,
+        previewSectionSpacing: this.sectionSpacing,
       });
       this.previewUrl = '/m/' + this.slug + '?' + params.toString();
     },

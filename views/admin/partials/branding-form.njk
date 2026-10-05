@@ -251,6 +251,15 @@
 
           <p class="mt-2 text-sm text-muted-text" x-show="backgroundStyle === 'image'" x-cloak>{{ labels.branding.backgroundImageHint }}</p>
         </fieldset>
+
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text">{{ labels.branding.sectionSpacingLabel }}</legend>
+          <div class="grid max-w-md grid-cols-3 gap-2">
+            {{ choiceCard('sectionSpacing', 'cozy', labels.branding.sectionSpacingCozy, restaurant.sectionSpacing == 'cozy', 'x-model="sectionSpacing" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('sectionSpacing', 'comfortable', labels.branding.sectionSpacingComfortable, restaurant.sectionSpacing != 'cozy' and restaurant.sectionSpacing != 'spacious', 'x-model="sectionSpacing" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('sectionSpacing', 'spacious', labels.branding.sectionSpacingSpacious, restaurant.sectionSpacing == 'spacious', 'x-model="sectionSpacing" x-on:change="schedulePreview()"') }}
+          </div>
+        </fieldset>
       </div>
     </section>
 
