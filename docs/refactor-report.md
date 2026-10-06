@@ -16,7 +16,7 @@ The brief assumed an AI-templated demo needing a rebuild. The repository had alr
 ## Verification run after the first commit
 
 - axe (WCAG 2 A, AA, 2.2 AA) over the public menu, admin login, dashboard and QR page in both languages found one serious issue: the English menu's "open now" pill had 4.42:1 contrast. `--color-success` darkened from `#2E7D4F` to `#2A7248` (4.7:1 on the tint). Rerun: zero violations on all eight pages.
-- Menu screenshots at 375, 768 and 1280px in Arabic (RTL) and English (LTR) saved in `docs/ux/screenshots/after/`. No horizontal scroll at any width, `dir` correct in both locales.
+- Menu screenshots at 375, 768 and 1280px in Arabic (RTL) and English (LTR) saved in `docs/ux/screenshots/refactor/`. No horizontal scroll at any width, `dir` correct in both locales.
 - `contrast:check` script updated to the new success value.
 
 ## AI tells found
