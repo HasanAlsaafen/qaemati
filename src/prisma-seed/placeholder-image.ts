@@ -6,11 +6,11 @@
  */
 
 const GRADIENT_PAIRS: [string, string][] = [
-  ['#44603C', '#6B8F5E'], // primary olive
-  ['#C4622D', '#E08A52'], // secondary terracotta
-  ['#A0481B', '#C4622D'], // secondary-text to secondary
+  ['#1565C0', '#4A8FD8'], // primary blue
+  ['#07808D', '#3FB0BD'], // teal
+  ['#9A5700', '#E58A00'], // secondary-text to a deeper orange
   ['#E2B04A', '#F0CC80'], // gold
-  ['#365030', '#44603C'], // primary-hover to primary
+  ['#0F52A0', '#1565C0'], // primary-hover to primary
   ['#2E7D4F', '#52A374'], // success
 ];
 

@@ -243,15 +243,6 @@
         </fieldset>
 
         <fieldset class="flex flex-col gap-1.5">
-          <legend class="text-sm font-medium text-text">{{ labels.branding.itemDividerLabel }}</legend>
-          <div class="grid max-w-md grid-cols-2 gap-2">
-            {{ choiceCard('itemDivider', 'none', labels.branding.itemDividerNone, restaurant.itemDivider != 'logo', 'x-model="itemDivider" x-on:change="schedulePreview()"') }}
-            {{ choiceCard('itemDivider', 'logo', labels.branding.itemDividerLogo, restaurant.itemDivider == 'logo', 'x-model="itemDivider" x-on:change="schedulePreview()"') }}
-          </div>
-          <p class="text-sm text-muted-text">{{ labels.branding.itemDividerHint }}</p>
-        </fieldset>
-
-        <fieldset class="flex flex-col gap-1.5">
           <legend class="text-sm font-medium text-text">{{ labels.branding.backgroundStyleLabel }}</legend>
           <div class="grid max-w-md grid-cols-3 gap-2">
             {{ choiceCard('backgroundStyle', 'solid', labels.branding.backgroundStyleSolid, restaurant.backgroundStyle != 'pattern' and restaurant.backgroundStyle != 'image', 'x-model="backgroundStyle" x-on:change="schedulePreview()"') }}

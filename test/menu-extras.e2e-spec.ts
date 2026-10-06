@@ -1,38 +1,20 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
 import { PrismaService } from '../src/prisma/prisma.service';
-import {
-  createTestApp,
-  createTestRestaurant,
-  deleteTestRestaurant,
-  loginAsAdmin,
-} from './utils/test-app';
+import { createTestApp, createTestRestaurant, deleteTestRestaurant } from './utils/test-app';
 
-describe('All chip and logo divider (e2e)', () => {
+describe('All chip (e2e)', () => {
   let app: NestExpressApplication;
   let prisma: PrismaService;
   let restaurantId: string;
   let slug: string;
-  let agent: ReturnType<typeof request.agent>;
-
-  async function saveBranding(fields: Record<string, string>) {
-    const page = await agent.get('/admin?lang=en');
-    const csrf = /name="csrf_token" value="([^"]*)"/.exec(page.text)?.[1] ?? '';
-    return agent
-      .patch('/admin/branding')
-      .set('X-CSRF-Token', csrf)
-      .set('Cookie', 'qaemati_locale=en')
-      .type('form')
-      .send({ nameAr: 'مطعم تجريبي', nameEn: 'Test Restaurant', currency: 'ILS', ...fields });
-  }
 
   beforeAll(async () => {
     app = await createTestApp();
     prisma = app.get(PrismaService);
-    const { restaurant, admin } = await createTestRestaurant(prisma, 'extras');
+    const { restaurant } = await createTestRestaurant(prisma, 'extras');
     restaurantId = restaurant.id;
     slug = restaurant.slug;
-    agent = await loginAsAdmin(app, admin.email);
     const category = await prisma.category.create({
       data: { restaurantId, nameAr: 'مقبلات', nameEn: 'Starters' },
     });
@@ -62,14 +44,17 @@ describe('All chip and logo divider (e2e)', () => {
     const first = res.text.indexOf('data-category-chip="#category-');
     expect(all).toBeGreaterThan(-1);
     expect(all).toBeLessThan(first);
+    expect(res.text).toMatch(/data-category-chip="#all"[^>]*aria-current="true"/);
     expect(res.text).toMatch(
-      /data-category-chip="#all"[\s\S]{0,400}aria-current="true"[\s\S]{0,60}All/,
+      /data-category-chip="#all"[\s\S]{0,900}data-chip-label[^>]*>\s*All\s*</,
     );
   });
 
   it('translates the All chip', async () => {
     const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=ar`);
-    expect(res.text).toMatch(/data-category-chip="#all"[\s\S]{0,500}الكل/);
+    expect(res.text).toMatch(
+      /data-category-chip="#all"[\s\S]{0,900}data-chip-label[^>]*>\s*الكل\s*</,
+    );
   });
 
   it('shows no chip bar entries for a menu with no categories', async () => {
@@ -85,48 +70,45 @@ describe('All chip and logo divider (e2e)', () => {
     });
   });
 
-  it('shows no divider by default', async () => {
-    await prisma.restaurant.update({
-      where: { id: restaurantId },
-      data: { logoPath: '/uploads/test-logo.png' },
+  describe('reference design details', () => {
+    beforeAll(async () => {
+      await prisma.restaurant.update({
+        where: { id: restaurantId },
+        data: { logoPath: '/uploads/test-logo.png' },
+      });
     });
-    const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
-    expect(res.text).not.toContain('data-item-divider');
-  });
 
-  it('puts the logo between dishes but not after the last one', async () => {
-    const saved = await saveBranding({ itemDivider: 'logo' });
-    expect(saved.status).toBe(200);
-    const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
-    expect(res.text.match(/data-item-divider/g)).toHaveLength(2);
-    expect(res.text).toContain('src="/uploads/test-logo.png"');
-  });
-
-  it('shows nothing when the logo divider is chosen but there is no logo', async () => {
-    await prisma.restaurant.update({ where: { id: restaurantId }, data: { logoPath: null } });
-    const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
-    expect(res.text).not.toContain('data-item-divider');
-  });
-
-  it('rejects an unknown divider value and keeps the saved one', async () => {
-    const res = await saveBranding({ itemDivider: 'stars' });
-    expect(res.status).toBe(200);
-    const { toast } = JSON.parse(res.headers['hx-trigger']);
-    expect(toast.variant).toBe('danger');
-    const row = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
-    expect(row?.itemDivider).toBe('logo');
-  });
-
-  it('applies the unsaved divider to the admin preview only for the owner', async () => {
-    await prisma.restaurant.update({
-      where: { id: restaurantId },
-      data: { logoPath: '/uploads/test-logo.png', itemDivider: 'none' },
+    it('prints the currency symbol after the number instead of the code', async () => {
+      const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
+      expect(res.text).toMatch(/5\.00 ₪/);
     });
-    const owner = await agent.get(`/m/${slug}?lang=en&previewItemDivider=logo`);
-    expect(owner.text).toContain('data-item-divider');
-    const visitor = await request(app.getHttpServer()).get(
-      `/m/${slug}?lang=en&previewItemDivider=logo`,
-    );
-    expect(visitor.text).not.toContain('data-item-divider');
+
+    it('uses the restaurant logo as the picture for a dish and a category with no photo', async () => {
+      const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
+      expect(res.text).toMatch(/menu-item-card__image[\s\S]{0,300}src="\/uploads\/test-logo\.png"/);
+      expect(res.text).toMatch(/data-chip-circle[\s\S]{0,200}src="\/uploads\/test-logo\.png"/);
+    });
+
+    it('draws the category chip from the first dish photo when there is one', async () => {
+      const category = await prisma.category.findFirst({ where: { restaurantId } });
+      await prisma.item.updateMany({
+        where: { categoryId: category!.id, nameEn: 'Hummus' },
+        data: { imagePath: '/uploads/test-hummus.png' },
+      });
+      const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
+      expect(res.text).toMatch(/data-chip-circle[\s\S]{0,200}src="\/uploads\/test-hummus\.png"/);
+    });
+
+    it('marks the active language in the AR | EN pill', async () => {
+      const en = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
+      expect(en.text).toMatch(/href="\/lang\/en"[^>]*aria-current="true"/);
+      const ar = await request(app.getHttpServer()).get(`/m/${slug}?lang=ar`);
+      expect(ar.text).toMatch(/href="\/lang\/ar"[^>]*aria-current="true"/);
+    });
+
+    it('translates the close button of the item sheet', async () => {
+      const ar = await request(app.getHttpServer()).get(`/m/${slug}?lang=ar`);
+      expect(ar.text).toContain('aria-label="إغلاق"');
+    });
   });
 });

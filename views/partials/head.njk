@@ -2,23 +2,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
-{# Above-the-fold font preloads: body text (Thmanyah Sans Regular),
-   medium-weight UI text (category chips, buttons: Thmanyah Sans Medium),
-   and numerals/Latin (Inter). Found via a Lighthouse LCP audit: Medium
-   wasn't preloaded, so the browser only discovered it after parsing CSS,
-   adding a chained request on the critical path. See docs/design-system.md. #}
-<link rel="preload" href="/fonts/inter/inter-variable-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/thmanyah/thmanyahsans-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/thmanyah/thmanyahsans-Medium.woff2" as="font" type="font/woff2" crossorigin>
-{# Bold weights: the public menu's restaurant-name <h1> (serif display) and
-   every menu item card title (sans) both render bold, above the fold, in
-   Arabic -- measured via Lighthouse as the cause of a 3.5s+ LCP on the
-   Arabic menu vs ~2s in English (Phase 8 audit): without a preload, the
-   browser only discovers these two files after parsing app.css, adding a
-   full extra round trip to the critical path that the English page (Inter,
-   already preloaded) never pays. #}
-<link rel="preload" href="/fonts/thmanyah/thmanyahsans-Bold.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/thmanyah/thmanyahserifdisplay-Bold.woff2" as="font" type="font/woff2" crossorigin>
+{# Preload only what the first paint uses: the two Tajawal weights for the
+   language of the page. The other files load when text needs them. #}
+{% if locale == 'ar' %}
+<link rel="preload" href="/fonts/tajawal/tajawal-500-arabic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/tajawal/tajawal-700-arabic.woff2" as="font" type="font/woff2" crossorigin>
+{% else %}
+<link rel="preload" href="/fonts/tajawal/tajawal-500-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/tajawal/tajawal-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+{% endif %}
 
 <link rel="stylesheet" href="/css/app.css">
 <script defer src="/js/vendor/htmx.min.js"></script>

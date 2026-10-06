@@ -29,19 +29,21 @@
   var filterCount = document.querySelector('[data-filter-count]');
   var filterClear = document.querySelector('[data-filter-clear]');
 
-  var ACTIVE_CLASSES = ['bg-primary', 'text-primary-on'];
-  var INACTIVE_CLASSES = ['bg-muted-surface', 'text-text', 'hover:bg-primary-soft'];
-
+  // Mirrors the classes views/components/category-chip.njk renders: the
+  // active chip gets a primary ring on its circle and a darker label.
   function setChipActive(chip, isActive) {
-    if (isActive) {
-      chip.classList.remove.apply(chip.classList, INACTIVE_CLASSES);
-      chip.classList.add.apply(chip.classList, ACTIVE_CLASSES);
-      chip.setAttribute('aria-current', 'true');
-    } else {
-      chip.classList.remove.apply(chip.classList, ACTIVE_CLASSES);
-      chip.classList.add.apply(chip.classList, INACTIVE_CLASSES);
-      chip.removeAttribute('aria-current');
+    var circle = chip.querySelector('[data-chip-circle]');
+    var label = chip.querySelector('[data-chip-label]');
+    if (circle) {
+      circle.classList.toggle('border-primary', isActive);
+      circle.classList.toggle('border-transparent', !isActive);
     }
+    if (label) {
+      label.classList.toggle('text-text', isActive);
+      label.classList.toggle('text-muted-text', !isActive);
+    }
+    if (isActive) chip.setAttribute('aria-current', 'true');
+    else chip.removeAttribute('aria-current');
   }
 
   function chipForSection(section) {
@@ -103,15 +105,6 @@
         var matches = matchesSearch && matchesTags;
         item.classList.toggle('hidden', !matches);
         if (matches) visibleInSection++;
-      });
-
-      // The last visible dish in a section gets no divider after it.
-      var visibleItems = items.filter(function (item) {
-        return !item.classList.contains('hidden');
-      });
-      items.forEach(function (item) {
-        var divider = item.querySelector('[data-item-divider]');
-        if (divider) divider.classList.toggle('hidden', item === visibleItems[visibleItems.length - 1]);
       });
 
       var sectionHasFilter = query !== '' || activeTags.length > 0;

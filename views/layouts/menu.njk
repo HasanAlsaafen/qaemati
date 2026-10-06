@@ -51,6 +51,7 @@
         --color-primary: {{ menu.primaryColorCss.primary }};
         --color-primary-hover: {{ menu.primaryColorCss.primaryHover }};
         --color-primary-soft: {{ menu.primaryColorCss.primarySoft }};
+        --color-primary-text: {{ menu.primaryColorCss.primaryText }};
         {% endif %}
         {% if menu.secondaryColorCss %}
         --color-secondary: {{ menu.secondaryColorCss.secondary }};
@@ -59,18 +60,16 @@
         --color-secondary-soft: {{ menu.secondaryColorCss.secondarySoft }};
         {% endif %}
         {% if menu.fontTheme == 'modern' %}
-        {# IBM Plex Sans Arabic is already self-hosted as the Arabic
-           fallback face (src/styles/fonts.css); the "modern" theme just
-           promotes it ahead of Thmanyah rather than loading anything
-           new. It has no serif display face, so --font-display reuses
-           the same sans stack instead of falling back to Thmanyah's. #}
-        --font-sans: 'IBM Plex Sans Arabic', 'Inter', 'Thmanyah', 'Segoe UI', Tahoma, sans-serif;
+        {# The "modern" theme swaps Tajawal for IBM Plex Sans Arabic, which is
+           already self-hosted, so nothing new is loaded. #}
+        --font-sans: 'IBM Plex Sans Arabic', 'Inter', 'Segoe UI', Tahoma, sans-serif;
         --font-display: 'IBM Plex Sans Arabic', 'Inter', 'Segoe UI', Tahoma, sans-serif;
         {% endif %}
         {% if menu.cornerStyleCss %}
         --radius-sm: {{ menu.cornerStyleCss.radiusSm }};
         --radius-md: {{ menu.cornerStyleCss.radiusMd }};
         --radius-lg: {{ menu.cornerStyleCss.radiusLg }};
+        --radius-card: {{ menu.cornerStyleCss.radiusCard }};
         {% endif %}
         {% if menu.backgroundColorCss %}
         --color-bg: {{ menu.backgroundColorCss }};

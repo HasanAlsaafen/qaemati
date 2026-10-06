@@ -6,6 +6,7 @@ import {
   meetsBackgroundContrast,
   meetsPrimaryColorContrast,
   meetsSecondaryColorContrast,
+  primaryTextOnSoft,
   relativeLuminance,
   rgbToHex,
   rgbToTriplet,
@@ -134,5 +135,20 @@ describe('meetsBackgroundContrast', () => {
 
   it('rejects a dark background that the fixed dark body text would disappear into', () => {
     expect(meetsBackgroundContrast(hexToRgb('#2B2622')!)).toBe(false);
+  });
+});
+
+describe('primaryTextOnSoft', () => {
+  it('leaves a color that already reads on its own tint untouched', () => {
+    const blue = hexToRgb('#1565C0')!;
+    expect(primaryTextOnSoft(blue)).toEqual(blue);
+  });
+
+  it('darkens a color that passes on white but not on its tint', () => {
+    const teal = hexToRgb('#07808D')!;
+    expect(contrastRatio(teal, lighten(teal))).toBeLessThan(4.5);
+    const text = primaryTextOnSoft(teal);
+    expect(contrastRatio(text, lighten(teal))).toBeGreaterThanOrEqual(4.5);
+    expect(text.r).toBeLessThan(teal.r);
   });
 });

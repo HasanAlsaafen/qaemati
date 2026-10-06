@@ -22,3 +22,11 @@ Owner decisions from the audit approval, plus the defaults taken from section 9 
 18. Every new model carries a restaurant id (Menu), and every new service method takes it, so a tenant can be added later without changing callers.
 19. The cached offline notice from the reference was already covered by the existing offline banner and offline page, so only the brand logo divider was added from that item.
 20. Facebook accepts a page name or a full facebook.com https link, and the map link accepts any https URL so the owner can paste whichever map service they use.
+21. The owner then asked that the design match the reference menu, which replaces decision 1 (keep the olive and cream look). The public menu and, through shared tokens, the admin now follow the reference: pale cool page, cream white surfaces, blue primary with an orange accent, Tajawal type, round category chips, image first dish cards, a centered detail card and a centered footer.
+22. Tap targets stay at 44px even though the reference uses smaller pills, because accessible touch targets were an original requirement and the visual difference is small.
+23. The reference's own teal measured 3.55:1 against white, so the demo cafe uses a slightly deeper teal and the system keeps requiring 4.5:1 for primary colors.
+24. The between dishes logo divider from Phase C was removed before release. On the real page the logo is the placeholder picture for dishes and categories without a photo, so that is what was built, with no setting.
+25. Only the category row is sticky. Search scrolls away, because two sticky rows would take about a fifth of a phone screen.
+26. The Thmanyah font files stay in the repository because they are a licensed asset the owner supplied, but nothing loads them any more.
+27. Text on a restaurant's soft primary tint uses a derived color that is darkened only when needed, so any brand color that passes on white also reads on its tint.
+

@@ -1,8 +1,10 @@
 {#
-  A single chip in the sticky horizontal category bar. active reflects
-  scroll-spy state, toggled client-side by public/js/menu.js (which
-  duplicates the active/inactive classes below; keep them in sync).
+  Round category chips in the sticky bar: a 56px circle with the category's
+  photo (or the restaurant logo, or an icon) and a label below. The active
+  chip gets a primary ring. State is toggled client side by public/js/menu.js,
+  which swaps the same classes, so keep the two in sync.
 #}
+
 {#
   The first chip of the bar. It scrolls back to the start of the menu and is
   the active chip until the reader scrolls into the first category.
@@ -11,20 +13,40 @@
   <a
     href="#main-content"
     data-category-chip="#all"
-    class="inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium transition-colors duration-fast ease-standard focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'bg-primary text-primary-on' if active else 'bg-muted-surface text-text hover:bg-primary-soft' }}"
+    class="flex w-16 shrink-0 flex-col items-center gap-1.5 rounded-md py-1 text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     {% if active %}aria-current="true"{% endif %}
   >
-    {{ label }}
+    <span
+      data-chip-circle
+      class="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 p-0.5 {{ 'border-primary' if active else 'border-transparent' }}"
+    >
+      <span class="flex h-full w-full items-center justify-center rounded-full bg-muted-surface text-muted-text">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v6M7 7h4M17 3c-2 2-3 5-3 8h3v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </span>
+    <span data-chip-label class="line-clamp-2 text-xs font-medium leading-tight {{ 'text-text' if active else 'text-muted-text' }}">{{ label }}</span>
   </a>
 {% endmacro %}
 
-{% macro categoryChip(label, href, active=false) %}
+{% macro categoryChip(label, href, active=false, imageUrl=none, fallbackUrl=none) %}
   <a
     href="{{ href }}"
     data-category-chip="{{ href }}"
-    class="inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium transition-colors duration-fast ease-standard focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'bg-primary text-primary-on' if active else 'bg-muted-surface text-text hover:bg-primary-soft' }}"
+    class="flex w-16 shrink-0 flex-col items-center gap-1.5 rounded-md py-1 text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     {% if active %}aria-current="true"{% endif %}
   >
-    {{ label }}
+    <span
+      data-chip-circle
+      class="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 p-0.5 {{ 'border-primary' if active else 'border-transparent' }}"
+    >
+      {% if imageUrl or fallbackUrl %}
+        <img src="{{ imageUrl or fallbackUrl }}" alt="" width="52" height="52" loading="lazy" decoding="async" class="h-full w-full rounded-full object-cover">
+      {% else %}
+        <span class="flex h-full w-full items-center justify-center rounded-full bg-muted-surface text-muted-text">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v6M7 7h4M17 3c-2 2-3 5-3 8h3v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      {% endif %}
+    </span>
+    <span data-chip-label class="line-clamp-2 text-xs font-medium leading-tight {{ 'text-text' if active else 'text-muted-text' }}">{{ label }}</span>
   </a>
 {% endmacro %}

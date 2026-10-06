@@ -26,6 +26,7 @@ module.exports = {
           DEFAULT: withOpacity('--color-primary'),
           hover: withOpacity('--color-primary-hover'),
           soft: withOpacity('--color-primary-soft'),
+          text: withOpacity('--color-primary-text'),
           on: withOpacity('--color-on-primary'),
         },
         secondary: {
@@ -53,6 +54,7 @@ module.exports = {
         sm: 'var(--radius-sm)',
         md: 'var(--radius-md)',
         lg: 'var(--radius-lg)',
+        card: 'var(--radius-card)',
         button: 'var(--radius-button)',
       },
       boxShadow: {

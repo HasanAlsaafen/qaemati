@@ -75,6 +75,21 @@ export function darken(rgb: Rgb, amount = 0.2): Rgb {
   };
 }
 
+/**
+ * Text drawn on --color-primary-soft (tag and table badges). A primary that
+ * is dark enough for white button text can still fall short on its own
+ * tint, so this darkens it just far enough to reach 4.5:1 and leaves a
+ * color that already passes untouched.
+ */
+export function primaryTextOnSoft(rgb: Rgb, minRatio = 4.5): Rgb {
+  const soft = lighten(rgb);
+  let candidate = rgb;
+  for (let step = 0; step < 20 && contrastRatio(candidate, soft) < minRatio; step++) {
+    candidate = darken(candidate, 0.05);
+  }
+  return candidate;
+}
+
 /** A soft tint of the same hue for --color-primary-soft (badge/chip
  *  backgrounds), by blending toward white. */
 export function lighten(rgb: Rgb, amount = 0.85): Rgb {
@@ -103,7 +118,7 @@ export function toSecondaryPalette(rgb: Rgb): SecondaryPalette {
   return {
     secondary: rgb,
     secondaryHover: darken(rgb, 0.2),
-    secondaryText: darken(rgb, 0.35),
+    secondaryText: darken(rgb, 0.4),
     secondarySoft: lighten(rgb, 0.85),
   };
 }
@@ -116,7 +131,7 @@ export function meetsSecondaryColorContrast(rgb: Rgb): boolean {
 /** tokens.css's fixed --color-text -- never itself customizable, so a
  *  restaurant-chosen background only has to stay readable against this
  *  one known value, not a second moving target. */
-export const DEFAULT_TEXT: Rgb = { r: 43, g: 38, b: 34 };
+export const DEFAULT_TEXT: Rgb = { r: 15, g: 42, b: 48 };
 
 /** A restaurant's chosen page background must still read clearly under
  *  the app's fixed body text color. */

@@ -43,7 +43,6 @@ export class UpdateBrandingDto extends BaseFormDto {
   @text(32) cardStyle?: string;
   @text(32) buttonShape?: string;
   @text(32) categoryDivider?: string;
-  @text(32) itemDivider?: string;
   @text(32) backgroundStyle?: string;
   @text(32) backgroundPattern?: string;
   @text(32) sectionSpacing?: string;

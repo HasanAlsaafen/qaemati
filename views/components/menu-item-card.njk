@@ -15,45 +15,42 @@
   unavailable -- there'd be nothing to add it *to* send, and nothing to
   add if it can't be served.
 #}
-{% macro menuItemCard(item, unavailableLabel, selectionLabels, hasWhatsapp, fromPriceLabel, dividerLogoUrl=none) %}
-  {# The search script hides whole rows, so the optional logo divider lives
-     inside the same wrapper as its card and disappears with it. #}
+{% macro menuItemCard(item, unavailableLabel, selectionLabels, hasWhatsapp, fromPriceLabel, placeholderUrl=none) %}
+  {# The search script hides whole cells by [data-menu-item], so everything
+     that belongs to a dish lives inside this wrapper. #}
   <div data-menu-item="true" data-search-text="{{ item.searchText }}" data-tags="{{ item.tagCodes }}">
-  <div
-    class="menu-item-card flex w-full items-start gap-3 rounded-lg border border-border bg-surface p-3 {{ 'opacity-60' if not item.available }}"
-  >
+  <div class="menu-item-card relative flex h-full flex-col overflow-hidden rounded-card border border-border bg-surface/95 {{ 'opacity-60' if not item.available }}">
     <button
       type="button"
       x-data
       x-on:click="$dispatch('open-item-sheet', JSON.parse($el.dataset.item))"
-      class="flex min-w-0 flex-1 items-start gap-3 rounded-md text-start transition-colors duration-fast ease-standard hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      class="flex flex-1 flex-col text-start focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
       data-item="{{ item | dump }}"
       {% if not item.available %}aria-disabled="true"{% endif %}
     >
-      <span class="menu-item-card__image relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-muted-surface">
-        <img
-          src="{{ item.imageUrl }}"
-          alt=""
-          loading="lazy"
-          width="80"
-          height="80"
-          class="h-full w-full object-cover"
-        >
+      <span class="menu-item-card__image relative block aspect-[4/3] w-full overflow-hidden bg-muted-surface">
+        {% if item.imageUrl %}
+          <img src="{{ item.imageUrl }}" alt="" loading="lazy" decoding="async" width="400" height="300" class="h-full w-full object-cover">
+        {% elif placeholderUrl %}
+          <img src="{{ placeholderUrl }}" alt="" loading="lazy" decoding="async" width="400" height="300" class="h-full w-full object-contain p-6 opacity-80">
+        {% else %}
+          <span class="flex h-full w-full items-center justify-center text-muted-text">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v6M7 7h4M17 3c-2 2-3 5-3 8h3v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        {% endif %}
       </span>
-      <span class="flex min-w-0 flex-1 flex-col gap-1">
-        <span class="flex items-start justify-between gap-2">
-          <span class="truncate font-sans text-base font-bold leading-heading text-text">{{ item.name }}</span>
-          {% if item.fromPriceFormatted %}
-            <span dir="ltr" class="shrink-0 text-base font-bold text-text">{{ fromPriceLabel }} {{ item.fromPriceFormatted }} {{ item.currency }}</span>
-          {% else %}
-            <span dir="ltr" class="shrink-0 text-base font-bold text-text">{{ item.priceFormatted }} {{ item.currency }}</span>
-          {% endif %}
-        </span>
+      <span class="flex flex-1 flex-col gap-1 p-3 sm:p-4">
+        <span class="line-clamp-2 font-display text-sm font-bold leading-heading text-text">{{ item.name }}</span>
+        {% if item.fromPriceFormatted %}
+          <span dir="ltr" class="text-start font-display text-sm font-bold text-primary">{{ fromPriceLabel }} {{ item.fromPriceFormatted }} {{ item.currencySymbol }}</span>
+        {% else %}
+          <span dir="ltr" class="text-start font-display text-sm font-bold text-primary">{{ item.priceFormatted }} {{ item.currencySymbol }}</span>
+        {% endif %}
         {% if item.description %}
-          <span class="menu-item-card__description line-clamp-2 text-sm leading-body text-muted-text">{{ item.description }}</span>
+          <span class="menu-item-card__description line-clamp-2 text-xs leading-body text-muted-text">{{ item.description }}</span>
         {% endif %}
         {% if item.tags and item.tags.length or not item.available %}
-          <span class="mt-1 flex flex-wrap gap-1.5">
+          <span class="mt-1 flex flex-wrap gap-1">
             {% if not item.available %}
               {{ badge(unavailableLabel, 'neutral') }}
             {% endif %}
@@ -66,16 +63,18 @@
     </button>
 
     {% if hasWhatsapp and item.available %}
+      {# Sits on the photo corner so it never collides with the name or price. #}
+      {% set addButtonClass = 'absolute end-2 top-2 inline-flex h-11 w-11 items-center justify-center rounded-full bg-surface/95 text-text shadow-raised hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary' %}
       {% if item.variants.length %}
-        {# A2: an item with sizes has no single price to quick-add at --
-           tapping "+" opens the detail sheet to pick one instead, same
-           destination as tapping the card itself. #}
+        {# A2: an item with sizes has no single price to quick-add at, so
+           the plus opens the detail sheet to pick one, same destination as
+           tapping the card. #}
         <button
           type="button"
           x-data
           x-on:click="$dispatch('open-item-sheet', JSON.parse($el.closest('[data-menu-item]').querySelector('[data-item]').dataset.item))"
           aria-label="{{ item.addAriaLabel }}"
-          class="inline-flex h-11 w-11 shrink-0 items-center justify-center self-center rounded-full border border-border-strong text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          class="{{ addButtonClass }}"
         >
           <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
         </button>
@@ -92,17 +91,12 @@
             addedToastMessage: {{ selectionLabels.addedToast | dump }},
           })"
           aria-label="{{ item.addAriaLabel }}"
-          class="inline-flex h-11 w-11 shrink-0 items-center justify-center self-center rounded-full border border-border-strong text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          class="{{ addButtonClass }}"
         >
           <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
         </button>
       {% endif %}
     {% endif %}
   </div>
-  {% if dividerLogoUrl %}
-    <div class="mt-3 flex justify-center" data-item-divider aria-hidden="true">
-      <img src="{{ dividerLogoUrl }}" alt="" width="20" height="20" loading="lazy" class="h-5 w-5 rounded-full object-cover opacity-60">
-    </div>
-  {% endif %}
   </div>
 {% endmacro %}

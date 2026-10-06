@@ -10,9 +10,17 @@ import {
   nowInHebronMinutes,
 } from '../common/open-status';
 import { PrismaService } from '../prisma/prisma.service';
-import { darken, hexToRgb, lighten, rgbToTriplet, toSecondaryPalette } from '../common/color';
+import {
+  darken,
+  hexToRgb,
+  lighten,
+  primaryTextOnSoft,
+  rgbToTriplet,
+  toSecondaryPalette,
+} from '../common/color';
 import { AnalyticsService } from '../admin/analytics.service';
 import { toFacebookUrl, toTelUrl } from '../common/contact';
+import { currencySymbol } from '../common/currency';
 
 export interface MenuOptionView {
   id: string;
@@ -28,6 +36,10 @@ export interface MenuItemView {
   price: number;
   priceFormatted: string;
   currency: string;
+  /** What is printed after the number: ₪, $, or the code itself. */
+  currencySymbol: string;
+  /** Shown under the price in the detail sheet. */
+  categoryName: string;
   imageUrl: string | null;
   available: boolean;
   tags: { code: ItemTag; label: string; variant: string }[];
@@ -65,6 +77,9 @@ export interface MenuCategoryView {
   id: string;
   name: string;
   anchor: string;
+  /** First dish photo in the category, shown in its round chip. The page
+   *  falls back to the restaurant logo, then to an icon. */
+  thumbUrl: string | null;
   items: MenuItemView[];
 }
 
@@ -100,9 +115,14 @@ export interface MenuView {
   /** A4: "R G B" triplets to override --color-primary (and friends) for
    *  a restaurant that picked its own brand color -- null when the
    *  restaurant hasn't set one, in which case the layout falls back to
-   *  src/styles/tokens.css's own Zaytoun default, same "unset means use
+   *  src/styles/tokens.css's own default palette, same "unset means use
    *  the house default" convention as every other optional field here. */
-  primaryColorCss: { primary: string; primaryHover: string; primarySoft: string } | null;
+  primaryColorCss: {
+    primary: string;
+    primaryHover: string;
+    primarySoft: string;
+    primaryText: string;
+  } | null;
   /** Admin customization: a second accent override, same "null means
    *  default" convention as primaryColorCss. */
   secondaryColorCss: {
@@ -119,9 +139,14 @@ export interface MenuView {
    *  'sharp' -- null for 'rounded', the token defaults already in
    *  src/styles/tokens.css, same "null means default" convention as
    *  primaryColorCss/secondaryColorCss. See Restaurant.cornerStyle. */
-  cornerStyleCss: { radiusSm: string; radiusMd: string; radiusLg: string } | null;
+  cornerStyleCss: {
+    radiusSm: string;
+    radiusMd: string;
+    radiusLg: string;
+    radiusCard: string;
+  } | null;
   /** "R G B" triplet overriding --color-bg -- null means the default
-   *  Zaytoun cream, same convention as primaryColorCss. See
+   *  default page color, same convention as primaryColorCss. See
    *  Restaurant.backgroundColor. */
   backgroundColorCss: string | null;
   /** Admin customization: 'flat' | 'raised' -- see Restaurant.cardStyle. */
@@ -134,8 +159,6 @@ export interface MenuView {
   /** Admin customization: 'none' | 'line' | 'dashed' between category
    *  sections -- see Restaurant.categoryDivider. */
   categoryDivider: string;
-  /** 'none' | 'logo' -- see Restaurant.itemDivider. */
-  itemDivider: string;
   /** Admin customization: 'solid' | 'pattern' | 'image' -- see
    *  Restaurant.backgroundStyle. */
   backgroundStyle: string;
@@ -176,7 +199,6 @@ export interface MenuPreviewOverrides {
   cardStyle?: string;
   buttonShape?: string;
   categoryDivider?: string;
-  itemDivider?: string;
   backgroundStyle?: string;
   backgroundPattern?: string;
   sectionSpacing?: string;
@@ -244,8 +266,6 @@ export class MenuService {
       isPreviewOwner && preview!.cardStyle ? preview!.cardStyle : restaurant.cardStyle;
     const effectiveButtonShape =
       isPreviewOwner && preview!.buttonShape ? preview!.buttonShape : restaurant.buttonShape;
-    const effectiveItemDivider =
-      isPreviewOwner && preview!.itemDivider ? preview!.itemDivider : restaurant.itemDivider;
     const effectiveCategoryDivider =
       isPreviewOwner && preview!.categoryDivider
         ? preview!.categoryDivider
@@ -312,6 +332,7 @@ export class MenuService {
         id: category.id,
         name: pick(category.nameAr, category.nameEn),
         anchor: `category-${category.id}`,
+        thumbUrl: category.items.find((item) => item.imagePath)?.imagePath ?? null,
         items: category.items.map((item) => {
           const name = pick(item.nameAr, item.nameEn);
           const description = pickNullable(item.descriptionAr, item.descriptionEn);
@@ -343,6 +364,8 @@ export class MenuService {
             price: Number(item.price),
             priceFormatted: Number(item.price).toFixed(2),
             currency: item.currency,
+            currencySymbol: currencySymbol(item.currency, locale),
+            categoryName: pick(category.nameAr, category.nameEn),
             imageUrl: item.imagePath,
             available: item.available,
             tags: item.tags.map((tag) => ({
@@ -422,7 +445,6 @@ export class MenuService {
       cardStyle: effectiveCardStyle,
       buttonShapeCss: toButtonShapeCss(effectiveButtonShape),
       categoryDivider: effectiveCategoryDivider,
-      itemDivider: effectiveItemDivider,
       backgroundStyle: effectiveBackgroundStyle,
       backgroundPattern: effectiveBackgroundPattern,
       backgroundImageUrl: restaurant.backgroundImagePath,
@@ -454,7 +476,7 @@ export class MenuService {
     return {
       name: locale === 'ar' ? restaurant.nameAr : restaurant.nameEn,
       iconUrl: restaurant.logoPath,
-      themeColor: restaurant.primaryColor ?? '#2f5233',
+      themeColor: restaurant.primaryColor ?? '#1565C0',
     };
   }
 }
@@ -469,9 +491,12 @@ function toInstagramUrl(handle: string): string {
   return `https://instagram.com/${username}`;
 }
 
-function toPrimaryColorCss(
-  primaryColor: string | null,
-): { primary: string; primaryHover: string; primarySoft: string } | null {
+function toPrimaryColorCss(primaryColor: string | null): {
+  primary: string;
+  primaryHover: string;
+  primarySoft: string;
+  primaryText: string;
+} | null {
   if (!primaryColor) return null;
   const rgb = hexToRgb(primaryColor);
   if (!rgb) return null;
@@ -479,6 +504,7 @@ function toPrimaryColorCss(
     primary: rgbToTriplet(rgb),
     primaryHover: rgbToTriplet(darken(rgb)),
     primarySoft: rgbToTriplet(lighten(rgb)),
+    primaryText: rgbToTriplet(primaryTextOnSoft(rgb)),
   };
 }
 
@@ -500,14 +526,14 @@ function toSecondaryColorCss(secondaryColor: string | null): {
   };
 }
 
-/** 'sharp' trades tokens.css's 6px/10px/16px for a crisp near-square
+/** 'sharp' trades tokens.css's 6px/10px/16px/20px for a crisp near-square
  *  look; 'rounded' (and anything else) keeps the defaults by returning
  *  null, same convention as the color overrides above. */
 function toCornerStyleCss(
   cornerStyle: string,
-): { radiusSm: string; radiusMd: string; radiusLg: string } | null {
+): { radiusSm: string; radiusMd: string; radiusLg: string; radiusCard: string } | null {
   if (cornerStyle !== 'sharp') return null;
-  return { radiusSm: '2px', radiusMd: '4px', radiusLg: '6px' };
+  return { radiusSm: '2px', radiusMd: '4px', radiusLg: '6px', radiusCard: '6px' };
 }
 
 function toBackgroundColorCss(backgroundColor: string | null): string | null {

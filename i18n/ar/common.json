@@ -104,7 +104,8 @@
     "menusLabel": "القوائم",
     "menuHoursNote": "تُقدَّم هذه القائمة من {from} إلى {to} فقط.",
     "menuClosedNow": "القائمة مغلقة الآن.",
-    "allCategories": "الكل"
+    "allCategories": "الكل",
+    "close": "إغلاق"
   },
   "admin": {
     "auth": {
@@ -279,7 +280,7 @@
       "secondaryColorLabel": "لون التمييز",
       "secondaryColorHint": "لون ثانٍ للتمييزات الصغيرة، مثل زر رابط إنستغرام. يجب أن يبقى واضحًا كنص داكن على درجته الفاتحة.",
       "fontThemeLabel": "الخط",
-      "fontThemeClassic": "كلاسيكي (ثمانية)",
+      "fontThemeClassic": "كلاسيكي (تجوال)",
       "fontThemeModern": "عصري (آي بي إم بليكس سانس عربي)",
       "menuDensityLabel": "كثافة القائمة",
       "menuDensityComfortable": "مريحة",
@@ -327,11 +328,7 @@
       "mapUrlHint": "رابط يبدأ بـ https من خرائط جوجل أو أي خدمة خرائط.",
       "invalidPhone": "أدخل رقم هاتف صالحًا، مثل 02 222 0111.",
       "invalidFacebook": "أدخل اسم صفحة فيسبوك أو رابطها الكامل.",
-      "invalidMapUrl": "أدخل رابطًا يبدأ بـ https.",
-      "itemDividerLabel": "بين الأطباق",
-      "itemDividerNone": "لا شيء",
-      "itemDividerLogo": "شعارك",
-      "itemDividerHint": "يظهر شعارك صغيرًا بين الأطباق. ارفع الشعار أولًا، وبدونه لا يظهر شيء."
+      "invalidMapUrl": "أدخل رابطًا يبدأ بـ https."
     },
     "tour": {
       "skip": "تخطّي",

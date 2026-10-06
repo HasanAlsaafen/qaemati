@@ -12,35 +12,24 @@
 
 :root {
   /*
-    Two stacks for mixed Arabic/Latin text. Thmanyah and IBM Plex Sans
-    Arabic are scoped to Arabic unicode-range only (see fonts.css), so
-    Latin characters always resolve to Inter regardless of which Arabic
-    face is active. See docs/design-system.md for the fallback chain.
-
-    --font-sans: body text and most headings (Thmanyah Sans).
-    --font-display: the public menu header and category titles ONLY, per
-    the brief's "editorial touch" (Thmanyah Serif Display, Bold only).
+    Tajawal first for Arabic and Latin alike, IBM Plex Sans Arabic and Inter
+    behind it as fallbacks. The "modern" font theme (views/layouts/menu.njk)
+    swaps both variables to Plex.
   */
-  --font-sans: 'Thmanyah', 'Inter', 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
-  --font-display: 'Thmanyah Serif Display', 'Thmanyah', 'Inter', 'IBM Plex Sans Arabic', 'Segoe UI',
-    Tahoma, sans-serif;
+  --font-sans: 'Tajawal', 'IBM Plex Sans Arabic', 'Inter', 'Segoe UI', Tahoma, sans-serif;
+  --font-display: 'Tajawal', 'IBM Plex Sans Arabic', 'Inter', 'Segoe UI', Tahoma, sans-serif;
 }
 
 /*
   Admin customization: menuDensity (views/layouts/menu.njk sets
-  data-menu-density on <body>). "compact" shrinks the item card image and
+  data-menu-density on <body>). "compact" shortens the item photo and
   hides the description line so more items fit per screen -- a restaurant
   with long, simple menus (drinks, a bakery counter) can opt into this
   instead of "comfortable" (the original card size, left alone here by
   only overriding what compact needs).
 */
-body[data-menu-density='compact'] .menu-item-card {
-  padding: 0.5rem;
-  gap: 0.5rem;
-}
 body[data-menu-density='compact'] .menu-item-card__image {
-  width: 3.25rem;
-  height: 3.25rem;
+  aspect-ratio: 16 / 9;
 }
 body[data-menu-density='compact'] .menu-item-card__description {
   display: none;

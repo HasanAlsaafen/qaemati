@@ -14,7 +14,6 @@ const CORNER_STYLES = new Set(['rounded', 'sharp']);
 const CARD_STYLES = new Set(['flat', 'raised']);
 const BUTTON_SHAPES = new Set(['rounded', 'pill']);
 const CATEGORY_DIVIDERS = new Set(['none', 'line', 'dashed']);
-const ITEM_DIVIDERS = new Set(['none', 'logo']);
 const BACKGROUND_STYLES = new Set(['solid', 'pattern', 'image']);
 const BACKGROUND_PATTERNS = new Set(['dots', 'grid', 'diagonal']);
 const SECTION_SPACINGS = new Set(['cozy', 'comfortable', 'spacious']);
@@ -38,18 +37,17 @@ export interface RestaurantDetailsInput {
   openTime?: string | null;
   closeTime?: string | null;
   currency: string;
-  /** Null clears back to the default Zaytoun palette. */
+  /** Null clears back to the default palette. */
   primaryColor?: string | null;
   secondaryColor?: string | null;
   fontTheme?: string;
   menuDensity?: string;
   cornerStyle?: string;
-  /** Null clears back to the default Zaytoun cream. */
+  /** Null clears back to the default page color. */
   backgroundColor?: string | null;
   cardStyle?: string;
   buttonShape?: string;
   categoryDivider?: string;
-  itemDivider?: string;
   backgroundStyle?: string;
   backgroundPattern?: string;
   sectionSpacing?: string;
@@ -122,12 +120,6 @@ export class RestaurantService {
       'none',
       'INVALID_CATEGORY_DIVIDER',
     );
-    const itemDivider = this.validateChoice(
-      input.itemDivider,
-      ITEM_DIVIDERS,
-      'none',
-      'INVALID_ITEM_DIVIDER',
-    );
     const backgroundStyle = this.validateChoice(
       input.backgroundStyle,
       BACKGROUND_STYLES,
@@ -177,7 +169,6 @@ export class RestaurantService {
         cardStyle,
         buttonShape,
         categoryDivider,
-        itemDivider,
         backgroundStyle,
         backgroundPattern,
         sectionSpacing,

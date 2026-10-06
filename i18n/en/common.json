@@ -104,7 +104,8 @@
     "menusLabel": "Menus",
     "menuHoursNote": "This menu is served from {from} to {to} only.",
     "menuClosedNow": "It is closed right now.",
-    "allCategories": "All"
+    "allCategories": "All",
+    "close": "Close"
   },
   "admin": {
     "auth": {
@@ -279,7 +280,7 @@
       "secondaryColorLabel": "Accent color",
       "secondaryColorHint": "A second color for smaller highlights, like the Instagram link button. Must stay readable as dark text on its own light tint.",
       "fontThemeLabel": "Typeface",
-      "fontThemeClassic": "Classic (Thmanyah)",
+      "fontThemeClassic": "Classic (Tajawal)",
       "fontThemeModern": "Modern (IBM Plex Sans Arabic)",
       "menuDensityLabel": "Menu density",
       "menuDensityComfortable": "Comfortable",
@@ -327,11 +328,7 @@
       "mapUrlHint": "An https link from Google Maps or any map service.",
       "invalidPhone": "Enter a valid phone number, for example 02 222 0111.",
       "invalidFacebook": "Enter a Facebook page name or its full link.",
-      "invalidMapUrl": "Enter a link that starts with https.",
-      "itemDividerLabel": "Between dishes",
-      "itemDividerNone": "Nothing",
-      "itemDividerLogo": "Your logo",
-      "itemDividerHint": "Shows your logo small between dishes. Upload a logo first, without one nothing is shown."
+      "invalidMapUrl": "Enter a link that starts with https."
     },
     "tour": {
       "skip": "Skip",

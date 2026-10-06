@@ -24,11 +24,11 @@
 <div
   class="mt-4 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[1fr_400px] lg:items-start"
   x-data="{
-    color: {{ (restaurant.primaryColor or '#44603C') | dump }},
-    defaultColor: '#44603C',
+    color: {{ (restaurant.primaryColor or '#1565C0') | dump }},
+    defaultColor: '#1565C0',
     contrast: null,
-    secondaryColor: {{ (restaurant.secondaryColor or '#C4622D') | dump }},
-    defaultSecondaryColor: '#C4622D',
+    secondaryColor: {{ (restaurant.secondaryColor or '#FF9800') | dump }},
+    defaultSecondaryColor: '#FF9800',
     secondaryContrast: null,
     // Whether to still show the server-rendered fieldErrors.primary/
     // secondaryColor message (set from a rejected save). Starts shown
@@ -39,8 +39,8 @@
     primaryColorErrorDismissed: false,
     secondaryColorErrorDismissed: false,
     backgroundColorErrorDismissed: false,
-    backgroundColor: {{ (restaurant.backgroundColor or '#FAF6EF') | dump }},
-    defaultBackgroundColor: '#FAF6EF',
+    backgroundColor: {{ (restaurant.backgroundColor or '#F2F9FA') | dump }},
+    defaultBackgroundColor: '#F2F9FA',
     backgroundContrast: null,
     fontTheme: {{ (restaurant.fontTheme or 'classic') | dump }},
     menuDensity: {{ (restaurant.menuDensity or 'comfortable') | dump }},
@@ -48,7 +48,6 @@
     cardStyle: {{ (restaurant.cardStyle or 'flat') | dump }},
     buttonShape: {{ (restaurant.buttonShape or 'rounded') | dump }},
     categoryDivider: {{ (restaurant.categoryDivider or 'none') | dump }},
-    itemDivider: {{ (restaurant.itemDivider or 'none') | dump }},
     backgroundStyle: {{ (restaurant.backgroundStyle or 'solid') | dump }},
     backgroundPattern: {{ (restaurant.backgroundPattern or 'dots') | dump }},
     sectionSpacing: {{ (restaurant.sectionSpacing or 'comfortable') | dump }},
@@ -97,7 +96,6 @@
         previewCardStyle: this.cardStyle,
         previewButtonShape: this.buttonShape,
         previewCategoryDivider: this.categoryDivider,
-        previewItemDivider: this.itemDivider,
         previewBackgroundStyle: this.backgroundStyle,
         previewBackgroundPattern: this.backgroundPattern,
         previewSectionSpacing: this.sectionSpacing,

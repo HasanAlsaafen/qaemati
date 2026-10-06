@@ -15,25 +15,25 @@ interface Pair {
 }
 
 const colors = {
-  bg: '#FAF6EF',
-  surface: '#FFFFFF',
-  surfaceMuted: '#F2EBDD',
-  text: '#2B2622',
-  textMuted: '#6B6258',
-  primary: '#44603C',
-  primaryHover: '#365030',
-  primarySoft: '#E7EEDF',
-  secondary: '#C4622D',
-  secondaryText: '#A0481B',
-  secondarySoft: '#F7E3D6',
+  bg: '#F2F9FA',
+  surface: '#FFFDFA',
+  surfaceMuted: '#DCECEF',
+  text: '#0F2A30',
+  textMuted: '#4F6E75',
+  primary: '#1565C0',
+  primaryHover: '#0F52A0',
+  primarySoft: '#E3EEFA',
+  secondary: '#FF9800',
+  secondaryText: '#9A5700',
+  secondarySoft: '#FFF1DB',
   gold: '#E2B04A',
-  onGold: '#2B2622',
+  onGold: '#0F2A30',
   success: '#2A7248',
   warning: '#A56716',
   warningText: '#7A480A',
   danger: '#B3382C',
   white: '#FFFFFF',
-  borderStrong: '#9C927F',
+  borderStrong: '#6F8F98',
 };
 
 

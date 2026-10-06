@@ -1,7 +1,9 @@
 /*
-  Zaytoun palette and base design tokens as CSS custom properties.
-  Exposed on :root so a restaurant can later override --color-primary
-  (and friends) without touching Tailwind config or templates.
+  Base design tokens as CSS custom properties, exposed on :root so a
+  restaurant can override --color-primary (and friends) without touching
+  Tailwind config or templates. The defaults follow the reference menu the
+  owner chose: a pale cool page, cream white surfaces, a blue primary and an
+  orange accent.
 
   Colors are stored as "R G B" triplets (not hex) so Tailwind's
   rgb(var(--x) / <alpha-value>) pattern can apply opacity modifiers
@@ -9,37 +11,35 @@
 */
 :root {
   /* Colors */
-  --color-bg: 250 246 239; /* #FAF6EF */
-  --color-surface: 255 255 255; /* #FFFFFF */
-  --color-surface-muted: 242 235 221; /* #F2EBDD */
-  --color-border: 230 220 201; /* #E6DCC9 */
+  --color-bg: 242 249 250; /* #F2F9FA */
+  --color-surface: 255 253 250; /* #FFFDFA */
+  --color-surface-muted: 220 236 239; /* #DCECEF */
+  --color-border: 207 228 232; /* #CFE4E8 */
   /* Stronger border for interactive boundaries (inputs, selects, toggles)
      where WCAG 1.4.11 non-text contrast (3:1) applies. The lighter
-     --color-border above stays for decorative dividers between sections,
-     where it is never the only cue (always paired with spacing or a
-     background change). */
-  --color-border-strong: 156 146 127; /* #9C927F */
-  --color-text: 43 38 34; /* #2B2622 */
-  --color-text-muted: 107 98 88; /* #6B6258 */
+     --color-border above stays for decorative dividers and card outlines,
+     where it is never the only cue. */
+  --color-border-strong: 111 143 152; /* #6F8F98, 3.4:1 on surface */
+  --color-text: 15 42 48; /* #0F2A30 */
+  --color-text-muted: 79 110 117; /* #4F6E75 */
 
-  --color-primary: 68 96 60; /* #44603C */
-  --color-primary-hover: 54 80 48; /* #365030 */
-  --color-primary-soft: 231 238 223; /* #E7EEDF */
+  --color-primary: 21 101 192; /* #1565C0 */
+  --color-primary-hover: 15 82 160; /* #0F52A0 */
+  --color-primary-soft: 227 238 250; /* #E3EEFA */
+  /* Text on --color-primary-soft. Equal to the primary here, a restaurant's
+     own color gets a darker derived value (see primaryTextOnSoft). */
+  --color-primary-text: 21 101 192; /* #1565C0 */
   --color-on-primary: 255 255 255;
 
-  --color-secondary: 196 98 45; /* #C4622D */
-  /* Adjusted from the original #A8501F (4.41:1 against --color-secondary-soft,
-     the badge/button background it's most often paired with, so it failed
-     WCAG AA at small text sizes) to #A0481B (4.92:1 against secondary-soft).
-     Caught by a Lighthouse accessibility audit on the live page, not the
-     contrast-check script, which never tested this specific background
-     pairing -- see docs/design-system.md and scripts/check-contrast.ts. */
-  --color-secondary-text: 160 72 27; /* #A0481B */
-  --color-secondary-soft: 247 227 214; /* #F7E3D6 */
-  --color-on-secondary: 255 255 255;
+  --color-secondary: 255 152 0; /* #FF9800 */
+  /* Text on --color-secondary-soft and on the page: 5.1:1 and above. The
+     bright orange itself is only ever a fill or an accent, never text. */
+  --color-secondary-text: 154 87 0; /* #9A5700 */
+  --color-secondary-soft: 255 241 219; /* #FFF1DB */
+  --color-on-secondary: 15 42 48;
 
   --color-gold: 226 176 74; /* #E2B04A */
-  --color-on-gold: 43 38 34; /* #2B2622 */
+  --color-on-gold: 15 42 48; /* #0F2A30 */
 
   --color-success: 42 114 72; /* #2A7248 */
   /* Adjusted from the original #B7791F (3.64:1 with white) to meet WCAG AA
@@ -53,6 +53,8 @@
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
+  /* Menu cards, the item sheet and the header logo. */
+  --radius-card: 20px;
   --radius-full: 9999px;
   /* Admin customization (Restaurant.buttonShape): CTA-style buttons on
      the public menu (WhatsApp/Instagram links, the selection sheet's
@@ -64,9 +66,9 @@
      selection bar, which aren't part of this customization. */
   --radius-button: var(--radius-md);
 
-  /* Elevation (warm, low-opacity shadows, not pure black) */
-  --shadow-raised: 0 1px 2px 0 rgb(43 38 34 / 0.06), 0 1px 3px 0 rgb(43 38 34 / 0.08);
-  --shadow-overlay: 0 8px 16px -4px rgb(43 38 34 / 0.12), 0 4px 6px -2px rgb(43 38 34 / 0.08);
+  /* Elevation (cool, low-opacity shadows, not pure black) */
+  --shadow-raised: 0 1px 2px 0 rgb(15 42 48 / 0.06), 0 1px 3px 0 rgb(15 42 48 / 0.08);
+  --shadow-overlay: 0 8px 16px -4px rgb(15 42 48 / 0.12), 0 4px 6px -2px rgb(15 42 48 / 0.08);
 
   /* Motion */
   --duration-fast: 150ms;

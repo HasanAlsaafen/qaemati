@@ -2,40 +2,40 @@
   menu: the public menu view model. Renders nothing when the owner has not
   filled in any contact detail, so a new restaurant never shows an empty box.
   text.hasSelectionBar adds bottom padding so the fixed selection bar never
-  covers the last link.
+  covers the last link. Centered on purpose: it is the one place on the page
+  that reads like a signature, not a list.
 #}
 {% macro restaurantFooter(menu, text) %}
   {% if menu.phoneUrl or menu.whatsappUrl or menu.instagramUrl or menu.facebookUrl or menu.address or menu.mapUrl or menu.workingHours %}
-    {% set linkClass = 'inline-flex min-h-11 min-w-11 items-center gap-2 text-sm font-medium text-primary hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary' %}
-    <footer class="border-t border-border bg-surface {{ 'pb-24' if text.hasSelectionBar }}">
-      <div class="mx-auto max-w-2xl px-4 py-8">
-        <h2 class="font-display text-xl font-bold leading-heading text-text">{{ text.title }}</h2>
-        {% if menu.address or menu.mapUrl %}
-          <div class="mt-3">
-            {% if menu.address %}<p class="text-sm leading-body text-text">{{ menu.address }}</p>{% endif %}
-            {% if menu.mapUrl %}
-              <a href="{{ menu.mapUrl }}" target="_blank" rel="noopener noreferrer" class="{{ linkClass }}">{{ text.openMap }}</a>
-            {% endif %}
-          </div>
+    {% set linkClass = 'inline-flex min-h-11 min-w-11 items-center gap-1.5 text-sm text-muted-text hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary' %}
+    {% set pin = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>' %}
+    <footer class="mt-10 border-t border-border bg-surface py-8 shadow-raised {{ 'pb-28' if text.hasSelectionBar }}">
+      {% if menu.address or menu.mapUrl %}
+        <p class="mb-4 flex items-center justify-center gap-1.5 px-4 text-center text-sm text-muted-text sm:px-6">
+          {% if menu.mapUrl %}
+            <a href="{{ menu.mapUrl }}" target="_blank" rel="noopener noreferrer" class="{{ linkClass }}">{{ pin | safe }}<span>{{ menu.address or text.openMap }}</span></a>
+          {% else %}
+            {{ pin | safe }}<span>{{ menu.address }}</span>
+          {% endif %}
+        </p>
+      {% endif %}
+      {% if menu.workingHours %}
+        <p class="mb-4 px-4 text-center text-sm text-muted-text sm:px-6">{{ menu.workingHours }}</p>
+      {% endif %}
+      <ul class="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-6 gap-y-1 px-4 sm:px-6">
+        {% if menu.phoneUrl %}
+          <li><a href="{{ menu.phoneUrl }}" class="{{ linkClass }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg><span dir="ltr">{{ menu.phone }}</span></a></li>
         {% endif %}
-        {% if menu.workingHours %}
-          <p class="mt-3 text-sm text-muted-text">{{ menu.workingHours }}</p>
+        {% if menu.whatsappUrl %}
+          <li><a href="{{ menu.whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="{{ linkClass }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5Z"/></svg>{{ text.whatsapp }}</a></li>
         {% endif %}
-        <ul class="mt-3 flex flex-wrap gap-x-6">
-          {% if menu.phoneUrl %}
-            <li><a href="{{ menu.phoneUrl }}" class="{{ linkClass }}">{{ text.call }}<span dir="ltr" class="font-normal text-muted-text">{{ menu.phone }}</span></a></li>
-          {% endif %}
-          {% if menu.whatsappUrl %}
-            <li><a href="{{ menu.whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="{{ linkClass }}">{{ text.whatsapp }}</a></li>
-          {% endif %}
-          {% if menu.instagramUrl %}
-            <li><a href="{{ menu.instagramUrl }}" target="_blank" rel="noopener noreferrer" class="{{ linkClass }}">{{ text.instagram }}</a></li>
-          {% endif %}
-          {% if menu.facebookUrl %}
-            <li><a href="{{ menu.facebookUrl }}" target="_blank" rel="noopener noreferrer" class="{{ linkClass }}">{{ text.facebook }}</a></li>
-          {% endif %}
-        </ul>
-      </div>
+        {% if menu.instagramUrl %}
+          <li><a href="{{ menu.instagramUrl }}" target="_blank" rel="noopener noreferrer" class="{{ linkClass }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>{{ text.instagram }}</a></li>
+        {% endif %}
+        {% if menu.facebookUrl %}
+          <li><a href="{{ menu.facebookUrl }}" target="_blank" rel="noopener noreferrer" class="{{ linkClass }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3Z"/></svg>{{ text.facebook }}</a></li>
+        {% endif %}
+      </ul>
     </footer>
   {% endif %}
 {% endmacro %}

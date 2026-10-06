@@ -61,7 +61,7 @@
   window.checkSecondaryColorContrast = function (hex) {
     const rgb = hexToRgb(hex);
     if (!rgb) return null;
-    const text = darken(rgb, 0.35);
+    const text = darken(rgb, 0.4);
     const soft = lighten(rgb, 0.85);
     const ratio = contrastRatio(text, soft);
     return { ratio: ratio, passes: ratio >= 4.5 };

@@ -114,6 +114,6 @@ gradient SVG placeholders (`prisma/seed/placeholder-image.ts`), never real photo
 
 ## Notes
 
-- The Arabic typeface is Thmanyah, a licensed asset in `public/fonts/thmanyah/` (see
-  `docs/design-system.md` for the licensing caveat around self-hosting it).
+- The typeface is Tajawal with IBM Plex Sans Arabic as fallback, both open fonts self-hosted in
+  `public/fonts` (see `docs/design-system.md`). The older Thmanyah files are kept but unused.
 - All demo data is fictional; no real businesses or copyrighted assets are used.

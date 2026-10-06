@@ -1,15 +1,17 @@
 # Qaemati design system
 
-"Warm Minimalism": warm, appetizing, calm, premium local cafe, not a corporate dashboard.
-Generous whitespace, moderate rounded corners, soft shadows, thin borders. Item photos and
-prices lead the hierarchy. An editorial touch (large, confident headings) is reserved for the
-public menu header and category titles only; everything else (admin panel, forms, dialogs)
-stays plain and utilitarian.
+Follows the reference menu the owner chose (qr.befoundonline.ps/menu/haddoota): a pale cool page
+with cream white surfaces, a single strong primary color per restaurant, round category chips with
+photos, image-first dish cards with a 20px radius and a hairline border, a centered detail card,
+and a centered contact footer. Admin screens use the same tokens, so the product reads as one
+system. Layout, tokens and behavior were rebuilt from what the page shows. No images, logos,
+fonts files or copy come from the reference: Tajawal and IBM Plex Sans Arabic are open fonts and
+every picture is the restaurant's own or a clearly marked placeholder.
 
-Interaction ideas only are borrowed from reference products, never their layout, assets, logos,
-or copy: the sticky category bar with scroll-spy and the item bottom sheet (Wolt-style), large
-editorial headings for headers and category titles (Dishoom-style), and overall calm, uncluttered
-density (Blue Bottle Coffee-style).
+Two deliberate differences from the reference, both for accessibility: every tappable control keeps
+a 44px target (the reference uses about 32px pills), and the demo cafe's teal is slightly deeper
+than the reference's, because that teal measures 3.55:1 against white and the design system
+requires 4.5:1.
 
 ## Tokens
 
@@ -17,19 +19,19 @@ All tokens are CSS custom properties on `:root` in `src/styles/tokens.css`, mirr
 theme values in `tailwind.config.js`. A restaurant can override the look later by overriding the
 CSS variables (for example `--color-primary`) without touching Tailwind config or templates.
 
-### Color: the Zaytoun palette
+### Color
 
 | Token | Hex | Usage |
 |---|---|---|
-| `--color-bg` | `#FAF6EF` | Page background |
-| `--color-surface` | `#FFFFFF` | Cards, sheets, inputs |
-| `--color-surface-muted` | `#F2EBDD` | Subtle fills (skeletons, chips at rest) |
-| `--color-border` | `#E6DCC9` | Decorative dividers only (never the sole cue for an interactive boundary) |
-| `--color-border-strong` | `#9C927F` | Input/select/toggle outlines (meets 3:1 non-text contrast) |
-| `--color-text` | `#2B2622` | Primary text |
-| `--color-text-muted` | `#6B6258` | Secondary text |
-| `--color-primary` / `-hover` / `-soft` | `#44603C` / `#365030` / `#E7EEDF` | Primary actions, availability/success-adjacent accents |
-| `--color-secondary` / `-text` / `-soft` | `#C4622D` / `#A0481B` / `#F7E3D6` | Terracotta accents. Use `-text` for small text and button backgrounds (the lighter `DEFAULT` fails AA at small sizes) |
+| `--color-bg` | `#F2F9FA` | Page background |
+| `--color-surface` | `#FFFDFA` | Header, cards (at 95%), footer, inputs |
+| `--color-surface-muted` | `#DCECEF` | Photo placeholders, chips at rest, skeletons |
+| `--color-border` | `#CFE4E8` | Card outlines and dividers (never the sole cue for an interactive boundary) |
+| `--color-border-strong` | `#6F8F98` | Input/select/toggle outlines (3.4:1 on surface) |
+| `--color-text` | `#0F2A30` | Primary text |
+| `--color-text-muted` | `#4F6E75` | Secondary text |
+| `--color-primary` / `-hover` / `-soft` / `-text` | `#1565C0` / `#0F52A0` / `#E3EEFA` / `#1565C0` | Primary actions and accents. `-text` is the primary darkened only as far as needed to read at 4.5:1 on `-soft`, so tag badges stay readable on any restaurant color |
+| `--color-secondary` / `-text` / `-soft` | `#FF9800` / `#9A5700` / `#FFF1DB` | Orange accent (today's special marker). Use `-text` for small text, the bright orange is only ever a fill |
 | `--color-gold` | `#E2B04A` | "Popular" badge only, paired with dark text |
 | `--color-success` | `#2A7248` | Success states, also text on its own 10% tint (4.7:1) |
 | `--color-warning` | `#A56716` | Warning states. Adjusted from the originally specified `#B7791F` (3.64:1 with white text) to `#A56716` (4.61:1), per the contrast script below |
@@ -54,94 +56,24 @@ added so it can't happen again silently.
 
 ### Typography
 
-- **Arabic, body and most headings**: Thmanyah Sans, the digital-use member of the licensed
-  Thmanyah family, provided by the project owner
-  (`public/fonts/thmanyah/LICENSE.pdf`, downloaded from font.thmanyah.com).
-- **Arabic, editorial only**: Thmanyah Serif Display, Bold, reserved exclusively for the public
-  menu header (restaurant name) and category titles, per the brief's "editorial touch... on the
-  public menu header and category titles only." Nowhere else uses this face: admin headings,
-  dialog titles, card titles, and every other heading use Thmanyah Sans.
-- **Latin**: Inter, for numerals and English text, so a price or English word reads consistently
-  regardless of which Arabic face is active.
-- **Font stacks**, declared once in `src/styles/app.css`:
-  - `--font-sans`: `'Thmanyah', 'Inter', 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif`
-    (`'Thmanyah'` here is the Thmanyah Sans face).
-  - `--font-display`: `'Thmanyah Serif Display', 'Thmanyah', 'Inter', 'IBM Plex Sans Arabic', ...`
-    — only ever applied via the `font-display` Tailwind utility, and only to the two elements
-    named above.
+Tajawal (SIL OFL, `public/fonts/tajawal`) carries interface text, headings and prices in Arabic
+and Latin at 400, 500 and 700, with IBM Plex Sans Arabic and Inter behind it as fallbacks. Both
+are self-hosted, nothing loads from a CDN, and each file is limited to its own unicode range so
+only the script a page uses is downloaded. The two weights used above the fold are preloaded.
+The "modern" font theme swaps both families to IBM Plex Sans Arabic.
 
-**Available weights (confirmed from the licensed family).** Thmanyah ships five weights across
-all three of its sub-families (Sans, Serif Display, Serif Text): Light (300), Regular (400),
-Medium (500), Bold (700), Black (900). We ship Thmanyah Sans at 400/500/700 (matching the type
-scale below) and Thmanyah Serif Display at 700 only (the one weight the editorial treatment
-uses). No faux bold or faux italic anywhere: component CSS never requests a weight/style without
-a matching `@font-face` declaration.
+| Role | Size and weight |
+|---|---|
+| Restaurant name | 18px (20px from `sm`), 700 |
+| Category title | 24px, 700, with a 4px primary bar at the start |
+| Dish name and price | 14px, 700 (price in the primary color) |
+| Description, hints | 12px to 14px, 400, muted |
+| Chip label | 12px, 500 |
 
-**Licensing note.** The Thmanyah license (`public/fonts/thmanyah/LICENSE.pdf`) permits embedding
-the font in websites "only as part of a compiled, packaged, or obfuscated product," and
-separately prohibits making the font available in any way that lets a third party extract,
-download, or reuse the font files independently, "including through web embedding." Plain
-self-hosted `@font-face` files, which is what this project does, do not meet that bar — a visitor
-can retrieve the `.woff2` directly via devtools. The project owner reviewed this clause
-(including the version in the official download's `LICENSE.pdf`, not just the website) and
-made an informed decision to self-host anyway for this demo. Documented here so it's a known,
-deliberate tradeoff rather than an oversight if this project moves beyond a demo.
-
-**Fallback behavior.** Both Thmanyah faces and the `IBM Plex Sans Arabic` fallback restrict their
-`unicode-range` to Arabic code points (`src/styles/fonts.css`), so:
-
-- An Arabic character tries Thmanyah first. If a Thmanyah file is ever missing (a 404 doesn't
-  break the layout — the browser just treats that face as unavailable for that character) it
-  falls through to Inter (no Arabic glyphs, skipped), then to IBM Plex Sans Arabic, which renders.
-- A Latin character or digit never matches a Thmanyah/IBM Plex Sans Arabic unicode-range at all,
-  so it always renders in Inter, regardless of which Arabic face is active.
-
-IBM Plex Sans Arabic and Inter are self-hosted under `public/fonts/` (SIL Open Font License,
-`OFL.txt` included in each folder) rather than linked from Google Fonts, to avoid a third-party
-request on every page load and keep the Lighthouse performance budget intact.
-
-**Preloading.** Only fonts actually rendering above the fold are preloaded, in
-`views/layouts/base.njk`: Inter (needed immediately for any numeral/Latin text) and Thmanyah Sans
-Regular (the default body/heading face).
-
-**Line height is per-language**, via CSS variables that flip based on `<html lang>`:
-
-| Variable | Arabic | Latin (default) |
-|---|---|---|
-| `--leading-body` | 1.8 | 1.5 |
-| `--leading-heading` | 1.5 | 1.25 |
-
-Exposed as Tailwind `leading-body` / `leading-heading`.
-
-**Type scale** (Tailwind's default `text-*` sizes, no custom scale needed, combined with
-`leading-body`/`leading-heading` and `font-display`/`font-sans`). Weights are limited to what
-Thmanyah actually ships (300/400/500/700/900); there is no 600, so nothing in this scale uses it:
-
-| Role | Size | Weight | Font | Line height |
-|---|---|---|---|---|
-| Editorial display (menu header name, category titles) | `text-4xl` (36px) / `text-2xl` (24px) | 700 | `font-display` | `leading-heading` |
-| H1 (page title, admin) | `text-2xl` (24px) | 700 | `font-sans` | `leading-heading` |
-| H2 | `text-xl` (20px) | 700 | `font-sans` | `leading-heading` |
-| Body | `text-base` (16px) | 400 | `font-sans` | `leading-body` |
-| Small / meta | `text-sm` (14px) | 400 | `font-sans` | `leading-body` |
-| Caption / badge | `text-xs` (12px) | 500 | `font-sans` | `leading-body` |
-
-**Numerals**: Western digits (0-9) are used everywhere, in both languages, for prices, phone
-numbers, and counts. This is a deliberate, documented choice: the font stack already renders any
-Latin/digit character in Inter regardless of surrounding Arabic text (see above), so prices stay
-visually consistent whether the page is in Arabic or English. Arabic-Indic digits would need a
-different numeral treatment and would break that consistency.
-
-**A price like "18.00 ILS" needs an explicit `dir="ltr"` wrapper on an RTL page.** Found on the
-public menu: without it, the Unicode bidi algorithm reorders the digit run and the Latin
-currency-code run relative to each other inside the ambient RTL paragraph, rendering "ILS 18.00"
-even though the source order is "18.00 ILS" (the digits inside "18.00" are never reversed, only
-the position of the whole number relative to the word "ILS"). Every place a price is shown
-(`components/menu-item-card.njk`, `components/item-detail-sheet.njk`) wraps it in `dir="ltr"`.
-Any future bilingual number-plus-Latin-word string on an RTL page needs the same treatment.
-
-No faux bold or faux italic: only the weights actually declared via `@font-face` are used in
-component CSS; nothing sets `font-weight` or `font-style` to a value without a matching face.
+Numerals stay Western digits (0-9) in both languages, and prices read number first, then the
+currency symbol (`15.00 ₪`), with the symbol coming from `Intl` and the code kept when a currency
+has no short symbol. The earlier Thmanyah files remain in `public/fonts/thmanyah` but nothing
+references them.
 
 ### Spacing, shape, elevation
 

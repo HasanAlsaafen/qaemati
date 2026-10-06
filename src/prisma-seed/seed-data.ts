@@ -60,7 +60,7 @@ export interface SeedRestaurant {
    *  the free-text workingHoursAr/En above. */
   openTime?: string;
   closeTime?: string;
-  /** A4: hex color overriding the default Zaytoun palette for this
+  /** A4: hex color overriding the default palette for this
    *  restaurant's own public menu. Omitted means "use the default." */
   primaryColor?: string;
   adminEmail: string;
@@ -80,6 +80,7 @@ export const seedRestaurants: SeedRestaurant[] = [
     instagramHandle: '@baytalzaytoun',
     workingHoursAr: 'يوميًا من 7 صباحًا حتى 11 مساءً',
     workingHoursEn: 'Daily, 7:00 AM - 11:00 PM',
+    primaryColor: '#07808D',
     menus: [
       {
         key: 'breakfast',

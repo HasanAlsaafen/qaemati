@@ -86,7 +86,6 @@ export class BrandingController {
       cardStyle,
       buttonShape,
       categoryDivider,
-      itemDivider,
       backgroundStyle,
       backgroundPattern,
       sectionSpacing,
@@ -138,7 +137,6 @@ export class BrandingController {
         cardStyle: cardStyle?.trim(),
         buttonShape: buttonShape?.trim(),
         categoryDivider: categoryDivider?.trim(),
-        itemDivider: itemDivider?.trim(),
         backgroundStyle: backgroundStyle?.trim(),
         backgroundPattern: backgroundPattern?.trim(),
         sectionSpacing: sectionSpacing?.trim(),
@@ -210,7 +208,6 @@ export class BrandingController {
         case 'INVALID_CARD_STYLE':
         case 'INVALID_BUTTON_SHAPE':
         case 'INVALID_CATEGORY_DIVIDER':
-        case 'INVALID_ITEM_DIVIDER':
         case 'INVALID_BACKGROUND_STYLE':
         case 'INVALID_BACKGROUND_PATTERN':
         case 'INVALID_SECTION_SPACING':

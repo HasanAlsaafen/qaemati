@@ -8,8 +8,8 @@ Branch `refactor/human-ui-and-production-prep`. Two phases from the approved aud
 | --- | --- | --- |
 | Type-check | pass | pass |
 | Lint | pass | pass |
-| Unit tests | 84 pass | 139 pass after Phase C (55 new, none changed) |
-| E2E tests | 66 pass | 117 pass after Phase C (51 new, none changed or weakened) |
+| Unit tests | 84 pass | 146 pass after Phase D (62 new, none changed) |
+| E2E tests | 66 pass | 117 pass after Phase D (51 new net, none weakened) |
 | axe nodes, 17 pages at 375px (WCAG 2 A, AA, 2.2 AA) | 64, all serious or critical | 0 |
 | Pages with horizontal scroll at 375px | 4 | 0 |
 | Interactive controls under 44px | 257 | 0 |
@@ -139,6 +139,44 @@ Left undone in Phase C
 Dev database changes made while verifying (not part of the code)
 - All three migrations were applied to the dev and test databases.
 - On the dev database I set the demo contact details on both restaurants, split the cafe into Breakfast and All day menus the way the seed does, and turned on the logo divider for it. The two restaurants' other data, uploads and branding were not touched. `npm run prisma:seed` recreates the same state from scratch.
+
+## Phase D: match the reference design (this session, after Phase C)
+
+The owner asked that the design match the reference menu. I opened the page in a browser, read its computed styles and DOM, and rebuilt the public menu to follow it. Nothing was copied from the page: no images, logos, font files or text.
+
+What was taken from the reference
+- Tokens: page `#F2F9FA`, cream white surface `#FFFDFA`, muted fill `#DCECEF`, border `#CFE4E8`, text `#0F2A30`, muted text `#4F6E75`, blue primary and orange accent defaults, 20px card radius, no card shadow. Admin pages share the tokens.
+- Type: Tajawal for interface text, headings and prices, IBM Plex Sans Arabic as fallback. Self-hosted, 400, 500 and 700, Arabic and Latin files with their license, preloaded per language.
+- Layout: full width cover, then a header row with the logo, name and tagline at the start and an AR | EN pill at the end; pill menu tabs; a full width rounded search with filter and share buttons; round category chips with photos and a ringed active state, "All" first; section titles with a primary bar; a two column grid (three on large screens) of image first dish cards with the price in the primary color and the currency symbol after the number; a centered detail card with a big photo, a dark round close button, name, price, category and description; a centered footer with the address and map pin, hours, and an icon row for phone, WhatsApp, Instagram and Facebook.
+- Placeholders: a dish or category without a photo shows the restaurant logo (or a fork and knife icon). A category chip uses the first photographed dish of that category.
+
+Changes beyond the visuals
+- Removed the Phase C "between dishes" divider and its column (migration `20261007030000_drop_item_divider`), since the reference's logo was a placeholder picture, not a divider. No release had included it.
+- Header call and WhatsApp buttons moved to the footer, matching the reference.
+- Currency symbols from `Intl` (`src/common/currency.ts`, tested): ₪ for ILS, code kept for JOD in English.
+- New `primary-text` token, derived per restaurant, so tag badges read on any brand color (found by axe on the cafe's teal: 3.84:1 before, 4.5:1 or better after). The secondary text derivation moved from a 35% to a 40% darkening because the default orange failed on its own tint in the branding preview (4.24:1).
+- The item sheet close button is translated now (it was hard coded English).
+
+Files touched (main ones)
+- New: `public/fonts/tajawal/*`, `src/common/currency.ts` and spec, migration `20261007030000`.
+- Rewritten: `views/components/{restaurant-header,language-switcher,menu-switcher,category-chip,menu-item-card,restaurant-footer}.njk`, `views/pages/menu.njk`.
+- Changed: `src/styles/{tokens,fonts,app}.css`, `tailwind.config.js`, `views/partials/head.njk`, `views/layouts/menu.njk`, `views/components/{item-detail-sheet,menu-filter-sheet}.njk`, `public/js/menu.js`, `public/js/color-contrast.js`, `src/menu/menu.service.ts`, `src/common/color.ts`, `scripts/check-contrast.ts`, `docs/design-system.md`, seed placeholder colors, favicon.
+
+Tests
+- Unit 146 pass (2 new for the derived text color, 5 for currency symbols), e2e 117 pass.
+- Two existing specials tests located the banner by a CSS class that the restyle removed. I added a `data-todays-specials` hook and pointed them at it. The second one would have passed vacuously on an empty slice, so it now also asserts the banner is found. The All chip tests were updated for the new chip markup. No assertion was weakened.
+- New tests: currency symbol, logo placeholder for a dish and for a category, category chip from the first photo, active language in the pill, translated close button.
+
+Verification
+- axe at 375px on all 17 pages plus the two menu cafe page in both languages and both menus: 0 violations, no horizontal scroll, no control under 44px.
+- `contrast:check` passes with the new palette. Looked at in a real browser: Arabic and English at 375px, Arabic at 1280px, the detail card, the footer, and the selection bar after adding a dish.
+
+Left undone
+- Search is not sticky (see decisions).
+- The reference's item cards have no description, tags or add button. Ours keep them because they carry information and features the owner relies on.
+- I read the reference at one point in time and only its public page. Other states (its admin, its English version) were not seen.
+
+Dev database changes made for this phase: the cafe's saved olive colors were reset to the seed's teal and its old background color cleared, and the seeded placeholder pictures were regenerated in the new palette. `npm run prisma:seed` recreates this.
 
 ## New risks noticed
 

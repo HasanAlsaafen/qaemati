@@ -91,18 +91,20 @@ describe('Specials and schedules (e2e)', () => {
     const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
     // Nunjucks HTML-escapes the apostrophe in "Today's special" to &#39;.
     expect(res.text).toContain('Today&#39;s special');
-    const bannerSection = res.text.split('bg-gold/10')[1]?.split('</main>')[0] ?? '';
+    const bannerSection = res.text.split('data-todays-specials')[1]?.split('</main>')[0] ?? '';
     expect(bannerSection).toContain('Special Item');
   });
 
   it("does not show a non-special item in the today's special banner", async () => {
     const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
-    // The banner markup sits between the "bg-gold/10" wrapper and the
+    // The banner markup sits between the data-todays-specials wrapper and the
     // sticky search bar that follows it; "Ordinary Item" legitimately
     // appears elsewhere (its own category row, and that row's embedded
     // JSON payload), so scope the check to the banner section specifically
     // rather than counting every occurrence on the page.
-    const bannerSection = res.text.split('bg-gold/10')[1]?.split('sticky top-0')[0] ?? '';
+    const bannerSection = res.text.split('data-todays-specials')[1]?.split('sticky top-0')[0] ?? '';
+    // An empty slice would pass this check for the wrong reason.
+    expect(bannerSection).toContain('Special Item');
     expect(bannerSection).not.toContain('Ordinary Item');
   });
 

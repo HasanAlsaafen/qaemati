@@ -97,9 +97,6 @@ model Restaurant {
   /// change needed per category.
   categoryDivider String @default("none")
 
-  /// 'none' or 'logo': the restaurant logo shown small between dishes.
-  itemDivider String @default("none")
-
   /// Admin customization: 'solid' (the original flat --color-bg,
   /// possibly itself overridden by backgroundColor) | 'pattern' (a
   /// subtle repeating CSS pattern tinted with --color-primary, see
