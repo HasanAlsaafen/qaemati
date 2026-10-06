@@ -8,6 +8,17 @@ import { DEMO_ADMIN_PASSWORD } from '../prisma-seed/run-seed';
 export class HomeController {
   constructor(private readonly prisma: PrismaService) {}
 
+  /** B4: the service worker's offline fallback (public/sw.js) serves
+   *  this page -- precached at install time -- for any navigation that
+   *  fails while offline and isn't otherwise cached. Plain GET, no
+   *  restaurant context: by the time this renders, the actual page the
+   *  visitor wanted has already failed to load. */
+  @Get('offline')
+  @Render('pages/offline')
+  offline() {
+    return {};
+  }
+
   @Get()
   @Render('pages/home')
   async index(@Query('demoReset') demoReset: string | undefined, @Req() req: Request) {

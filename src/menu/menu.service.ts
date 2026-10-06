@@ -366,6 +366,22 @@ export class MenuService {
     });
     return restaurant?.id ?? null;
   }
+
+  /** B4: just enough for the per-restaurant web app manifest (name,
+   *  icon, theme color) -- not the full getMenu() query, which this
+   *  endpoint has no use for. Falls back to the site favicon when the
+   *  restaurant hasn't uploaded a logo, so "Add to Home Screen" still
+   *  works (a manifest with no usable icon fails Chrome's
+   *  installability check entirely). */
+  async getManifestData(slug: string, locale: Locale) {
+    const restaurant = await this.prisma.restaurant.findUnique({ where: { slug } });
+    if (!restaurant) return null;
+    return {
+      name: locale === 'ar' ? restaurant.nameAr : restaurant.nameEn,
+      iconUrl: restaurant.logoPath,
+      themeColor: restaurant.primaryColor ?? '#2f5233',
+    };
+  }
 }
 
 function toWhatsappUrl(rawPhone: string): string {

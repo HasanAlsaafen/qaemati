@@ -44,4 +44,37 @@ describe('Public menu (e2e)', () => {
     expect(res.status).toBe(200);
     expect(res.text).toContain('Table 7');
   });
+
+  it('serves a per-restaurant web app manifest scoped to this slug', async () => {
+    const res = await request(app.getHttpServer()).get(`/m/${slug}/manifest.webmanifest?lang=en`);
+    expect(res.status).toBe(200);
+    expect(res.headers['content-type']).toContain('application/manifest+json');
+    expect(res.body.name).toBe('Test Restaurant');
+    expect(res.body.start_url).toBe(`/m/${slug}`);
+    expect(res.body.scope).toBe(`/m/${slug}`);
+    expect(res.body.icons.length).toBeGreaterThan(0);
+  });
+
+  it('404s the manifest for an unknown slug', async () => {
+    const res = await request(app.getHttpServer()).get('/m/does-not-exist/manifest.webmanifest');
+    expect(res.status).toBe(404);
+  });
+
+  it('links the manifest and registers the service worker on a real (non-embed) menu page', async () => {
+    const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
+    expect(res.text).toContain(`/m/${slug}/manifest.webmanifest`);
+    expect(res.text).toContain('/js/pwa.js');
+  });
+
+  it('omits the manifest link on the embedded branding-preview page', async () => {
+    const res = await request(app.getHttpServer()).get(`/m/${slug}?embed=1&lang=en`);
+    expect(res.text).not.toContain('manifest.webmanifest');
+    expect(res.text).not.toContain('/js/pwa.js');
+  });
+
+  it('serves the offline fallback page the service worker falls back to', async () => {
+    const res = await request(app.getHttpServer()).get('/offline?lang=en');
+    expect(res.status).toBe(200);
+    expect(res.text).toContain('You&#39;re offline');
+  });
 });

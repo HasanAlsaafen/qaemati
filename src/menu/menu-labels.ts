@@ -31,6 +31,14 @@ export function buildMenuLabels(i18n: I18nService, locale: Locale) {
       // there automatically gets a filter option here too.
       tagOptions: ALL_TAGS.map((code) => ({ code, label: t(TAG_I18N_KEY[code]) })),
     },
+    share: {
+      buttonLabel: t('common.menu.share.buttonLabel'),
+      copied: t('common.menu.share.copied'),
+    },
+    pwa: {
+      installButton: t('common.menu.pwa.installButton'),
+      offlineBanner: t('common.menu.pwa.offlineBanner'),
+    },
     // Raw templates (the literal "{time}" placeholder left
     // uninterpolated) for the client-side ticking open/closed badge
     // (restaurant-header.njk + public/js/open-status.js) to substitute

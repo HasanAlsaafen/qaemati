@@ -1,0 +1,10 @@
+{% extends "layouts/base.njk" %}
+
+{% block title %}{{ t('common.menu.pwa.offlineTitle') }}{% endblock %}
+
+{% block content %}
+<div class="rounded-xl border border-border bg-surface p-8 text-center shadow-sm">
+  <h1 class="font-sans text-2xl font-bold text-text">{{ t('common.menu.pwa.offlineTitle') }}</h1>
+  <p class="mt-3 text-muted-text">{{ t('common.menu.pwa.offlineDescription') }}</p>
+</div>
+{% endblock %}

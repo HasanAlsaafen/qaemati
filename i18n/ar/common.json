@@ -85,6 +85,16 @@
       "buttonLabel": "تصفية",
       "title": "تصفية",
       "clearButton": "مسح التصفية"
+    },
+    "share": {
+      "buttonLabel": "مشاركة",
+      "copied": "تم نسخ الرابط"
+    },
+    "pwa": {
+      "installButton": "إضافة إلى الشاشة الرئيسية",
+      "offlineBanner": "أنت غير متصل بالإنترنت",
+      "offlineTitle": "أنت غير متصل بالإنترنت",
+      "offlineDescription": "هذه القائمة غير متاحة الآن. أعد الاتصال وحاول مرة أخرى."
     }
   },
   "admin": {

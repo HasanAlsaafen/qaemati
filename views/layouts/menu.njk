@@ -14,6 +14,18 @@
     <script defer src="/js/selection.js"></script>
   {% endif %}
   {% include "partials/head.njk" %}
+  {# B4: per-restaurant manifest, not a site-wide one -- start_url/scope
+     need to point at this exact slug so "Add to Home Screen" installs a
+     shortcut to this menu specifically. Skipped entirely in the
+     branding page's own iframe preview (embed=1): an iframe can't be
+     "installed," and a nested manifest link there would just be dead
+     weight. #}
+  {% if menu and not embed %}
+    <link rel="manifest" href="/m/{{ menu.slug }}/manifest.webmanifest">
+    {% if menu.primaryColorCss %}
+      <meta name="theme-color" content="{{ menu.primaryColorCss.primary }}">
+    {% endif %}
+  {% endif %}
   {# A4: a restaurant's own brand color overrides the Zaytoun default
      tokens (src/styles/tokens.css) for this page only -- scoped here
      via inline :root, not by editing the shared stylesheet, so every
@@ -74,6 +86,9 @@
   {{ toastHost() }}
 
   <script defer src="/js/scroll-restore.js"></script>
+  {% if menu and not embed %}
+    <script defer src="/js/pwa.js"></script>
+  {% endif %}
   {% block scripts %}{% endblock %}
 </body>
 </html>

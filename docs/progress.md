@@ -1661,3 +1661,47 @@ a partial-template system for a utility page.
   decision, not an oversight.
 - Undo is single-level by design (glossary says "Undo," not "Undo history") -- a second bulk
   action after one you meant to undo makes the first one unrecoverable through this UI.
+
+## Phase 17: Pack B4 -- share + PWA (done, closes out Pack B)
+
+### What was built
+
+- **Share button**: next to the filter/language controls on the public menu. `navigator.share`
+  where available (mobile browsers); falls back to copying the URL to the clipboard and a toast
+  ("Link copied") everywhere else -- verified both paths work (clipboard path confirmed live,
+  since desktop Chrome has no `navigator.share`).
+- **Add to Home Screen**: a per-restaurant web app manifest at
+  `/m/:slug/manifest.webmanifest` (not one site-wide manifest) -- `start_url`/`scope` point at
+  that exact slug, so installing from one restaurant's menu doesn't also claim to be installing
+  any other restaurant's. Uses the restaurant's uploaded logo as the icon when set, falling back
+  to the site favicon (a manifest with no usable icon fails Chrome's installability check
+  outright). Skipped on the branding page's own embedded iframe preview (`embed=1`) -- an iframe
+  can't be installed, so the link and the `beforeinstallprompt`-driven button would both be dead
+  weight there.
+- **Offline**: a service worker (`public/sw.js`) precaches a small static shell (the offline
+  page itself, `app.css`, the favicon) and serves that offline page for any navigation that fails
+  while offline. Deliberately NOT full offline menu browsing -- a menu's content changes whenever
+  its owner edits it, so caching `/m/:slug` pages themselves would risk serving a stale menu
+  (wrong prices, items marked available that no longer are) with no way for a visitor to tell.
+  Scope is "a friendly offline page instead of the browser's network-error page," not an offline
+  menu cache; noted as a deliberate boundary, not an oversight.
+
+### Verified
+
+- E2e: extended `test/menu.e2e-spec.ts` (+5 cases) -- the manifest's shape and per-slug
+  start_url/scope, a 404 for an unknown slug, the manifest link + `/js/pwa.js` present on a real
+  menu page and absent on the embedded preview, and the offline fallback page rendering. 60 e2e +
+  74 unit tests total.
+- Interactive (Claude-in-Chrome): loaded a real menu page, confirmed "Add to Home Screen" appears
+  (Chrome's own `beforeinstallprompt`, meaning the manifest + service worker + icon all passed
+  its installability check), clicked Share and confirmed the "Link copied" toast fires, then
+  fetched the manifest directly and confirmed its `name`/`start_url`/`scope`/`icons` and that the
+  service worker reports `active: true`.
+- `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
+  pass. No new migration needed this phase.
+
+### Known gaps / follow-ups
+
+Pack B (B1-B4) is now fully built. No further scoped work remains from the Phase 7 glossary
+research; the next phase, if any, needs fresh scoping from the user rather than continuing down
+a pre-existing list.

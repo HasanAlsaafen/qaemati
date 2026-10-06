@@ -94,4 +94,40 @@ export class MenuController {
     }
     res.setHeader('Cache-Control', 'no-store');
   }
+
+  /** B4: a per-restaurant web app manifest -- `start_url` points at
+   *  this exact restaurant's menu, so "Add to Home Screen" installs a
+   *  shortcut to THIS menu, not a generic app. Falls back to the site
+   *  favicon when the restaurant has no logo (a manifest with no
+   *  usable icon fails Chrome's installability check outright). */
+  @Get(':slug/manifest.webmanifest')
+  async manifest(
+    @Param('slug') slug: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    const locale = req.locale ?? 'ar';
+    const data = await this.menuService.getManifestData(slug, locale);
+    if (!data) {
+      res.status(404).send();
+      return;
+    }
+    const icon = data.iconUrl
+      ? { src: data.iconUrl, sizes: 'any', purpose: 'any' }
+      : { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' };
+
+    res.setHeader('Content-Type', 'application/manifest+json');
+    res.json({
+      name: data.name,
+      short_name: data.name,
+      start_url: `/m/${slug}`,
+      scope: `/m/${slug}`,
+      display: 'standalone',
+      background_color: '#ffffff',
+      theme_color: data.themeColor,
+      dir: locale === 'ar' ? 'rtl' : 'ltr',
+      lang: locale,
+      icons: [icon],
+    });
+  }
 }

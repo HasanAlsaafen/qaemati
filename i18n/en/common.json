@@ -85,6 +85,16 @@
       "buttonLabel": "Filter",
       "title": "Filter",
       "clearButton": "Clear filters"
+    },
+    "share": {
+      "buttonLabel": "Share",
+      "copied": "Link copied"
+    },
+    "pwa": {
+      "installButton": "Add to Home Screen",
+      "offlineBanner": "You're offline",
+      "offlineTitle": "You're offline",
+      "offlineDescription": "This menu isn't available right now. Reconnect and try again."
     }
   },
   "admin": {
