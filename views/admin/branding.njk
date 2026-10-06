@@ -22,7 +22,7 @@
   from it, survive that swap untouched.
 #}
 <div
-  class="mt-4 grid gap-6 lg:grid-cols-[1fr_400px] lg:items-start"
+  class="mt-4 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[1fr_400px] lg:items-start"
   x-data="{
     color: {{ (restaurant.primaryColor or '#44603C') | dump }},
     defaultColor: '#44603C',

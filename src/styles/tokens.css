@@ -45,6 +45,7 @@
   /* Adjusted from the original #B7791F (3.64:1 with white) to meet WCAG AA
      4.5:1 for white text, per docs/design-system.md contrast verification. */
   --color-warning: 165 103 22; /* #A56716 */
+  --color-warning-text: 122 72 10; /* #7A480A, for text on a warning tint */
   --color-danger: 179 56 44; /* #B3382C */
   --color-on-status: 255 255 255;
 

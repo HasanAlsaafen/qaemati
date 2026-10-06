@@ -88,6 +88,8 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale, defaultCurre
       duplicate: t('common.admin.bulk.duplicate'),
       duplicated: t('common.admin.bulk.duplicated'),
       selectAll: t('common.admin.bulk.selectAll'),
+      selectItem: t('common.admin.bulk.selectItem'),
+      importFileLabel: t('common.admin.bulk.importFileLabel'),
       changePrices: t('common.admin.bulk.changePrices'),
       changePricesHint: t('common.admin.bulk.changePricesHint'),
       percentLabel: t('common.admin.bulk.percentLabel'),

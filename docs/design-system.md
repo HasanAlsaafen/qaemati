@@ -33,6 +33,7 @@ CSS variables (for example `--color-primary`) without touching Tailwind config o
 | `--color-gold` | `#E2B04A` | "Popular" badge only, paired with dark text |
 | `--color-success` | `#2A7248` | Success states, also text on its own 10% tint (4.7:1) |
 | `--color-warning` | `#A56716` | Warning states. Adjusted from the originally specified `#B7791F` (3.64:1 with white text) to `#A56716` (4.61:1), per the contrast script below |
+| `--color-warning-text` | `#7A480A` | Text on a warning tint. `--color-warning` itself is only 3.8:1 on its own 10% tint, so message text uses this darker value (6.3:1) |
 | `--color-danger` | `#B3382C` | Errors and destructive actions only, never decorative |
 
 Every text/background and button/status pairing is checked by `npm run contrast:check`

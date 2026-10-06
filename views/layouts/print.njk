@@ -11,6 +11,9 @@
   {% include "partials/head.njk" %}
 </head>
 <body class="min-h-screen bg-bg text-text font-sans antialiased">
-  {% block content %}{% endblock %}
+  {% include "partials/skip-link.njk" %}
+  <main id="main-content" tabindex="-1" class="focus:outline-none">
+    {% block content %}{% endblock %}
+  </main>
 </body>
 </html>

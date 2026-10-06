@@ -1,49 +1,28 @@
+{% from "components/file-input.njk" import fileInput %}
 {# restaurant: Restaurant row (admin-view-model.ts toRestaurantSettingsView) #}
 <section id="branding-images" class="rounded-lg border border-border bg-surface p-4">
   <div class="grid gap-6 sm:grid-cols-2">
     <div>
       <label for="branding-logo-input" class="text-sm font-medium text-text">{{ labels.branding.logoLabel }}</label>
-      <div class="mt-2 flex items-center gap-3">
+      <div class="mt-2 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
         <span class="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-muted-surface">
           {% if restaurant.logoPath %}
             <img src="{{ restaurant.logoPath }}" alt="" width="64" height="64" class="h-full w-full object-cover">
           {% endif %}
         </span>
-        <input
-          id="branding-logo-input"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          name="image"
-          class="block text-sm text-text"
-          hx-post="/admin/branding/logo"
-          hx-trigger="change"
-          hx-target="#branding-images"
-          hx-swap="outerHTML"
-          hx-encoding="multipart/form-data"
-        >
+        {{ fileInput('branding-logo-input', 'image', 'image/jpeg,image/png,image/webp', 'hx-post="/admin/branding/logo" hx-trigger="change" hx-target="#branding-images" hx-swap="outerHTML" hx-encoding="multipart/form-data"') }}
       </div>
     </div>
 
     <div>
       <label for="branding-cover-input" class="text-sm font-medium text-text">{{ labels.branding.coverImageLabel }}</label>
-      <div class="mt-2 flex items-center gap-3">
+      <div class="mt-2 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
         <span class="h-16 w-28 shrink-0 overflow-hidden rounded-md bg-muted-surface">
           {% if restaurant.coverImagePath %}
             <img src="{{ restaurant.coverImagePath }}" alt="" width="112" height="64" class="h-full w-full object-cover">
           {% endif %}
         </span>
-        <input
-          id="branding-cover-input"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          name="image"
-          class="block text-sm text-text"
-          hx-post="/admin/branding/cover"
-          hx-trigger="change"
-          hx-target="#branding-images"
-          hx-swap="outerHTML"
-          hx-encoding="multipart/form-data"
-        >
+        {{ fileInput('branding-cover-input', 'image', 'image/jpeg,image/png,image/webp', 'hx-post="/admin/branding/cover" hx-trigger="change" hx-target="#branding-images" hx-swap="outerHTML" hx-encoding="multipart/form-data"') }}
       </div>
     </div>
   </div>
@@ -58,25 +37,13 @@
   #}
   <div class="mt-6 border-t border-border pt-6" x-show="backgroundStyle === 'image'" x-cloak>
     <label for="branding-background-input" class="text-sm font-medium text-text">{{ labels.branding.backgroundImageLabel }}</label>
-    <div class="mt-2 flex items-center gap-3">
+    <div class="mt-2 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
       <span class="h-16 w-28 shrink-0 overflow-hidden rounded-md bg-muted-surface">
         {% if restaurant.backgroundImagePath %}
           <img src="{{ restaurant.backgroundImagePath }}" alt="" width="112" height="64" class="h-full w-full object-cover">
         {% endif %}
       </span>
-      <input
-        id="branding-background-input"
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        name="image"
-        class="block text-sm text-text"
-        hx-post="/admin/branding/background"
-        hx-trigger="change"
-        hx-target="#branding-images"
-        hx-swap="outerHTML"
-        hx-encoding="multipart/form-data"
-        hx-on::after-request="window.dispatchEvent(new Event('qaemati-preview-refresh'))"
-      >
+      {{ fileInput('branding-background-input', 'image', 'image/jpeg,image/png,image/webp', 'hx-post="/admin/branding/background" hx-trigger="change" hx-target="#branding-images" hx-swap="outerHTML" hx-encoding="multipart/form-data" hx-on::after-request="window.dispatchEvent(new Event(\'qaemati-preview-refresh\'))"') }}
     </div>
   </div>
 </section>

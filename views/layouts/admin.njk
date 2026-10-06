@@ -38,16 +38,17 @@
     },
   }"
 >
+  {% include "partials/skip-link.njk" %}
   <div class="flex min-h-screen flex-col sm:flex-row">
     <aside
       class="hidden shrink-0 border-e border-border bg-surface transition-[width] duration-base ease-standard sm:sticky sm:top-0 sm:flex sm:h-screen sm:flex-col sm:overflow-y-auto"
       x-bind:class="collapsed ? 'sm:w-16' : 'sm:w-56'"
     >
       <div class="flex h-14 items-center px-3" x-bind:class="collapsed ? 'justify-center' : 'justify-between'">
-        <a href="/admin" class="truncate text-lg font-bold" x-show="!collapsed">{{ t('common.app.name') }}</a>
+        <a href="/admin" class="inline-flex min-h-11 items-center truncate text-lg font-bold" x-show="!collapsed">{{ t('common.app.name') }}</a>
         <button
           type="button"
-          class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-muted-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           x-on:click="toggleCollapsed()"
           x-bind:aria-expanded="(!collapsed).toString()"
           aria-label="{{ t('common.admin.nav.toggleSidebar') }}"
@@ -111,7 +112,7 @@
     <div class="flex min-w-0 flex-1 flex-col">
       <header class="border-b border-border bg-surface sm:hidden">
         <div class="flex items-center justify-between gap-3 px-4 py-3">
-          <a href="/admin" class="text-lg font-bold">{{ t('common.app.name') }}</a>
+          <a href="/admin" class="inline-flex min-h-11 items-center text-lg font-bold">{{ t('common.app.name') }}</a>
           <button
             type="button"
             class="inline-flex h-11 w-11 items-center justify-center rounded-md text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
@@ -156,7 +157,7 @@
         both squeezed into ~700px, producing a squashed form with a
         cut-off phone preview.
       #}
-      <main class="mx-auto w-full {% block mainWidth %}max-w-3xl{% endblock %} px-4 py-8">
+      <main id="main-content" tabindex="-1" class="mx-auto w-full {% block mainWidth %}max-w-3xl{% endblock %} px-4 py-8 focus:outline-none">
         {% block content %}{% endblock %}
       </main>
     </div>

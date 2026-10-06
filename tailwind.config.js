@@ -38,6 +38,7 @@ module.exports = {
         'on-gold': withOpacity('--color-on-gold'),
         success: withOpacity('--color-success'),
         warning: withOpacity('--color-warning'),
+        'warning-text': withOpacity('--color-warning-text'),
         danger: withOpacity('--color-danger'),
       },
       fontFamily: {

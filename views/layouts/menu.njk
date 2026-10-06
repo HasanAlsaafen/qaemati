@@ -95,6 +95,7 @@
   style="background-image: url('{{ menu.backgroundImageUrl }}'); background-size: cover; background-position: top center; background-repeat: no-repeat;"
   {% endif %}
 >
+  {% include "partials/skip-link.njk" %}
   {% block content %}{% endblock %}
 
   {{ toastHost() }}

@@ -30,10 +30,22 @@ const colors = {
   onGold: '#2B2622',
   success: '#2A7248',
   warning: '#A56716',
+  warningText: '#7A480A',
   danger: '#B3382C',
   white: '#FFFFFF',
   borderStrong: '#9C927F',
 };
+
+
+// Status messages are drawn as colored text on a 10% tint of the same color
+// over the page background, which is lower contrast than text on white.
+function tint(fgHex: string, bgHex: string, alpha = 0.1): string {
+  const fg = hexToRgb(fgHex)!;
+  const bg = hexToRgb(bgHex)!;
+  const mix = (f: number, b: number) => Math.round(alpha * f + (1 - alpha) * b);
+  const toHex = (n: number) => n.toString(16).padStart(2, '0');
+  return `#${toHex(mix(fg.r, bg.r))}${toHex(mix(fg.g, bg.g))}${toHex(mix(fg.b, bg.b))}`;
+}
 
 const pairs: Pair[] = [
   { name: 'text / bg', fg: colors.text, bg: colors.bg, minRatio: 4.5, context: 'body text' },
@@ -155,6 +167,34 @@ const pairs: Pair[] = [
     bg: colors.surface,
     minRatio: 3,
     context: 'interactive UI boundary',
+  },
+  {
+    name: 'success / success tint on bg (message)',
+    fg: colors.success,
+    bg: tint(colors.success, colors.bg),
+    minRatio: 4.5,
+    context: 'status message',
+  },
+  {
+    name: 'danger / danger tint on bg (message)',
+    fg: colors.danger,
+    bg: tint(colors.danger, colors.bg),
+    minRatio: 4.5,
+    context: 'status message',
+  },
+  {
+    name: 'warning-text / warning tint on bg (message)',
+    fg: colors.warningText,
+    bg: tint(colors.warning, colors.bg),
+    minRatio: 4.5,
+    context: 'status message',
+  },
+  {
+    name: 'secondary-text / surface (404 label)',
+    fg: colors.secondaryText,
+    bg: colors.surface,
+    minRatio: 4.5,
+    context: 'small text',
   },
 ];
 

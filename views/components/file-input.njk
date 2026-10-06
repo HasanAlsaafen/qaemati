@@ -1,0 +1,17 @@
+{#
+  Native file input restyled so the browse button is a 44px target and the
+  control can shrink with its container. Without min-w-0 and a full width,
+  the browser's intrinsic input width (about 306px) pushes narrow phone
+  layouts into horizontal scroll. The caller supplies the <label>.
+#}
+{% macro fileInput(id, name, accept, attrs='', required=false) %}
+  <input
+    id="{{ id }}"
+    type="file"
+    name="{{ name }}"
+    accept="{{ accept }}"
+    {% if required %}required{% endif %}
+    class="block min-h-11 w-full min-w-0 text-sm text-text file:me-3 file:min-h-11 file:cursor-pointer file:rounded-md file:border file:border-border-strong file:bg-surface file:px-4 file:text-sm file:font-medium file:text-text hover:file:bg-muted-surface"
+    {{ attrs | safe }}
+  >
+{% endmacro %}

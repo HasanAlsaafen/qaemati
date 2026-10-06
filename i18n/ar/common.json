@@ -18,7 +18,8 @@
     }
   },
   "nav": {
-    "language": "English"
+    "language": "English",
+    "skipToContent": "انتقل إلى المحتوى الرئيسي"
   },
   "errors": {
     "notFoundTitle": "الصفحة غير موجودة",
@@ -206,7 +207,9 @@
       "categoryColumn": "القسم",
       "priceColumn": "السعر",
       "emptyTitle": "لا توجد أصناف بعد",
-      "emptyDescription": "أضف أصنافًا من صفحة الأقسام أولاً."
+      "emptyDescription": "أضف أصنافًا من صفحة الأقسام أولاً.",
+      "importFileLabel": "ملف CSV",
+      "selectItem": "تحديد {name}"
     },
     "qr": {
       "title": "رموز QR والطباعة",

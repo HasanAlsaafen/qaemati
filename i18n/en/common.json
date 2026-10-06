@@ -18,7 +18,8 @@
     }
   },
   "nav": {
-    "language": "العربية"
+    "language": "العربية",
+    "skipToContent": "Skip to main content"
   },
   "errors": {
     "notFoundTitle": "Page not found",
@@ -206,7 +207,9 @@
       "categoryColumn": "Category",
       "priceColumn": "Price",
       "emptyTitle": "No items yet",
-      "emptyDescription": "Add items from the Categories page first."
+      "emptyDescription": "Add items from the Categories page first.",
+      "importFileLabel": "CSV file",
+      "selectItem": "Select {name}"
     },
     "qr": {
       "title": "QR codes & printing",

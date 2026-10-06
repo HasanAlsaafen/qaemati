@@ -1,0 +1,9 @@
+{#
+  First focusable element on every page. Hidden until it receives focus,
+  then pinned top-start so a keyboard user can jump past the navigation.
+  Every layout must give its main landmark id="main-content".
+#}
+<a
+  href="#main-content"
+  class="sr-only print:hidden focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:inline-flex focus:min-h-11 focus:items-center focus:rounded-md focus:bg-primary focus:px-4 focus:text-sm focus:font-medium focus:text-primary-on focus:shadow-overlay focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-text"
+>{{ t('common.nav.skipToContent') }}</a>
