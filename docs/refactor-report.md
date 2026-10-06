@@ -13,6 +13,12 @@ The brief assumed an AI-templated demo needing a rebuild. The repository had alr
 - **Phase 5, production seams**: added `/robots.txt`, `/sitemap.xml` (one entry per restaurant), `/health` (database round trip), `PUBLIC_BASE_URL` support, and explicit static cache headers. `docs/conversion-roadmap.md` written.
 - **Phase 6, verification**: new unit tests for the SEO helpers, new e2e spec for the endpoints and menu metadata, tour e2e assertion updated for the reworded string.
 
+## Verification run after the first commit
+
+- axe (WCAG 2 A, AA, 2.2 AA) over the public menu, admin login, dashboard and QR page in both languages found one serious issue: the English menu's "open now" pill had 4.42:1 contrast. `--color-success` darkened from `#2E7D4F` to `#2A7248` (4.7:1 on the tint). Rerun: zero violations on all eight pages.
+- Menu screenshots at 375, 768 and 1280px in Arabic (RTL) and English (LTR) saved in `docs/ux/screenshots/after/`. No horizontal scroll at any width, `dir` correct in both locales.
+- `contrast:check` script updated to the new success value.
+
 ## AI tells found
 
 | Tell | Fix |
@@ -30,7 +36,7 @@ Unchanged. Zaytoun palette as CSS variables, Thmanyah display and body faces wit
 - No visual rewrite, no new front-end structure. The existing component macros and layouts already match the seams the brief asks for.
 - Rate limiting beyond login, and a JSON logger. Admin form endpoints are behind session auth and CSRF. Revisit when running multiple instances.
 - Home page social tags. It is a demo index.
-- Screenshots at 375, 768 and 1280 and an axe or Lighthouse rerun. Prior reports exist in `docs/ux/`. I did not rerun them in this pass.
+- Lighthouse rerun. Prior reports exist in `docs/ux/lighthouse/`.
 - Real address and opening hours in JSON-LD. The schema stores free text hours and no structured address, so I only emit fields that exist.
 
 ## Next steps

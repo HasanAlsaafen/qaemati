@@ -41,7 +41,7 @@
   --color-gold: 226 176 74; /* #E2B04A */
   --color-on-gold: 43 38 34; /* #2B2622 */
 
-  --color-success: 46 125 79; /* #2E7D4F */
+  --color-success: 42 114 72; /* #2A7248 */
   /* Adjusted from the original #B7791F (3.64:1 with white) to meet WCAG AA
      4.5:1 for white text, per docs/design-system.md contrast verification. */
   --color-warning: 165 103 22; /* #A56716 */

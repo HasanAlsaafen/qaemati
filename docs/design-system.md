@@ -31,7 +31,7 @@ CSS variables (for example `--color-primary`) without touching Tailwind config o
 | `--color-primary` / `-hover` / `-soft` | `#44603C` / `#365030` / `#E7EEDF` | Primary actions, availability/success-adjacent accents |
 | `--color-secondary` / `-text` / `-soft` | `#C4622D` / `#A0481B` / `#F7E3D6` | Terracotta accents. Use `-text` for small text and button backgrounds (the lighter `DEFAULT` fails AA at small sizes) |
 | `--color-gold` | `#E2B04A` | "Popular" badge only, paired with dark text |
-| `--color-success` | `#2E7D4F` | Success states |
+| `--color-success` | `#2A7248` | Success states, also text on its own 10% tint (4.7:1) |
 | `--color-warning` | `#A56716` | Warning states. Adjusted from the originally specified `#B7791F` (3.64:1 with white text) to `#A56716` (4.61:1), per the contrast script below |
 | `--color-danger` | `#B3382C` | Errors and destructive actions only, never decorative |
 

@@ -28,7 +28,7 @@ const colors = {
   secondarySoft: '#F7E3D6',
   gold: '#E2B04A',
   onGold: '#2B2622',
-  success: '#2E7D4F',
+  success: '#2A7248',
   warning: '#A56716',
   danger: '#B3382C',
   white: '#FFFFFF',

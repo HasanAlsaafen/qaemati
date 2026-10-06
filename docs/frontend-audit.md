@@ -46,3 +46,7 @@ Baseline before changes: `tsc`, lint, 74 unit tests and 60 e2e tests all passed.
 - **Home**: functional demo index. No decorative sections.
 - **Admin**: task shaped screens, inline validation, guided tour. No High issues.
 - **Error pages**: designed, bilingual, rendered by the global exception filter.
+
+## Follow-up finding
+
+- Medium: English menu "open now" pill measured 4.42:1 (needs 4.5:1). Fixed by darkening `--color-success`.
