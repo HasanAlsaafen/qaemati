@@ -69,7 +69,7 @@
       "messageTableLine": "طاولة: {name}",
       "messageNoteLine": "ملاحظة: {note}",
       "messageTotalLine": "الإجمالي: {total} {currency}",
-      "messageItemLine": "{qty}x {name} — {price} {currency}"
+      "messageItemLine": "{qty}x {name}: {price} {currency}"
     },
     "fromPrice": "يبدأ من",
     "selectVariant": "اختر الحجم",

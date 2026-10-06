@@ -69,7 +69,7 @@
       "messageTableLine": "Table: {name}",
       "messageNoteLine": "Note: {note}",
       "messageTotalLine": "Total: {total} {currency}",
-      "messageItemLine": "{qty}x {name} — {price} {currency}"
+      "messageItemLine": "{qty}x {name}: {price} {currency}"
     },
     "fromPrice": "From",
     "selectVariant": "Choose a size",
@@ -311,7 +311,7 @@
       "next": "Next",
       "done": "Done",
       "stepLabel": "Step {current} of {total}",
-      "step1Title": "Welcome to your menu",
+      "step1Title": "Your menu is ready",
       "step1Body": "This dashboard is where you manage your categories and items. Add a category, then add items to it -- every change appears on your public menu immediately.",
       "step2Title": "Specials, variants, and add-ons",
       "step2Body": "Open any item to set sizes (variants), extras (add-ons), or mark it as today's special. Categories can also have their own time window, e.g. a Breakfast category shown only in the morning.",

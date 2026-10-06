@@ -37,7 +37,7 @@ describe('Guided tour (e2e)', () => {
   it('shows the tour on a fresh admin login', async () => {
     const agent = await loginAsAdmin(app, adminEmail);
     const res = await agent.get('/admin?lang=en').set('Cookie', 'qaemati_locale=en');
-    expect(res.text).toContain('Welcome to your menu');
+    expect(res.text).toContain('Your menu is ready');
   });
 
   it('marks the tour dismissed in the database and stops showing it', async () => {
@@ -56,12 +56,12 @@ describe('Guided tour (e2e)', () => {
     // Same session, no new login: the dashboard must not show the tour
     // again without a fresh page load even having to re-check the DB.
     const dashboardRes = await agent.get('/admin?lang=en').set('Cookie', 'qaemati_locale=en');
-    expect(dashboardRes.text).not.toContain('Welcome to your menu');
+    expect(dashboardRes.text).not.toContain('Your menu is ready');
   });
 
   it('does not show the tour again on a subsequent fresh login', async () => {
     const agent = await loginAsAdmin(app, adminEmail);
     const res = await agent.get('/admin?lang=en').set('Cookie', 'qaemati_locale=en');
-    expect(res.text).not.toContain('Welcome to your menu');
+    expect(res.text).not.toContain('Your menu is ready');
   });
 });

@@ -2,7 +2,7 @@ import { buildWhatsAppMessage, buildWhatsAppUrl } from './build-whatsapp-message
 
 const labels = {
   messageTableLine: 'Table: {name}',
-  messageItemLine: '{qty}x {name} — {price} {currency}',
+  messageItemLine: '{qty}x {name}: {price} {currency}',
   messageNoteLine: 'Note: {note}',
   messageTotalLine: 'Total: {total} {currency}',
   disclaimer: 'This is a message, not an online order or payment.',
@@ -21,7 +21,7 @@ describe('buildWhatsAppMessage', () => {
     });
 
     expect(message).toContain('Bayt Al-Zaytoun');
-    expect(message).toContain('2x Arabic Coffee — 12.00 ILS');
+    expect(message).toContain('2x Arabic Coffee: 12.00 ILS');
     expect(message).toContain('Total: 24.00 ILS');
     expect(message).toContain('This is a message, not an online order or payment.');
   });
@@ -91,8 +91,8 @@ describe('buildWhatsAppMessage', () => {
       currency: 'ILS',
       labels,
     });
-    expect(message).toContain('1x Coffee — 10.00 ILS');
-    expect(message).toContain('3x Knafeh — 20.00 ILS');
+    expect(message).toContain('1x Coffee: 10.00 ILS');
+    expect(message).toContain('3x Knafeh: 20.00 ILS');
   });
 });
 

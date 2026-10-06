@@ -4,6 +4,7 @@ import { I18nService } from 'nestjs-i18n';
 import { MenuService } from './menu.service';
 import { buildMenuLabels } from './menu-labels';
 import { AnalyticsService } from '../admin/analytics.service';
+import { buildRestaurantJsonLd, getBaseUrl, toAbsoluteUrl } from '../seo/seo';
 
 @Controller('m')
 export class MenuController {
@@ -58,8 +59,24 @@ export class MenuController {
         }
       : undefined;
     const menu = await this.menuService.getMenu(slug, locale, preview);
+    const baseUrl = getBaseUrl(req);
+    const canonicalUrl = `${baseUrl}/m/${encodeURIComponent(slug)}`;
+    const imageUrl = toAbsoluteUrl(baseUrl, menu.coverImageUrl ?? menu.logoUrl);
     return {
       menu,
+      seo: {
+        canonicalUrl,
+        imageUrl,
+        jsonLd: buildRestaurantJsonLd({
+          name: menu.name,
+          description: menu.description,
+          url: canonicalUrl,
+          imageUrl,
+          menuUrl: canonicalUrl,
+          telephone: menu.whatsappUrl ? `+${menu.whatsappUrl.replace(/\D/g, '')}` : null,
+          instagramUrl: menu.instagramUrl,
+        }),
+      },
       tableLabel: table?.trim() || null,
       // Purely cosmetic (hides the scrollbar inside the branding page's
       // iframe preview, see src/styles/app.css's .embed-frame rule) --

@@ -24,7 +24,7 @@ export interface BuildWhatsAppMessageInput {
   currency: string;
   labels: {
     messageTableLine: string; // "Table: {name}"
-    messageItemLine: string; // "{qty}x {name} — {price} {currency}"
+    messageItemLine: string; // "{qty}x {name}: {price} {currency}"
     messageNoteLine: string; // "Note: {note}"
     messageTotalLine: string; // "Total: {total} {currency}"
     disclaimer: string;

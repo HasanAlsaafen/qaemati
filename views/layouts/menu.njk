@@ -14,6 +14,20 @@
     <script defer src="/js/selection.js"></script>
   {% endif %}
   {% include "partials/head.njk" %}
+  {% if seo and not embed %}
+    <link rel="canonical" href="{{ seo.canonicalUrl }}">
+    <meta property="og:type" content="restaurant.restaurant">
+    <meta property="og:title" content="{{ menu.name }}">
+    <meta property="og:description" content="{{ menu.description or menu.name }}">
+    <meta property="og:url" content="{{ seo.canonicalUrl }}">
+    <meta property="og:locale" content="{{ 'ar_AR' if locale == 'ar' else 'en_US' }}">
+    <meta name="twitter:card" content="{{ 'summary_large_image' if seo.imageUrl else 'summary' }}">
+    {% if seo.imageUrl %}
+      <meta property="og:image" content="{{ seo.imageUrl }}">
+      <meta name="twitter:image" content="{{ seo.imageUrl }}">
+    {% endif %}
+    <script type="application/ld+json">{{ seo.jsonLd | safe }}</script>
+  {% endif %}
   {# B4: per-restaurant manifest, not a site-wide one -- start_url/scope
      need to point at this exact slug so "Add to Home Screen" installs a
      shortcut to this menu specifically. Skipped entirely in the

@@ -51,7 +51,18 @@ export async function configureApp(app: NestExpressApplication): Promise<void> {
   // ~90KB uncompressed menu page).
   app.use(compression());
   app.use(cookieParser());
-  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.useStaticAssets(join(__dirname, '..', 'public'), {
+    maxAge: '1h',
+    setHeaders: (res, filePath) => {
+      // Font files never change in place; the service worker must always
+      // be revalidated or a bad release can never be replaced.
+      if (filePath.includes(`${join('public', 'fonts')}`)) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      } else if (filePath.endsWith('sw.js')) {
+        res.setHeader('Cache-Control', 'no-cache');
+      }
+    },
+  });
 
   // Nest applies its own default body parsers (express.json/urlencoded)
   // later than these explicit app.use() calls -- the same "module
