@@ -1,0 +1,16 @@
+{% extends "layouts/base.njk" %}
+
+{% block title %}{{ t('common.billing.errors.' + kind + 'Title') }}{% endblock %}
+
+{% block content %}
+<div class="rounded-card border border-border bg-surface p-8">
+  <p class="text-sm font-medium text-secondary-text">{{ statusCode }}</p>
+  <h1 class="mt-2 font-display text-2xl font-bold text-text">{{ t('common.billing.errors.' + kind + 'Title') }}</h1>
+  <p class="mt-3 text-muted-text">{{ message }}</p>
+  <p class="mt-1 text-sm text-muted-text">{{ t('common.billing.errors.body') }}</p>
+  <a
+    href="/admin/billing"
+    class="mt-6 inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+  >{{ t('common.billing.errors.toBilling') }}</a>
+</div>
+{% endblock %}

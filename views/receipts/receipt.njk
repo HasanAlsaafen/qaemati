@@ -1,0 +1,61 @@
+{% extends "layouts/print.njk" %}
+
+{% block title %}{{ payment.receiptNo | receiptNo }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-xl px-4 py-8">
+  <div class="print:hidden mb-4 flex items-center justify-between gap-3">
+    <a href="{{ '/admin/billing' if layout == 'tenant' else '/super/payments' }}" class="inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline">{{ t('common.billing.receipt.back') }}</a>
+    <button type="button" x-data x-on:click="window.print()" class="inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover">{{ t('common.billing.receipt.print') }}</button>
+  </div>
+
+  <article class="rounded-card border border-border bg-surface p-6">
+    <header class="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-4">
+      <div>
+        <p class="font-display text-xl font-bold text-text">{{ t('common.app.name') }}</p>
+        <p class="text-sm text-muted-text">{{ t('common.billing.receipt.title') }}</p>
+      </div>
+      <div class="text-end">
+        <p class="font-display text-lg font-bold text-text" dir="ltr">{{ payment.receiptNo | receiptNo }}</p>
+        <p class="text-sm text-muted-text" dir="ltr">{{ payment.paidAt | isoDate }}</p>
+        {% if payment.status == 'VOID' %}
+          <p class="mt-1 inline-flex rounded-sm bg-danger/10 px-2 py-0.5 text-xs font-bold text-danger">{{ t('common.billing.page.void') }}</p>
+        {% endif %}
+      </div>
+    </header>
+
+    <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+      <div>
+        <dt class="text-muted-text">{{ t('common.billing.receipt.restaurant') }}</dt>
+        <dd class="font-medium text-text">{{ payment.restaurant.nameEn if locale == 'en' else payment.restaurant.nameAr }}</dd>
+      </div>
+      <div>
+        <dt class="text-muted-text">{{ t('common.billing.receipt.plan') }}</dt>
+        <dd class="font-medium text-text">{{ payment.subscription.plan.nameEn if locale == 'en' else payment.subscription.plan.nameAr }}</dd>
+      </div>
+      <div>
+        <dt class="text-muted-text">{{ t('common.billing.receipt.period') }}</dt>
+        <dd class="font-medium text-text" dir="ltr">{{ payment.periodStart | isoDate }} to {{ payment.periodEnd | isoDate }}</dd>
+      </div>
+      <div>
+        <dt class="text-muted-text">{{ t('common.billing.receipt.method') }}</dt>
+        <dd class="font-medium text-text">{{ t('common.billing.method.' + payment.method) }}</dd>
+      </div>
+      {% if payment.reference %}
+        <div class="sm:col-span-2">
+          <dt class="text-muted-text">{{ t('common.billing.receipt.reference') }}</dt>
+          <dd class="font-medium text-text" dir="ltr">{{ payment.reference }}</dd>
+        </div>
+      {% endif %}
+    </dl>
+
+    <p class="mt-6 flex items-baseline justify-between gap-3 border-t border-border pt-4 text-lg font-bold text-text">
+      <span>{{ t('common.billing.receipt.amount') }}</span>
+      <span dir="ltr">{{ payment.amount | money }} {{ payment.currency | symbol(locale) }}</span>
+    </p>
+    {% if payment.status == 'VOID' and payment.voidReason %}
+      <p class="mt-3 text-sm text-muted-text">{{ payment.voidReason }}</p>
+    {% endif %}
+  </article>
+</div>
+{% endblock %}

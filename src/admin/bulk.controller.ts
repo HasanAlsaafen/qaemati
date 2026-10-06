@@ -17,8 +17,10 @@ import { BulkService, ImportRowResult } from './bulk.service';
 import { buildAdminLabels } from './admin-labels';
 import { csvImportMulterOptions } from './upload.config';
 import { parseIds } from './parse-ids';
+import { RequiresFeature } from '../tenancy/requires-feature';
 import { PriceChangeDto, UndoDto } from './dto/bulk.dto';
 
+@RequiresFeature('bulkTools')
 @Controller('admin/bulk')
 export class BulkController {
   constructor(

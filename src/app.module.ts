@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 import { validateEnv } from './config/env.validation';
@@ -12,6 +12,9 @@ import { AuthModule } from './auth/auth.module';
 import { CsrfViewMiddleware } from './auth/csrf-view.middleware';
 import { AdminModule } from './admin/admin.module';
 import { HomeModule } from './home/home.module';
+import { TenancyModule } from './tenancy/tenancy.module';
+import { FeatureGuard } from './tenancy/requires-feature';
+import { TenantContextMiddleware } from './tenancy/tenant-context.middleware';
 import { MenuModule } from './menu/menu.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { StyleguideModule } from './styleguide/styleguide.module';
@@ -32,6 +35,7 @@ import { StyleguideModule } from './styleguide/styleguide.module';
       ],
     }),
     PrismaModule,
+    TenancyModule,
     HomeModule,
     MenuModule,
     StyleguideModule,
@@ -40,6 +44,7 @@ import { StyleguideModule } from './styleguide/styleguide.module';
   ],
   providers: [
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
+    { provide: APP_GUARD, useClass: FeatureGuard },
     // Not applied via consumer.apply() (see configure() below) -- only
     // registered here as a provider so main.ts can fetch an instance with
     // app.get() and app.use() it before session/CSRF middleware.
@@ -53,6 +58,7 @@ export class AppModule implements NestModule {
     // runs before this one need `t` to already be set).
     consumer.apply(CsrfViewMiddleware).forRoutes('*');
     consumer.apply(AdminAuthMiddleware).exclude('admin/login', 'admin/logout').forRoutes('admin');
+    consumer.apply(TenantContextMiddleware).exclude('admin/login').forRoutes('admin');
     consumer.apply(AdminLocalsMiddleware).forRoutes('admin');
   }
 }

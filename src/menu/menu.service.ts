@@ -21,6 +21,9 @@ import {
 import { AnalyticsService } from '../admin/analytics.service';
 import { toFacebookUrl, toTelUrl } from '../common/contact';
 import { currencySymbol } from '../common/currency';
+import { TenancyService } from '../tenancy/tenancy.service';
+import { isServable } from '../tenancy/tenant-access';
+import { MenuUnavailableException } from '../tenancy/tenancy.exceptions';
 
 export interface MenuOptionView {
   id: string;
@@ -96,6 +99,9 @@ export interface MenuView {
   logoUrl: string | null;
   coverImageUrl: string | null;
   whatsappUrl: string | null;
+  /** The plan includes the WhatsApp selection list. The plain WhatsApp link
+   *  in the footer does not depend on it. */
+  orderingEnabled: boolean;
   instagramUrl: string | null;
   tagline: string | null;
   phone: string | null;
@@ -210,6 +216,7 @@ export class MenuService {
     private readonly prisma: PrismaService,
     private readonly i18n: I18nService,
     private readonly analytics: AnalyticsService,
+    private readonly tenancy: TenancyService,
   ) {}
 
   async getMenu(
@@ -242,6 +249,12 @@ export class MenuService {
     }
 
     const isPreviewOwner = Boolean(preview && preview.restaurantId === restaurant.id);
+    // An owner previewing their own menu still sees it while the subscription
+    // is over, diners and crawlers do not, and their visit is not counted.
+    const tenant = await this.tenancy.getContext(restaurant.id);
+    if (!isPreviewOwner && !isServable(tenant.access)) {
+      throw new MenuUnavailableException();
+    }
     if (!isPreviewOwner) {
       await this.analytics.recordMenuView(restaurant.id);
     }
@@ -401,6 +414,7 @@ export class MenuService {
       logoUrl: restaurant.logoPath,
       coverImageUrl: restaurant.coverImagePath,
       whatsappUrl: restaurant.whatsapp ? toWhatsappUrl(restaurant.whatsapp) : null,
+      orderingEnabled: tenant.features.has('whatsappOrdering'),
       instagramUrl: restaurant.instagramHandle ? toInstagramUrl(restaurant.instagramHandle) : null,
       tagline: pickNullable(restaurant.taglineAr, restaurant.taglineEn),
       phone: restaurant.phone,
@@ -473,6 +487,7 @@ export class MenuService {
   async getManifestData(slug: string, locale: Locale) {
     const restaurant = await this.prisma.restaurant.findUnique({ where: { slug } });
     if (!restaurant) return null;
+    if (!isServable((await this.tenancy.getContext(restaurant.id)).access)) return null;
     return {
       name: locale === 'ar' ? restaurant.nameAr : restaurant.nameEn,
       iconUrl: restaurant.logoPath,

@@ -8,6 +8,7 @@ import { TourController } from './tour.controller';
 import { AnalyticsController } from './analytics.controller';
 import { BulkController } from './bulk.controller';
 import { MenusController } from './menus.controller';
+import { BillingController } from './billing.controller';
 import { MenusService } from './menus.service';
 import { MenusViewService } from './menus-view.service';
 import { CategoryService } from './category.service';
@@ -28,6 +29,7 @@ import { BulkService } from './bulk.service';
     AnalyticsController,
     BulkController,
     MenusController,
+    BillingController,
   ],
   providers: [
     CategoryService,

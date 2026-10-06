@@ -127,7 +127,8 @@
       "qr": "QR & print",
       "toggleMenu": "Menu",
       "branding": "Branding",
-      "toggleSidebar": "Collapse sidebar"
+      "toggleSidebar": "Collapse sidebar",
+      "billing": "Subscription"
     },
     "form": {
       "required": "This field is required.",
@@ -375,5 +376,98 @@
     "invalidTime": "Enter a time like 09:30.",
     "invalidOption": "Pick one of the available options.",
     "summary": "Some fields need attention."
+  },
+  "billing": {
+    "blockedToast": "Your subscription has ended, so changes are turned off. Renew to continue.",
+    "featureUnavailable": "This feature is not part of your plan.",
+    "limit": {
+      "menus": "Your plan allows {limit} menus. Upgrade to add more.",
+      "categories": "Your plan allows {limit} categories. Upgrade to add more.",
+      "items": "Your plan allows {limit} dishes. Upgrade to add more.",
+      "adminUsers": "Your plan allows {limit} admin users. Upgrade to add more."
+    },
+    "errors": {
+      "blockedTitle": "Subscription ended",
+      "featureTitle": "Not in your plan",
+      "limitTitle": "Plan limit reached",
+      "body": "Contact the platform team to renew or change your plan.",
+      "menuUnavailableTitle": "This menu is not available right now",
+      "menuUnavailableBody": "Please ask the restaurant. It should be back soon.",
+      "toBilling": "View subscription"
+    },
+    "banner": {
+      "trial": "Free trial: {days} days left.",
+      "trialToday": "Your free trial ends today.",
+      "ending": "Your subscription ends in {days} days.",
+      "endingToday": "Your subscription ends today.",
+      "grace": "Your subscription ended. The menu goes offline in {days} days.",
+      "blocked": "Your subscription has ended. Your menu is offline and changes are turned off.",
+      "manage": "View subscription"
+    },
+    "status": {
+      "TRIALING": "Trial",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Payment due",
+      "SUSPENDED": "Suspended",
+      "CANCELED": "Canceled"
+    },
+    "access": {
+      "ok": "In good standing",
+      "trial": "Free trial",
+      "grace": "Grace period",
+      "blocked": "Menu offline"
+    },
+    "method": {
+      "CASH": "Cash",
+      "BANK_TRANSFER": "Bank transfer",
+      "CARD": "Card",
+      "OTHER": "Other"
+    },
+    "interval": {
+      "MONTHLY": "month",
+      "YEARLY": "year"
+    },
+    "feature": {
+      "bulkTools": "Bulk tools",
+      "analytics": "Analytics",
+      "whatsappOrdering": "WhatsApp selection list"
+    },
+    "resource": {
+      "menus": "Menus",
+      "categories": "Categories",
+      "items": "Dishes",
+      "adminUsers": "Admin users"
+    },
+    "unlimited": "Unlimited",
+    "page": {
+      "title": "Subscription",
+      "noSubscription": "This account has no subscription on record.",
+      "noCharge": "No charge",
+      "status": "Status",
+      "trialEnds": "Trial ends",
+      "periodEnds": "Paid until",
+      "noEnd": "No end date",
+      "offlineOn": "Menu goes offline on",
+      "contact": "To renew or change your plan, contact the platform team.",
+      "usage": "Usage",
+      "features": "What your plan includes",
+      "included": "Included",
+      "notIncluded": "Not included",
+      "payments": "Payments and receipts",
+      "noPayments": "No payments recorded yet.",
+      "void": "Void",
+      "receipt": "Receipt"
+    },
+    "receipt": {
+      "back": "Back",
+      "print": "Print",
+      "title": "Payment receipt",
+      "restaurant": "Restaurant",
+      "plan": "Plan",
+      "period": "Period covered",
+      "method": "Method",
+      "reference": "Reference",
+      "amount": "Amount paid"
+    }
   }
 }

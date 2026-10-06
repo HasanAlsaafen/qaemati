@@ -9,7 +9,7 @@
      runs, not on DOMContentLoaded, so a store registered any later than
      this finds Alpine already started. See the comment in
      partials/head.njk for the full explanation. #}
-  {% if menu.whatsappUrl %}
+  {% if menu.whatsappUrl and menu.orderingEnabled %}
     <script defer src="{{ asset('/js/whatsapp-message.js') }}"></script>
     <script defer src="{{ asset('/js/selection.js') }}"></script>
   {% endif %}

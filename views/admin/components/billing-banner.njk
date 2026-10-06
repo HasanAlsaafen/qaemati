@@ -1,0 +1,27 @@
+{#
+  One line above every admin page about the subscription. Says nothing while
+  all is well, warns during the last week, the grace period and after the
+  menu has gone offline. tenant comes from TenantContextMiddleware.
+#}
+{% if tenant and tenant.access %}
+  {% set access = tenant.access %}
+  {% set message = '' %}
+  {% set tone = 'warning' %}
+  {% if access.state == 'blocked' %}
+    {% set message = t('common.billing.banner.blocked') %}
+    {% set tone = 'danger' %}
+  {% elif access.state == 'grace' %}
+    {% set message = t('common.billing.banner.grace', { days: access.daysLeft }) %}
+    {% set tone = 'danger' %}
+  {% elif access.state == 'trial' %}
+    {% set message = t('common.billing.banner.trialToday') if access.daysLeft == 0 else t('common.billing.banner.trial', { days: access.daysLeft }) %}
+  {% elif access.state == 'ok' and access.daysLeft is number and access.daysLeft <= 7 %}
+    {% set message = t('common.billing.banner.endingToday') if access.daysLeft == 0 else t('common.billing.banner.ending', { days: access.daysLeft }) %}
+  {% endif %}
+  {% if message %}
+    <div role="status" class="mx-auto mt-4 flex w-full max-w-3xl flex-wrap items-center justify-between gap-2 rounded-md border px-4 py-2 text-sm {{ 'border-danger/30 bg-danger/10 text-danger' if tone == 'danger' else 'border-warning/30 bg-warning/10 text-warning-text' }}">
+      <span>{{ message }}</span>
+      <a href="/admin/billing" class="inline-flex min-h-11 items-center font-medium underline">{{ t('common.billing.banner.manage') }}</a>
+    </div>
+  {% endif %}
+{% endif %}

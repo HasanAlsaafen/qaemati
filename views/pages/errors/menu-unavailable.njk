@@ -1,0 +1,10 @@
+{% extends "layouts/base.njk" %}
+
+{% block title %}{{ t('common.billing.errors.menuUnavailableTitle') }}{% endblock %}
+
+{% block content %}
+<div class="rounded-card border border-border bg-surface p-8 text-center">
+  <h1 class="font-display text-2xl font-bold text-text">{{ t('common.billing.errors.menuUnavailableTitle') }}</h1>
+  <p class="mt-3 text-muted-text">{{ t('common.billing.errors.menuUnavailableBody') }}</p>
+</div>
+{% endblock %}

@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { TenancyService } from '../tenancy/tenancy.service';
 
 export interface MenuInput {
   nameAr: string;
@@ -20,7 +21,10 @@ export const DEFAULT_MENU_NAME_EN = 'Main menu';
 
 @Injectable()
 export class MenusService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly tenancy: TenancyService,
+  ) {}
 
   /**
    * Every restaurant is expected to have at least one menu. Rows written
@@ -68,6 +72,7 @@ export class MenusService {
 
   async create(restaurantId: string, input: MenuInput) {
     await this.ensureDefault(restaurantId);
+    await this.tenancy.assertCanAdd(restaurantId, 'menus');
     const last = await this.prisma.menu.findFirst({
       where: { restaurantId },
       orderBy: { sortOrder: 'desc' },

@@ -2,6 +2,7 @@ import { Controller, Get, Header, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { PrismaService } from '../prisma/prisma.service';
 import { getBaseUrl } from './seo';
+import { computeAccess, isServable } from '../tenancy/tenant-access';
 
 @Controller()
 export class SeoController {
@@ -24,10 +25,13 @@ export class SeoController {
   @Header('Content-Type', 'application/xml; charset=utf-8')
   async sitemap(@Req() req: Request): Promise<string> {
     const baseUrl = getBaseUrl(req);
-    const restaurants = await this.prisma.restaurant.findMany({
-      select: { slug: true, updatedAt: true },
+    const rows = await this.prisma.restaurant.findMany({
+      select: { slug: true, updatedAt: true, subscription: true },
       orderBy: { slug: 'asc' },
     });
+    // Restaurants whose subscription is over are left out, their menu is offline.
+    const now = new Date();
+    const restaurants = rows.filter((row) => isServable(computeAccess(row.subscription, now)));
     const urls = restaurants
       .map(
         (r) =>

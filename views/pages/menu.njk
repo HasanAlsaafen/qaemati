@@ -10,7 +10,7 @@
 {% from "components/restaurant-footer.njk" import restaurantFooter %}
 {% from "components/menu-switcher.njk" import menuSwitcher %}
 
-{% set hasWhatsapp = menu.whatsappUrl %}
+{% set hasWhatsapp = menu.whatsappUrl and menu.orderingEnabled %}
 
 {% block title %}{{ menu.name }}{% endblock %}
 {% block meta_description %}{{ menu.description or menu.name }}{% endblock %}

@@ -61,12 +61,14 @@
       <nav class="flex flex-1 flex-col gap-1 px-2 py-2 text-sm">
         {% set navItems = [
           { href: '/admin', label: t('common.admin.nav.categories'), icon: 'categories' },
-          { href: '/admin/analytics', label: t('common.admin.nav.analytics'), icon: 'analytics' },
-          { href: '/admin/bulk', label: t('common.admin.nav.bulk'), icon: 'bulk' },
+          { href: '/admin/analytics', label: t('common.admin.nav.analytics'), icon: 'analytics', feature: 'analytics' },
+          { href: '/admin/bulk', label: t('common.admin.nav.bulk'), icon: 'bulk', feature: 'bulkTools' },
           { href: '/admin/qr', label: t('common.admin.nav.qr'), icon: 'qr' },
-          { href: '/admin/branding', label: t('common.admin.nav.branding'), icon: 'branding' }
+          { href: '/admin/branding', label: t('common.admin.nav.branding'), icon: 'branding' },
+          { href: '/admin/billing', label: t('common.admin.nav.billing'), icon: 'billing' }
         ] %}
         {% for item in navItems %}
+          {% if not item.feature or (tenant and item.feature in tenant.features) %}
           <a
             href="{{ item.href }}"
             title="{{ item.label }}"
@@ -76,6 +78,7 @@
             {% include "admin/components/sidebar-icons/" + item.icon + ".njk" %}
             <span x-show="!collapsed" class="truncate">{{ item.label }}</span>
           </a>
+          {% endif %}
         {% endfor %}
 
         {% if restaurantSlug %}
@@ -131,9 +134,11 @@
 
         <div id="admin-mobile-nav" x-show="navOpen" x-cloak class="border-t border-border px-4 py-3">
           <nav class="flex flex-col gap-1 text-sm">
-            <a href="/admin" class="min-h-11 inline-flex items-center rounded-md px-3 hover:bg-muted-surface">{{ t('common.admin.nav.categories') }}</a>
-            <a href="/admin/qr" class="min-h-11 inline-flex items-center rounded-md px-3 hover:bg-muted-surface">{{ t('common.admin.nav.qr') }}</a>
-            <a href="/admin/branding" class="min-h-11 inline-flex items-center rounded-md px-3 hover:bg-muted-surface">{{ t('common.admin.nav.branding') }}</a>
+            {% for item in navItems %}
+              {% if not item.feature or (tenant and item.feature in tenant.features) %}
+                <a href="{{ item.href }}" class="min-h-11 inline-flex items-center rounded-md px-3 hover:bg-muted-surface">{{ item.label }}</a>
+              {% endif %}
+            {% endfor %}
             {% if restaurantSlug %}
               <a href="/m/{{ restaurantSlug }}" target="_blank" rel="noopener noreferrer" class="min-h-11 inline-flex items-center rounded-md px-3 hover:bg-muted-surface">{{ t('common.admin.nav.previewMenu') }}</a>
             {% endif %}
@@ -160,6 +165,8 @@
         both squeezed into ~700px, producing a squashed form with a
         cut-off phone preview.
       #}
+      {% include "admin/components/billing-banner.njk" %}
+
       <main id="main-content" tabindex="-1" class="mx-auto w-full {% block mainWidth %}max-w-3xl{% endblock %} px-4 py-8 focus:outline-none">
         {% block content %}{% endblock %}
       </main>

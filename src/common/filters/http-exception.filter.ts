@@ -10,6 +10,12 @@ import {
 import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 import { ValidationFailedException } from '../validation/validation-failed.exception';
+import {
+  FeatureUnavailableException,
+  MenuUnavailableException,
+  PlanLimitException,
+  SubscriptionBlockedException,
+} from '../../tenancy/tenancy.exceptions';
 
 function hasHttpStatusCode(error: unknown): error is { statusCode: number } {
   return (
@@ -52,6 +58,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return;
     }
 
+    if (
+      exception instanceof SubscriptionBlockedException ||
+      exception instanceof PlanLimitException ||
+      exception instanceof FeatureUnavailableException ||
+      exception instanceof MenuUnavailableException
+    ) {
+      this.respondBilling(exception, request, response);
+      return;
+    }
+
     if (status !== HttpStatus.NOT_FOUND) {
       this.logger.error(
         `${request.method} ${request.url} -> ${status}`,
@@ -90,6 +106,63 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const template = status === HttpStatus.NOT_FOUND ? 'pages/errors/404' : 'pages/errors/500';
     response.status(status).render(template, { statusCode: status });
+  }
+
+  /** Subscription, plan limit and feature refusals. These are expected
+   *  business answers, so they are not logged as errors. */
+  private respondBilling(
+    exception:
+      | SubscriptionBlockedException
+      | PlanLimitException
+      | FeatureUnavailableException
+      | MenuUnavailableException,
+    request: Request,
+    response: Response,
+  ): void {
+    const locale = request.locale ?? 'ar';
+    const t = (key: string, args?: Record<string, unknown>): string =>
+      this.i18n.t(`common.billing.${key}`, { lang: locale, args });
+    const isHtmx = request.headers['hx-request'] === 'true';
+    const wantsJson = !isHtmx && request.accepts(['html', 'json']) === 'json';
+
+    if (exception instanceof MenuUnavailableException) {
+      response.setHeader('Retry-After', '3600');
+      if (wantsJson) {
+        response.status(503).json({ statusCode: 503, code: 'MENU_UNAVAILABLE' });
+      } else {
+        response.status(503).render('pages/errors/menu-unavailable', { statusCode: 503 });
+      }
+      return;
+    }
+
+    let code = 'SUBSCRIPTION_BLOCKED';
+    let kind = 'blocked';
+    let message = t('blockedToast');
+    if (exception instanceof PlanLimitException) {
+      code = 'PLAN_LIMIT';
+      kind = 'limit';
+      message = t(`limit.${exception.resource}`, { limit: exception.limit });
+    } else if (exception instanceof FeatureUnavailableException) {
+      code = 'FEATURE_UNAVAILABLE';
+      kind = 'feature';
+      message = t('featureUnavailable');
+    }
+
+    if (isHtmx) {
+      response.setHeader(
+        'HX-Trigger',
+        JSON.stringify({ toast: { message: encodeURIComponent(message), variant: 'danger' } }),
+      );
+      response.status(HttpStatus.PAYMENT_REQUIRED).send('');
+      return;
+    }
+    if (wantsJson) {
+      response.status(HttpStatus.PAYMENT_REQUIRED).json({ statusCode: 402, code, message });
+      return;
+    }
+    response
+      .status(HttpStatus.PAYMENT_REQUIRED)
+      .render('pages/errors/billing', { statusCode: 402, kind, message });
   }
 
   private respondValidationFailure(

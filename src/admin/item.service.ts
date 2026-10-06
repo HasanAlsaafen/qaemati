@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { ItemTag } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { TenancyService } from '../tenancy/tenancy.service';
 
 export interface ItemOption {
   nameAr: string;
@@ -25,10 +26,14 @@ export interface ItemInput {
 
 @Injectable()
 export class ItemService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly tenancy: TenancyService,
+  ) {}
 
   async create(restaurantId: string, categoryId: string, input: ItemInput) {
     await this.assertCategoryOwnership(restaurantId, categoryId);
+    await this.tenancy.assertCanAdd(restaurantId, 'items');
     const last = await this.prisma.item.findFirst({
       where: { categoryId },
       orderBy: { sortOrder: 'desc' },

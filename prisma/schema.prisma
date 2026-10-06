@@ -165,6 +165,8 @@ model Restaurant {
 
   adminUsers AdminUser[]
   menus      Menu[]
+  subscription Subscription?
+  payments     Payment[]
   categories Category[]
   items      Item[]
   tables     RestaurantTable[]
@@ -427,4 +429,168 @@ model RestaurantTable {
   updatedAt DateTime @updatedAt
 
   @@index([restaurantId])
+}
+
+// ---------------------------------------------------------------------------
+// SaaS: plans, subscriptions, payments, platform operators
+// ---------------------------------------------------------------------------
+
+enum BillingInterval {
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  SUSPENDED
+  CANCELED
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  CARD
+  OTHER
+}
+
+enum PaymentStatus {
+  PAID
+  VOID
+}
+
+/// What a restaurant can buy. A null limit means unlimited. Feature keys come
+/// from src/tenancy/plan-features.ts.
+model Plan {
+  id String @id @default(cuid())
+
+  nameAr        String
+  nameEn        String
+  descriptionAr String?
+  descriptionEn String?
+
+  priceAmount Decimal         @db.Decimal(10, 2)
+  currency    String          @default("ILS")
+  interval    BillingInterval @default(MONTHLY)
+  trialDays   Int             @default(0)
+
+  maxMenus       Int?
+  maxCategories  Int?
+  maxItems       Int?
+  maxAdminUsers  Int?
+  features       String[]
+
+  /// Archived plans stay on the tenants that have them but cannot be chosen
+  /// for new ones.
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  subscriptions Subscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// One per restaurant. A null currentPeriodEnd means it never expires, which
+/// is what internal and free accounts use.
+model Subscription {
+  id String @id @default(cuid())
+
+  restaurantId String     @unique
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  planId String
+  plan   Plan   @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  status             SubscriptionStatus @default(TRIALING)
+  trialEndsAt        DateTime?
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+
+  /// Days the menu stays up after the period ends, with a warning in the admin.
+  graceDays       Int       @default(7)
+  canceledAt      DateTime?
+  suspendedReason String?
+  note            String?
+
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([planId])
+  @@index([status])
+  @@index([currentPeriodEnd])
+}
+
+/// The manual ledger. Recording one extends the subscription. Voiding keeps the
+/// row and never changes the period, so history stays honest.
+model Payment {
+  id String @id @default(cuid())
+
+  /// Printed on the receipt as R-000042.
+  receiptNo Int @unique @default(autoincrement())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  amount   Decimal       @db.Decimal(10, 2)
+  currency String
+  method   PaymentMethod
+  reference String?
+  status   PaymentStatus @default(PAID)
+
+  paidAt      DateTime
+  periodStart DateTime
+  periodEnd   DateTime
+  periods     Int      @default(1)
+
+  note       String?
+  voidedAt   DateTime?
+  voidReason String?
+
+  recordedById String?
+  recordedBy   SuperAdmin? @relation(fields: [recordedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([restaurantId, paidAt])
+  @@index([paidAt])
+}
+
+/// Platform operators. Separate from AdminUser on purpose: a super admin
+/// belongs to no restaurant, and a restaurant admin can never become one.
+model SuperAdmin {
+  id String @id @default(cuid())
+
+  email        String @unique
+  passwordHash String
+  name         String
+
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Who did what to which tenant. restaurantId is not a foreign key so the
+/// trail survives a tenant being removed.
+model AuditLog {
+  id String @id @default(cuid())
+
+  actorType  String
+  actorId    String?
+  actorLabel String?
+  action     String
+  restaurantId String?
+  meta       Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([restaurantId, createdAt])
+  @@index([createdAt])
 }

@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { TenancyService } from '../tenancy/tenancy.service';
+import { PlanLimitException } from '../tenancy/tenancy.exceptions';
 import { parseCsv, stringifyCsv } from './csv';
 
 const CSV_HEADER = ['id', 'category', 'nameAr', 'nameEn', 'price', 'currency', 'available'];
@@ -25,7 +27,10 @@ interface SnapshotEntry {
 
 @Injectable()
 export class BulkService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly tenancy: TenancyService,
+  ) {}
 
   /** B3: copies an item (and its variants/addons) into the same
    *  category, appended to the end -- not undo-logged, since deleting
@@ -36,6 +41,7 @@ export class BulkService {
       include: { variants: true, addons: true },
     });
     if (!item) throw new NotFoundException('Item not found');
+    await this.tenancy.assertCanAdd(restaurantId, 'items');
 
     const last = await this.prisma.item.findFirst({
       where: { categoryId: item.categoryId },
@@ -233,6 +239,19 @@ export class BulkService {
         });
         results.push({ line, status: 'updated' });
       } else {
+        try {
+          await this.tenancy.assertCanAdd(restaurantId, 'items');
+        } catch (error) {
+          if (error instanceof PlanLimitException) {
+            results.push({
+              line,
+              status: 'error',
+              message: `Plan limit of ${error.limit} dishes reached`,
+            });
+            continue;
+          }
+          throw error;
+        }
         const last = await this.prisma.item.findFirst({
           where: { categoryId: category.id },
           orderBy: { sortOrder: 'desc' },
