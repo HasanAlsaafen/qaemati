@@ -10,7 +10,7 @@
 #}
 {% macro categoryBlock(category, labels, isFirst, isLast, menus) %}
   <section id="category-{{ category.id }}" data-sort-id="{{ category.id }}" x-data="{ editing: false, addingItem: false }" class="rounded-lg border border-border bg-surface p-4">
-    <div x-show="!editing" class="flex items-start justify-between gap-3">
+    <div x-show="!editing" class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
       <div class="flex min-w-0 items-start gap-2">
         <span
           data-drag-handle
@@ -20,6 +20,39 @@
         >
           <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="5" cy="4" r="1.3"/><circle cx="11" cy="4" r="1.3"/><circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/><circle cx="5" cy="12" r="1.3"/><circle cx="11" cy="12" r="1.3"/></svg>
         </span>
+        {#
+          The round picture used in the public category bar. The label wraps
+          a hidden file input, so tapping the circle opens the picker, same
+          as the dish photos. No picture is a valid state: the public page
+          then uses the restaurant logo, so the circle shows a camera hint
+          instead of looking broken.
+        #}
+        <label
+          for="category-{{ category.id }}-image-input"
+          class="relative block h-12 w-12 shrink-0 cursor-pointer overflow-hidden rounded-full bg-muted-surface focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary"
+          title="{{ labels.categories.imageLabel }}"
+        >
+          {% if category.imagePath %}
+            <img src="{{ category.imagePath }}" alt="" width="48" height="48" class="h-full w-full object-cover">
+          {% else %}
+            <span class="flex h-full w-full items-center justify-center text-muted-text" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h3l2-2h6l2 2h3v12H4V7Z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="3"/></svg>
+            </span>
+          {% endif %}
+          <span class="sr-only">{{ labels.categories.imageLabel }}</span>
+          <input
+            id="category-{{ category.id }}-image-input"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            name="image"
+            class="sr-only"
+            hx-post="/admin/categories/{{ category.id }}/image"
+            hx-trigger="change"
+            hx-target="#category-{{ category.id }}"
+            hx-swap="outerHTML"
+            hx-encoding="multipart/form-data"
+          >
+        </label>
         <div class="min-w-0">
           <h2 class="font-sans text-lg font-bold text-text">{{ category.nameEn }} <span class="font-normal text-muted-text">/ {{ category.nameAr }}</span></h2>
           {% if category.availableFrom and category.availableTo %}
@@ -27,7 +60,7 @@
           {% endif %}
         </div>
       </div>
-      <div class="flex shrink-0 items-center gap-1">
+      <div class="flex flex-wrap items-center gap-1 sm:shrink-0">
         <button
           type="button"
           aria-label="{{ labels.form.moveUp }}"
@@ -52,6 +85,19 @@
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
+        {% if category.imagePath %}
+          <button
+            type="button"
+            aria-label="{{ labels.categories.removeImage }}"
+            title="{{ labels.categories.removeImage }}"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-full text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            hx-delete="/admin/categories/{{ category.id }}/image"
+            hx-target="#category-{{ category.id }}"
+            hx-swap="outerHTML"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 3l18 18" stroke-linecap="round"/></svg>
+          </button>
+        {% endif %}
         <button
           type="button"
           aria-label="{{ labels.form.edit }}"
@@ -100,6 +146,7 @@
           <input id="category-{{ category.id }}-availableTo" name="availableTo" type="time" dir="ltr" value="{{ category.availableTo or '' }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
         </div>
         <p class="w-full text-xs text-muted-text">{{ labels.categories.availabilityHint }}</p>
+        <p class="w-full text-xs text-muted-text">{{ labels.categories.imageHint }}</p>
       </div>
       {{ button(labels.form.save, 'primary', 'sm', 'submit') }}
       {{ button(labels.form.cancel, 'ghost', 'sm', 'button', 'x-on:click="editing = false"') }}

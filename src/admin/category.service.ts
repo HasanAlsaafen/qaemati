@@ -94,6 +94,12 @@ export class CategoryService {
     });
   }
 
+  /** Pass null to clear the picture so the public chip falls back. */
+  async setImage(restaurantId: string, categoryId: string, imagePath: string | null) {
+    await this.assertOwnership(restaurantId, categoryId);
+    return this.prisma.category.update({ where: { id: categoryId }, data: { imagePath } });
+  }
+
   async remove(restaurantId: string, categoryId: string): Promise<void> {
     await this.assertOwnership(restaurantId, categoryId);
     await this.prisma.category.delete({ where: { id: categoryId } });

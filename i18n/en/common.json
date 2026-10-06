@@ -165,7 +165,12 @@
       "addedToast": "Category added",
       "availableFromLabel": "Available from",
       "availableToLabel": "Available until",
-      "availabilityHint": "Leave both empty to show this category all day, e.g. for a Breakfast category available 07:00-11:00."
+      "availabilityHint": "Leave both empty to show this category all day, e.g. for a Breakfast category available 07:00-11:00.",
+      "imageLabel": "Category image",
+      "imageHint": "Shown in the round chip of the category bar. Without one, your logo is used.",
+      "removeImage": "Remove image",
+      "imageUpdatedToast": "Category image updated",
+      "imageRemovedToast": "Category image removed"
     },
     "items": {
       "addItem": "Add item",

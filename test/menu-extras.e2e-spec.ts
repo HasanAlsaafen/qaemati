@@ -89,14 +89,40 @@ describe('All chip (e2e)', () => {
       expect(res.text).toMatch(/data-chip-circle[\s\S]{0,200}src="\/uploads\/test-logo\.png"/);
     });
 
-    it('draws the category chip from the first dish photo when there is one', async () => {
+    it('draws the category chip from the category image when it has one', async () => {
       const category = await prisma.category.findFirst({ where: { restaurantId } });
+      await prisma.category.update({
+        where: { id: category!.id },
+        data: { imagePath: '/uploads/categories/test-cat.png' },
+      });
+      const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
+      expect(res.text).toMatch(
+        /data-chip-circle[\s\S]{0,300}src="\/uploads\/categories\/test-cat\.png"/,
+      );
+    });
+
+    it('does not borrow a dish photo for the category chip', async () => {
+      const category = await prisma.category.findFirst({ where: { restaurantId } });
+      await prisma.category.update({ where: { id: category!.id }, data: { imagePath: null } });
       await prisma.item.updateMany({
         where: { categoryId: category!.id, nameEn: 'Hummus' },
         data: { imagePath: '/uploads/test-hummus.png' },
       });
       const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
-      expect(res.text).toMatch(/data-chip-circle[\s\S]{0,200}src="\/uploads\/test-hummus\.png"/);
+      const chip = /data-category-chip="#category-[\s\S]{0,600}/.exec(res.text)?.[0] ?? '';
+      expect(chip).toContain('/uploads/test-logo.png');
+      expect(chip).not.toContain('test-hummus');
+    });
+
+    it('uses the built in image when there is no category image and no logo', async () => {
+      await prisma.restaurant.update({ where: { id: restaurantId }, data: { logoPath: null } });
+      const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
+      const chip = /data-category-chip="#category-[\s\S]{0,600}/.exec(res.text)?.[0] ?? '';
+      expect(chip).toContain('/images/category-fallback.svg');
+      await prisma.restaurant.update({
+        where: { id: restaurantId },
+        data: { logoPath: '/uploads/test-logo.png' },
+      });
     });
 
     it('marks the active language in the AR | EN pill', async () => {

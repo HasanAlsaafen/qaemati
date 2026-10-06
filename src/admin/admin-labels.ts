@@ -60,6 +60,11 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale, defaultCurre
       availableFromLabel: t('common.admin.categories.availableFromLabel'),
       availableToLabel: t('common.admin.categories.availableToLabel'),
       availabilityHint: t('common.admin.categories.availabilityHint'),
+      imageLabel: t('common.admin.categories.imageLabel'),
+      imageHint: t('common.admin.categories.imageHint'),
+      removeImage: t('common.admin.categories.removeImage'),
+      imageUpdatedToast: t('common.admin.categories.imageUpdatedToast'),
+      imageRemovedToast: t('common.admin.categories.imageRemovedToast'),
     },
     items: {
       addItem: t('common.admin.items.addItem'),

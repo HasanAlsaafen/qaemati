@@ -1,13 +1,29 @@
-import { Body, Controller, Delete, Param, Patch, Post, Req, Res, Render } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Patch,
+  Post,
+  Req,
+  Res,
+  Render,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 import { CategoryService } from './category.service';
+import { Locale } from '../common/middleware/locale-view.middleware';
 import { MenusService } from './menus.service';
 import { RestaurantService } from './restaurant.service';
 import { buildAdminLabels } from './admin-labels';
 import { toCategoryViewList } from './admin-view-model';
 import { triggerToast } from './htmx-toast';
 import { parseIds } from './parse-ids';
+import { categoryImageMulterOptions } from './upload.config';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
 import { MoveDto, ReorderDto } from './dto/common.dto';
 
@@ -98,6 +114,46 @@ export class CategoriesController {
       category: toCategoryViewList([category])[0],
       labels: buildAdminLabels(this.i18n, locale, restaurant.currency),
     });
+  }
+
+  @Post(':id/image')
+  @Render('admin/partials/category')
+  @UseInterceptors(FileInterceptor('image', categoryImageMulterOptions))
+  async uploadImage(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File | undefined,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    if (!file) throw new BadRequestException('No image uploaded');
+    const restaurantId = req.session.restaurantId as string;
+    const locale = req.locale ?? 'ar';
+    await this.categories.setImage(restaurantId, id, `/uploads/categories/${file.filename}`);
+    triggerToast(res, this.i18n.t('common.admin.categories.imageUpdatedToast', { lang: locale }));
+    return this.categoryPartial(id, restaurantId, locale);
+  }
+
+  @Delete(':id/image')
+  @Render('admin/partials/category')
+  async removeImage(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const restaurantId = req.session.restaurantId as string;
+    const locale = req.locale ?? 'ar';
+    await this.categories.setImage(restaurantId, id, null);
+    triggerToast(res, this.i18n.t('common.admin.categories.imageRemovedToast', { lang: locale }));
+    return this.categoryPartial(id, restaurantId, locale);
+  }
+
+  private async categoryPartial(id: string, restaurantId: string, locale: Locale) {
+    const category = await this.categories.findOneWithItems(id);
+    const restaurant = await this.restaurants.findById(restaurantId);
+    return {
+      category: toCategoryViewList([category])[0],
+      labels: buildAdminLabels(this.i18n, locale, restaurant.currency),
+    };
   }
 
   @Delete(':id')

@@ -21,6 +21,7 @@ import { seedRestaurants } from './seed-data';
 const UPLOADS_DIR = join(__dirname, '..', '..', 'public', 'uploads', 'seed');
 const ITEMS_IMAGE_DIR = join(UPLOADS_DIR, 'items');
 const RESTAURANTS_IMAGE_DIR = join(UPLOADS_DIR, 'restaurants');
+const CATEGORIES_IMAGE_DIR = join(UPLOADS_DIR, 'categories');
 
 export const DEMO_ADMIN_PASSWORD = 'Qaemati@Demo123';
 
@@ -42,6 +43,7 @@ function writeLogoImage(dir: string, filename: string, seed: string): void {
 export async function runSeed(prisma: PrismaClient): Promise<string[]> {
   mkdirSync(ITEMS_IMAGE_DIR, { recursive: true });
   mkdirSync(RESTAURANTS_IMAGE_DIR, { recursive: true });
+  mkdirSync(CATEGORIES_IMAGE_DIR, { recursive: true });
 
   // Seed data is meant to be re-run from a clean slate; delete in FK order.
   await prisma.item.deleteMany();
@@ -107,8 +109,15 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
 
     let categorySortOrder = 0;
     for (const categoryData of restaurantData.categories) {
+      const categoryImageFilename = `${restaurantData.slug}-${slugify(categoryData.nameEn)}.svg`;
+      writeItemImage(
+        CATEGORIES_IMAGE_DIR,
+        categoryImageFilename,
+        `category-${restaurantData.slug}-${slugify(categoryData.nameEn)}`,
+      );
       const category = await prisma.category.create({
         data: {
+          imagePath: `/uploads/seed/categories/${categoryImageFilename}`,
           restaurantId: restaurant.id,
           nameAr: categoryData.nameAr,
           nameEn: categoryData.nameEn,

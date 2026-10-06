@@ -201,6 +201,15 @@ Limits of this test
 
 New tests: versioned asset URLs and the worker strategy (`test/seo.e2e-spec.ts`), translated close labels and the selection symbol (`test/menu-extras.e2e-spec.ts`), `asset-url.spec.ts`. Totals: 149 unit, 120 e2e, all passing.
 
+## Phase F: category pictures
+
+Each category can now have its own picture, shown in the round chip of the public category bar.
+- Order of use: the category's picture, then the restaurant logo, then a built in image (`public/images/category-fallback.svg`). The earlier behavior of borrowing the first dish photo was removed, and a test covers that a dish photo is never used.
+- Admin: the round thumbnail at the start of each category header opens the file picker, a remove button appears once a picture is set, and the edit form explains the fallback. Uploads reuse the dish photo rules (JPEG, PNG or WebP, 5 MB) in their own folder, `public/uploads/categories`, and only the owner restaurant can change a category.
+- Data: `Category.imagePath` (migration `20261007040000_add_category_image`). The seed gives every demo category a generated picture, and the same was applied to the dev database.
+- The category header wraps its action buttons under the title on phones, which the extra button made necessary.
+- Tests: `test/category-image.e2e-spec.ts` (upload, remove, bad file, another restaurant's category, control on the dashboard) and three fallback tests in `test/menu-extras.e2e-spec.ts`. Totals: 149 unit, 127 e2e.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).

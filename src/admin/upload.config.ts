@@ -17,42 +17,43 @@ export const RESTAURANT_IMAGE_UPLOAD_DIR = join(
   'restaurants',
 );
 
-export const itemImageMulterOptions: MulterOptions = {
-  storage: diskStorage({
-    destination: ITEM_IMAGE_UPLOAD_DIR,
-    filename: (_req, file, callback) => {
-      callback(null, `${randomUUID()}${extname(file.originalname)}`);
+function imageUploadOptions(destination: string): MulterOptions {
+  return {
+    storage: diskStorage({
+      destination,
+      filename: (_req, file, callback) => {
+        callback(null, `${randomUUID()}${extname(file.originalname)}`);
+      },
+    }),
+    limits: { fileSize: MAX_FILE_SIZE_BYTES },
+    fileFilter: (_req, file, callback) => {
+      if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
+        callback(new BadRequestException('INVALID_IMAGE_TYPE'), false);
+        return;
+      }
+      callback(null, true);
     },
-  }),
-  limits: { fileSize: MAX_FILE_SIZE_BYTES },
-  fileFilter: (_req, file, callback) => {
-    if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
-      callback(new BadRequestException('INVALID_IMAGE_TYPE'), false);
-      return;
-    }
-    callback(null, true);
-  },
-};
+  };
+}
+
+export const CATEGORY_IMAGE_UPLOAD_DIR = join(
+  __dirname,
+  '..',
+  '..',
+  'public',
+  'uploads',
+  'categories',
+);
+
+export const itemImageMulterOptions = imageUploadOptions(ITEM_IMAGE_UPLOAD_DIR);
 
 /// A4: restaurant logo/cover uploads share the item image rules (same
 /// allowed types, same size cap) but write to their own directory so a
 /// restaurant's branding assets don't mix with its menu item photos.
-export const restaurantImageMulterOptions: MulterOptions = {
-  storage: diskStorage({
-    destination: RESTAURANT_IMAGE_UPLOAD_DIR,
-    filename: (_req, file, callback) => {
-      callback(null, `${randomUUID()}${extname(file.originalname)}`);
-    },
-  }),
-  limits: { fileSize: MAX_FILE_SIZE_BYTES },
-  fileFilter: (_req, file, callback) => {
-    if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
-      callback(new BadRequestException('INVALID_IMAGE_TYPE'), false);
-      return;
-    }
-    callback(null, true);
-  },
-};
+export const restaurantImageMulterOptions = imageUploadOptions(RESTAURANT_IMAGE_UPLOAD_DIR);
+
+/// Category chip pictures, same rules, their own directory.
+export const categoryImageMulterOptions = imageUploadOptions(CATEGORY_IMAGE_UPLOAD_DIR);
 
 /// B3: CSV import -- kept in memory (no disk write) since it's parsed
 /// and discarded in one request; browsers send a variety of mime types

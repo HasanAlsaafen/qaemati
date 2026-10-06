@@ -9,7 +9,7 @@ import { join } from 'path';
 import { mkdirSync } from 'fs';
 import { configureNunjucks } from './common/view/nunjucks';
 import { doubleCsrfProtection } from './auth/csrf';
-import { ITEM_IMAGE_UPLOAD_DIR } from './admin/upload.config';
+import { CATEGORY_IMAGE_UPLOAD_DIR, ITEM_IMAGE_UPLOAD_DIR } from './admin/upload.config';
 import { LocaleViewMiddleware } from './common/middleware/locale-view.middleware';
 import { createRateLimiter } from './common/middleware/rate-limit';
 import { createValidationPipe } from './common/validation/create-validation-pipe';
@@ -141,4 +141,5 @@ export async function configureApp(app: NestExpressApplication): Promise<void> {
   app.useGlobalPipes(createValidationPipe());
   configureNunjucks(app);
   mkdirSync(ITEM_IMAGE_UPLOAD_DIR, { recursive: true });
+  mkdirSync(CATEGORY_IMAGE_UPLOAD_DIR, { recursive: true });
 }

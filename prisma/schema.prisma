@@ -250,6 +250,10 @@ model Category {
   menuId String?
   menu   Menu?   @relation(fields: [menuId], references: [id], onDelete: SetNull)
 
+  /// Picture for the round chip in the public category bar. Null falls back
+  /// to the restaurant logo, then to a built in image.
+  imagePath String?
+
   items Item[]
 
   createdAt DateTime @default(now())

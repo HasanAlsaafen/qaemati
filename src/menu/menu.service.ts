@@ -77,8 +77,8 @@ export interface MenuCategoryView {
   id: string;
   name: string;
   anchor: string;
-  /** First dish photo in the category, shown in its round chip. The page
-   *  falls back to the restaurant logo, then to an icon. */
+  /** The category's own picture for its round chip. The page falls back to
+   *  the restaurant logo, then to a built in image. */
   thumbUrl: string | null;
   items: MenuItemView[];
 }
@@ -332,7 +332,7 @@ export class MenuService {
         id: category.id,
         name: pick(category.nameAr, category.nameEn),
         anchor: `category-${category.id}`,
-        thumbUrl: category.items.find((item) => item.imagePath)?.imagePath ?? null,
+        thumbUrl: category.imagePath,
         items: category.items.map((item) => {
           const name = pick(item.nameAr, item.nameEn);
           const description = pickNullable(item.descriptionAr, item.descriptionEn);

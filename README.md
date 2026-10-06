@@ -111,7 +111,6 @@ down in `afterAll`, so files can run back-to-back without clobbering each other'
 Each gets one seeded admin user (`admin@<slug>.example.com`); every seeded account shares the
 password `Qaemati@Demo123` (also printed at the end of the seed run). Item images are generated
 gradient SVG placeholders (`prisma/seed/placeholder-image.ts`), never real photos.
-يخ ش
 ## Notes
 
 - The typeface is Tajawal with IBM Plex Sans Arabic as fallback, both open fonts self-hosted in
