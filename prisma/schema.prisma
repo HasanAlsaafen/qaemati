@@ -164,6 +164,7 @@ model Restaurant {
   updatedAt DateTime @updatedAt
 
   adminUsers AdminUser[]
+  menus      Menu[]
   categories Category[]
   items      Item[]
   tables     RestaurantTable[]
@@ -196,6 +197,33 @@ model AdminUser {
   @@index([restaurantId])
 }
 
+/// A named group of categories with its own optional serving hours, such as
+/// Breakfast 07:00 to 12:00 and All day. Hours only describe the menu on the
+/// public page, they never hide it.
+model Menu {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  nameAr String
+  nameEn String
+
+  /// "HH:MM" 24h, Asia/Hebron. Both set or both null. A window that ends
+  /// before it starts (22:00 to 02:00) runs overnight.
+  availableFrom String?
+  availableTo   String?
+
+  sortOrder Int @default(0)
+
+  categories Category[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([restaurantId])
+}
+
 model Category {
   id String @id @default(cuid())
 
@@ -216,12 +244,19 @@ model Category {
   availableFrom String?
   availableTo   String?
 
+  /// Which menu this category belongs to. Nullable so rows written before
+  /// menus existed, or by code that does not know about them, still load:
+  /// null means "the restaurant's first menu" (see MenusService).
+  menuId String?
+  menu   Menu?   @relation(fields: [menuId], references: [id], onDelete: SetNull)
+
   items Item[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([restaurantId])
+  @@index([menuId])
 }
 
 model Item {

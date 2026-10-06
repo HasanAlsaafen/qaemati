@@ -19,6 +19,7 @@ export class MenuController {
   async show(
     @Param('slug') slug: string,
     @Query('table') table: string | undefined,
+    @Query('menu') menuId: string | undefined,
     @Query('previewName') previewName: string | undefined,
     @Query('previewPrimaryColor') previewPrimaryColor: string | undefined,
     @Query('previewSecondaryColor') previewSecondaryColor: string | undefined,
@@ -58,7 +59,7 @@ export class MenuController {
           sectionSpacing: previewSectionSpacing?.trim() || undefined,
         }
       : undefined;
-    const menu = await this.menuService.getMenu(slug, locale, preview);
+    const menu = await this.menuService.getMenu(slug, locale, preview, menuId);
     const baseUrl = getBaseUrl(req);
     const canonicalUrl = `${baseUrl}/m/${encodeURIComponent(slug)}`;
     const imageUrl = toAbsoluteUrl(baseUrl, menu.coverImageUrl ?? menu.logoUrl);

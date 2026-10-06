@@ -7,7 +7,7 @@
   (hx-target="#categories-list"), since moving one category changes which
   category is adjacent to which -- simplest to just re-render the list.
 #}
-{% macro categoriesList(categories, labels) %}
+{% macro categoriesList(categories, labels, menuId, menus) %}
   <div
     id="categories-list"
     x-data="{ adding: false }"
@@ -18,7 +18,7 @@
   >
     {% if categories.length %}
       {% for category in categories %}
-        {{ categoryBlock(category, labels, loop.first, loop.last) }}
+        {{ categoryBlock(category, labels, loop.first, loop.last, menus) }}
       {% endfor %}
     {% else %}
       {{ emptyState(labels.categories.emptyTitle, labels.categories.emptyDescription) }}
@@ -43,6 +43,7 @@
         hx-swap="outerHTML"
         class="flex flex-wrap items-end gap-3 rounded-md border border-border bg-muted-surface p-3"
       >
+        <input type="hidden" name="menuId" value="{{ menuId }}">
         <div class="flex flex-col gap-1.5">
           <label for="new-category-nameAr" class="text-sm font-medium text-text">{{ labels.form.nameAr }}</label>
           <input id="new-category-nameAr" name="nameAr" type="text" dir="rtl" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>

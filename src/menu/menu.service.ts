@@ -68,6 +68,12 @@ export interface MenuCategoryView {
   items: MenuItemView[];
 }
 
+export interface MenuTabView {
+  id: string;
+  name: string;
+  active: boolean;
+}
+
 export interface MenuView {
   slug: string;
   name: string;
@@ -86,6 +92,11 @@ export interface MenuView {
   openStatus: OpenStatusView | null;
   categories: MenuCategoryView[];
   todaysSpecials: MenuItemView[];
+  /** Every menu of the restaurant, in the owner's order. Empty or a single
+   *  entry means the page shows no switcher. */
+  menus: MenuTabView[];
+  /** The menu on screen, with its serving hours as a sentence. */
+  activeMenu: { name: string; hoursNote: string | null } | null;
   /** A4: "R G B" triplets to override --color-primary (and friends) for
    *  a restaurant that picked its own brand color -- null when the
    *  restaurant hasn't set one, in which case the layout falls back to
@@ -176,10 +187,16 @@ export class MenuService {
     private readonly analytics: AnalyticsService,
   ) {}
 
-  async getMenu(slug: string, locale: Locale, preview?: MenuPreviewOverrides): Promise<MenuView> {
+  async getMenu(
+    slug: string,
+    locale: Locale,
+    preview?: MenuPreviewOverrides,
+    requestedMenuId?: string,
+  ): Promise<MenuView> {
     const restaurant = await this.prisma.restaurant.findUnique({
       where: { slug },
       include: {
+        menus: { orderBy: { sortOrder: 'asc' } },
         categories: {
           orderBy: { sortOrder: 'asc' },
           include: {
@@ -267,7 +284,22 @@ export class MenuService {
 
     const todaysSpecials: MenuItemView[] = [];
 
+    // A menu with no hours is always being served. Categories without a
+    // menu belong to the first one, so rows from before menus existed still
+    // show up.
+    const servingNow = (menu: { availableFrom: string | null; availableTo: string | null }) =>
+      !menu.availableFrom ||
+      !menu.availableTo ||
+      computeOpenStatus(menu.availableFrom, menu.availableTo, nowMinutes).isOpen;
+    const activeMenuRow =
+      restaurant.menus.find((menu) => menu.id === requestedMenuId) ??
+      restaurant.menus.find(servingNow) ??
+      restaurant.menus[0] ??
+      null;
+    const firstMenuId = restaurant.menus[0]?.id ?? null;
+
     const categories = restaurant.categories
+      .filter((category) => !activeMenuRow || (category.menuId ?? firstMenuId) === activeMenuRow.id)
       .filter((category) =>
         isCategoryAvailableNow(category.availableFrom, category.availableTo, nowMinutes),
       )
@@ -352,6 +384,30 @@ export class MenuService {
       openStatus,
       categories,
       todaysSpecials,
+      menus: restaurant.menus.map((menu) => ({
+        id: menu.id,
+        name: pick(menu.nameAr, menu.nameEn),
+        active: menu.id === activeMenuRow?.id,
+      })),
+      activeMenu: activeMenuRow
+        ? {
+            name: pick(activeMenuRow.nameAr, activeMenuRow.nameEn),
+            hoursNote:
+              activeMenuRow.availableFrom && activeMenuRow.availableTo
+                ? [
+                    this.i18n.t('common.menu.menuHoursNote', {
+                      lang: locale,
+                      args: { from: activeMenuRow.availableFrom, to: activeMenuRow.availableTo },
+                    }),
+                    servingNow(activeMenuRow)
+                      ? null
+                      : this.i18n.t('common.menu.menuClosedNow', { lang: locale }),
+                  ]
+                    .filter(Boolean)
+                    .join(' ')
+                : null,
+          }
+        : null,
       primaryColorCss: toPrimaryColorCss(effectivePrimaryColor),
       secondaryColorCss: toSecondaryColorCss(effectiveSecondaryColor),
       fontTheme: effectiveFontTheme,

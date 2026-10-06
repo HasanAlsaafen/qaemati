@@ -9,6 +9,8 @@ export interface CategoryInput {
    *  controller before reaching here (see CategoriesController.update). */
   availableFrom?: string | null;
   availableTo?: string | null;
+  /** Set to move the category to another menu of the same restaurant. */
+  menuId?: string | null;
 }
 
 @Injectable()
@@ -18,6 +20,22 @@ export class CategoryService {
   listForRestaurant(restaurantId: string) {
     return this.prisma.category.findMany({
       where: { restaurantId },
+      orderBy: { sortOrder: 'asc' },
+      include: {
+        items: {
+          orderBy: { sortOrder: 'asc' },
+          include: {
+            variants: { orderBy: { sortOrder: 'asc' } },
+            addons: { orderBy: { sortOrder: 'asc' } },
+          },
+        },
+      },
+    });
+  }
+
+  listForMenu(restaurantId: string, menuId: string) {
+    return this.prisma.category.findMany({
+      where: { restaurantId, menuId },
       orderBy: { sortOrder: 'asc' },
       include: {
         items: {
@@ -57,6 +75,7 @@ export class CategoryService {
         nameAr: input.nameAr,
         nameEn: input.nameEn,
         sortOrder: last ? last.sortOrder + 1 : 0,
+        menuId: input.menuId ?? null,
       },
     });
   }
@@ -70,6 +89,7 @@ export class CategoryService {
         nameEn: input.nameEn,
         availableFrom: input.availableFrom ?? null,
         availableTo: input.availableTo ?? null,
+        ...(input.menuId ? { menuId: input.menuId } : {}),
       },
     });
   }
@@ -84,6 +104,7 @@ export class CategoryService {
     const neighbor = await this.prisma.category.findFirst({
       where: {
         restaurantId,
+        menuId: category.menuId,
         sortOrder: direction === 'up' ? { lt: category.sortOrder } : { gt: category.sortOrder },
       },
       orderBy: { sortOrder: direction === 'up' ? 'desc' : 'asc' },

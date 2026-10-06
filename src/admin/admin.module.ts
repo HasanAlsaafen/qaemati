@@ -7,6 +7,9 @@ import { BrandingController } from './branding.controller';
 import { TourController } from './tour.controller';
 import { AnalyticsController } from './analytics.controller';
 import { BulkController } from './bulk.controller';
+import { MenusController } from './menus.controller';
+import { MenusService } from './menus.service';
+import { MenusViewService } from './menus-view.service';
 import { CategoryService } from './category.service';
 import { ItemService } from './item.service';
 import { TableService } from './table.service';
@@ -24,6 +27,7 @@ import { BulkService } from './bulk.service';
     TourController,
     AnalyticsController,
     BulkController,
+    MenusController,
   ],
   providers: [
     CategoryService,
@@ -32,6 +36,8 @@ import { BulkService } from './bulk.service';
     RestaurantService,
     AnalyticsService,
     BulkService,
+    MenusService,
+    MenusViewService,
   ],
 })
 export class AdminModule {}

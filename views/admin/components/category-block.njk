@@ -8,7 +8,7 @@
   Same local-edit-mode pattern as item-row: renaming opens instantly via
   Alpine state, only Save/Cancel-with-save hits the server.
 #}
-{% macro categoryBlock(category, labels, isFirst, isLast) %}
+{% macro categoryBlock(category, labels, isFirst, isLast, menus) %}
   <section id="category-{{ category.id }}" data-sort-id="{{ category.id }}" x-data="{ editing: false, addingItem: false }" class="rounded-lg border border-border bg-surface p-4">
     <div x-show="!editing" class="flex items-start justify-between gap-3">
       <div class="flex min-w-0 items-start gap-2">
@@ -80,6 +80,16 @@
         <label for="category-{{ category.id }}-nameEn" class="text-sm font-medium text-text">{{ labels.form.nameEn }}</label>
         <input id="category-{{ category.id }}-nameEn" name="nameEn" type="text" value="{{ category.nameEn }}" dir="ltr" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" required>
       </div>
+      {% if menus and menus.length > 1 %}
+        <div class="flex w-full flex-col gap-1.5 sm:w-auto">
+          <label for="category-{{ category.id }}-menuId" class="text-sm font-medium text-text">{{ labels.menus.categoryMenuLabel }}</label>
+          <select id="category-{{ category.id }}-menuId" name="menuId" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+            {% for menu in menus %}
+              <option value="{{ menu.id }}" {% if menu.id == category.menuId %}selected{% endif %}>{{ menu.nameEn }} / {{ menu.nameAr }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
       <div class="flex w-full flex-wrap items-end gap-3">
         <div class="flex flex-col gap-1.5">
           <label for="category-{{ category.id }}-availableFrom" class="text-sm font-medium text-text">{{ labels.categories.availableFromLabel }}</label>

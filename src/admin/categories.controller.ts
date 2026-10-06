@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Param, Patch, Post, Req, Res, Render } from '
 import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 import { CategoryService } from './category.service';
+import { MenusService } from './menus.service';
 import { RestaurantService } from './restaurant.service';
 import { buildAdminLabels } from './admin-labels';
 import { toCategoryViewList } from './admin-view-model';
@@ -14,6 +15,7 @@ import { MoveDto, ReorderDto } from './dto/common.dto';
 export class CategoriesController {
   constructor(
     private readonly categories: CategoryService,
+    private readonly menus: MenusService,
     private readonly restaurants: RestaurantService,
     private readonly i18n: I18nService,
   ) {}
@@ -29,30 +31,37 @@ export class CategoriesController {
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
 
+    const menu = await this.menus.resolve(restaurantId, body.menuId);
+
     if (nameAr?.trim() && nameEn?.trim()) {
-      await this.categories.create(restaurantId, { nameAr: nameAr.trim(), nameEn: nameEn.trim() });
+      await this.categories.create(restaurantId, {
+        nameAr: nameAr.trim(),
+        nameEn: nameEn.trim(),
+        menuId: menu.id,
+      });
       triggerToast(res, this.i18n.t('common.admin.categories.addedToast', { lang: locale }));
     } else {
       triggerToast(res, this.i18n.t('common.admin.form.required', { lang: locale }), 'danger');
     }
 
-    const categories = await this.categories.listForRestaurant(restaurantId);
+    const categories = await this.categories.listForMenu(restaurantId, menu.id);
     const restaurant = await this.restaurants.findById(restaurantId);
     return {
       categories: toCategoryViewList(categories),
+      menuId: menu.id,
       labels: buildAdminLabels(this.i18n, locale, restaurant.currency),
     };
   }
 
   @Patch(':id')
-  @Render('admin/partials/category')
   async update(
     @Param('id') id: string,
     @Body() body: UpdateCategoryDto,
     @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+    @Res() res: Response,
+  ): Promise<void> {
     const { nameAr, nameEn, availableFrom, availableTo } = body;
+    const menuId = body.menuId?.trim() || undefined;
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
 
@@ -62,20 +71,33 @@ export class CategoriesController {
     // never opens.
     const hasWindow = Boolean(availableFrom?.trim()) && Boolean(availableTo?.trim());
 
+    const before = await this.categories.findOneWithItems(id);
+    if (menuId) await this.menus.assertOwnership(restaurantId, menuId);
+    const movedToAnotherMenu = Boolean(menuId) && menuId !== before.menuId;
+
     await this.categories.update(restaurantId, id, {
       nameAr: nameAr?.trim() || '',
       nameEn: nameEn?.trim() || '',
       availableFrom: hasWindow ? availableFrom!.trim() : null,
       availableTo: hasWindow ? availableTo!.trim() : null,
+      menuId,
     });
+
+    // The block belongs to the menu on screen, so once it moves it has to
+    // leave this list: an empty body swaps it out of the page.
+    if (movedToAnotherMenu) {
+      triggerToast(res, this.i18n.t('common.admin.menus.categoryMovedToast', { lang: locale }));
+      res.status(200).send('');
+      return;
+    }
     triggerToast(res, this.i18n.t('common.admin.categories.savedToast', { lang: locale }));
 
     const category = await this.categories.findOneWithItems(id);
     const restaurant = await this.restaurants.findById(restaurantId);
-    return {
+    res.render('admin/partials/category', {
       category: toCategoryViewList([category])[0],
       labels: buildAdminLabels(this.i18n, locale, restaurant.currency),
-    };
+    });
   }
 
   @Delete(':id')
@@ -92,11 +114,16 @@ export class CategoriesController {
   async reorder(@Body() body: ReorderDto, @Req() req: Request) {
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
-    await this.categories.reorder(restaurantId, parseIds(body.ids));
-    const categories = await this.categories.listForRestaurant(restaurantId);
+    const ids = parseIds(body.ids);
+    await this.categories.reorder(restaurantId, ids);
+    const menuId = ids.length
+      ? (await this.categories.findOneWithItems(ids[0])).menuId
+      : (await this.menus.resolve(restaurantId)).id;
+    const categories = await this.categories.listForMenu(restaurantId, menuId!);
     const restaurant = await this.restaurants.findById(restaurantId);
     return {
       categories: toCategoryViewList(categories),
+      menuId,
       labels: buildAdminLabels(this.i18n, locale, restaurant.currency),
     };
   }
@@ -107,10 +134,12 @@ export class CategoriesController {
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
     await this.categories.move(restaurantId, id, body.direction);
-    const categories = await this.categories.listForRestaurant(restaurantId);
+    const { menuId } = await this.categories.findOneWithItems(id);
+    const categories = await this.categories.listForMenu(restaurantId, menuId!);
     const restaurant = await this.restaurants.findById(restaurantId);
     return {
       categories: toCategoryViewList(categories),
+      menuId,
       labels: buildAdminLabels(this.i18n, locale, restaurant.currency),
     };
   }

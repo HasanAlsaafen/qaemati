@@ -100,7 +100,11 @@
     "call": "Call",
     "facebook": "Facebook",
     "contactTitle": "Contact",
-    "openMap": "Open in maps"
+    "openMap": "Open in maps",
+    "menusLabel": "Menus",
+    "menuHoursNote": "This menu is served from {from} to {to} only.",
+    "menuClosedNow": "It is closed right now.",
+    "allCategories": "All"
   },
   "admin": {
     "auth": {
@@ -339,6 +343,23 @@
       "step3Body": "The QR codes page generates a printable code for your tables and a general one for your door or receipts -- each one opens your public menu directly.",
       "step4Title": "Branding",
       "step4Body": "The Branding page is where you set your logo, cover image, primary color, and currency -- your public menu picks these up automatically."
+    },
+    "menus": {
+      "tabsLabel": "Menus",
+      "addMenu": "Add menu",
+      "fromLabel": "Serving from",
+      "toLabel": "Serving until",
+      "hoursHint": "Leave both empty if this menu is always available. Customers see the hours as a note, the menu is never hidden.",
+      "served": "Served from {from} to {to}",
+      "alwaysAvailable": "Always available",
+      "deleteConfirmTitle": "Delete this menu?",
+      "deleteConfirmBody": "Its categories and dishes move to another menu. Nothing else is deleted.",
+      "categoryMenuLabel": "Menu",
+      "addedToast": "Menu added",
+      "savedToast": "Menu saved",
+      "deletedToast": "Menu deleted, its categories moved",
+      "lastMenuToast": "You need at least one menu.",
+      "categoryMovedToast": "Category moved to the other menu"
     }
   },
   "validation": {

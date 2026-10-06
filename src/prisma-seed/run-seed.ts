@@ -46,6 +46,7 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
   // Seed data is meant to be re-run from a clean slate; delete in FK order.
   await prisma.item.deleteMany();
   await prisma.category.deleteMany();
+  await prisma.menu.deleteMany();
   await prisma.adminUser.deleteMany();
   await prisma.restaurant.deleteMany();
 
@@ -85,6 +86,25 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
       },
     });
 
+    const menuDefinitions = restaurantData.menus ?? [
+      { key: 'main', nameAr: 'القائمة الرئيسية', nameEn: 'Main menu' },
+    ];
+    const menuIdByKey = new Map<string, string>();
+    for (const [index, menuData] of menuDefinitions.entries()) {
+      const menu = await prisma.menu.create({
+        data: {
+          restaurantId: restaurant.id,
+          nameAr: menuData.nameAr,
+          nameEn: menuData.nameEn,
+          availableFrom: menuData.availableFrom,
+          availableTo: menuData.availableTo,
+          sortOrder: index,
+        },
+      });
+      menuIdByKey.set(menuData.key, menu.id);
+    }
+    const firstMenuId = menuIdByKey.get(menuDefinitions[0].key)!;
+
     let categorySortOrder = 0;
     for (const categoryData of restaurantData.categories) {
       const category = await prisma.category.create({
@@ -94,6 +114,7 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
           nameEn: categoryData.nameEn,
           availableFrom: categoryData.availableFrom,
           availableTo: categoryData.availableTo,
+          menuId: (categoryData.menu && menuIdByKey.get(categoryData.menu)) || firstMenuId,
           sortOrder: categorySortOrder++,
         },
       });

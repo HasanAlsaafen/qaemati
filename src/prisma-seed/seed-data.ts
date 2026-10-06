@@ -17,7 +17,18 @@ export interface SeedCategory {
   /** A3: optional daily window, "HH:MM" 24h. Both set or both omitted. */
   availableFrom?: string;
   availableTo?: string;
+  /** Key of one of the restaurant's menus. Omitted means the first menu. */
+  menu?: string;
   items: SeedItem[];
+}
+
+export interface SeedMenu {
+  key: string;
+  nameAr: string;
+  nameEn: string;
+  /** "HH:MM" 24h. Both set or both omitted. */
+  availableFrom?: string;
+  availableTo?: string;
 }
 
 export interface SeedContact {
@@ -42,6 +53,8 @@ export interface SeedRestaurant {
   workingHoursAr: string;
   workingHoursEn: string;
   contact?: SeedContact;
+  /** Omitted means a single menu called Main menu. */
+  menus?: SeedMenu[];
   /** A3: structured daily hours, "HH:MM" 24h, Asia/Hebron -- see the
    *  schema comment on Restaurant.openTime for why this is separate from
    *  the free-text workingHoursAr/En above. */
@@ -67,6 +80,16 @@ export const seedRestaurants: SeedRestaurant[] = [
     instagramHandle: '@baytalzaytoun',
     workingHoursAr: 'يوميًا من 7 صباحًا حتى 11 مساءً',
     workingHoursEn: 'Daily, 7:00 AM - 11:00 PM',
+    menus: [
+      {
+        key: 'breakfast',
+        nameAr: 'الفطور',
+        nameEn: 'Breakfast',
+        availableFrom: '07:00',
+        availableTo: '12:00',
+      },
+      { key: 'allday', nameAr: 'طوال اليوم', nameEn: 'All day' },
+    ],
     contact: {
       taglineAr: 'قهوة على مهلها، ومناقيش طازجة',
       taglineEn: 'Slow coffee and fresh manakeesh',
@@ -84,6 +107,7 @@ export const seedRestaurants: SeedRestaurant[] = [
       {
         nameAr: 'مشروبات ساخنة',
         nameEn: 'Hot Drinks',
+        menu: 'allday',
         items: [
           {
             nameAr: 'قهوة عربية',
@@ -127,6 +151,7 @@ export const seedRestaurants: SeedRestaurant[] = [
       {
         nameAr: 'مشروبات باردة',
         nameEn: 'Cold Drinks',
+        menu: 'allday',
         items: [
           {
             nameAr: 'آيس لاتيه',
@@ -172,6 +197,7 @@ export const seedRestaurants: SeedRestaurant[] = [
       {
         nameAr: 'فطور',
         nameEn: 'Breakfast',
+        menu: 'breakfast',
         availableFrom: '07:00',
         availableTo: '11:00',
         items: [
@@ -213,6 +239,7 @@ export const seedRestaurants: SeedRestaurant[] = [
       {
         nameAr: 'مناقيش ومعجنات',
         nameEn: 'Manakeesh & Savory Pastries',
+        menu: 'breakfast',
         items: [
           {
             nameAr: 'مناقيش زعتر',
@@ -259,6 +286,7 @@ export const seedRestaurants: SeedRestaurant[] = [
       {
         nameAr: 'ساندويشات',
         nameEn: 'Sandwiches',
+        menu: 'allday',
         items: [
           {
             nameAr: 'ساندويش حلوم',
@@ -297,6 +325,7 @@ export const seedRestaurants: SeedRestaurant[] = [
       {
         nameAr: 'حلويات',
         nameEn: 'Sweets & Desserts',
+        menu: 'allday',
         items: [
           {
             nameAr: 'كنافة نابلسية',
@@ -342,6 +371,7 @@ export const seedRestaurants: SeedRestaurant[] = [
       {
         nameAr: 'وجبات خفيفة',
         nameEn: 'Light Bites',
+        menu: 'allday',
         items: [
           {
             nameAr: 'حمص مع خبز',

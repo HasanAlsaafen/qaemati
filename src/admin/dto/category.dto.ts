@@ -7,6 +7,11 @@ import { TIME_PATTERN } from './common.dto';
 export class CreateCategoryDto extends BaseFormDto {
   @IsOptional()
   @IsString({ message: 'invalid' })
+  @MaxLength(64, { message: 'tooLong' })
+  menuId?: string;
+
+  @IsOptional()
+  @IsString({ message: 'invalid' })
   @MaxLength(120, { message: 'tooLong' })
   nameAr?: string;
 

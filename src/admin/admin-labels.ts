@@ -38,6 +38,18 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale, defaultCurre
       moveDown: t('common.admin.form.moveDown'),
       dragToReorder: t('common.admin.form.dragToReorder'),
     },
+    menus: {
+      tabsLabel: t('common.admin.menus.tabsLabel'),
+      addMenu: t('common.admin.menus.addMenu'),
+      fromLabel: t('common.admin.menus.fromLabel'),
+      toLabel: t('common.admin.menus.toLabel'),
+      hoursHint: t('common.admin.menus.hoursHint'),
+      served: t('common.admin.menus.served'),
+      alwaysAvailable: t('common.admin.menus.alwaysAvailable'),
+      deleteConfirmTitle: t('common.admin.menus.deleteConfirmTitle'),
+      deleteConfirmBody: t('common.admin.menus.deleteConfirmBody'),
+      categoryMenuLabel: t('common.admin.menus.categoryMenuLabel'),
+    },
     categories: {
       title: t('common.admin.categories.title'),
       addCategory: t('common.admin.categories.addCategory'),

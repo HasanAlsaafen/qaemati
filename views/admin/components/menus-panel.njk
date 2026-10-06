@@ -1,0 +1,133 @@
+{% from "components/button.njk" import button %}
+{% from "admin/components/delete-trigger.njk" import deleteTrigger %}
+{% from "admin/components/categories-list.njk" import categoriesList %}
+
+{#
+  menus: every menu of the restaurant, activeMenu: the one on screen.
+  The whole panel is swapped after any menu change (hx-target="#menus-panel"),
+  since adding, renaming, reordering or deleting a menu changes the tabs and
+  the category list together. Tabs are plain links so a menu is bookmarkable.
+#}
+{% macro menusPanel(menus, activeMenu, categories, labels, menuId) %}
+  {% set fieldClass = 'min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary' %}
+  {% set iconClass = 'inline-flex h-11 w-11 items-center justify-center rounded-full text-text hover:bg-muted-surface disabled:opacity-30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary' %}
+  <div id="menus-panel" x-data="{ addingMenu: false, editingMenu: false }" class="flex flex-col gap-4">
+    <nav aria-label="{{ labels.menus.tabsLabel }}" class="flex flex-wrap items-center gap-2">
+      {% for menu in menus %}
+        <a
+          href="/admin?menu={{ menu.id }}"
+          {% if menu.id == activeMenu.id %}aria-current="page"{% endif %}
+          class="inline-flex min-h-11 items-center rounded-button px-4 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'bg-primary text-primary-on' if menu.id == activeMenu.id else 'border border-border-strong text-text hover:bg-muted-surface' }}"
+        >{{ menu.nameEn }} / {{ menu.nameAr }}</a>
+      {% endfor %}
+      <button
+        type="button"
+        x-show="!addingMenu"
+        x-on:click="addingMenu = true"
+        class="inline-flex min-h-11 items-center gap-2 rounded-button border border-dashed border-border-strong px-4 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
+        {{ labels.menus.addMenu }}
+      </button>
+    </nav>
+
+    <form
+      x-show="addingMenu"
+      x-cloak
+      hx-post="/admin/menus"
+      hx-target="#menus-panel"
+      hx-swap="outerHTML"
+      class="flex flex-col gap-3 rounded-md border border-border bg-muted-surface p-3"
+    >
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div class="flex flex-col gap-1.5">
+          <label for="new-menu-nameAr" class="text-sm font-medium text-text">{{ labels.form.nameAr }}</label>
+          <input id="new-menu-nameAr" name="nameAr" type="text" dir="rtl" maxlength="80" class="{{ fieldClass }}" required>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="new-menu-nameEn" class="text-sm font-medium text-text">{{ labels.form.nameEn }}</label>
+          <input id="new-menu-nameEn" name="nameEn" type="text" dir="ltr" maxlength="80" class="{{ fieldClass }}" required>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="new-menu-availableFrom" class="text-sm font-medium text-text">{{ labels.menus.fromLabel }}</label>
+          <input id="new-menu-availableFrom" name="availableFrom" type="time" dir="ltr" class="{{ fieldClass }}">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="new-menu-availableTo" class="text-sm font-medium text-text">{{ labels.menus.toLabel }}</label>
+          <input id="new-menu-availableTo" name="availableTo" type="time" dir="ltr" class="{{ fieldClass }}">
+        </div>
+      </div>
+      <p class="text-sm text-muted-text">{{ labels.menus.hoursHint }}</p>
+      <div class="flex items-center gap-2">
+        {{ button(labels.form.add, 'primary', 'sm', 'submit') }}
+        {{ button(labels.form.cancel, 'ghost', 'sm', 'button', 'x-on:click="addingMenu = false"') }}
+      </div>
+    </form>
+
+    <section class="rounded-lg border border-border bg-surface p-4" aria-labelledby="active-menu-title">
+      <div x-show="!editingMenu" class="flex flex-wrap items-start justify-between gap-3">
+        <div class="min-w-0">
+          <h2 id="active-menu-title" class="font-sans text-lg font-bold text-text">{{ activeMenu.nameEn }} <span class="font-normal text-muted-text">/ {{ activeMenu.nameAr }}</span></h2>
+          <p class="mt-0.5 text-sm text-muted-text" dir="ltr">
+            {% if activeMenu.availableFrom and activeMenu.availableTo %}
+              {{ labels.menus.served | replace('{from}', activeMenu.availableFrom) | replace('{to}', activeMenu.availableTo) }}
+            {% else %}
+              {{ labels.menus.alwaysAvailable }}
+            {% endif %}
+          </p>
+        </div>
+        <div class="flex shrink-0 items-center gap-1">
+          {% if menus.length > 1 %}
+            <button type="button" aria-label="{{ labels.form.moveUp }}" {% if activeMenu.id == menus[0].id %}disabled{% endif %} class="{{ iconClass }}" hx-post="/admin/menus/{{ activeMenu.id }}/move" hx-vals='{"direction": "up"}' hx-target="#menus-panel" hx-swap="outerHTML">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 10l5-5 5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" aria-label="{{ labels.form.moveDown }}" {% if activeMenu.id == menus[menus.length - 1].id %}disabled{% endif %} class="{{ iconClass }}" hx-post="/admin/menus/{{ activeMenu.id }}/move" hx-vals='{"direction": "down"}' hx-target="#menus-panel" hx-swap="outerHTML">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          {% endif %}
+          <button type="button" aria-label="{{ labels.form.edit }}" class="{{ iconClass }}" x-on:click="editingMenu = true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          {% if menus.length > 1 %}
+            {{ deleteTrigger(labels.form.delete, labels.menus.deleteConfirmTitle, labels.menus.deleteConfirmBody, labels.form.delete, labels.form.cancel, '/admin/menus/' + activeMenu.id, '#menus-panel', 'outerHTML') }}
+          {% endif %}
+        </div>
+      </div>
+
+      <form
+        x-show="editingMenu"
+        x-cloak
+        hx-patch="/admin/menus/{{ activeMenu.id }}"
+        hx-target="#menus-panel"
+        hx-swap="outerHTML"
+        class="flex flex-col gap-3"
+      >
+        <div class="grid gap-3 sm:grid-cols-2">
+          <div class="flex flex-col gap-1.5">
+            <label for="menu-nameAr" class="text-sm font-medium text-text">{{ labels.form.nameAr }}</label>
+            <input id="menu-nameAr" name="nameAr" type="text" dir="rtl" maxlength="80" value="{{ activeMenu.nameAr }}" class="{{ fieldClass }}" required>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="menu-nameEn" class="text-sm font-medium text-text">{{ labels.form.nameEn }}</label>
+            <input id="menu-nameEn" name="nameEn" type="text" dir="ltr" maxlength="80" value="{{ activeMenu.nameEn }}" class="{{ fieldClass }}" required>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="menu-availableFrom" class="text-sm font-medium text-text">{{ labels.menus.fromLabel }}</label>
+            <input id="menu-availableFrom" name="availableFrom" type="time" dir="ltr" value="{{ activeMenu.availableFrom or '' }}" class="{{ fieldClass }}">
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="menu-availableTo" class="text-sm font-medium text-text">{{ labels.menus.toLabel }}</label>
+            <input id="menu-availableTo" name="availableTo" type="time" dir="ltr" value="{{ activeMenu.availableTo or '' }}" class="{{ fieldClass }}">
+          </div>
+        </div>
+        <p class="text-sm text-muted-text">{{ labels.menus.hoursHint }}</p>
+        <div class="flex items-center gap-2">
+          {{ button(labels.form.save, 'primary', 'sm', 'submit') }}
+          {{ button(labels.form.cancel, 'ghost', 'sm', 'button', 'x-on:click="editingMenu = false"') }}
+        </div>
+      </form>
+    </section>
+
+    {{ categoriesList(categories, labels, menuId, menus) }}
+  </div>
+{% endmacro %}
