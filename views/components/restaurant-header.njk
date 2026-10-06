@@ -4,7 +4,7 @@
   here: this header scrolls away, and a control the user can only reach by
   scrolling back to the top isn't actually reachable mid-scroll.
 #}
-{% macro restaurantHeader(restaurant, whatsappLabel, instagramLabel, openStatusLabels) %}
+{% macro restaurantHeader(restaurant, whatsappLabel, instagramLabel, openStatusLabels, callLabel) %}
   <header class="border-b border-border bg-surface">
     {% if restaurant.coverImageUrl %}
       <img
@@ -28,6 +28,9 @@
         {% endif %}
         <div class="min-w-0">
           <h1 class="font-display text-3xl font-bold leading-heading text-text">{{ restaurant.name }}</h1>
+          {% if restaurant.tagline %}
+            <p class="mt-1 text-base font-medium leading-body text-text">{{ restaurant.tagline }}</p>
+          {% endif %}
           {% if restaurant.description %}
             <p class="mt-1 text-sm leading-body text-muted-text">{{ restaurant.description }}</p>
           {% endif %}
@@ -70,9 +73,17 @@
         </div>
       </div>
 
-      {% if restaurant.whatsappUrl or restaurant.instagramUrl %}
+      {% if restaurant.phoneUrl or restaurant.whatsappUrl or restaurant.instagramUrl %}
         <div class="mt-4 flex flex-wrap gap-2">
-          {% if restaurant.whatsappUrl %}
+          {% if restaurant.phoneUrl %}
+            <a
+              href="{{ restaurant.phoneUrl }}"
+              class="inline-flex min-h-11 items-center gap-2 rounded-button bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              {{ callLabel }}
+            </a>
+          {% endif %}          {% if restaurant.whatsappUrl %}
             <a
               href="{{ restaurant.whatsappUrl }}"
               target="_blank"

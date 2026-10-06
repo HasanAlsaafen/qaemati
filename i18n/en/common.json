@@ -96,7 +96,11 @@
       "offlineBanner": "You're offline",
       "offlineTitle": "You're offline",
       "offlineDescription": "This menu isn't available right now. Reconnect and try again."
-    }
+    },
+    "call": "Call",
+    "facebook": "Facebook",
+    "contactTitle": "Contact",
+    "openMap": "Open in maps"
   },
   "admin": {
     "auth": {
@@ -306,7 +310,20 @@
       "sectionSpacingCozy": "Cozy",
       "sectionSpacingComfortable": "Comfortable",
       "sectionSpacingSpacious": "Spacious",
-      "previewFrameLabel": "Live preview"
+      "previewFrameLabel": "Live preview",
+      "contactTitle": "Contact and location",
+      "taglineArLabel": "Tagline (Arabic)",
+      "taglineEnLabel": "Tagline (English)",
+      "phoneLabel": "Phone number",
+      "facebookLabel": "Facebook",
+      "facebookHint": "A page name or the full page link.",
+      "addressArLabel": "Address (Arabic)",
+      "addressEnLabel": "Address (English)",
+      "mapUrlLabel": "Map link",
+      "mapUrlHint": "An https link from Google Maps or any map service.",
+      "invalidPhone": "Enter a valid phone number, for example 02 222 0111.",
+      "invalidFacebook": "Enter a Facebook page name or its full link.",
+      "invalidMapUrl": "Enter a link that starts with https."
     },
     "tour": {
       "skip": "Skip",

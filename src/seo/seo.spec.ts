@@ -37,7 +37,8 @@ describe('seo helpers', () => {
         imageUrl: null,
         menuUrl: 'https://a.test/m/a',
         telephone: null,
-        instagramUrl: null,
+        address: null,
+        sameAs: [],
       }),
     );
     expect(data).toEqual({
@@ -47,5 +48,26 @@ describe('seo helpers', () => {
       url: 'https://a.test/m/a',
       hasMenu: 'https://a.test/m/a',
     });
+  });
+
+  it('includes address and every social profile when present', () => {
+    const data = JSON.parse(
+      buildRestaurantJsonLd({
+        name: 'A',
+        description: null,
+        url: 'https://a.test/m/a',
+        imageUrl: null,
+        menuUrl: 'https://a.test/m/a',
+        telephone: '+97022220111',
+        address: 'Hebron, Bridge Area',
+        sameAs: ['https://instagram.com/a', 'https://facebook.com/a'],
+      }),
+    );
+    expect(data.address).toEqual({
+      '@type': 'PostalAddress',
+      streetAddress: 'Hebron, Bridge Area',
+    });
+    expect(data.sameAs).toHaveLength(2);
+    expect(data.telephone).toBe('+97022220111');
   });
 });

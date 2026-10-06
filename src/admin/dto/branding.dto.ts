@@ -21,6 +21,13 @@ export class UpdateBrandingDto extends BaseFormDto {
   @text(1000) descriptionAr?: string;
   @text(1000) descriptionEn?: string;
   @text(32) whatsapp?: string;
+  @text(120) taglineAr?: string;
+  @text(120) taglineEn?: string;
+  @text(32) phone?: string;
+  @text(200) facebookUrl?: string;
+  @text(200) addressAr?: string;
+  @text(200) addressEn?: string;
+  @text(500) mapUrl?: string;
   @text(64) instagramHandle?: string;
   @text(200) workingHoursAr?: string;
   @text(200) workingHoursEn?: string;

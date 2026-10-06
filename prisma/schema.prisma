@@ -130,6 +130,21 @@ model Restaurant {
   whatsapp        String?
   instagramHandle String?
 
+  /// Short line under the name on the public menu header.
+  taglineAr String?
+  taglineEn String?
+
+  /// Voice number for a tap to call link, shown next to WhatsApp.
+  phone String?
+
+  /// A page handle or a full https URL, normalised by src/common/contact.ts.
+  facebookUrl String?
+
+  /// Free text street address and area, plus an optional map link (https).
+  addressAr String?
+  addressEn String?
+  mapUrl    String?
+
   workingHoursAr String?
   workingHoursEn String?
 

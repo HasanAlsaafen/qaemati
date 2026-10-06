@@ -65,6 +65,13 @@ export class BrandingController {
       descriptionEn,
       whatsapp,
       instagramHandle,
+      taglineAr,
+      taglineEn,
+      phone,
+      facebookUrl,
+      addressAr,
+      addressEn,
+      mapUrl,
       workingHoursAr,
       workingHoursEn,
       openTime,
@@ -109,6 +116,13 @@ export class BrandingController {
         descriptionEn: descriptionEn?.trim() || null,
         whatsapp: whatsapp?.trim() || null,
         instagramHandle: instagramHandle?.trim() || null,
+        taglineAr: taglineAr?.trim() || null,
+        taglineEn: taglineEn?.trim() || null,
+        phone: phone?.trim() || null,
+        facebookUrl: facebookUrl?.trim() || null,
+        addressAr: addressAr?.trim() || null,
+        addressEn: addressEn?.trim() || null,
+        mapUrl: mapUrl?.trim() || null,
         workingHoursAr: workingHoursAr?.trim() || null,
         workingHoursEn: workingHoursEn?.trim() || null,
         openTime: openTime?.trim() || null,
@@ -169,6 +183,18 @@ export class BrandingController {
         case 'INVALID_BACKGROUND_COLOR':
           toastMessage = t('common.admin.branding.invalidColorToast');
           errorFieldErrors.backgroundColor = toastMessage;
+          break;
+        case 'INVALID_PHONE':
+          toastMessage = t('common.admin.branding.invalidPhone');
+          errorFieldErrors.phone = toastMessage;
+          break;
+        case 'INVALID_FACEBOOK':
+          toastMessage = t('common.admin.branding.invalidFacebook');
+          errorFieldErrors.facebookUrl = toastMessage;
+          break;
+        case 'INVALID_MAP_URL':
+          toastMessage = t('common.admin.branding.invalidMapUrl');
+          errorFieldErrors.mapUrl = toastMessage;
           break;
         case 'OPEN_CLOSE_BOTH_REQUIRED':
           toastMessage = t('common.admin.branding.bothHoursRequiredToast');

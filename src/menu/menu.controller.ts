@@ -73,8 +73,15 @@ export class MenuController {
           url: canonicalUrl,
           imageUrl,
           menuUrl: canonicalUrl,
-          telephone: menu.whatsappUrl ? `+${menu.whatsappUrl.replace(/\D/g, '')}` : null,
-          instagramUrl: menu.instagramUrl,
+          telephone: menu.phone
+            ? menu.phone.replace(/[^0-9+]/g, '')
+            : menu.whatsappUrl
+              ? `+${menu.whatsappUrl.replace(/\D/g, '')}`
+              : null,
+          address: menu.address,
+          sameAs: [menu.instagramUrl, menu.facebookUrl].filter((url): url is string =>
+            Boolean(url),
+          ),
         }),
       },
       tableLabel: table?.trim() || null,

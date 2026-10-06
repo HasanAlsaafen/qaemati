@@ -6,6 +6,7 @@ import {
   meetsPrimaryColorContrast,
   meetsSecondaryColorContrast,
 } from '../common/color';
+import { isValidFacebook, isValidMapUrl, isValidPhone, toFacebookUrl } from '../common/contact';
 
 const FONT_THEMES = new Set(['classic', 'modern']);
 const MENU_DENSITIES = new Set(['comfortable', 'compact']);
@@ -24,6 +25,13 @@ export interface RestaurantDetailsInput {
   descriptionEn?: string | null;
   whatsapp?: string | null;
   instagramHandle?: string | null;
+  taglineAr?: string | null;
+  taglineEn?: string | null;
+  phone?: string | null;
+  facebookUrl?: string | null;
+  addressAr?: string | null;
+  addressEn?: string | null;
+  mapUrl?: string | null;
   workingHoursAr?: string | null;
   workingHoursEn?: string | null;
   openTime?: string | null;
@@ -61,6 +69,16 @@ export class RestaurantService {
     const hasWindow = Boolean(input.openTime) && Boolean(input.closeTime);
     if ((input.openTime || input.closeTime) && !hasWindow) {
       throw new BadRequestException('OPEN_CLOSE_BOTH_REQUIRED');
+    }
+
+    if (input.phone && !isValidPhone(input.phone)) {
+      throw new BadRequestException('INVALID_PHONE');
+    }
+    if (input.facebookUrl && !isValidFacebook(input.facebookUrl)) {
+      throw new BadRequestException('INVALID_FACEBOOK');
+    }
+    if (input.mapUrl && !isValidMapUrl(input.mapUrl)) {
+      throw new BadRequestException('INVALID_MAP_URL');
     }
 
     const primaryColor = this.validatePrimaryColor(input.primaryColor);
@@ -130,6 +148,13 @@ export class RestaurantService {
         descriptionEn: input.descriptionEn ?? null,
         whatsapp: input.whatsapp ?? null,
         instagramHandle: input.instagramHandle ?? null,
+        taglineAr: input.taglineAr ?? null,
+        taglineEn: input.taglineEn ?? null,
+        phone: input.phone?.trim() || null,
+        facebookUrl: input.facebookUrl ? toFacebookUrl(input.facebookUrl) : null,
+        addressAr: input.addressAr ?? null,
+        addressEn: input.addressEn ?? null,
+        mapUrl: input.mapUrl?.trim() || null,
         workingHoursAr: input.workingHoursAr ?? null,
         workingHoursEn: input.workingHoursEn ?? null,
         openTime: hasWindow ? input.openTime : null,

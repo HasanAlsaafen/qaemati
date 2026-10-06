@@ -66,6 +66,21 @@
     </section>
 
     <section class="rounded-lg border border-border bg-surface p-4">
+      <h2 class="font-sans text-lg font-bold text-text">{{ labels.branding.contactTitle }}</h2>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        {{ input(name='taglineAr', label=labels.branding.taglineArLabel, value=restaurant.taglineAr or '', error=fieldErrors.taglineAr, dir='rtl', attrs='maxlength="120"') }}
+        {{ input(name='taglineEn', label=labels.branding.taglineEnLabel, value=restaurant.taglineEn or '', error=fieldErrors.taglineEn, dir='ltr', attrs='maxlength="120"') }}
+        {{ input(name='phone', label=labels.branding.phoneLabel, type='tel', value=restaurant.phone or '', error=fieldErrors.phone, attrs='autocomplete="off"') }}
+        {{ input(name='facebookUrl', label=labels.branding.facebookLabel, value=restaurant.facebookUrl or '', error=fieldErrors.facebookUrl, hint=labels.branding.facebookHint, dir='ltr') }}
+        {{ input(name='addressAr', label=labels.branding.addressArLabel, value=restaurant.addressAr or '', error=fieldErrors.addressAr, dir='rtl', attrs='maxlength="200"') }}
+        {{ input(name='addressEn', label=labels.branding.addressEnLabel, value=restaurant.addressEn or '', error=fieldErrors.addressEn, dir='ltr', attrs='maxlength="200"') }}
+        <div class="sm:col-span-2">
+          {{ input(name='mapUrl', label=labels.branding.mapUrlLabel, type='url', value=restaurant.mapUrl or '', error=fieldErrors.mapUrl, hint=labels.branding.mapUrlHint, attrs='maxlength="500"') }}
+        </div>
+      </div>
+    </section>
+
+    <section class="rounded-lg border border-border bg-surface p-4">
       <h2 class="font-sans text-lg font-bold text-text">{{ labels.branding.appearanceTitle }}</h2>
       <div class="mt-4 flex flex-wrap items-start gap-6">
         <div class="flex flex-col gap-1.5">

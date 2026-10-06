@@ -1,0 +1,41 @@
+{#
+  menu: the public menu view model. Renders nothing when the owner has not
+  filled in any contact detail, so a new restaurant never shows an empty box.
+  text.hasSelectionBar adds bottom padding so the fixed selection bar never
+  covers the last link.
+#}
+{% macro restaurantFooter(menu, text) %}
+  {% if menu.phoneUrl or menu.whatsappUrl or menu.instagramUrl or menu.facebookUrl or menu.address or menu.mapUrl or menu.workingHours %}
+    {% set linkClass = 'inline-flex min-h-11 min-w-11 items-center gap-2 text-sm font-medium text-primary hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary' %}
+    <footer class="border-t border-border bg-surface {{ 'pb-24' if text.hasSelectionBar }}">
+      <div class="mx-auto max-w-2xl px-4 py-8">
+        <h2 class="font-display text-xl font-bold leading-heading text-text">{{ text.title }}</h2>
+        {% if menu.address or menu.mapUrl %}
+          <div class="mt-3">
+            {% if menu.address %}<p class="text-sm leading-body text-text">{{ menu.address }}</p>{% endif %}
+            {% if menu.mapUrl %}
+              <a href="{{ menu.mapUrl }}" target="_blank" rel="noopener noreferrer" class="{{ linkClass }}">{{ text.openMap }}</a>
+            {% endif %}
+          </div>
+        {% endif %}
+        {% if menu.workingHours %}
+          <p class="mt-3 text-sm text-muted-text">{{ menu.workingHours }}</p>
+        {% endif %}
+        <ul class="mt-3 flex flex-wrap gap-x-6">
+          {% if menu.phoneUrl %}
+            <li><a href="{{ menu.phoneUrl }}" class="{{ linkClass }}">{{ text.call }}<span dir="ltr" class="font-normal text-muted-text">{{ menu.phone }}</span></a></li>
+          {% endif %}
+          {% if menu.whatsappUrl %}
+            <li><a href="{{ menu.whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="{{ linkClass }}">{{ text.whatsapp }}</a></li>
+          {% endif %}
+          {% if menu.instagramUrl %}
+            <li><a href="{{ menu.instagramUrl }}" target="_blank" rel="noopener noreferrer" class="{{ linkClass }}">{{ text.instagram }}</a></li>
+          {% endif %}
+          {% if menu.facebookUrl %}
+            <li><a href="{{ menu.facebookUrl }}" target="_blank" rel="noopener noreferrer" class="{{ linkClass }}">{{ text.facebook }}</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </footer>
+  {% endif %}
+{% endmacro %}

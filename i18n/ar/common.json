@@ -96,7 +96,11 @@
       "offlineBanner": "أنت غير متصل بالإنترنت",
       "offlineTitle": "أنت غير متصل بالإنترنت",
       "offlineDescription": "هذه القائمة غير متاحة الآن. أعد الاتصال وحاول مرة أخرى."
-    }
+    },
+    "call": "اتصال",
+    "facebook": "فيسبوك",
+    "contactTitle": "التواصل",
+    "openMap": "افتح في الخرائط"
   },
   "admin": {
     "auth": {
@@ -306,7 +310,20 @@
       "sectionSpacingCozy": "متقارب",
       "sectionSpacingComfortable": "مريح",
       "sectionSpacingSpacious": "واسع",
-      "previewFrameLabel": "معاينة مباشرة"
+      "previewFrameLabel": "معاينة مباشرة",
+      "contactTitle": "التواصل والموقع",
+      "taglineArLabel": "العبارة تحت الاسم (عربي)",
+      "taglineEnLabel": "العبارة تحت الاسم (إنجليزي)",
+      "phoneLabel": "رقم الهاتف",
+      "facebookLabel": "فيسبوك",
+      "facebookHint": "اسم الصفحة أو رابطها الكامل.",
+      "addressArLabel": "العنوان (عربي)",
+      "addressEnLabel": "العنوان (إنجليزي)",
+      "mapUrlLabel": "رابط الخريطة",
+      "mapUrlHint": "رابط يبدأ بـ https من خرائط جوجل أو أي خدمة خرائط.",
+      "invalidPhone": "أدخل رقم هاتف صالحًا، مثل 02 222 0111.",
+      "invalidFacebook": "أدخل اسم صفحة فيسبوك أو رابطها الكامل.",
+      "invalidMapUrl": "أدخل رابطًا يبدأ بـ https."
     },
     "tour": {
       "skip": "تخطّي",

@@ -20,6 +20,16 @@ export interface SeedCategory {
   items: SeedItem[];
 }
 
+export interface SeedContact {
+  taglineAr: string;
+  taglineEn: string;
+  phone: string;
+  facebookUrl: string;
+  addressAr: string;
+  addressEn: string;
+  mapUrl: string;
+}
+
 export interface SeedRestaurant {
   slug: string;
   nameAr: string;
@@ -31,6 +41,7 @@ export interface SeedRestaurant {
   instagramHandle: string;
   workingHoursAr: string;
   workingHoursEn: string;
+  contact?: SeedContact;
   /** A3: structured daily hours, "HH:MM" 24h, Asia/Hebron -- see the
    *  schema comment on Restaurant.openTime for why this is separate from
    *  the free-text workingHoursAr/En above. */
@@ -56,6 +67,15 @@ export const seedRestaurants: SeedRestaurant[] = [
     instagramHandle: '@baytalzaytoun',
     workingHoursAr: 'يوميًا من 7 صباحًا حتى 11 مساءً',
     workingHoursEn: 'Daily, 7:00 AM - 11:00 PM',
+    contact: {
+      taglineAr: 'قهوة على مهلها، ومناقيش طازجة',
+      taglineEn: 'Slow coffee and fresh manakeesh',
+      phone: '+970 2 000 0111',
+      facebookUrl: 'baytalzaytoun',
+      addressAr: 'وسط البلد، الخليل',
+      addressEn: 'Downtown, Hebron',
+      mapUrl: 'https://www.openstreetmap.org/search?query=Hebron',
+    },
     openTime: '07:00',
     closeTime: '23:00',
     adminEmail: 'admin@baytalzaytoun.example.com',
@@ -355,6 +375,15 @@ export const seedRestaurants: SeedRestaurant[] = [
     instagramHandle: '@alsanabel.restaurant',
     workingHoursAr: 'يوميًا من 12 ظهرًا حتى 12 منتصف الليل',
     workingHoursEn: 'Daily, 12:00 PM - 12:00 AM',
+    contact: {
+      taglineAr: 'مشاوي على الفحم وأرز بيتي',
+      taglineEn: 'Charcoal grills and home style rice',
+      phone: '+962 6 000 0222',
+      facebookUrl: 'alsanabel.restaurant',
+      addressAr: 'الجبيهة، عمّان',
+      addressEn: 'Jubeiha, Amman',
+      mapUrl: 'https://www.openstreetmap.org/search?query=Amman',
+    },
     openTime: '12:00',
     closeTime: '00:00',
     primaryColor: '#1E5F74',

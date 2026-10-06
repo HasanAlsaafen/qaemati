@@ -12,6 +12,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { darken, hexToRgb, lighten, rgbToTriplet, toSecondaryPalette } from '../common/color';
 import { AnalyticsService } from '../admin/analytics.service';
+import { toFacebookUrl, toTelUrl } from '../common/contact';
 
 export interface MenuOptionView {
   id: string;
@@ -75,6 +76,12 @@ export interface MenuView {
   coverImageUrl: string | null;
   whatsappUrl: string | null;
   instagramUrl: string | null;
+  tagline: string | null;
+  phone: string | null;
+  phoneUrl: string | null;
+  facebookUrl: string | null;
+  address: string | null;
+  mapUrl: string | null;
   workingHours: string | null;
   openStatus: OpenStatusView | null;
   categories: MenuCategoryView[];
@@ -335,6 +342,12 @@ export class MenuService {
       coverImageUrl: restaurant.coverImagePath,
       whatsappUrl: restaurant.whatsapp ? toWhatsappUrl(restaurant.whatsapp) : null,
       instagramUrl: restaurant.instagramHandle ? toInstagramUrl(restaurant.instagramHandle) : null,
+      tagline: pickNullable(restaurant.taglineAr, restaurant.taglineEn),
+      phone: restaurant.phone,
+      phoneUrl: restaurant.phone ? toTelUrl(restaurant.phone) : null,
+      facebookUrl: restaurant.facebookUrl ? toFacebookUrl(restaurant.facebookUrl) : null,
+      address: pickNullable(restaurant.addressAr, restaurant.addressEn),
+      mapUrl: restaurant.mapUrl,
       workingHours: pickNullable(restaurant.workingHoursAr, restaurant.workingHoursEn),
       openStatus,
       categories,

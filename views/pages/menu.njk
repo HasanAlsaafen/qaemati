@@ -8,6 +8,7 @@
 {% from "components/empty-state.njk" import emptyState %}
 {% from "components/selection-bar.njk" import selectionBar %}
 {% from "components/menu-filter-sheet.njk" import menuFilterSheet %}
+{% from "components/restaurant-footer.njk" import restaurantFooter %}
 
 {% set hasWhatsapp = menu.whatsappUrl %}
 
@@ -23,7 +24,7 @@
 >
   {{ labels.pwa.offlineBanner }}
 </div>
-{{ restaurantHeader(menu, t('common.menu.whatsapp'), t('common.menu.instagram'), labels.openStatus) }}
+{{ restaurantHeader(menu, t('common.menu.whatsapp'), t('common.menu.instagram'), labels.openStatus, t('common.menu.call')) }}
 
 {% if menu.todaysSpecials.length %}
   {#
@@ -128,6 +129,16 @@
     {% endfor %}
   </div>
 </main>
+
+{{ restaurantFooter(menu, {
+  title: t('common.menu.contactTitle'),
+  call: t('common.menu.call'),
+  whatsapp: t('common.menu.whatsapp'),
+  instagram: t('common.menu.instagram'),
+  facebook: t('common.menu.facebook'),
+  openMap: t('common.menu.openMap'),
+  hasSelectionBar: hasWhatsapp
+}) }}
 
 <div class="print:hidden">
   {{ itemDetailSheet(t('common.menu.unavailable'), hasWhatsapp, labels.selection.addButton, labels.selection.addedToast, labels.selectVariant, labels.addonsTitle, labels.selectVariantPrompt, labels.allergenNoteLabel) }}

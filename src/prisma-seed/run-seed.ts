@@ -68,6 +68,7 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
         instagramHandle: restaurantData.instagramHandle,
         workingHoursAr: restaurantData.workingHoursAr,
         workingHoursEn: restaurantData.workingHoursEn,
+        ...restaurantData.contact,
         openTime: restaurantData.openTime,
         closeTime: restaurantData.closeTime,
         currency: restaurantData.currency,

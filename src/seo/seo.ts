@@ -31,7 +31,8 @@ export interface RestaurantJsonLdInput {
   imageUrl: string | null;
   menuUrl: string;
   telephone: string | null;
-  instagramUrl: string | null;
+  address: string | null;
+  sameAs: string[];
 }
 
 export function buildRestaurantJsonLd(input: RestaurantJsonLdInput): string {
@@ -45,6 +46,7 @@ export function buildRestaurantJsonLd(input: RestaurantJsonLdInput): string {
   if (input.description) data.description = input.description;
   if (input.imageUrl) data.image = input.imageUrl;
   if (input.telephone) data.telephone = input.telephone;
-  if (input.instagramUrl) data.sameAs = [input.instagramUrl];
+  if (input.address) data.address = { '@type': 'PostalAddress', streetAddress: input.address };
+  if (input.sameAs.length > 0) data.sameAs = input.sameAs;
   return serializeJsonLd(data);
 }
