@@ -6,6 +6,13 @@
   <title>{% block title %}{{ t('common.app.name') }}{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}{{ t('common.home.subtitle') }}{% endblock %}">
   {% include "partials/head.njk" %}
+  {% if seo %}
+    <link rel="canonical" href="{{ seo.canonicalUrl }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ t('common.app.name') }}">
+    <meta property="og:description" content="{{ t('common.home.subtitle') }}">
+    <meta property="og:url" content="{{ seo.canonicalUrl }}">
+  {% endif %}
 </head>
 <body class="min-h-screen bg-bg text-text font-sans antialiased">
   <header class="border-b border-border bg-surface">

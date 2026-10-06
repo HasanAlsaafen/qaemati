@@ -2,6 +2,7 @@ import { Controller, Get, Query, Render, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { PrismaService } from '../prisma/prisma.service';
 import { isDemoModeEnabled } from '../common/demo-mode';
+import { getBaseUrl } from '../seo/seo';
 import { DEMO_ADMIN_PASSWORD } from '../prisma-seed/run-seed';
 
 @Controller()
@@ -35,6 +36,7 @@ export class HomeController {
     });
 
     return {
+      seo: { canonicalUrl: `${getBaseUrl(req)}/` },
       restaurants: restaurants.map((restaurant) => ({
         slug: restaurant.slug,
         name: locale === 'ar' ? restaurant.nameAr : restaurant.nameEn,

@@ -11,6 +11,8 @@ import { configureNunjucks } from './common/view/nunjucks';
 import { doubleCsrfProtection } from './auth/csrf';
 import { ITEM_IMAGE_UPLOAD_DIR } from './admin/upload.config';
 import { LocaleViewMiddleware } from './common/middleware/locale-view.middleware';
+import { createRateLimiter } from './common/middleware/rate-limit';
+import { accessLog } from './common/logging/access-log';
 import './auth/session.types';
 
 /**
@@ -22,6 +24,9 @@ import './auth/session.types';
  * several Phase 4 bugs when it drifted even slightly.
  */
 export async function configureApp(app: NestExpressApplication): Promise<void> {
+  // Behind a TLS proxy req.ip is the proxy unless Express is told to read
+  // X-Forwarded-For. Opt in with TRUST_PROXY=1 (hops to trust).
+  if (process.env.TRUST_PROXY) app.set('trust proxy', Number(process.env.TRUST_PROXY) || true);
   app.use(
     helmet({
       contentSecurityPolicy: {
@@ -49,6 +54,7 @@ export async function configureApp(app: NestExpressApplication): Promise<void> {
   // and our HTML/CSS are mostly repeated Tailwind class names and JSON,
   // which compress extremely well (found via a Lighthouse run showing a
   // ~90KB uncompressed menu page).
+  app.use(accessLog);
   app.use(compression());
   app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '..', 'public'), {
@@ -72,6 +78,22 @@ export async function configureApp(app: NestExpressApplication): Promise<void> {
   // parsing to have already run; without this, req.body was still `{}`
   // when CSRF checked it, failing every plain-form POST with "invalid csrf
   // token" even when the token was correct.
+  // Applied before CSRF so a flood of forged posts is cut off cheaply.
+  // Login has its own per-account limiter on top of this.
+  app.use(
+    createRateLimiter({
+      windowMs: 60_000,
+      max: 3,
+      match: (req) => req.method === 'POST' && req.path === '/demo/reset',
+    }),
+  );
+  app.use(
+    createRateLimiter({
+      windowMs: 60_000,
+      max: 120,
+      match: (req) => req.method === 'POST',
+    }),
+  );
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
 

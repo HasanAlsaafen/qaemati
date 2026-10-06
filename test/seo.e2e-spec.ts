@@ -45,4 +45,10 @@ describe('SEO and health (e2e)', () => {
     expect(res.text).toContain('property="og:title"');
     expect(res.text).toContain('"@type":"Restaurant"');
   });
+
+  it('gives the home page a canonical url and Open Graph title', async () => {
+    const res = await request(app.getHttpServer()).get('/?lang=en');
+    expect(res.text).toMatch(/rel="canonical" href="https?:\/\/[^"]+\/"/);
+    expect(res.text).toContain('property="og:title"');
+  });
 });

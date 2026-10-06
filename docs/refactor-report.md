@@ -19,6 +19,13 @@ The brief assumed an AI-templated demo needing a rebuild. The repository had alr
 - Menu screenshots at 375, 768 and 1280px in Arabic (RTL) and English (LTR) saved in `docs/ux/screenshots/refactor/`. No horizontal scroll at any width, `dir` correct in both locales.
 - `contrast:check` script updated to the new success value.
 
+## Hardening added in the third pass
+
+- `src/common/middleware/rate-limit.ts`: fixed-window limiter per IP. 120 POSTs a minute overall, 3 a minute on `/demo/reset` (unauthenticated and destructive). Runs before CSRF. `TRUST_PROXY` opts in to reading `X-Forwarded-For`.
+- `src/common/logging/`: JSON line logger when `NODE_ENV=production`, plus an access log with method, path, status and duration (static files skipped).
+- Home page now has canonical and Open Graph tags.
+- Tests: 84 unit and 66 e2e, all passing.
+
 ## AI tells found
 
 | Tell | Fix |
@@ -34,9 +41,8 @@ Unchanged. Zaytoun palette as CSS variables, Thmanyah display and body faces wit
 ## Intentionally not done
 
 - No visual rewrite, no new front-end structure. The existing component macros and layouts already match the seams the brief asks for.
-- Rate limiting beyond login, and a JSON logger. Admin form endpoints are behind session auth and CSRF. Revisit when running multiple instances.
-- Home page social tags. It is a demo index.
-- Lighthouse rerun. Prior reports exist in `docs/ux/lighthouse/`.
+- A shared rate limit store. The limiter is per process, which is fine for one instance.
+- Lighthouse rerun. It is not installed here and I did not add it. Prior reports exist in `docs/ux/lighthouse/`.
 - Real address and opening hours in JSON-LD. The schema stores free text hours and no structured address, so I only emit fields that exist.
 
 ## Next steps

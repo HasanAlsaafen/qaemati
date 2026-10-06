@@ -8,7 +8,7 @@ The seams already exist. This lists what to build on each one, in order.
 4. **Home page.** Replace the demo index at `src/home/home.controller.ts` with a real landing page, or redirect `/` to a marketing site.
 5. **Custom domains.** Resolve the restaurant from the Host header in `MenuController` before falling back to the slug. Update `getBaseUrl` in `src/seo/seo.ts` to return that domain.
 6. **Images.** Uploads go to `public/uploads` (`src/admin/upload.config.ts`). Move to object storage and a resizing step before running more than one instance.
-7. **Sessions and rate limits.** Sessions already live in Postgres, so multiple instances work. The login rate limiter is in memory (`src/auth/login-rate-limiter.ts`) and needs a shared store at that point.
+7. **Sessions and rate limits.** Sessions already live in Postgres, so multiple instances work. The login limiter (`src/auth/login-rate-limiter.ts`) and the POST limiter (`src/common/middleware/rate-limit.ts`) are in memory and need a shared store at that point. Set `TRUST_PROXY` behind a proxy so limits apply per client.
 8. **Orders and reservations.** The selection list builds a WhatsApp message client side (`public/js/selection.js`, mirrored by `src/common/text/build-whatsapp-message.ts`). A real order flow would add an `Order` model and a POST endpoint behind the same CSRF and validation setup the admin forms use.
 9. **Analytics.** Menu and item views are recorded (`src/admin/analytics.service.ts`). Add events for selection sends before adding a third party tool, and update the CSP in `src/bootstrap.ts` if you do.
-10. **Logging.** Nest `Logger` is used. Swap in a JSON logger at `NestFactory.create` when you need log shipping.
+10. **Logging.** Production already logs JSON lines (`src/common/logging/json-logger.ts`) plus an access log. Point your log shipper at stdout.
