@@ -19,6 +19,7 @@ import { toRestaurantSettingsView } from './admin-view-model';
 import { RestaurantService } from './restaurant.service';
 import { triggerToast } from './htmx-toast';
 import { restaurantImageMulterOptions } from './upload.config';
+import { UpdateBrandingDto } from './dto/branding.dto';
 
 @Controller('admin/branding')
 export class BrandingController {
@@ -43,32 +44,35 @@ export class BrandingController {
   @Patch()
   @Render('admin/partials/branding-form')
   async update(
-    @Body('nameAr') nameAr: string,
-    @Body('nameEn') nameEn: string,
-    @Body('descriptionAr') descriptionAr: string,
-    @Body('descriptionEn') descriptionEn: string,
-    @Body('whatsapp') whatsapp: string,
-    @Body('instagramHandle') instagramHandle: string,
-    @Body('workingHoursAr') workingHoursAr: string,
-    @Body('workingHoursEn') workingHoursEn: string,
-    @Body('openTime') openTime: string,
-    @Body('closeTime') closeTime: string,
-    @Body('currency') currency: string,
-    @Body('primaryColor') primaryColor: string,
-    @Body('secondaryColor') secondaryColor: string,
-    @Body('fontTheme') fontTheme: string,
-    @Body('menuDensity') menuDensity: string,
-    @Body('cornerStyle') cornerStyle: string,
-    @Body('backgroundColor') backgroundColor: string,
-    @Body('cardStyle') cardStyle: string,
-    @Body('buttonShape') buttonShape: string,
-    @Body('categoryDivider') categoryDivider: string,
-    @Body('backgroundStyle') backgroundStyle: string,
-    @Body('backgroundPattern') backgroundPattern: string,
-    @Body('sectionSpacing') sectionSpacing: string,
+    @Body() body: UpdateBrandingDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+    const {
+      nameAr,
+      nameEn,
+      descriptionAr,
+      descriptionEn,
+      whatsapp,
+      instagramHandle,
+      workingHoursAr,
+      workingHoursEn,
+      openTime,
+      closeTime,
+      currency,
+      primaryColor,
+      secondaryColor,
+      fontTheme,
+      menuDensity,
+      cornerStyle,
+      backgroundColor,
+      cardStyle,
+      buttonShape,
+      categoryDivider,
+      backgroundStyle,
+      backgroundPattern,
+      sectionSpacing,
+    } = body;
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
     const requiredMessage = this.i18n.t('common.admin.form.required', { lang: locale });
@@ -89,8 +93,8 @@ export class BrandingController {
 
     try {
       const restaurant = await this.restaurants.update(restaurantId, {
-        nameAr: nameAr.trim(),
-        nameEn: nameEn.trim(),
+        nameAr: (nameAr ?? '').trim(),
+        nameEn: (nameEn ?? '').trim(),
         descriptionAr: descriptionAr?.trim() || null,
         descriptionEn: descriptionEn?.trim() || null,
         whatsapp: whatsapp?.trim() || null,

@@ -12,7 +12,9 @@ import { doubleCsrfProtection } from './auth/csrf';
 import { ITEM_IMAGE_UPLOAD_DIR } from './admin/upload.config';
 import { LocaleViewMiddleware } from './common/middleware/locale-view.middleware';
 import { createRateLimiter } from './common/middleware/rate-limit';
+import { createValidationPipe } from './common/validation/create-validation-pipe';
 import { accessLog } from './common/logging/access-log';
+import { getSessionSecret } from './config/env.validation';
 import './auth/session.types';
 
 /**
@@ -91,7 +93,7 @@ export async function configureApp(app: NestExpressApplication): Promise<void> {
     createRateLimiter({
       windowMs: 60_000,
       max: 120,
-      match: (req) => req.method === 'POST',
+      match: (req) => req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'OPTIONS',
     }),
   );
   app.use(express.urlencoded({ extended: true }));
@@ -114,7 +116,7 @@ export async function configureApp(app: NestExpressApplication): Promise<void> {
         tableName: 'session',
         createTableIfMissing: true,
       }),
-      secret: process.env.SESSION_SECRET ?? 'change-me-in-production',
+      secret: getSessionSecret(),
       resave: false,
       // CSRF validation ties a token to req.session.id (see auth/csrf.ts).
       // With saveUninitialized: false, an anonymous visitor's session is
@@ -136,6 +138,7 @@ export async function configureApp(app: NestExpressApplication): Promise<void> {
   );
   app.use(doubleCsrfProtection);
 
+  app.useGlobalPipes(createValidationPipe());
   configureNunjucks(app);
   mkdirSync(ITEM_IMAGE_UPLOAD_DIR, { recursive: true });
 }

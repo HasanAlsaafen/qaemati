@@ -320,5 +320,13 @@
       "step4Title": "Branding",
       "step4Body": "The Branding page is where you set your logo, cover image, primary color, and currency -- your public menu picks these up automatically."
     }
+  },
+  "validation": {
+    "invalid": "This value is not valid.",
+    "tooLong": "This is too long.",
+    "invalidNumber": "Enter a number, for example 12.50.",
+    "invalidTime": "Enter a time like 09:30.",
+    "invalidOption": "Pick one of the available options.",
+    "summary": "Some fields need attention."
   }
 }

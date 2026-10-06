@@ -24,6 +24,8 @@ import { toCategoryViewList, toItemView } from './admin-view-model';
 import { triggerToast } from './htmx-toast';
 import { parseIds } from './parse-ids';
 import { itemImageMulterOptions } from './upload.config';
+import { CreateItemDto, UpdateItemDto } from './dto/item.dto';
+import { MoveDto, ReorderDto } from './dto/common.dto';
 
 function parseTags(raw: string | string[] | undefined): ItemTag[] {
   const values = Array.isArray(raw) ? raw : raw ? [raw] : [];
@@ -72,13 +74,11 @@ export class ItemsController {
   @Render('admin/partials/category')
   async create(
     @Param('categoryId') categoryId: string,
-    @Body('nameAr') nameAr: string,
-    @Body('nameEn') nameEn: string,
-    @Body('price') price: string,
-    @Body('currency') currency: string,
+    @Body() body: CreateItemDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+    const { nameAr, nameEn, price, currency } = body;
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
     const priceValue = Number(price);
@@ -109,12 +109,12 @@ export class ItemsController {
   @Render('admin/partials/category')
   async reorder(
     @Param('categoryId') categoryId: string,
-    @Body('ids') ids: string | string[] | undefined,
+    @Body() body: ReorderDto,
     @Req() req: Request,
   ) {
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
-    await this.items.reorder(restaurantId, categoryId, parseIds(ids));
+    await this.items.reorder(restaurantId, categoryId, parseIds(body.ids));
     const category = await this.categories.findOneWithItems(categoryId);
     return {
       category: toCategoryViewList([category])[0],
@@ -126,21 +126,24 @@ export class ItemsController {
   @Render('admin/partials/item')
   async update(
     @Param('id') id: string,
-    @Body('nameAr') nameAr: string,
-    @Body('nameEn') nameEn: string,
-    @Body('descriptionAr') descriptionAr: string,
-    @Body('descriptionEn') descriptionEn: string,
-    @Body('allergenNoteAr') allergenNoteAr: string,
-    @Body('allergenNoteEn') allergenNoteEn: string,
-    @Body('price') price: string,
-    @Body('currency') currency: string,
-    @Body('tags') tags: string | string[] | undefined,
-    @Body('variants') variants: unknown,
-    @Body('addons') addons: unknown,
-    @Body('isTodaysSpecial') isTodaysSpecial: string | undefined,
+    @Body() body: UpdateItemDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+    const {
+      nameAr,
+      nameEn,
+      descriptionAr,
+      descriptionEn,
+      allergenNoteAr,
+      allergenNoteEn,
+      price,
+      currency,
+      tags,
+      variants,
+      addons,
+      isTodaysSpecial,
+    } = body;
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
     const priceValue = Number(price);
@@ -229,15 +232,11 @@ export class ItemsController {
 
   @Post('items/:id/move')
   @Render('admin/partials/category')
-  async move(
-    @Param('id') id: string,
-    @Body('direction') direction: 'up' | 'down',
-    @Req() req: Request,
-  ) {
+  async move(@Param('id') id: string, @Body() body: MoveDto, @Req() req: Request) {
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
     const item = await this.items.assertOwnership(restaurantId, id);
-    await this.items.move(restaurantId, id, direction);
+    await this.items.move(restaurantId, id, body.direction);
     const category = await this.categories.findOneWithItems(item.categoryId);
     return {
       category: toCategoryViewList([category])[0],

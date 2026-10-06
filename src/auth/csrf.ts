@@ -1,5 +1,6 @@
 import { doubleCsrf } from 'csrf-csrf';
 import { Request } from 'express';
+import { getCsrfSecret } from '../config/env.validation';
 
 /**
  * Double-submit-cookie CSRF protection. Needs express-session mounted
@@ -9,7 +10,7 @@ import { Request } from 'express';
  */
 export const { doubleCsrfProtection, generateCsrfToken, invalidCsrfTokenError } = (() => {
   const { doubleCsrfProtection, generateToken, invalidCsrfTokenError } = doubleCsrf({
-    getSecret: () => process.env.CSRF_SECRET ?? 'change-me-in-production',
+    getSecret: () => getCsrfSecret(),
     getSessionIdentifier: (req: Request) => req.session.id,
     cookieName: 'qaemati_csrf',
     cookieOptions: {

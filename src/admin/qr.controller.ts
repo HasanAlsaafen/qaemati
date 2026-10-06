@@ -17,6 +17,8 @@ import { TableService } from './table.service';
 import { buildAdminLabels } from './admin-labels';
 import { buildMenuUrl, generateQrSvg } from './qr-code';
 import { triggerToast } from './htmx-toast';
+import { TableLabelDto } from './dto/table.dto';
+import { MoveDto } from './dto/common.dto';
 
 interface TableView {
   id: string;
@@ -83,10 +85,11 @@ export class QrController {
   @Post('tables')
   @Render('admin/partials/tables-list')
   async create(
-    @Body('label') label: string,
+    @Body() body: TableLabelDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+    const { label } = body;
     const restaurantId = req.session.restaurantId as string;
     const slug = req.session.restaurantSlug as string;
     const locale = req.locale ?? 'ar';
@@ -108,10 +111,11 @@ export class QrController {
   @Render('admin/partials/table-row')
   async update(
     @Param('id') id: string,
-    @Body('label') label: string,
+    @Body() body: TableLabelDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+    const { label } = body;
     const restaurantId = req.session.restaurantId as string;
     const slug = req.session.restaurantSlug as string;
     const locale = req.locale ?? 'ar';
@@ -140,16 +144,12 @@ export class QrController {
 
   @Post('tables/:id/move')
   @Render('admin/partials/tables-list')
-  async move(
-    @Param('id') id: string,
-    @Body('direction') direction: 'up' | 'down',
-    @Req() req: Request,
-  ) {
+  async move(@Param('id') id: string, @Body() body: MoveDto, @Req() req: Request) {
     const restaurantId = req.session.restaurantId as string;
     const slug = req.session.restaurantSlug as string;
     const locale = req.locale ?? 'ar';
 
-    await this.tables.move(restaurantId, id, direction);
+    await this.tables.move(restaurantId, id, body.direction);
 
     return {
       tables: await this.buildTableViews(req, restaurantId, slug),

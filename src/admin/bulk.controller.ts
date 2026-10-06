@@ -17,6 +17,7 @@ import { BulkService, ImportRowResult } from './bulk.service';
 import { buildAdminLabels } from './admin-labels';
 import { csvImportMulterOptions } from './upload.config';
 import { parseIds } from './parse-ids';
+import { PriceChangeDto, UndoDto } from './dto/bulk.dto';
 
 @Controller('admin/bulk')
 export class BulkController {
@@ -56,11 +57,8 @@ export class BulkController {
 
   @Post('price-change')
   @Render('admin/bulk')
-  async priceChange(
-    @Body('itemIds') itemIds: string | string[] | undefined,
-    @Body('percent') percent: string,
-    @Req() req: Request,
-  ) {
+  async priceChange(@Body() body: PriceChangeDto, @Req() req: Request) {
+    const { itemIds, percent } = body;
     const restaurantId = req.session.restaurantId as string;
     const percentValue = Number(percent);
     const ids = parseIds(itemIds);
@@ -111,7 +109,8 @@ export class BulkController {
 
   @Post('undo')
   @Render('admin/bulk')
-  async undo(@Body('logId') logId: string, @Req() req: Request) {
+  async undo(@Body() body: UndoDto, @Req() req: Request) {
+    const logId = body.logId ?? '';
     const restaurantId = req.session.restaurantId as string;
     const ok = await this.bulk.undo(restaurantId, logId);
     return this.pageData(req, {

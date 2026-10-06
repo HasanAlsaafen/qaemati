@@ -23,8 +23,8 @@
       <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
       <input type="hidden" name="redirect" value="{{ redirect }}">
 
-      {{ input('email', t('common.admin.auth.emailLabel'), 'email', email, '', none, none, 'required autocomplete="username"') }}
-      {{ input('password', t('common.admin.auth.passwordLabel'), 'password', '', '', none, none, 'required autocomplete="current-password"') }}
+      {{ input('email', t('common.admin.auth.emailLabel'), 'email', email, '', fieldErrors.email, none, 'required autocomplete="username"') }}
+      {{ input('password', t('common.admin.auth.passwordLabel'), 'password', '', '', fieldErrors.password, none, 'required autocomplete="current-password"') }}
 
       {{ button(t('common.admin.auth.submit'), 'primary', 'md', 'submit') }}
     </form>

@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
+import { ValidationFailedException } from '../validation/validation-failed.exception';
 
 function hasHttpStatusCode(error: unknown): error is { statusCode: number } {
   return (
@@ -46,11 +47,28 @@ export class HttpExceptionFilter implements ExceptionFilter {
           ? exception.statusCode
           : HttpStatus.INTERNAL_SERVER_ERROR;
 
+    if (exception instanceof ValidationFailedException) {
+      this.respondValidationFailure(exception, request, response);
+      return;
+    }
+
     if (status !== HttpStatus.NOT_FOUND) {
       this.logger.error(
         `${request.method} ${request.url} -> ${status}`,
         exception instanceof Error ? exception.stack : undefined,
       );
+    }
+
+    // API clients get JSON and never a stack trace or an internal error
+    // message: 5xx details stay in the log.
+    if (request.headers['hx-request'] !== 'true' && request.accepts(['html', 'json']) === 'json') {
+      response.status(status).json({
+        statusCode: status,
+        error: HttpStatus[status] ?? 'Error',
+        message:
+          status < 500 && exception instanceof Error ? exception.message : 'Internal server error',
+      });
+      return;
     }
 
     // htmx only swaps 2xx responses into the DOM by default, so a full
@@ -72,5 +90,49 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const template = status === HttpStatus.NOT_FOUND ? 'pages/errors/404' : 'pages/errors/500';
     response.status(status).render(template, { statusCode: status });
+  }
+
+  private respondValidationFailure(
+    exception: ValidationFailedException,
+    request: Request,
+    response: Response,
+  ): void {
+    const locale = request.locale ?? 'ar';
+    const t = (key: string): string => this.i18n.t(`common.validation.${key}`, { lang: locale });
+    const errors: Record<string, string[]> = {};
+    for (const [field, keys] of Object.entries(exception.fieldErrors)) {
+      errors[field] = keys.map(t);
+    }
+    const summary = t('summary');
+
+    // The login form is the one plain HTML form: re-render it in place
+    // with the message under each field and the typed email kept.
+    if (request.method === 'POST' && request.path === '/admin/login') {
+      const redirect = exception.values.redirect;
+      response.status(HttpStatus.UNPROCESSABLE_ENTITY).render('admin/login', {
+        redirect:
+          typeof redirect === 'string' && redirect.startsWith('/admin') ? redirect : '/admin',
+        email: typeof exception.values.email === 'string' ? exception.values.email : '',
+        error: summary,
+        fieldErrors: Object.fromEntries(Object.entries(errors).map(([f, m]) => [f, m[0]])),
+      });
+      return;
+    }
+
+    // htmx does not swap a 4xx response, so the form on screen keeps what
+    // was typed. public/js/form-errors.js reads this body and marks the
+    // fields; the toast covers anything it cannot place.
+    if (request.headers['hx-request'] === 'true') {
+      response.setHeader(
+        'HX-Trigger',
+        JSON.stringify({ toast: { message: encodeURIComponent(summary), variant: 'danger' } }),
+      );
+    }
+    response.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+      statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+      error: 'Unprocessable Entity',
+      message: summary,
+      errors,
+    });
   }
 }

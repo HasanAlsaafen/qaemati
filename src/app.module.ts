@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
+import { validateEnv } from './config/env.validation';
 import { AcceptLanguageResolver, CookieResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LocaleViewMiddleware } from './common/middleware/locale-view.middleware';
@@ -17,7 +18,7 @@ import { StyleguideModule } from './styleguide/styleguide.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
     I18nModule.forRoot({
       fallbackLanguage: 'ar',
       loaderOptions: {

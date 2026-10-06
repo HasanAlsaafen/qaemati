@@ -7,6 +7,8 @@ import { buildAdminLabels } from './admin-labels';
 import { toCategoryViewList } from './admin-view-model';
 import { triggerToast } from './htmx-toast';
 import { parseIds } from './parse-ids';
+import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
+import { MoveDto, ReorderDto } from './dto/common.dto';
 
 @Controller('admin/categories')
 export class CategoriesController {
@@ -19,11 +21,11 @@ export class CategoriesController {
   @Post()
   @Render('admin/partials/categories-list')
   async create(
-    @Body('nameAr') nameAr: string,
-    @Body('nameEn') nameEn: string,
+    @Body() body: CreateCategoryDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+    const { nameAr, nameEn } = body;
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
 
@@ -46,13 +48,11 @@ export class CategoriesController {
   @Render('admin/partials/category')
   async update(
     @Param('id') id: string,
-    @Body('nameAr') nameAr: string,
-    @Body('nameEn') nameEn: string,
-    @Body('availableFrom') availableFrom: string | undefined,
-    @Body('availableTo') availableTo: string | undefined,
+    @Body() body: UpdateCategoryDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+    const { nameAr, nameEn, availableFrom, availableTo } = body;
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
 
@@ -89,10 +89,10 @@ export class CategoriesController {
 
   @Post('reorder')
   @Render('admin/partials/categories-list')
-  async reorder(@Body('ids') ids: string | string[] | undefined, @Req() req: Request) {
+  async reorder(@Body() body: ReorderDto, @Req() req: Request) {
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
-    await this.categories.reorder(restaurantId, parseIds(ids));
+    await this.categories.reorder(restaurantId, parseIds(body.ids));
     const categories = await this.categories.listForRestaurant(restaurantId);
     const restaurant = await this.restaurants.findById(restaurantId);
     return {
@@ -103,14 +103,10 @@ export class CategoriesController {
 
   @Post(':id/move')
   @Render('admin/partials/categories-list')
-  async move(
-    @Param('id') id: string,
-    @Body('direction') direction: 'up' | 'down',
-    @Req() req: Request,
-  ) {
+  async move(@Param('id') id: string, @Body() body: MoveDto, @Req() req: Request) {
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
-    await this.categories.move(restaurantId, id, direction);
+    await this.categories.move(restaurantId, id, body.direction);
     const categories = await this.categories.listForRestaurant(restaurantId);
     const restaurant = await this.restaurants.findById(restaurantId);
     return {

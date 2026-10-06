@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { I18nService } from 'nestjs-i18n';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginRateLimiter } from './login-rate-limiter';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('admin')
 export class AuthController {
@@ -23,13 +24,8 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(
-    @Body('email') email: string | undefined,
-    @Body('password') password: string | undefined,
-    @Body('redirect') redirect: string | undefined,
-    @Req() req: Request,
-    @Res() res: Response,
-  ): Promise<void> {
+  async login(@Body() body: LoginDto, @Req() req: Request, @Res() res: Response): Promise<void> {
+    const { email, password, redirect } = body;
     const locale = req.locale ?? 'ar';
     const safeRedirect = redirect && redirect.startsWith('/admin') ? redirect : '/admin';
     const rateLimitKey = `${req.ip}:${(email ?? '').toLowerCase()}`;
