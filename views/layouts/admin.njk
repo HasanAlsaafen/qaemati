@@ -1,4 +1,5 @@
 {% from "components/toast.njk" import toastHost %}
+{% from "components/language-switcher.njk" import languageSwitcher %}
 <!DOCTYPE html>
 <html lang="{{ locale }}" dir="{{ dir }}">
 <head>
@@ -95,6 +96,7 @@
         {% if adminName %}
           <p x-show="!collapsed" class="truncate px-3 pb-1 text-xs text-muted-text">{{ t('common.admin.auth.loggedInAs', { name: adminName }) }}</p>
         {% endif %}
+        <div x-show="!collapsed" class="px-1 pb-2">{{ languageSwitcher(otherLocale, t('common.nav.language')) }}</div>
         <form method="post" action="/admin/logout">
           <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
           <button
@@ -113,6 +115,7 @@
       <header class="border-b border-border bg-surface sm:hidden">
         <div class="flex items-center justify-between gap-3 px-4 py-3">
           <a href="/admin" class="inline-flex min-h-11 items-center text-lg font-bold">{{ t('common.app.name') }}</a>
+          <div class="ms-auto">{{ languageSwitcher(otherLocale, t('common.nav.language')) }}</div>
           <button
             type="button"
             class="inline-flex h-11 w-11 items-center justify-center rounded-md text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
@@ -165,7 +168,7 @@
 
   {{ toastHost() }}
   {% include "admin/components/guided-tour.njk" %}
-  <script defer src="/js/form-errors.js"></script>
+  <script defer src="{{ asset('/js/form-errors.js') }}"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

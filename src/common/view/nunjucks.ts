@@ -1,6 +1,7 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as nunjucks from 'nunjucks';
 import { join } from 'path';
+import { assetUrl } from './asset-url';
 
 /**
  * Wires Nunjucks as the Express view engine. Nest has no official Nunjucks
@@ -9,11 +10,12 @@ import { join } from 'path';
  */
 export function configureNunjucks(app: NestExpressApplication): void {
   const viewsDir = join(__dirname, '..', '..', '..', 'views');
-  nunjucks.configure(viewsDir, {
+  const env = nunjucks.configure(viewsDir, {
     autoescape: true,
     watch: process.env.NODE_ENV !== 'production',
     express: app.getHttpAdapter().getInstance(),
   });
+  env.addGlobal('asset', assetUrl);
 
   app.set('view engine', 'njk');
   app.set('views', viewsDir);

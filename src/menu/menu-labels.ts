@@ -25,6 +25,7 @@ export function buildMenuLabels(i18n: I18nService, locale: Locale) {
       buttonLabel: t('common.menu.filter.buttonLabel'),
       title: t('common.menu.filter.title'),
       clearButton: t('common.menu.filter.clearButton'),
+      closeLabel: t('common.menu.close'),
       // B1: every ItemTag, for the filter sheet's checkbox list --
       // built from the same ALL_TAGS/TAG_I18N_KEY source item cards
       // and the admin tag checkboxes already use, so a new tag added
@@ -52,6 +53,7 @@ export function buildMenuLabels(i18n: I18nService, locale: Locale) {
     selection: {
       addButton: t('common.menu.selection.addButton'),
       barLabel: t('common.menu.selection.barLabel'),
+      closeLabel: t('common.menu.close'),
       title: t('common.menu.selection.title'),
       emptyTitle: t('common.menu.selection.emptyTitle'),
       emptyDescription: t('common.menu.selection.emptyDescription'),

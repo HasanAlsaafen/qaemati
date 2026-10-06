@@ -51,4 +51,16 @@ describe('SEO and health (e2e)', () => {
     expect(res.text).toMatch(/rel="canonical" href="https?:\/\/[^"]+\/"/);
     expect(res.text).toContain('property="og:title"');
   });
+
+  it('versions the stylesheet and scripts so a deploy cannot leave stale copies behind', async () => {
+    const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
+    expect(res.text).toMatch(/href="\/css\/app\.css\?v=[0-9a-z]+"/);
+    expect(res.text).toMatch(/src="\/js\/menu\.js\?v=[0-9a-z]+"/);
+  });
+
+  it('serves a service worker that fetches the stylesheet from the network first', async () => {
+    const res = await request(app.getHttpServer()).get('/sw.js');
+    expect(res.text).toContain('qaemati-shell-v2');
+    expect(res.text).not.toContain('cached || fetch(request)');
+  });
 });

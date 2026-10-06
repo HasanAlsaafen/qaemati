@@ -5,7 +5,9 @@
 // stale. Scope is deliberately just "a friendly offline page instead of
 // the browser's own network-error page," plus the static shell (CSS/JS/
 // icon) so that offline page actually renders styled.
-const CACHE_NAME = 'qaemati-shell-v1';
+// Bump the version whenever the strategy below changes so old caches are
+// deleted on activate.
+const CACHE_NAME = 'qaemati-shell-v2';
 const PRECACHE_URLS = ['/offline', '/css/app.css', '/favicon.svg'];
 
 self.addEventListener('install', (event) => {
@@ -36,11 +38,20 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static shell assets: cache-first, since these are content-hashed-ish
-  // build output (app.css, the favicon) that changes only on deploy, not
-  // per-visit.
+  // The shell is only a fallback for the offline page. The stylesheet is
+  // network first: the file is not content hashed, so serving a cached copy
+  // first would keep returning visitors on an old stylesheet after every
+  // deploy, against new HTML. The cache is used only when the network fails.
   const url = new URL(request.url);
   if (url.origin === self.location.origin && PRECACHE_URLS.includes(url.pathname)) {
-    event.respondWith(caches.match(request).then((cached) => cached || fetch(request)));
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const copy = response.clone();
+          if (response.ok) caches.open(CACHE_NAME).then((cache) => cache.put(url.pathname, copy));
+          return response;
+        })
+        .catch(() => caches.match(url.pathname)),
+    );
   }
 });

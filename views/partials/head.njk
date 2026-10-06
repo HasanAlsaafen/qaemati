@@ -12,8 +12,8 @@
 <link rel="preload" href="/fonts/tajawal/tajawal-700-latin.woff2" as="font" type="font/woff2" crossorigin>
 {% endif %}
 
-<link rel="stylesheet" href="/css/app.css">
-<script defer src="/js/vendor/htmx.min.js"></script>
+<link rel="stylesheet" href="{{ asset('/css/app.css') }}">
+<script defer src="{{ asset('/js/vendor/htmx.min.js') }}"></script>
 {# Alpine's CDN build starts via a queued microtask right after its own
    script executes, not on DOMContentLoaded -- so a later <script defer>
    that calls Alpine.store()/registers an alpine:init listener runs too
@@ -26,5 +26,5 @@
    page template that extends a different layout (verified empirically;
    Nunjucks blocks resolve against the direct extends chain only, not
    through an unrelated {% include %}). #}
-<script defer src="/js/vendor/alpine.min.js"></script>
+<script defer src="{{ asset('/js/vendor/alpine.min.js') }}"></script>
 <style>[x-cloak] { display: none !important; }</style>

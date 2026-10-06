@@ -29,4 +29,6 @@ Owner decisions from the audit approval, plus the defaults taken from section 9 
 25. Only the category row is sticky. Search scrolls away, because two sticky rows would take about a fifth of a phone screen.
 26. The Thmanyah font files stay in the repository because they are a licensed asset the owner supplied, but nothing loads them any more.
 27. Text on a restaurant's soft primary tint uses a derived color that is darkened only when needed, so any brand color that passes on white also reads on its tint.
+28. Stylesheet and script URLs carry a version string and the service worker fetches the stylesheet from the network first, because the files are not content hashed and a cached copy otherwise outlives every deploy.
+29. The admin gets the same AR | EN pill as the public menu, so language is a visible choice in both places.
 

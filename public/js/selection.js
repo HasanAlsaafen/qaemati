@@ -89,5 +89,11 @@ document.addEventListener('alpine:init', () => {
       const first = Object.values(this.items)[0];
       return first ? first.currency : '';
     },
+
+    // What is shown next to a price. The WhatsApp message keeps the code.
+    get currencySymbol() {
+      const first = Object.values(this.items)[0];
+      return first ? first.currencySymbol || first.currency : '';
+    },
   });
 });

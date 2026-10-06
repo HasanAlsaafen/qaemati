@@ -8,8 +8,8 @@ Branch `refactor/human-ui-and-production-prep`. Two phases from the approved aud
 | --- | --- | --- |
 | Type-check | pass | pass |
 | Lint | pass | pass |
-| Unit tests | 84 pass | 146 pass after Phase D (62 new, none changed) |
-| E2E tests | 66 pass | 117 pass after Phase D (51 new net, none weakened) |
+| Unit tests | 84 pass | 149 pass after Phase E (65 new, none changed) |
+| E2E tests | 66 pass | 120 pass after Phase E (54 new net, none weakened) |
 | axe nodes, 17 pages at 375px (WCAG 2 A, AA, 2.2 AA) | 64, all serious or critical | 0 |
 | Pages with horizontal scroll at 375px | 4 | 0 |
 | Interactive controls under 44px | 257 | 0 |
@@ -177,6 +177,29 @@ Left undone
 - I read the reference at one point in time and only its public page. Other states (its admin, its English version) were not seen.
 
 Dev database changes made for this phase: the cafe's saved olive colors were reset to the seed's teal and its old background color cleared, and the seeded placeholder pictures were regenerated in the new palette. `npm run prisma:seed` recreates this.
+
+## Phase E: full test in Chrome (after Phase D)
+
+A real Chrome session (not an emulator) against the running app: the public menu in Arabic and English, menu tabs, search, the dietary filter, category chips and the All chip, the detail card, the selection panel and its WhatsApp link, then the admin (dashboard, adding, editing, toggling and deleting a dish, adding and deleting a menu, the branding form with a validation error, Bulk, QR, Analytics), the 404, offline and logged-out paths, the manifest, robots, sitemap and health. Test data created along the way (one dish, one menu) was deleted again and the database was checked afterwards.
+
+Bugs found and fixed
+1. Stale stylesheet after any deploy (High). The service worker served `/css/app.css` cache first under a fixed cache name, and a comment wrongly called the file content hashed. A returning visitor kept the old stylesheet against new HTML: in this session the cover image rendered 485px tall and the search icon fell out of its field. Fixed by making the worker network first for the stylesheet, bumping the cache to v2, and adding a version string (file modified time) to every CSS and JS URL through a new `asset()` template helper (`src/common/view/asset-url.ts`). Chrome, still running the old worker, recovered by itself on the next load.
+2. "Add to Home Screen" squeezed the search field to about 110px with its placeholder cut off, whenever Chrome offered the install prompt. It now has its own row.
+3. The filter and selection sheets stretched across the whole screen on desktop, and so did the floating selection bar. They are now capped at a readable width.
+4. The selection bar and panel showed "ILS" while every price on the page showed the shekel sign. They now show the symbol (the WhatsApp message keeps the code).
+5. The close button of the filter sheet and the selection panel was announced as "Close" in English on the Arabic page. Both are translated now.
+6. The admin had no language switcher, so an owner could not change the admin language after login, and htmx updates came back in whatever language a cookie from elsewhere held, mixing English and Arabic on one screen. The AR | EN pill is now in the admin sidebar and in the mobile header.
+
+What passed in Chrome
+- Language pill, menu tabs with hours note and the "closed now" sentence, search (Arabic), the dietary filter with its count badge, category chips with the active ring, All chip returning to the top, detail card, add to selection, quantity and note, the WhatsApp message text (`1x قهوة تركية: 11.00 ILS`), the single menu restaurant without a cover image, the footer links.
+- Admin: add dish, availability switch with its toast, edit, delete with the confirm dialog, add menu with overnight hours and its tab on the public page, delete menu, the branding validation error with the typed value kept and nothing saved, Bulk, QR, Analytics.
+- 404 page (HTML and JSON), offline page, logged-out redirect to the login page, CSRF refusal, health, robots, sitemap, manifest. No JavaScript or CSP errors from the app. The only console errors came from a Chrome extension.
+
+Limits of this test
+- The browser window could not be made narrower than the desktop viewport, so phone widths were not re-tested in Chrome. They were verified earlier with an emulated 375px browser, and again after these fixes (0 axe violations, no horizontal scroll, no control under 44px).
+- I did not log out of the admin session, because it belongs to this Chrome profile, and did not send a real WhatsApp message.
+
+New tests: versioned asset URLs and the worker strategy (`test/seo.e2e-spec.ts`), translated close labels and the selection symbol (`test/menu-extras.e2e-spec.ts`), `asset-url.spec.ts`. Totals: 149 unit, 120 e2e, all passing.
 
 ## New risks noticed
 

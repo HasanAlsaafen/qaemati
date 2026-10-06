@@ -10,8 +10,8 @@
      this finds Alpine already started. See the comment in
      partials/head.njk for the full explanation. #}
   {% if menu.whatsappUrl %}
-    <script defer src="/js/whatsapp-message.js"></script>
-    <script defer src="/js/selection.js"></script>
+    <script defer src="{{ asset('/js/whatsapp-message.js') }}"></script>
+    <script defer src="{{ asset('/js/selection.js') }}"></script>
   {% endif %}
   {% include "partials/head.njk" %}
   {% if seo and not embed %}
@@ -99,9 +99,9 @@
 
   {{ toastHost() }}
 
-  <script defer src="/js/scroll-restore.js"></script>
+  <script defer src="{{ asset('/js/scroll-restore.js') }}"></script>
   {% if menu and not embed %}
-    <script defer src="/js/pwa.js"></script>
+    <script defer src="{{ asset('/js/pwa.js') }}"></script>
   {% endif %}
   {% block scripts %}{% endblock %}
 </body>

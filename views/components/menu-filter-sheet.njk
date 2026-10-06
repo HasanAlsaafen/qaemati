@@ -22,7 +22,7 @@
     <span data-filter-count class="absolute -end-1 -top-1 hidden h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-on"></span>
   </button>
 
-  {% call bottomSheet('menu-filter', filterLabels.title) %}
+  {% call bottomSheet('menu-filter', filterLabels.title, filterLabels.closeLabel) %}
     <div data-filter-options class="flex flex-col gap-1">
       {% for tag in filterLabels.tagOptions %}
         <label class="flex min-h-11 items-center gap-2 text-sm text-text">

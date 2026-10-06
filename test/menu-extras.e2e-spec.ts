@@ -106,9 +106,18 @@ describe('All chip (e2e)', () => {
       expect(ar.text).toMatch(/href="\/lang\/ar"[^>]*aria-current="true"/);
     });
 
-    it('translates the close button of the item sheet', async () => {
+    it('translates every close button, none is left in English', async () => {
       const ar = await request(app.getHttpServer()).get(`/m/${slug}?lang=ar`);
-      expect(ar.text).toContain('aria-label="إغلاق"');
+      expect(ar.text).not.toContain('aria-label="Close"');
+      // item sheet and filter sheet are in the markup, the selection bar's is in its data
+      expect(ar.text.match(/aria-label="إغلاق"/g)?.length).toBeGreaterThanOrEqual(2);
+      expect(ar.text).toContain('closeLabel&quot;:&quot;إغلاق');
+    });
+
+    it('shows the currency symbol in the selection data, not just the code', async () => {
+      const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
+      expect(res.text).toContain('currencySymbol');
+      expect(res.text).toContain('$store.selection.currencySymbol');
     });
   });
 });

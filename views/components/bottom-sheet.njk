@@ -3,7 +3,7 @@
   "open-sheet:<id>" (e.g. from a menu item card's @click="$dispatch('open-sheet:item-42')").
   Self-contained Alpine component; no global JS beyond Alpine itself.
 #}
-{% macro bottomSheet(id, titleText) %}
+{% macro bottomSheet(id, titleText, closeLabel='Close') %}
   <div
     x-data="{ open: false }"
     x-on:open-sheet-{{ id }}.window="open = true"
@@ -28,7 +28,7 @@
       role="dialog"
       aria-modal="true"
       aria-labelledby="{{ id }}-title"
-      class="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-lg bg-surface shadow-overlay"
+      class="absolute inset-x-0 bottom-0 mx-auto max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-t-card bg-surface shadow-overlay"
       x-show="open"
       x-transition:enter="transition-transform duration-base ease-standard"
       x-transition:enter-start="translate-y-full"
@@ -41,7 +41,7 @@
         <h2 id="{{ id }}-title" class="font-sans text-lg font-bold text-text">{{ titleText }}</h2>
         <button
           type="button"
-          aria-label="Close"
+          aria-label="{{ closeLabel }}"
           class="inline-flex h-11 w-11 items-center justify-center rounded-full text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           x-on:click="open = false"
         >
