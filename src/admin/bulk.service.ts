@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { parseCsv, stringifyCsv } from './csv';
@@ -35,7 +35,7 @@ export class BulkService {
       where: { id: itemId, restaurantId },
       include: { variants: true, addons: true },
     });
-    if (!item) return;
+    if (!item) throw new NotFoundException('Item not found');
 
     const last = await this.prisma.item.findFirst({
       where: { categoryId: item.categoryId },
