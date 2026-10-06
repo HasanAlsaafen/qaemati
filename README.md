@@ -105,8 +105,8 @@ down in `afterAll`, so files can run back-to-back without clobbering each other'
 
 `npm run prisma:seed` creates two fictional, fully bilingual businesses:
 
-- **Bayt Al-Zaytoun** (`bayt-al-zaytoun`) - a cafe, 7 categories, 30 items, ILS.
-- **Al-Sanabel** (`al-sanabel`) - a restaurant, 6 categories, 21 items, JOD.
+- **Bayt Al-Zaytoun** (`bayt-al-zaytoun`) - a cafe, two menus (Breakfast 07:00 to 12:00, All day), 7 categories, 30 items, ILS.
+- **Al-Sanabel** (`al-sanabel`) - a restaurant, one Main menu, 6 categories, 21 items, JOD.
 
 Each gets one seeded admin user (`admin@<slug>.example.com`); every seeded account shares the
 password `Qaemati@Demo123` (also printed at the end of the seed run). Item images are generated

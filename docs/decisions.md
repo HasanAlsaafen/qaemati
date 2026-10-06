@@ -15,3 +15,10 @@ Owner decisions from the audit approval, plus the defaults taken from section 9 
 11. Demo credentials on the public home page are only acceptable on a labeled demo host, so DEMO_MODE must be off elsewhere (audit decision 10).
 12. DTOs check type, length, format and allowed values, while required field rules and domain rules such as color contrast stay in the controllers and services that already report them per field, so existing behavior and tests are unchanged.
 13. Validation failures on htmx forms return 422 with field messages and are drawn next to the inputs by a small script without swapping the form, so typed values are kept, and the login form is re-rendered by the server with its message and email kept.
+14. Phase C was scoped from the reference menu the owner pointed to, and all four offered items were approved: contact and social details, multiple menus with hours, an All chip, and brand logo dividers.
+15. Existing categories moved into a named Main menu through a migration (owner choice), while a category with no menu still falls back to the first menu at runtime so code and tests that know nothing about menus keep working.
+16. Menu hours describe a menu on the public page and never hide it, the page opens the first menu being served right now, and a menu with no hours counts as always served.
+17. Deleting a menu moves its categories to another menu instead of deleting them, and the last menu cannot be deleted.
+18. Every new model carries a restaurant id (Menu), and every new service method takes it, so a tenant can be added later without changing callers.
+19. The cached offline notice from the reference was already covered by the existing offline banner and offline page, so only the brand logo divider was added from that item.
+20. Facebook accepts a page name or a full facebook.com https link, and the map link accepts any https URL so the owner can paste whichever map service they use.

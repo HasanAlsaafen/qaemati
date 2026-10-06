@@ -1,6 +1,6 @@
 # Implementation log
 
-Branch `refactor/human-ui-and-production-prep`. Two phases from the approved audit (`docs/frontend-audit-report.md`). Decisions applied are in `docs/decisions.md`.
+Branch `refactor/human-ui-and-production-prep`. Two phases from the approved audit, then Phase C requested mid session (`docs/frontend-audit-report.md`). Decisions applied are in `docs/decisions.md`.
 
 ## Results at a glance
 
@@ -8,8 +8,8 @@ Branch `refactor/human-ui-and-production-prep`. Two phases from the approved aud
 | --- | --- | --- |
 | Type-check | pass | pass |
 | Lint | pass | pass |
-| Unit tests | 84 pass | 117 pass (33 new, none changed) |
-| E2E tests | 66 pass | 83 pass (17 new, none changed or weakened) |
+| Unit tests | 84 pass | 139 pass after Phase C (55 new, none changed) |
+| E2E tests | 66 pass | 117 pass after Phase C (51 new, none changed or weakened) |
 | axe nodes, 17 pages at 375px (WCAG 2 A, AA, 2.2 AA) | 64, all serious or critical | 0 |
 | Pages with horizontal scroll at 375px | 4 | 0 |
 | Interactive controls under 44px | 257 | 0 |
@@ -91,6 +91,55 @@ Left undone in Phase B
 - Admin screens were checked at 375px only in the pages listed. Item edit and add forms inside an open category, the guided tour and the confirm dialog were not measured in their open states, because axe and the target scan run on the page as loaded.
 - Dark overlays and the preview iframe interior are outside the scan.
 
+## Phase C: menus like the reference, plus admin management (commits 0aabb31, fa753e8, b89aa4c)
+
+Scope came from the reference menu (qr.befoundonline.ps/menu/haddoota, read through a page summarizer, so details may be off) and the owner approved all four offered items, with existing categories moved into a named Main menu.
+
+Step 1, contact, address and social
+- Admin Branding page gains a "Contact and location" card: tagline (Arabic and English), phone, Facebook, address (Arabic and English) and a map link. Each invalid value is flagged on its own field and nothing is saved.
+- Public menu: tagline under the name, a Call button in the header, and a footer with address, map link, hours, phone, WhatsApp, Instagram and Facebook. The footer renders nothing when no detail is set. Structured data gains a real telephone, a `PostalAddress` and both social profiles.
+- Validation is shared by the form and the page in `src/common/contact.ts`: phone shape, a Facebook handle or a facebook.com https link, an https map link.
+- Migration `20261007000000_add_contact_and_location`, seven nullable columns.
+
+Step 2, multiple menus with hours
+- New `Menu` table (restaurant id, names, optional serving window, order) and `Category.menuId`, nullable. Migration `20261007010000_add_menus` creates a Main menu per restaurant and assigns every existing category to it. Verified on the dev database: 7 and 6 categories assigned.
+- Public: tabs per menu (plain links, so each menu has an address), a sentence under the tabs such as "This menu is served from 07:00 to 12:00 only." plus "It is closed right now." when it is. The page opens the first menu being served now. Tab links keep the table label. A menu id from another restaurant is ignored.
+- Admin dashboard: a menus panel to add, rename, set hours, reorder and delete menus. New categories land in the menu on screen, a category can be moved to another menu from its edit form, and the category arrows stay inside one menu. Deleting a menu moves its categories and dishes to another menu. The last menu cannot be deleted. Overnight windows such as 22:00 to 02:00 work.
+- Admin middleware now loads the restaurant's menu list once per admin request so every partial that renders a category block can offer "move to menu".
+- Seed: the cafe has Breakfast (07:00 to 12:00) and All day, the restaurant has one Main menu.
+
+Step 3, All chip and logo between dishes
+- The category bar starts with an All chip, active at the top, scrolls back to the start when tapped, and the first category is no longer pre-selected.
+- New branding choice "Between dishes": nothing, or the restaurant logo shown small between dishes, with live preview. The divider sits inside each dish row, so search hides it with the dish and the last visible dish of a section never shows one. Nothing is drawn without a logo. Migration `20261007020000_add_item_divider`.
+
+Files touched (main ones)
+- New: `src/common/contact.ts`, `src/admin/menus.service.ts`, `src/admin/menus.controller.ts`, `src/admin/menus-view.service.ts`, `src/admin/dto/menu.dto.ts`, `views/admin/components/menus-panel.njk`, `views/admin/partials/menus-panel.njk`, `views/components/restaurant-footer.njk`, `views/components/menu-switcher.njk`, three migrations.
+- Changed: `prisma/schema.prisma`, `src/admin/{restaurant,category}.service.ts`, `src/admin/{categories,branding,dashboard}.controller.ts`, `src/admin/dto/{branding,category}.dto.ts`, `src/menu/menu.{service,controller}.ts`, `src/seo/seo.ts`, `src/auth/admin-locals.middleware.ts`, `src/prisma-seed/*`, `views/pages/menu.njk`, `views/components/{restaurant-header,menu-item-card,category-chip}.njk`, `views/admin/{branding,dashboard}.njk`, `views/admin/partials/branding-form.njk`, `views/admin/components/{categories-list,category-block,delete-trigger}.njk`, `public/js/menu.js`, both i18n files, `README.md`.
+
+Tests
+- Unit 139 pass (22 new: contact helpers, structured data).
+- E2E 117 pass (34 new, none changed): `test/contact.e2e-spec.ts` (5), `test/menus.e2e-spec.ts` (21), `test/menu-extras.e2e-spec.ts` (8). The CSRF sweep from Phase A picks up the four new menu routes automatically.
+- Menu tests build their serving windows from the real clock (an hour ahead for a closed menu), so they do not depend on the time of day.
+- Lint and type-check pass, `contrast:check` passes.
+
+Verification at 375px
+- `node scripts/admin-mobile-check.js`: 17 pages, 0 axe nodes, 0 pages with horizontal scroll, 0 controls under 44px, same as after Phase B.
+- The two-menu cafe page (tabs, hours note, footer, dividers) in Arabic and English, both menus: 0 axe nodes, no horizontal scroll, no control under 44px.
+- Driven in a real browser: add a menu with hours, rename it, delete it through the confirm dialog (the panel swaps back to another menu), no console errors. Scrollspy: All active at the top, a category after scrolling, All again after tapping it. Searching leaves no divider under the last visible dish.
+- A footer link caught at 42px wide in the first pass and a phone number written like (02) 2220111 that the first pattern rejected were both found by these checks and fixed before the commit.
+
+Left undone in Phase C
+- CSV import still finds a category by its English name across the whole restaurant. Two menus that each have a category with the same English name make the import ambiguous, so keep names unique until the import learns about menus.
+- Search and the filter work inside the menu on screen, not across menus.
+- The offline notice from the reference already exists (offline banner and offline page), so nothing was added.
+- No QR code per menu, and the sitemap lists restaurants only, each menu page points its canonical link at the restaurant page.
+- Item level hours and per-menu photos are not part of this.
+- The admin page title still says "Categories" although the page now manages menus too.
+
+Dev database changes made while verifying (not part of the code)
+- All three migrations were applied to the dev and test databases.
+- On the dev database I set the demo contact details on both restaurants, split the cafe into Breakfast and All day menus the way the seed does, and turned on the logo divider for it. The two restaurants' other data, uploads and branding were not touched. `npm run prisma:seed` recreates the same state from scratch.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).
@@ -98,3 +147,5 @@ Left undone in Phase B
 - The generic 422 toast text is the same for every failure, the specific wording is only in the field messages, which depend on `form-errors.js` finding an input with that `name`. A field rendered without a `name` attribute gets only the toast.
 - htmx loads and runs `form-errors.js` only on admin pages. Public pages have no htmx forms today.
 - Dev only: `url.parse()` deprecation warning appears at startup from a dependency, not from this code.
+- A new migration run on a database that already has menus is safe, but the Main menu backfill assumes menus did not exist: running `20261007010000_add_menus` twice by hand would add a second Main menu. Prisma applies it once.
+- Menu hours use the server clock in Asia/Hebron, same as category hours. A restaurant in another timezone needs that made configurable first.
