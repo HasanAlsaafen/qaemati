@@ -111,6 +111,29 @@ describe('Branding settings (e2e)', () => {
     expect(restaurant?.primaryColor).toBe('#1E5F74');
   });
 
+  it('keeps what was typed in the other fields when a save is rejected', async () => {
+    const token = await csrfToken('/admin/branding?lang=en');
+    const res = await agent
+      .patch('/admin/branding')
+      .set('X-CSRF-Token', token)
+      .set('Cookie', 'qaemati_locale=en')
+      .type('form')
+      .send({
+        nameAr: 'مطعم تجريبي',
+        nameEn: 'Test Restaurant',
+        currency: 'JOD',
+        primaryColor: 'not-a-color',
+        whatsapp: '+970599123456',
+        workingHoursEn: 'Daily 8 to 10',
+      });
+
+    expect(res.text).toContain('field-primaryColor-error');
+    expect(res.text).toContain('value="+970599123456"');
+    expect(res.text).toContain('value="Daily 8 to 10"');
+    const restaurant = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+    expect(restaurant?.whatsapp).not.toBe('+970599123456');
+  });
+
   it('requires both a nameAr and nameEn, flagging only the one left blank', async () => {
     const token = await csrfToken('/admin/branding?lang=en');
     const res = await agent

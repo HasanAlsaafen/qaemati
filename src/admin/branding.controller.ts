@@ -21,6 +21,16 @@ import { triggerToast } from './htmx-toast';
 import { restaurantImageMulterOptions } from './upload.config';
 import { UpdateBrandingDto } from './dto/branding.dto';
 
+/** What the user typed, so a rejected save does not wipe the form. */
+function typedValues(body: UpdateBrandingDto): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(body).filter(
+      (entry): entry is [string, string] =>
+        entry[0] !== 'csrf_token' && typeof entry[1] === 'string',
+    ),
+  );
+}
+
 @Controller('admin/branding')
 export class BrandingController {
   constructor(
@@ -85,7 +95,7 @@ export class BrandingController {
       triggerToast(res, requiredMessage, 'danger');
       const current = await this.restaurants.findById(restaurantId);
       return {
-        restaurant: toRestaurantSettingsView(current),
+        restaurant: { ...toRestaurantSettingsView(current), ...typedValues(body) },
         labels: buildAdminLabels(this.i18n, locale),
         fieldErrors,
       };
@@ -184,7 +194,7 @@ export class BrandingController {
       if (!toastMessage) throw error;
       triggerToast(res, toastMessage, 'danger');
       return {
-        restaurant: toRestaurantSettingsView(current),
+        restaurant: { ...toRestaurantSettingsView(current), ...typedValues(body) },
         labels: buildAdminLabels(this.i18n, locale),
         fieldErrors: errorFieldErrors,
       };
