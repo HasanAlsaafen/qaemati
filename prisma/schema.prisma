@@ -155,6 +155,7 @@ model Restaurant {
   itemVariants ItemVariant[]
   itemAddons   ItemAddon[]
   menuViews    MenuView[]
+  bulkOperationLogs BulkOperationLog[]
 }
 
 model AdminUser {
@@ -274,6 +275,29 @@ model MenuView {
 
   @@index([restaurantId, createdAt])
   @@index([itemId, createdAt])
+}
+
+/// B3: one entry per bulk-mutating action (bulk price change, CSV import)
+/// -- NOT per-item duplication, which is trivially reversible with one
+/// delete and doesn't need a snapshot. `snapshot` holds one JSON array
+/// entry per affected item: `{ itemId, created: bool, previous: {...} |
+/// null }`. `created: true` means undo = delete that item; otherwise
+/// undo = write `previous` back. Single-level undo (only the most
+/// recent un-undone log is offered), not a full history stack --
+/// matches the glossary's singular "Undo", not "Undo history".
+model BulkOperationLog {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  type     String
+  snapshot Json
+
+  createdAt DateTime  @default(now())
+  undoneAt  DateTime?
+
+  @@index([restaurantId, createdAt])
 }
 
 /// A2: a size/option with its own absolute price (not a delta) -- "Small

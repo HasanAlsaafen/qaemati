@@ -1608,3 +1608,56 @@ infrastructure (view-tracking, CSV parsing, a service worker) like B2–B4 would
 - Analytics has no CSV export or date-range picker beyond the fixed 7/30-day windows; not
   requested, and B3's "bulk tools" scope is a separate, already-named place for export-style
   features if wanted later.
+
+## Phase 16: Pack B3 -- bulk tools (done)
+
+### What was built
+
+New `/admin/bulk` page (own flat item list, not the category-nested dashboard -- a utility tool,
+not the menu editor) covering all four glossary terms:
+
+- **Duplicate**: copies an item (incl. variants/addons) into the same category. Not undo-logged
+  -- deleting the copy is itself a one-click undo, so a snapshot would be pure overhead.
+- **Bulk price change (%)**: select items, apply a percent to both the base price and every
+  variant price (an item with variants still has its own `price` field -- leaving variants out
+  would make "+10%" silently incomplete for any item that has them).
+- **CSV import/export**: a small hand-rolled RFC4180-ish parser/stringifier (`src/admin/csv.ts`,
+  no new dependency needed for a format this size). Import matches rows to items by `id` (blank
+  = create); `category` must match an existing category's English name exactly, otherwise that
+  row errors rather than silently forking the menu structure.
+- **Undo**: a new `BulkOperationLog` table snapshots the prior state of every item touched by a
+  price change or import (`created: true` entries undo as a delete, others restore the
+  snapshotted fields). Single-level undo -- only the most recent un-undone log is offered, not a
+  full history stack, matching the glossary's singular "Undo".
+
+Bug found and fixed before it shipped: the CSV import form originally posted CSRF the same way
+every other plain form on this page does (`csrf_token` hidden field). That doesn't work for
+`multipart/form-data` -- Express's body parsers never populate `req.body` for multipart, so
+`doubleCsrfProtection`'s hidden-field fallback can't see a token there, meaning the real form
+would always have 403'd in production despite looking identical to every working form around it.
+Caught via the e2e test, not manual testing. Fixed by switching every action on this page (not
+just import) to htmx, riding the global `X-CSRF-Token` header already set via `hx-headers` on
+`<body>` -- the same mechanism the existing branding image uploads already rely on for the exact
+same reason. Each action does a full-page re-render (`hx-select="body"` pulls `<body>` out of the
+full-document response), keeping the page's plain-form-per-action structure rather than inventing
+a partial-template system for a utility page.
+
+### Verified
+
+- E2e: new `test/bulk.e2e-spec.ts` (5 cases) -- duplicate, price change + undo (round-trips the
+  price back exactly), CSV export, CSV import (one create, one update, one category-mismatch
+  error row) + undo (deletes the created item, restores the updated one's prior fields). New
+  `src/admin/csv.spec.ts` (2 cases) for the parser/stringifier round-trip. 55 e2e + 74 unit tests
+  total.
+- `npx tsc --noEmit`, `npm run lint`, `npm run contrast:check`, and a full production build all
+  pass. Migration applied to both the dev and test databases.
+
+### Known gaps / follow-ups
+
+- B4 (share + PWA) remains unbuilt -- scoped, not started.
+- CSV import doesn't touch variants/addons or tags -- top-level item fields only
+  (id/category/name/price/currency/available). Noted rather than silently handled: extending it
+  would need a column format for variable-length variant/addon lists, which is its own design
+  decision, not an oversight.
+- Undo is single-level by design (glossary says "Undo," not "Undo history") -- a second bulk
+  action after one you meant to undo makes the first one unrecoverable through this UI.

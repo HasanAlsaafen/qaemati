@@ -6,11 +6,13 @@ import { QrController } from './qr.controller';
 import { BrandingController } from './branding.controller';
 import { TourController } from './tour.controller';
 import { AnalyticsController } from './analytics.controller';
+import { BulkController } from './bulk.controller';
 import { CategoryService } from './category.service';
 import { ItemService } from './item.service';
 import { TableService } from './table.service';
 import { RestaurantService } from './restaurant.service';
 import { AnalyticsService } from './analytics.service';
+import { BulkService } from './bulk.service';
 
 @Module({
   controllers: [
@@ -21,7 +23,15 @@ import { AnalyticsService } from './analytics.service';
     BrandingController,
     TourController,
     AnalyticsController,
+    BulkController,
   ],
-  providers: [CategoryService, ItemService, TableService, RestaurantService, AnalyticsService],
+  providers: [
+    CategoryService,
+    ItemService,
+    TableService,
+    RestaurantService,
+    AnalyticsService,
+    BulkService,
+  ],
 })
 export class AdminModule {}
