@@ -327,7 +327,11 @@
       "mapUrlHint": "رابط يبدأ بـ https من خرائط جوجل أو أي خدمة خرائط.",
       "invalidPhone": "أدخل رقم هاتف صالحًا، مثل 02 222 0111.",
       "invalidFacebook": "أدخل اسم صفحة فيسبوك أو رابطها الكامل.",
-      "invalidMapUrl": "أدخل رابطًا يبدأ بـ https."
+      "invalidMapUrl": "أدخل رابطًا يبدأ بـ https.",
+      "itemDividerLabel": "بين الأطباق",
+      "itemDividerNone": "لا شيء",
+      "itemDividerLogo": "شعارك",
+      "itemDividerHint": "يظهر شعارك صغيرًا بين الأطباق. ارفع الشعار أولًا، وبدونه لا يظهر شيء."
     },
     "tour": {
       "skip": "تخطّي",

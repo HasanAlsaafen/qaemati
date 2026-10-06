@@ -134,6 +134,8 @@ export interface MenuView {
   /** Admin customization: 'none' | 'line' | 'dashed' between category
    *  sections -- see Restaurant.categoryDivider. */
   categoryDivider: string;
+  /** 'none' | 'logo' -- see Restaurant.itemDivider. */
+  itemDivider: string;
   /** Admin customization: 'solid' | 'pattern' | 'image' -- see
    *  Restaurant.backgroundStyle. */
   backgroundStyle: string;
@@ -174,6 +176,7 @@ export interface MenuPreviewOverrides {
   cardStyle?: string;
   buttonShape?: string;
   categoryDivider?: string;
+  itemDivider?: string;
   backgroundStyle?: string;
   backgroundPattern?: string;
   sectionSpacing?: string;
@@ -241,6 +244,8 @@ export class MenuService {
       isPreviewOwner && preview!.cardStyle ? preview!.cardStyle : restaurant.cardStyle;
     const effectiveButtonShape =
       isPreviewOwner && preview!.buttonShape ? preview!.buttonShape : restaurant.buttonShape;
+    const effectiveItemDivider =
+      isPreviewOwner && preview!.itemDivider ? preview!.itemDivider : restaurant.itemDivider;
     const effectiveCategoryDivider =
       isPreviewOwner && preview!.categoryDivider
         ? preview!.categoryDivider
@@ -417,6 +422,7 @@ export class MenuService {
       cardStyle: effectiveCardStyle,
       buttonShapeCss: toButtonShapeCss(effectiveButtonShape),
       categoryDivider: effectiveCategoryDivider,
+      itemDivider: effectiveItemDivider,
       backgroundStyle: effectiveBackgroundStyle,
       backgroundPattern: effectiveBackgroundPattern,
       backgroundImageUrl: restaurant.backgroundImagePath,

@@ -2,7 +2,7 @@
 
 {% from "components/restaurant-header.njk" import restaurantHeader %}
 {% from "components/language-switcher.njk" import languageSwitcher %}
-{% from "components/category-chip.njk" import categoryChip %}
+{% from "components/category-chip.njk" import categoryChip, categoryAllChip %}
 {% from "components/menu-item-card.njk" import menuItemCard %}
 {% from "components/item-detail-sheet.njk" import itemDetailSheet %}
 {% from "components/empty-state.njk" import emptyState %}
@@ -108,8 +108,11 @@
     {{ languageSwitcher(otherLocale, t('common.nav.language'), 'data-preserve-scroll') }}
   </div>
   <div class="mx-auto flex max-w-2xl gap-2 overflow-x-auto px-4 py-3" data-category-bar>
+    {% if menu.categories.length %}
+      {{ categoryAllChip(t('common.menu.allCategories'), true) }}
+    {% endif %}
     {% for category in menu.categories %}
-      {{ categoryChip(category.name, '#' + category.anchor, loop.first) }}
+      {{ categoryChip(category.name, '#' + category.anchor, false) }}
     {% endfor %}
   </div>
 </div>
@@ -125,7 +128,7 @@
         <h2 class="font-display text-2xl font-bold leading-heading text-text">{{ category.name }}</h2>
         <div class="mt-3 flex flex-col gap-3">
           {% for item in category.items %}
-            {{ menuItemCard(item, t('common.menu.unavailable'), labels.selection, hasWhatsapp, labels.fromPrice) }}
+            {{ menuItemCard(item, t('common.menu.unavailable'), labels.selection, hasWhatsapp, labels.fromPrice, menu.logoUrl if (menu.itemDivider == 'logo' and not loop.last) else none) }}
           {% endfor %}
         </div>
       </section>

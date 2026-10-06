@@ -327,7 +327,11 @@
       "mapUrlHint": "An https link from Google Maps or any map service.",
       "invalidPhone": "Enter a valid phone number, for example 02 222 0111.",
       "invalidFacebook": "Enter a Facebook page name or its full link.",
-      "invalidMapUrl": "Enter a link that starts with https."
+      "invalidMapUrl": "Enter a link that starts with https.",
+      "itemDividerLabel": "Between dishes",
+      "itemDividerNone": "Nothing",
+      "itemDividerLogo": "Your logo",
+      "itemDividerHint": "Shows your logo small between dishes. Upload a logo first, without one nothing is shown."
     },
     "tour": {
       "skip": "Skip",

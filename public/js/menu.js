@@ -105,6 +105,15 @@
         if (matches) visibleInSection++;
       });
 
+      // The last visible dish in a section gets no divider after it.
+      var visibleItems = items.filter(function (item) {
+        return !item.classList.contains('hidden');
+      });
+      items.forEach(function (item) {
+        var divider = item.querySelector('[data-item-divider]');
+        if (divider) divider.classList.toggle('hidden', item === visibleItems[visibleItems.length - 1]);
+      });
+
       var sectionHasFilter = query !== '' || activeTags.length > 0;
       section.classList.toggle('hidden', visibleInSection === 0);
       var chip = chipForSection(section);
@@ -138,15 +147,39 @@
   // --- Scroll-spy -----------------------------------------------------
 
   var manualNavigationUntil = 0;
+  var allChip = chips.filter(function (chip) {
+    return chip.getAttribute('data-category-chip') === '#all';
+  })[0];
+  // Near the top of the page the reader has not entered a category yet.
+  var AT_TOP_PX = 80;
+
+  function activateChip(target) {
+    chips.forEach(function (c) {
+      setChipActive(c, c === target);
+    });
+  }
 
   chips.forEach(function (chip) {
-    chip.addEventListener('click', function () {
+    chip.addEventListener('click', function (event) {
       manualNavigationUntil = Date.now() + 800;
-      chips.forEach(function (c) {
-        setChipActive(c, c === chip);
-      });
+      activateChip(chip);
+      if (chip === allChip) {
+        event.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     });
   });
+
+  if (allChip) {
+    window.addEventListener(
+      'scroll',
+      function () {
+        if (Date.now() < manualNavigationUntil) return;
+        if (window.scrollY < AT_TOP_PX) activateChip(allChip);
+      },
+      { passive: true },
+    );
+  }
 
   if ('IntersectionObserver' in window && sections.length > 0) {
     var observer = new IntersectionObserver(
@@ -157,10 +190,9 @@
           if (!entry.isIntersecting) return;
           var chip = chipForSection(entry.target);
           if (!chip) return;
+          if (allChip && window.scrollY < AT_TOP_PX) return;
 
-          chips.forEach(function (c) {
-            setChipActive(c, c === chip);
-          });
+          activateChip(chip);
 
           if (categoryBar) {
             chip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });

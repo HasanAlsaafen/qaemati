@@ -197,6 +197,11 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale, defaultCurre
       buttonShapeRounded: t('common.admin.branding.buttonShapeRounded'),
       buttonShapePill: t('common.admin.branding.buttonShapePill'),
       categoryDividerLabel: t('common.admin.branding.categoryDividerLabel'),
+      itemDividerLabel: t('common.admin.branding.itemDividerLabel'),
+      itemDividerNone: t('common.admin.branding.itemDividerNone'),
+      itemDividerLogo: t('common.admin.branding.itemDividerLogo'),
+      itemDividerHint: t('common.admin.branding.itemDividerHint'),
+
       categoryDividerNone: t('common.admin.branding.categoryDividerNone'),
       categoryDividerLine: t('common.admin.branding.categoryDividerLine'),
       categoryDividerDashed: t('common.admin.branding.categoryDividerDashed'),

@@ -15,12 +15,12 @@
   unavailable -- there'd be nothing to add it *to* send, and nothing to
   add if it can't be served.
 #}
-{% macro menuItemCard(item, unavailableLabel, selectionLabels, hasWhatsapp, fromPriceLabel) %}
+{% macro menuItemCard(item, unavailableLabel, selectionLabels, hasWhatsapp, fromPriceLabel, dividerLogoUrl=none) %}
+  {# The search script hides whole rows, so the optional logo divider lives
+     inside the same wrapper as its card and disappears with it. #}
+  <div data-menu-item="true" data-search-text="{{ item.searchText }}" data-tags="{{ item.tagCodes }}">
   <div
     class="menu-item-card flex w-full items-start gap-3 rounded-lg border border-border bg-surface p-3 {{ 'opacity-60' if not item.available }}"
-    data-menu-item="true"
-    data-search-text="{{ item.searchText }}"
-    data-tags="{{ item.tagCodes }}"
   >
     <button
       type="button"
@@ -98,5 +98,11 @@
         </button>
       {% endif %}
     {% endif %}
+  </div>
+  {% if dividerLogoUrl %}
+    <div class="mt-3 flex justify-center" data-item-divider aria-hidden="true">
+      <img src="{{ dividerLogoUrl }}" alt="" width="20" height="20" loading="lazy" class="h-5 w-5 rounded-full object-cover opacity-60">
+    </div>
+  {% endif %}
   </div>
 {% endmacro %}
