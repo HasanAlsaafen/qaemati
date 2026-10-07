@@ -50,6 +50,17 @@
           </li>
         {% endif %}
       {% endfor %}
+      <li class="rounded-md border border-border bg-muted-surface p-3">
+        <p class="text-sm font-medium text-text">{{ t('common.home.demo.platformTitle') }}</p>
+        <p class="text-sm text-muted-text">{{ t('common.home.demo.platformHint') }}</p>
+        <p class="mt-1 text-sm text-muted-text" dir="ltr">
+          {{ t('common.home.demo.emailLabel') }}: <span class="font-mono">{{ demoSuperAdminEmail }}</span>
+        </p>
+        <p class="text-sm text-muted-text" dir="ltr">
+          {{ t('common.home.demo.passwordLabel') }}: <span class="font-mono">{{ demoAdminPassword }}</span>
+        </p>
+        <a href="/super/login" class="mt-1 inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline">{{ t('common.home.demo.platformLink') }}</a>
+      </li>
     </ul>
 
     <div class="mt-4 flex flex-wrap items-center gap-3">
@@ -58,7 +69,9 @@
         class="inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >{{ t('common.home.demo.loginLink') }}</a>
 
-      <form method="post" action="/demo/reset" onsubmit="return confirm({{ t('common.home.demo.resetConfirm') | dump }})">
+      {# An inline onsubmit handler is blocked by the page's CSP, so the confirmation
+         runs through Alpine, which the CSP allows. #}
+      <form method="post" action="/demo/reset" x-data x-on:submit="if (!confirm({{ t('common.home.demo.resetConfirm') | dump }})) $event.preventDefault()">
         <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
         <button
           type="submit"

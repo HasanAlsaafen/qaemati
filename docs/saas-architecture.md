@@ -1,0 +1,64 @@
+# SaaS architecture
+
+How one deployment serves many restaurants, and how the platform operator runs the business.
+
+## Tenants
+
+A tenant is a `Restaurant` row. Everything a restaurant owns carries its `restaurantId`: menus, categories, dishes, tables, admin users, analytics, bulk logs, the subscription and the payments. Every admin service takes the signed in restaurant's id from the session and checks ownership before it reads or changes anything by id. `test/tenant-isolation.e2e-spec.ts` proves it: one restaurant's admin attacks another's records through every route that takes an id, and nothing changes or leaks.
+
+Visitors reach a menu by `/m/:slug`. The slug is chosen at creation, must be unique, and a list of reserved words (`admin`, `super`, `lang`, and so on) is refused.
+
+Custom domains are not built. The seam is the lookup in `MenuController.show` and `MenuService.getMenu`, which find a restaurant by slug. A host to restaurant lookup would go in front of it, plus a `customDomain` column and a verification flow. `PUBLIC_BASE_URL` and `getBaseUrl` in `src/seo/seo.ts` are the places that would learn about it.
+
+## Plans, subscriptions and payments
+
+| Model | Meaning |
+| --- | --- |
+| `Plan` | Price, currency, monthly or yearly billing, trial days, limits (menus, categories, dishes, owner accounts, empty means unlimited) and feature keys (`bulkTools`, `analytics`, `whatsappOrdering`). Archived plans stay on the restaurants that have them. |
+| `Subscription` | One per restaurant. Status, trial end, paid until, grace days. An empty paid until means it never expires, which internal and free accounts use. |
+| `Payment` | The manual ledger. Amount, method, reference, the period it covered, a sequential receipt number. Voiding keeps the row. |
+| `SuperAdmin` | Platform operators. A separate table from `AdminUser`: a restaurant owner can never become one. |
+| `AuditLog` | Who did what to which restaurant. Not a foreign key, so it outlives a restaurant. |
+
+## What a subscription allows
+
+`computeAccess` in `src/tenancy/tenant-access.ts` is the only place that decides. It returns one of four states.
+
+| State | When | Public menu | Owner admin |
+| --- | --- | --- | --- |
+| ok | paid, or no end date | served | full |
+| trial | trial running | served | full, banner with the days left |
+| grace | the end passed but not the grace days | served | full, red banner with the days until offline |
+| blocked | grace over, or suspended, or canceled | answers 503 with a friendly page, out of the sitemap, manifest 404 | read only, every change answers 402, sign out and the billing page still work |
+
+Owners can preview their own menu while blocked. Nothing is ever deleted. A restaurant with no subscription row counts as ok, so anything created before billing keeps working.
+
+## Limits and features
+
+`TenancyService.assertCanAdd` runs on every create path: menus, categories, dishes (including duplicate and CSV rows, which become row errors) and owner accounts. `@RequiresFeature('analytics')` on a controller refuses the whole route, and the admin menu hides what the plan lacks. The WhatsApp selection list on the public menu follows the `whatsappOrdering` feature while the plain WhatsApp link stays.
+
+## The platform area
+
+Everything under `/super`, behind its own login and session fields, never mixed with the restaurant admin.
+
+- Overview: restaurants by state, monthly recurring revenue (active paid plans, yearly counted per month), money received this and last month per currency, what ends within 7 days, the latest payments.
+- Restaurants: search, filter by state, create (restaurant, first menu, subscription, owner account with a generated password shown once), then per restaurant: suspend, cancel, reactivate, change plan, edit dates and grace days, usage against limits, owner accounts (add, reset password, remove but never the last one), payments and activity.
+- Plans: create, edit, archive and restore.
+- Payments: record, filter by restaurant, method, status and dates, print receipts, void.
+- Activity log.
+
+Recording a payment extends the subscription from the end of time already paid for, or from the payment date when it had lapsed. A trial or overdue subscription becomes active. A suspended or canceled one keeps its status, because reactivating is a separate decision. Voiding never shortens the period, the operator edits the dates if they should change.
+
+Create the first operator with `npm run super:create -- you@example.org "Your Name"`. It prints a generated password once, or uses `SUPER_ADMIN_PASSWORD` if set.
+
+## Adding a payment provider
+
+The ledger is the single place that extends a subscription: `PaymentsService.record`. A provider integration would verify its webhook, then call that method with the amount, `method: 'CARD'` and the provider's transaction id as `reference`. Idempotency on that reference, refunds (a void plus a provider call) and renewal reminders are the parts to add. No provider code exists today on purpose.
+
+## Left for later
+
+- Two factor sign in for super admins.
+- Emails: renewal reminders, receipts, the owner's first password.
+- Support sign in as an owner.
+- Per plan branding limits and per tenant domains.
+- A shared store for the in memory rate limiters before running more than one instance.

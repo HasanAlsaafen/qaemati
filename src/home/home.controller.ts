@@ -3,7 +3,7 @@ import { Request } from 'express';
 import { PrismaService } from '../prisma/prisma.service';
 import { isDemoModeEnabled } from '../common/demo-mode';
 import { getBaseUrl } from '../seo/seo';
-import { DEMO_ADMIN_PASSWORD } from '../prisma-seed/run-seed';
+import { DEMO_ADMIN_PASSWORD, DEMO_SUPER_ADMIN_EMAIL } from '../prisma-seed/run-seed';
 
 @Controller()
 export class HomeController {
@@ -44,6 +44,7 @@ export class HomeController {
       })),
       demoMode,
       demoAdminPassword: demoMode ? DEMO_ADMIN_PASSWORD : null,
+      demoSuperAdminEmail: demoMode ? DEMO_SUPER_ADMIN_EMAIL : null,
       demoResetSucceeded: demoReset === 'success',
     };
   }

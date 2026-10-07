@@ -31,6 +31,7 @@ describe('SEO and health (e2e)', () => {
   it('keeps admin out of robots.txt and points at the sitemap', async () => {
     const res = await request(app.getHttpServer()).get('/robots.txt');
     expect(res.text).toContain('Disallow: /admin');
+    expect(res.text).toContain('Disallow: /super');
     expect(res.text).toMatch(/Sitemap: https?:\/\/.+\/sitemap\.xml/);
   });
 

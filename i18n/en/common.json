@@ -14,7 +14,10 @@
       "loginLink": "Go to admin login",
       "resetButton": "Reset demo data",
       "resetConfirm": "This restores both demo restaurants to their original sample menus and undoes any changes made in the admin panel. Continue?",
-      "resetSuccessMessage": "Demo data has been reset."
+      "resetSuccessMessage": "Demo data has been reset.",
+      "platformTitle": "Platform admin",
+      "platformHint": "Subscriptions, plans and payments for every restaurant.",
+      "platformLink": "Go to platform sign in"
     }
   },
   "nav": {

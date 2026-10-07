@@ -31,4 +31,11 @@ Owner decisions from the audit approval, plus the defaults taken from section 9 
 27. Text on a restaurant's soft primary tint uses a derived color that is darkened only when needed, so any brand color that passes on white also reads on its tint.
 28. Stylesheet and script URLs carry a version string and the service worker fetches the stylesheet from the network first, because the files are not content hashed and a cached copy otherwise outlives every deploy.
 29. The admin gets the same AR | EN pill as the public menu, so language is a visible choice in both places.
+30. Multi tenancy is now a runtime requirement, which replaces the earlier decision to stay single tenant. Every owned record already carried a restaurant id, and an isolation test suite proves one restaurant cannot read or change another's records.
+31. Payments are a manual ledger the platform operator fills in, with a single method that extends the subscription so a provider can be added later without touching callers.
+32. When a subscription ends there is a grace period (7 days by default, per restaurant), then the public menu goes offline and the owner's admin turns read only. Data is never deleted.
+33. Plans carry a price and billing period, usage limits and feature flags. Restaurants created before billing sit on an internal unlimited plan until the operator moves them.
+34. Visitors reach a menu by path slug. Custom domains and subdomains are left as a documented seam.
+35. Platform operators live in their own table and session, so no restaurant account can become one. Passwords are generated and shown once.
+36. The demo reset confirmation moved from an inline handler, which the CSP blocks, to Alpine, because the destructive reset otherwise ran without asking.
 

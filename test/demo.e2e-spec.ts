@@ -80,4 +80,19 @@ describe('Demo mode (e2e)', () => {
     expect(res.text).toContain('Qaemati@Demo123');
     expect(res.text).toContain('admin@baytalzaytoun.example.com');
   });
+
+  it('asks for confirmation before a reset through a handler the CSP allows', async () => {
+    const res = await agent.get('/?lang=en').set('Cookie', 'qaemati_locale=en');
+    // An inline onsubmit is blocked by script-src-attr 'none', so the reset
+    // would have run with no question.
+    expect(res.text).not.toContain('onsubmit=');
+    expect(res.text).toContain('x-on:submit="if (!confirm(');
+    expect(res.headers['content-security-policy']).toContain("script-src-attr 'none'");
+  });
+
+  it('lists the platform admin demo login', async () => {
+    const res = await agent.get('/?lang=en').set('Cookie', 'qaemati_locale=en');
+    expect(res.text).toContain('super@qaemati.example.com');
+    expect(res.text).toContain('/super/login');
+  });
 });

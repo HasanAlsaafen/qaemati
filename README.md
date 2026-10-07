@@ -101,6 +101,17 @@ down in `afterAll`, so files can run back-to-back without clobbering each other'
 - `prisma/` - Prisma schema and migrations
 - `docs/` - design system and progress notes
 
+## Platform admin (SaaS)
+
+Restaurants are tenants with plans, subscriptions and a manual payment ledger, run from `/super`
+(overview, restaurants, plans, payments, activity log). See `docs/saas-architecture.md`.
+
+- Create the first operator: `npm run super:create -- you@example.org "Your Name"` (prints a
+  generated password once, or set `SUPER_ADMIN_PASSWORD`).
+- The demo seed adds a platform operator, `super@qaemati.example.com`, with the shared demo password.
+- A restaurant whose subscription is over goes offline after its grace period and its admin turns
+  read only. Nothing is deleted.
+
 ## Demo data
 
 `npm run prisma:seed` creates two fictional, fully bilingual businesses:

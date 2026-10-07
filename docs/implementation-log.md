@@ -210,6 +210,31 @@ Each category can now have its own picture, shown in the round chip of the publi
 - The category header wraps its action buttons under the title on phones, which the extra button made necessary.
 - Tests: `test/category-image.e2e-spec.ts` (upload, remove, bad file, another restaurant's category, control on the dashboard) and three fallback tests in `test/menu-extras.e2e-spec.ts`. Totals: 149 unit, 127 e2e.
 
+## Phase G: multi tenancy and the platform area (SaaS)
+
+Requested mid session: make the system a SaaS, with a super admin to manage subscriptions and payments. Choices made with the owner: manual payment ledger, grace period then menu offline, plans with price, limits and feature flags, path slug URLs. Design and rules are in `docs/saas-architecture.md`.
+
+What was built
+- Isolation first. `test/tenant-isolation.e2e-spec.ts` (27 cases) has one restaurant's admin attack another's records through every route that takes an id, plus a control that the same routes work on its own records. Nothing leaked. One soft spot was fixed: duplicating a foreign dish was silently ignored and now answers 404.
+- Data: Plan, Subscription, Payment, SuperAdmin, AuditLog (migration `20261008000000_add_saas_billing`). A backfill gives every existing restaurant an active subscription on an internal unlimited plan, verified on the dev database.
+- Enforcement: one pure function decides ok, trial, grace or blocked. Blocked restaurants answer 503 on the public menu (also out of the sitemap, manifest 404), their admin turns read only (402), with a banner during the last week, the grace period and after. Plans cap menus, categories, dishes and owner accounts on every create path, and switch bulk tools, analytics and the WhatsApp selection list on or off.
+- Owners get a Subscription page: plan, dates, usage against limits, included features, payments and printable receipts.
+- Platform area under `/super`: overview, restaurants (create, suspend, cancel, reactivate, change plan, dates, owner accounts, password reset), plans, the payment ledger with receipts and voiding, and an activity log. `npm run super:create` makes a real operator, the demo seed adds plans, an operator and billing history.
+- The admin mobile menu was missing Analytics and Bulk tools, so both menus now come from one list.
+
+Bugs found on the way
+- The demo reset button asked for confirmation with an inline handler, which the page's CSP blocks, so the destructive reset ran without asking. It now uses Alpine, with a test.
+- Nunjucks has no `min` filter, found by the first test with a plan limit.
+
+Verification
+- 164 unit tests and 215 e2e tests pass. The e2e suites for this work are `tenant-isolation` (27), `subscription-enforcement` (19) and `super-admin` (43): login separation, creating a restaurant (invalid, reserved and taken addresses, owner email, keeping what was typed), suspend and reactivate against the live menu, plan changes and archived plans, owner accounts and their limit, payment date arithmetic (early, late, lapsed, suspended), refused amounts and dates, sequential receipts, voiding, ledger filters, receipts per owner, plans, metrics, search and the audit trail. The CSRF sweep from Phase A covers every new route automatically.
+- axe at 375px on all admin pages and every super page (overview in both languages, restaurants, new restaurant, restaurant page in both languages, plans, new plan, payments, new payment, receipt, activity log, billing in both languages): 0 violations, no horizontal scroll, no control under 44px.
+
+Left undone
+- Two factor sign in, emails (renewal reminders, receipts, first password), support sign in as an owner, a provider integration and custom domains. All are listed with their seams in the architecture doc.
+- Restaurants created through tests have no subscription row and count as unlimited. A real restaurant always gets one from the platform area.
+- The rate limiters are still in memory.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).

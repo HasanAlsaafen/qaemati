@@ -14,6 +14,7 @@ export class SeoController {
     return [
       'User-agent: *',
       'Disallow: /admin',
+      'Disallow: /super',
       'Disallow: /styleguide',
       'Disallow: /health',
       `Sitemap: ${getBaseUrl(req)}/sitemap.xml`,
