@@ -73,3 +73,58 @@ export function inviteMail(
     html: layout(locale, lines, url, button, footer),
   };
 }
+
+export function signupVerifyMail(
+  locale: Locale,
+  to: string,
+  name: string,
+  restaurant: string,
+  url: string,
+  hours: number,
+): MailMessage {
+  const ar = locale === 'ar';
+  const subject = ar ? 'أكّد بريدك لإنشاء مطعمك' : 'Confirm your email to create your restaurant';
+  const lines = ar
+    ? [
+        `مرحبا ${name}،`,
+        `طلبت إنشاء ${restaurant} على قائمتي. اضغط الزر لتأكيد بريدك وإنشاء المطعم. الرابط صالح لمدة ${hours} ساعة.`,
+      ]
+    : [
+        `Hello ${name},`,
+        `You asked to create ${restaurant} on Qaemati. Confirm your email to create it. The link is valid for ${hours} hours.`,
+      ];
+  const button = ar ? 'تأكيد وإنشاء مطعمي' : 'Confirm and create my restaurant';
+  const footer = ar
+    ? 'إذا لم تطلب ذلك فتجاهل هذه الرسالة، ولن يُنشأ شيء.'
+    : 'If this was not you, ignore this message and nothing will be created.';
+  return {
+    to,
+    subject,
+    text: `${lines.join('\n\n')}\n\n${url}\n\n${footer}`,
+    html: layout(locale, lines, url, button, footer),
+  };
+}
+
+export function signupExistsMail(locale: Locale, to: string, url: string): MailMessage {
+  const ar = locale === 'ar';
+  const subject = ar ? 'لديك حساب بالفعل' : 'You already have an account';
+  const lines = ar
+    ? [
+        'حاول شخص (ربما أنت) فتح حساب جديد بهذا البريد، لكن لديه حساب بالفعل.',
+        'سجّل الدخول، أو اختر كلمة مرور جديدة إن نسيتها.',
+      ]
+    : [
+        'Someone, possibly you, tried to sign up with this email, but it already has an account.',
+        'Sign in, or choose a new password if you forgot it.',
+      ];
+  const button = ar ? 'تسجيل الدخول' : 'Sign in';
+  const footer = ar
+    ? 'إذا لم تكن أنت فتجاهل هذه الرسالة.'
+    : 'If this was not you, ignore this message.';
+  return {
+    to,
+    subject,
+    text: `${lines.join('\n\n')}\n\n${url}\n\n${footer}`,
+    html: layout(locale, lines, url, button, footer),
+  };
+}

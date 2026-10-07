@@ -519,7 +519,8 @@ model Plan {
   isActive  Boolean @default(true)
   sortOrder Int     @default(0)
 
-  subscriptions Subscription[]
+  subscriptions  Subscription[]
+  signupRequests SignupRequest[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -783,4 +784,30 @@ model NotificationLog {
 
   @@unique([restaurantId, kind, forDate])
   @@index([restaurantId, sentAt])
+}
+
+/// A sign up waiting for the owner to confirm their email. Nothing exists for the
+/// restaurant until then, so nobody can squat an address or fill the database with
+/// restaurants. Only a hash of the link and of the password is kept.
+model SignupRequest {
+  id String @id @default(cuid())
+
+  tokenHash    String @unique
+  email        String
+  ownerName    String
+  passwordHash String
+
+  nameAr String
+  nameEn String
+  slug   String
+
+  planId String
+  plan   Plan   @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([slug])
+  @@index([expiresAt])
 }

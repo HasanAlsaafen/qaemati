@@ -2,9 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
-import { addDays } from '../tenancy/billing-dates';
 import { TenancyService } from '../tenancy/tenancy.service';
 import { AccessState, computeAccess } from '../tenancy/tenant-access';
+import { ProvisionConflict, TenantProvisioner } from '../provisioning/tenant-provisioner.service';
 import { Actor, AuditService } from './audit.service';
 import {
   ChangePlanDto,
@@ -15,28 +15,6 @@ import {
 } from './dto/super.dto';
 import { FieldError } from './field-error';
 import { generatePassword } from './password';
-
-/** Paths that already mean something, so a restaurant cannot take them. */
-const RESERVED_SLUGS = new Set([
-  'admin',
-  'super',
-  'm',
-  'lang',
-  'demo',
-  'health',
-  'robots',
-  'sitemap',
-  'styleguide',
-  'offline',
-  'uploads',
-  'images',
-  'css',
-  'js',
-  'fonts',
-  'api',
-  'static',
-  'assets',
-]);
 
 /** A date picked in a form means the end of that day, UTC. */
 export function endOfDay(date: string): Date {
@@ -62,6 +40,7 @@ export class TenantsService {
     private readonly prisma: PrismaService,
     private readonly tenancy: TenancyService,
     private readonly audit: AuditService,
+    private readonly provisioner: TenantProvisioner,
   ) {}
 
   async list(filter: { q?: string; state?: string } = {}): Promise<TenantRow[]> {
@@ -135,58 +114,28 @@ export class TenantsService {
   /** Creates the restaurant, its first menu, its subscription and its first admin. */
   async create(actor: Actor, dto: CreateTenantDto) {
     const slug = dto.slug.trim();
-    if (RESERVED_SLUGS.has(slug)) throw new FieldError('slug', 'slugReserved');
+    if (this.provisioner.isReserved(slug)) throw new FieldError('slug', 'slugReserved');
     const plan = await this.prisma.plan.findFirst({ where: { id: dto.planId, isActive: true } });
     if (!plan) throw new FieldError('planId', 'planUnavailable');
     if (dto.startMode === 'ACTIVE' && !dto.paidUntil)
       throw new FieldError('paidUntil', 'paidUntilRequired');
 
     const password = generatePassword();
-    const now = new Date();
     try {
-      const restaurant = await this.prisma.$transaction(async (tx) => {
-        const created = await tx.restaurant.create({
-          data: {
-            slug,
-            nameAr: dto.nameAr.trim(),
-            nameEn: dto.nameEn.trim(),
-            currency: plan.currency,
-          },
-        });
-        await tx.menu.create({
-          data: {
-            restaurantId: created.id,
-            nameAr: 'القائمة الرئيسية',
-            nameEn: 'Main menu',
-            sortOrder: 0,
-          },
-        });
-        await tx.subscription.create({
-          data:
-            dto.startMode === 'TRIAL'
-              ? {
-                  restaurantId: created.id,
-                  planId: plan.id,
-                  status: 'TRIALING',
-                  trialEndsAt: addDays(now, plan.trialDays),
-                }
-              : {
-                  restaurantId: created.id,
-                  planId: plan.id,
-                  status: 'ACTIVE',
-                  currentPeriodStart: now,
-                  currentPeriodEnd: endOfDay(dto.paidUntil!),
-                },
-        });
-        await tx.adminUser.create({
-          data: {
-            restaurantId: created.id,
-            email: dto.adminEmail.trim().toLowerCase(),
-            name: dto.adminName.trim(),
-            passwordHash: await bcrypt.hash(password, 10),
-          },
-        });
-        return created;
+      const restaurant = await this.provisioner.provision({
+        slug,
+        nameAr: dto.nameAr,
+        nameEn: dto.nameEn,
+        plan,
+        start:
+          dto.startMode === 'TRIAL'
+            ? { mode: 'TRIAL' }
+            : { mode: 'ACTIVE', paidUntil: endOfDay(dto.paidUntil!) },
+        owner: {
+          name: dto.adminName,
+          email: dto.adminEmail,
+          passwordHash: await bcrypt.hash(password, 10),
+        },
       });
       await this.audit.log(actor, 'tenant.created', restaurant.id, {
         slug,
@@ -195,11 +144,10 @@ export class TenantsService {
       });
       return { restaurant, password };
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        const target = String(error.meta?.target ?? '');
+      if (error instanceof ProvisionConflict) {
         throw new FieldError(
-          target.includes('email') ? 'adminEmail' : 'slug',
-          target.includes('email') ? 'emailTaken' : 'slugTaken',
+          error.field === 'email' ? 'adminEmail' : 'slug',
+          error.field === 'email' ? 'emailTaken' : 'slugTaken',
         );
       }
       throw error;

@@ -11,6 +11,14 @@
   {% set ctaHref = '/admin/login' %}{% set ctaLabel = t('common.home.landing.nav.signIn') %}
 {% endif %}
 {% set L = 'common.home.landing.' %}
+{# Where "start" goes: the sign up form when it is open, otherwise the contact details. #}
+{% if signupAvailable %}
+  {% set startHref = '/signup' %}
+  {% set startLabel = t(L + 'hero.primaryTrial') if hasTrial else t(L + 'hero.signup') %}
+{% else %}
+  {% set startHref = ctaHref %}
+  {% set startLabel = t(L + 'hero.primaryTrial') if hasTrial else t(L + 'hero.primary') %}
+{% endif %}
 
 {% block body %}
 <header class="sticky top-0 z-40 border-b border-border bg-surface">
@@ -26,7 +34,7 @@
     <div class="ms-auto flex items-center gap-2">
       {{ languageSwitcher(otherLocale, t('common.nav.language')) }}
       <a href="/admin/login" class="hidden min-h-11 items-center rounded-md px-3 text-sm font-medium text-text hover:bg-muted-surface lg:inline-flex">{{ t(L + 'nav.signIn') }}</a>
-      <a href="{{ ctaHref }}" class="hidden min-h-11 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover md:inline-flex">{{ t(L + 'hero.primary') }}</a>
+      <a href="{{ startHref }}" class="hidden min-h-11 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover md:inline-flex">{{ startLabel }}</a>
       <button type="button" class="inline-flex h-11 w-11 items-center justify-center rounded-md hover:bg-muted-surface md:hidden" aria-label="{{ t(L + 'nav.menu') }}" x-bind:aria-expanded="navOpen.toString()" aria-controls="landing-nav" x-on:click="navOpen = !navOpen">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
       </button>
@@ -52,7 +60,7 @@
         <h1 id="hero-title" class="font-display text-4xl font-bold leading-heading text-text sm:text-5xl lg:text-6xl">{{ t(L + 'hero.title') }}</h1>
         <p class="mt-6 max-w-xl text-lg leading-body text-text">{{ t(L + 'hero.text') }}</p>
         <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2">
-          <a href="{{ ctaHref }}" class="inline-flex min-h-12 items-center rounded-md bg-primary px-6 text-base font-bold text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(L + 'hero.primaryTrial') if hasTrial else t(L + 'hero.primary') }}</a>
+          <a href="{{ startHref }}" class="inline-flex min-h-12 items-center rounded-md bg-primary px-6 text-base font-bold text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ startLabel }}</a>
           {% if demoSlug %}
             <a href="/m/{{ demoSlug }}" class="inline-flex min-h-12 items-center text-base font-medium text-primary-text underline underline-offset-4 hover:text-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(L + 'hero.secondary') }}</a>
           {% endif %}
@@ -135,7 +143,7 @@
             {% endfor %}
             {% if included.length %}<p class="mt-3 text-sm text-text"><span class="font-medium">{{ t(L + 'pricing.includes') }}:</span> {{ included | join(', ') }}</p>{% endif %}
             {% if excluded.length %}<p class="mt-1 text-sm text-muted-text"><span class="font-medium">{{ t(L + 'pricing.excludes') }}:</span> {{ excluded | join(', ') }}</p>{% endif %}
-            <a href="{{ ctaHref }}" class="mt-4 inline-flex min-h-11 items-center text-sm font-bold text-primary-text underline underline-offset-4 hover:text-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(L + 'pricing.cta') }}</a>
+            <a href="{{ ('/signup?plan=' + plan.id) if signupAvailable else ctaHref }}" class="mt-4 inline-flex min-h-11 items-center text-sm font-bold text-primary-text underline underline-offset-4 hover:text-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(L + 'pricing.cta') }}</a>
           </li>
         {% endfor %}
       </ul>
@@ -167,8 +175,10 @@
         <p class="mt-2 text-lg">{{ t(L + 'cta.text') }}</p>
       </div>
       <div class="flex flex-wrap items-center gap-3">
-        <a href="{{ ctaHref }}" class="inline-flex min-h-12 items-center rounded-md bg-surface px-6 text-base font-bold text-primary-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-on">{{ t(L + 'cta.button') if (contact.whatsappUrl or contact.email) else t(L + 'nav.signIn') }}</a>
-        {% if contact.whatsappUrl and contact.email %}
+        <a href="{{ startHref }}" class="inline-flex min-h-12 items-center rounded-md bg-surface px-6 text-base font-bold text-primary-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-on">{{ startLabel if signupAvailable else (t(L + 'cta.button') if (contact.whatsappUrl or contact.email) else t(L + 'nav.signIn')) }}</a>
+        {% if signupAvailable and (contact.whatsappUrl or contact.email) %}
+          <a href="{{ ctaHref }}" class="inline-flex min-h-12 items-center rounded-md border border-primary-on px-6 text-base font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-on">{{ t(L + 'cta.button') }}</a>
+        {% elif contact.whatsappUrl and contact.email %}
           <a href="mailto:{{ contact.email }}" class="inline-flex min-h-12 items-center rounded-md border border-primary-on px-6 text-base font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-on">{{ t(L + 'contact.email') }}</a>
         {% endif %}
       </div>

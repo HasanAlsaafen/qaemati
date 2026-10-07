@@ -1,0 +1,67 @@
+{% extends "layouts/base.njk" %}
+{% from "components/input.njk" import input %}
+{% from "components/button.njk" import button %}
+
+{% set P = 'common.signup.' %}
+{% block title %}{{ t(P + 'title') }}{% endblock %}
+{% block meta_description %}{{ t(P + 'intro') }}{% endblock %}
+
+{% block content %}
+<h1 class="font-sans text-3xl font-bold text-text">{{ t(P + 'title') }}</h1>
+<p class="mt-2 max-w-xl text-muted-text">{{ t(P + 'intro') }}</p>
+
+{% if error %}
+  <p class="mt-6 rounded-md bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">{{ error }}</p>
+{% endif %}
+
+<form method="post" action="/signup" class="mt-8 flex flex-col gap-10" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+  {# A field no person sees. A script that fills every field gives itself away. #}
+  <div aria-hidden="true" class="absolute -start-[9999px] h-0 w-0 overflow-hidden">
+    <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+  </div>
+
+  <fieldset class="flex flex-col gap-4">
+    <legend class="font-sans text-lg font-bold text-text">{{ t(P + 'restaurantLegend') }}</legend>
+    {{ input('nameAr', t(P + 'nameAr'), 'text', values.nameAr, '', fieldErrors.nameAr, none, 'required autocomplete="organization"', 'rtl') }}
+    {{ input('nameEn', t(P + 'nameEn'), 'text', values.nameEn, '', fieldErrors.nameEn, none, 'required', 'ltr') }}
+    {{ input('slug', t(P + 'slug'), 'text', values.slug, '', fieldErrors.slug, t(P + 'slugHint'), 'required autocapitalize="none" spellcheck="false" data-slug-field', 'ltr') }}
+  </fieldset>
+
+  <fieldset class="flex flex-col gap-2">
+    <legend class="font-sans text-lg font-bold text-text">{{ t(P + 'planLegend') }}</legend>
+    <ul class="divide-y divide-border border-y border-border">
+      {% for plan in plans %}
+        <li>
+          <label class="flex min-h-14 cursor-pointer items-center gap-3 py-3">
+            <input type="radio" name="planId" value="{{ plan.id }}" class="h-5 w-5 shrink-0" {{ 'checked' if (values.planId == plan.id or (not values.planId and loop.first)) }}>
+            <span class="min-w-0 flex-1">
+              <span class="block font-medium text-text">{{ plan.nameAr if locale == 'ar' else plan.nameEn }}</span>
+              {% if plan.trialDays %}<span class="block text-sm text-success">{{ t('common.home.landing.pricing.trial', { days: plan.trialDays }) }}</span>{% endif %}
+            </span>
+            <span class="shrink-0 text-sm text-text" dir="ltr">{{ plan.price }} {{ plan.currency | symbol(locale) }} / {{ t('common.home.landing.pricing.' + plan.interval) }}</span>
+          </label>
+        </li>
+      {% endfor %}
+    </ul>
+    {% if fieldErrors.planId %}<p class="text-sm text-danger" role="alert">{{ fieldErrors.planId }}</p>{% endif %}
+  </fieldset>
+
+  <fieldset class="flex flex-col gap-4">
+    <legend class="font-sans text-lg font-bold text-text">{{ t(P + 'ownerLegend') }}</legend>
+    {{ input('ownerName', t(P + 'ownerName'), 'text', values.ownerName, '', fieldErrors.ownerName, none, 'required autocomplete="name"') }}
+    {{ input('email', t(P + 'email'), 'email', values.email, '', fieldErrors.email, t(P + 'emailHint'), 'required autocomplete="email"') }}
+    {{ input('password', t(P + 'password'), 'password', '', '', fieldErrors.password, t(P + 'passwordHint'), 'required minlength="10" autocomplete="new-password"') }}
+    {{ input('confirm', t(P + 'confirm'), 'password', '', '', fieldErrors.confirm, none, 'required minlength="10" autocomplete="new-password"') }}
+  </fieldset>
+
+  <div class="flex flex-wrap items-center gap-4">
+    {{ button(t(P + 'submit'), 'primary', 'md', 'submit') }}
+    <a href="/admin/login" class="inline-flex min-h-11 items-center text-sm font-medium text-primary-text underline underline-offset-4">{{ t(P + 'haveAccount') }}</a>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+  <script defer src="{{ asset('/js/signup.js') }}"></script>
+{% endblock %}

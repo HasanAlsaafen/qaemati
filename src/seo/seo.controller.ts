@@ -14,6 +14,7 @@ export class SeoController {
     return [
       'User-agent: *',
       'Disallow: /admin',
+      'Disallow: /signup/verify',
       'Disallow: /super',
       'Disallow: /styleguide',
       'Disallow: /health',

@@ -326,6 +326,13 @@ Order status for the guest, the first of five follow ups (guest status, staff ro
 - Tests (15 e2e): owner only recipients, each notice once, concurrent runs, the full sequence over time, trials, nothing for suspended or canceled or far off plans, a renewal starting fresh reminders, retrying when nobody could be reached, links and contact when configured, the receipt, and a failed email never undoing a payment.
 - Not verified against real Gmail, like the other mail.
 
+## Phase O (4/5): self sign up
+
+- Migration `20261017000000_signup_request`. `TenantProvisioner` extracted from the platform's create (its 44 tests still pass), `SignupService`, form, sent and confirm pages in both languages, a slug suggestion script, landing page buttons that go to the form while it is open, and a robots rule for the confirmation links.
+- Found by the tests: two people confirming at the same moment both passed the claim step, so one got a "taken" error instead of "link used". The claim now deletes by id and only the one that removed the row proceeds.
+- Tests: 33 e2e (form and plans, closing it, production without email, validation with kept values, taken and reserved addresses, replaced requests, known emails answered identically with no leak, creation, sign in afterwards, single use under concurrency, expired and malformed links, an address taken meanwhile, bots, rate limits per device and per inbox, CSRF). Browser: the form, the emailed link, confirming and landing in the admin with the tour, axe clean at 375 and 1280 in both languages.
+- Not done: a CAPTCHA, terms of service, and an email to you when someone signs up.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).

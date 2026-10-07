@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
+import { ProvisioningModule } from '../provisioning/provisioning.module';
 import { BillingNoticesModule } from '../billing-notices/billing-notices.module';
 import { AuditService } from './audit.service';
 import { DashboardService } from './dashboard.service';
@@ -16,7 +17,7 @@ import { SuperTenantsController } from './super-tenants.controller';
 import { TenantsService } from './tenants.service';
 
 @Module({
-  imports: [AuthModule, BillingNoticesModule],
+  imports: [AuthModule, BillingNoticesModule, ProvisioningModule],
   controllers: [
     SuperAuthController,
     SuperPasswordResetController,

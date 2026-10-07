@@ -19,6 +19,8 @@ declare module 'express-session' {
     restaurantId?: string;
     restaurantSlug?: string;
     adminName?: string;
+    /** When the sign up form was shown, to tell a person from a script. */
+    signupStartedAt?: number;
     /** OWNER, CASHIER or KITCHEN. A session from before roles existed has none and was an owner. */
     adminRole?: 'OWNER' | 'CASHIER' | 'KITCHEN';
     /** A5: cached once at login (see auth.controller.ts) rather than

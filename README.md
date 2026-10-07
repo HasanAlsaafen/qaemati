@@ -106,6 +106,11 @@ down in `afterAll`, so files can run back-to-back without clobbering each other'
 Dockerfile, a production compose file with automatic HTTPS, backup and restore scripts and a CI
 workflow are included. See `docs/deployment.md`.
 
+## Self sign up
+
+A restaurant can create itself at `/signup` (email confirmation, then a free trial). Close it with
+`SIGNUP_ENABLED=false`. See `docs/saas-architecture.md`.
+
 ## Table orders and the POS
 
 A menu opened from a table QR code sends its orders to a live staff screen at `/admin/pos`, with a

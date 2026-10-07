@@ -64,6 +64,20 @@ Used for:
 - The invitation an owner gets when the operator creates a restaurant or adds an account, so the owner can choose a password instead of keeping the generated one. The generated password is still shown to the operator once, as a fallback if the mail does not arrive.
 - A reset link when the operator resets an owner's password.
 
+## Self sign up
+
+`/signup` lets a restaurant create itself and start a trial, with no operator involved. The landing page's main button goes there while it is open.
+
+1. The visitor fills in the restaurant's names, a menu address, a plan from the active plans, and their own name, email and password (10 characters or more).
+2. Nothing is created yet. A `SignupRequest` is stored (password and link kept only as hashes) and a confirmation email is sent. The link is good for 24 hours.
+3. The link opens a page that only shows what will be created. Opening it, as an email scanner does, creates nothing. Pressing the button creates the restaurant, its first menu, a trial subscription and the owner, signs the owner in and lands in the admin with the first login tour.
+
+Why this shape: an address cannot be squatted and the database cannot be filled with restaurants by a script, because nothing exists until a real inbox confirms it. Both the link and the delete that uses it are claimed atomically, so a link works once, even if opened twice at the same moment.
+
+Protection against abuse, with no CAPTCHA: the confirmation step, a hidden form field and a minimum fill time (a script that trips either is told it worked and nothing happens), at most 6 requests per device and 3 per email per hour, and the same answer whether or not the email already has an account (the owner of that address is told by email instead, so the form cannot be used to find out who is a customer). A CAPTCHA is the next step if bots get through.
+
+It is open whenever `SIGNUP_ENABLED` is not `false` and there is an active plan to start on. In production it also needs working email (`MAIL_USER` and `MAIL_APP_PASSWORD`), since the link is the only way in, and is closed without it. Restaurants created this way and by the operator go through the same code (`TenantProvisioner`), so they cannot differ.
+
 ## Reminders and receipts
 
 An hourly check (`BillingScheduler`, off in tests and with `REMINDERS_ENABLED=false`) emails the **owners** of a restaurant, never cashiers or kitchen staff, in Arabic and English in one message:

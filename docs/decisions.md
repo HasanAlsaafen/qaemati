@@ -54,4 +54,6 @@ Owner decisions from the audit approval, plus the defaults taken from section 9 
 50. Table ordering is a plan feature (`tableOrdering`), like bulk tools and analytics. Restaurants on the internal plan have it.
 51. Roles are three fixed ones (owner, cashier, kitchen) rather than a permissions matrix. Staff are limited by a default deny list in one middleware, so new owner pages are protected without anyone remembering to add a check, and the per action rules live in `src/pos/roles.ts` with unit tests. Changing a role ends that person's sessions, because the role is cached on the session.
 52. Reminders are sent by an hourly in process check that claims each notice in the database before sending, instead of an external cron or a lock. It needs nothing extra to deploy, is safe on several instances, and can be called with any date in tests.
+53. Self sign up creates nothing until the owner confirms their email, and uses no CAPTCHA at first: a confirmation step, a honeypot, a minimum fill time and rate limits are enough to start with, and the form answers the same for a known email so it cannot reveal customers. Add a CAPTCHA if bots get through.
+54. Restaurant creation lives in one `TenantProvisioner` used by the platform area and by self sign up.
 

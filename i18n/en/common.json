@@ -26,7 +26,8 @@
         "secondary": "Open the live menu",
         "phoneDesktop": "This is a real menu. Scroll it, search it, open a dish.",
         "phoneTouch": "This is a real menu. Tap the phone to open it.",
-        "phoneTitle": "A live sample menu, shown inside a phone"
+        "phoneTitle": "A live sample menu, shown inside a phone",
+        "signup": "Create your restaurant"
       },
       "how": {
         "title": "How it works",
@@ -936,6 +937,45 @@
       "wrongCurrentPassword": "The current password is not right.",
       "passwordTooShort": "Use at least {min} characters.",
       "passwordMismatch": "The two passwords do not match."
+    }
+  },
+  "signup": {
+    "title": "Create your restaurant",
+    "intro": "Start a free trial and have your menu online today. We confirm your email first, then everything is created.",
+    "restaurantLegend": "The restaurant",
+    "nameAr": "Name in Arabic",
+    "nameEn": "Name in English",
+    "slug": "Menu address",
+    "slugHint": "Lowercase letters, numbers and hyphens. Guests open your menu at /m/your-address, and printed QR codes use it, so choose it carefully.",
+    "planLegend": "Plan",
+    "ownerLegend": "Your account",
+    "ownerName": "Your name",
+    "email": "Email",
+    "emailHint": "We send a confirmation link here. It is also how you reset your password.",
+    "password": "Password",
+    "passwordHint": "At least 10 characters.",
+    "confirm": "Repeat the password",
+    "submit": "Create my restaurant",
+    "haveAccount": "Already have an account? Sign in",
+    "sentTitle": "Check your email",
+    "sentText": "If {email} can be used, we sent a link to confirm it. Open the link to create your restaurant.",
+    "sentHelp": "The link works for 24 hours. If nothing arrives in a few minutes, look in your spam folder or try again.",
+    "backHome": "Back to the home page",
+    "verifyTitle": "Confirm and create",
+    "verifyButton": "Confirm and create my restaurant",
+    "goneTitle": "This link no longer works",
+    "goneText": "It expired or was already used. Start again to get a new one.",
+    "takenTitle": "That address was taken meanwhile",
+    "takenText": "Someone else took the menu address or the email while you were confirming. Start again with another address.",
+    "startAgain": "Start again",
+    "errors": {
+      "slugTaken": "That address is already used. Try another.",
+      "slugReserved": "That address is reserved. Try another.",
+      "planUnavailable": "Choose one of the plans.",
+      "passwordTooShort": "Use at least 10 characters.",
+      "passwordMismatch": "The two passwords do not match.",
+      "tooMany": "Too many attempts from here. Please try again in an hour.",
+      "mailDown": "We could not send the confirmation email. Please try again later."
     }
   }
 }

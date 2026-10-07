@@ -1,0 +1,28 @@
+{% extends "layouts/base.njk" %}
+{% from "components/button.njk" import button %}
+{% set P = 'common.signup.' %}
+{% block title %}{{ t(P + 'verifyTitle') }}{% endblock %}
+
+{% block content %}
+{% if gone %}
+  <h1 class="font-sans text-3xl font-bold text-text">{{ t(P + 'goneTitle') }}</h1>
+  <p class="mt-3 max-w-xl text-text" role="alert">{{ t(P + 'goneText') }}</p>
+  <a href="/signup" class="mt-6 inline-flex min-h-11 items-center text-sm font-medium text-primary-text underline underline-offset-4">{{ t(P + 'startAgain') }}</a>
+{% elif taken %}
+  <h1 class="font-sans text-3xl font-bold text-text">{{ t(P + 'takenTitle') }}</h1>
+  <p class="mt-3 max-w-xl text-text" role="alert">{{ t(P + 'takenText') }}</p>
+  <a href="/signup" class="mt-6 inline-flex min-h-11 items-center text-sm font-medium text-primary-text underline underline-offset-4">{{ t(P + 'startAgain') }}</a>
+{% else %}
+  <h1 class="font-sans text-3xl font-bold text-text">{{ t(P + 'verifyTitle') }}</h1>
+  <dl class="mt-4 max-w-xl divide-y divide-border border-y border-border text-sm">
+    <div class="flex justify-between gap-4 py-3"><dt class="text-muted-text">{{ t(P + 'nameEn') }}</dt><dd class="font-medium text-text">{{ request.nameAr if locale == 'ar' else request.nameEn }}</dd></div>
+    <div class="flex justify-between gap-4 py-3"><dt class="text-muted-text">{{ t(P + 'slug') }}</dt><dd class="font-medium text-text" dir="ltr">/m/{{ request.slug }}</dd></div>
+    <div class="flex justify-between gap-4 py-3"><dt class="text-muted-text">{{ t(P + 'email') }}</dt><dd class="font-medium text-text" dir="ltr">{{ request.email }}</dd></div>
+    <div class="flex justify-between gap-4 py-3"><dt class="text-muted-text">{{ t(P + 'planLegend') }}</dt><dd class="font-medium text-text">{{ request.plan.nameAr if locale == 'ar' else request.plan.nameEn }}{% if request.plan.trialDays %} ({{ t('common.home.landing.pricing.trial', { days: request.plan.trialDays }) }}){% endif %}</dd></div>
+  </dl>
+  <form method="post" action="/signup/verify/{{ token }}" class="mt-6">
+    <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+    {{ button(t(P + 'verifyButton'), 'primary', 'md', 'submit') }}
+  </form>
+{% endif %}
+{% endblock %}

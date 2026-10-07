@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { isDemoModeEnabled } from '../common/demo-mode';
 import { thmanyahEnabled } from '../common/thmanyah';
 import { getBaseUrl, serializeJsonLd } from '../seo/seo';
+import { SignupService } from '../signup/signup.service';
 import { TenancyService } from '../tenancy/tenancy.service';
 import { isServable } from '../tenancy/tenant-access';
 import { landingContact, toLandingPlans } from './landing';
@@ -13,6 +14,7 @@ export class HomeController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly tenancy: TenancyService,
+    private readonly signup: SignupService,
   ) {}
 
   /** A menu the landing page can show live: it exists, and it is not switched off. */
@@ -86,6 +88,7 @@ export class HomeController {
           })),
         }),
       },
+      signupAvailable: await this.signup.available(),
       thmanyah: thmanyahEnabled(),
       plans: landingPlans,
       hasTrial: landingPlans.some((plan) => plan.trialDays > 0),
