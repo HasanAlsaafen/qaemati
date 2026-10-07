@@ -53,4 +53,5 @@ Owner decisions from the audit approval, plus the defaults taken from section 9 
 49. Live updates use Socket.IO on the existing login session with an Origin check, and Postgres LISTEN / NOTIFY between instances, instead of Redis. Events carry only ids. Staff actions are ordinary CSRF protected POSTs, not socket messages, so validation and tenancy checks live in one place.
 50. Table ordering is a plan feature (`tableOrdering`), like bulk tools and analytics. Restaurants on the internal plan have it.
 51. Roles are three fixed ones (owner, cashier, kitchen) rather than a permissions matrix. Staff are limited by a default deny list in one middleware, so new owner pages are protected without anyone remembering to add a check, and the per action rules live in `src/pos/roles.ts` with unit tests. Changing a role ends that person's sessions, because the role is cached on the session.
+52. Reminders are sent by an hourly in process check that claims each notice in the database before sending, instead of an external cron or a lock. It needs nothing extra to deploy, is safe on several instances, and can be called with any date in tests.
 

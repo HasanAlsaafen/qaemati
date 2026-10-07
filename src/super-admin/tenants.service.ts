@@ -124,6 +124,11 @@ export class TenantsService {
         adminUsers: this.tenancy.limitFor(context.plan, 'adminUsers'),
       },
       audit: await this.audit.list({ restaurantId: id, take: 15 }),
+      notices: await this.prisma.notificationLog.findMany({
+        where: { restaurantId: id },
+        orderBy: { sentAt: 'desc' },
+        take: 10,
+      }),
     };
   }
 

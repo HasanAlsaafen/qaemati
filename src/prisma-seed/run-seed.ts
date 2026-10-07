@@ -163,7 +163,13 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
       ['kitchen', 'Demo Kitchen', 'KITCHEN'],
     ] as const) {
       await prisma.adminUser.create({
-        data: { restaurantId: restaurant.id, email: `${local}@${domain}`, passwordHash, name, role },
+        data: {
+          restaurantId: restaurant.id,
+          email: `${local}@${domain}`,
+          passwordHash,
+          name,
+          role,
+        },
       });
     }
 

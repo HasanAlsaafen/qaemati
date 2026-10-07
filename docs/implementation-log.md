@@ -320,6 +320,12 @@ Order status for the guest, the first of five follow ups (guest status, staff ro
 - The admin sidebar, mobile menu, billing banner, preview link and first login tour are hidden from staff. Seed: each demo restaurant has cashier@ and kitchen@ accounts with the demo password.
 - Tests: 31 e2e (sign in routing, access matrix, forbidden writes with a valid token, what each role sees and can change, floor versus kitchen sockets, the team page, limits, isolation) and 9 unit. Browser: cashier redirected from billing, kitchen board has no prices, axe clean on the team page at 375px in both languages and 1280px.
 
+## Phase O (3/5): renewal reminders and receipt emails
+
+- Migration `20261016000000_notification_log`. Pure rules in `notice-rules.ts` (8 unit tests), bilingual emails, `BillingNotifier.runReminders(now)`, an hourly scheduler, receipts on every recorded payment, and an "Emails sent to the owners" list on the platform restaurant page.
+- Tests (15 e2e): owner only recipients, each notice once, concurrent runs, the full sequence over time, trials, nothing for suspended or canceled or far off plans, a renewal starting fresh reminders, retrying when nobody could be reached, links and contact when configured, the receipt, and a failed email never undoing a payment.
+- Not verified against real Gmail, like the other mail.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).

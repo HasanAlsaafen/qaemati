@@ -64,6 +64,10 @@ class EnvironmentVariables {
 
   @IsOptional()
   @IsIn(['true', 'false'])
+  REMINDERS_ENABLED?: string;
+
+  @IsOptional()
+  @IsIn(['true', 'false'])
   SUPER_REQUIRE_2FA?: string;
 
   @IsOptional()

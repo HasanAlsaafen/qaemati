@@ -152,6 +152,19 @@
   {% endif %}
 </section>
 
+<section class="mt-8 rounded-card border border-border bg-surface p-5" aria-labelledby="notices-heading">
+  <h2 id="notices-heading" class="font-display text-lg font-bold text-text">{{ t('common.super.tenants.noticesTitle') }}</h2>
+  {% if notices.length %}
+    <ul class="mt-3 divide-y divide-border text-sm">
+      {% for notice in notices %}
+        <li class="flex flex-wrap items-baseline justify-between gap-2 py-2"><span class="text-text">{{ t('common.super.tenants.notice.' + notice.kind) }}</span><span class="text-muted-text" dir="ltr">{{ notice.forDate | isoDate }} · {{ notice.sentAt | isoDate }} · {{ notice.recipients }}</span></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="mt-3 text-sm text-muted-text">{{ t('common.super.tenants.noticesNone') }}</p>
+  {% endif %}
+</section>
+
 <section class="mt-6 rounded-card border border-border bg-surface p-4" aria-labelledby="audit-heading">
   <h2 id="audit-heading" class="font-display text-lg font-bold text-text">{{ t('common.super.nav.audit') }}</h2>
   {% if audit.length %}

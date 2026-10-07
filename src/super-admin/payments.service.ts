@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { BillingNotifier } from '../billing-notices/billing-notifier.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { nextPeriod } from '../tenancy/billing-dates';
 import { Actor, AuditService } from './audit.service';
@@ -24,6 +25,7 @@ export class PaymentsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly notifier: BillingNotifier,
   ) {}
 
   list(filter: PaymentFilter = {}) {
@@ -119,6 +121,8 @@ export class PaymentsService {
       method: dto.method,
       periodEnd: period.end.toISOString(),
     });
+    // The owners get the receipt by email. A failure there never undoes the payment.
+    await this.notifier.sendReceipt(payment.id);
     return payment;
   }
 

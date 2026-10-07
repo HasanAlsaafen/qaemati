@@ -815,7 +815,16 @@
       "note": "Internal note",
       "admins": "Team accounts",
       "resetPassword": "Reset password",
-      "addAdmin": "Add account"
+      "addAdmin": "Add account",
+      "noticesTitle": "Emails sent to the owners",
+      "noticesNone": "No reminders sent yet.",
+      "notice": {
+        "trial_ending": "Trial ends soon",
+        "expiring_7d": "Plan ends within 7 days",
+        "expiring_1d": "Plan ends tomorrow",
+        "grace_started": "Plan ended, grace period",
+        "menu_offline": "Menu went offline"
+      }
     },
     "plans": {
       "add": "Add plan",

@@ -13,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { PosModule } from './pos/pos.module';
 import { TeamModule } from './team/team.module';
+import { BillingNoticesModule } from './billing-notices/billing-notices.module';
 import { RateLimitModule } from './common/rate-limit/rate-limit.module';
 import { CsrfViewMiddleware } from './auth/csrf-view.middleware';
 import { AdminModule } from './admin/admin.module';
@@ -48,6 +49,7 @@ import { StyleguideModule } from './styleguide/styleguide.module';
     RateLimitModule,
     PosModule,
     TeamModule,
+    BillingNoticesModule,
     TenancyModule,
     SuperAdminModule,
     HomeModule,

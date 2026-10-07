@@ -35,6 +35,7 @@ model Restaurant {
 
   orders      Order[]
   waiterCalls WaiterCall[]
+  notices     NotificationLog[]
 
   nameAr String
   nameEn String
@@ -762,4 +763,24 @@ model WaiterCall {
   createdAt DateTime @default(now())
 
   @@index([restaurantId, status, createdAt])
+}
+
+/// One row per reminder already sent, so each one goes out once. The unique key
+/// is claimed before sending, which is what stops two servers sending it twice.
+model NotificationLog {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  kind    String
+  /// The day the notice is about (the end of the trial or of the paid period).
+  /// After a renewal the date changes, so the next ending gets its own reminders.
+  forDate DateTime @db.Date
+
+  recipients Int      @default(0)
+  sentAt     DateTime @default(now())
+
+  @@unique([restaurantId, kind, forDate])
+  @@index([restaurantId, sentAt])
 }

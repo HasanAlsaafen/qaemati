@@ -64,6 +64,23 @@ Used for:
 - The invitation an owner gets when the operator creates a restaurant or adds an account, so the owner can choose a password instead of keeping the generated one. The generated password is still shown to the operator once, as a fallback if the mail does not arrive.
 - A reset link when the operator resets an owner's password.
 
+## Reminders and receipts
+
+An hourly check (`BillingScheduler`, off in tests and with `REMINDERS_ENABLED=false`) emails the **owners** of a restaurant, never cashiers or kitchen staff, in Arabic and English in one message:
+
+| When | Email |
+| --- | --- |
+| A trial has 3 days or less left | trial ends soon |
+| A paid plan has 7 days or less left (1 day or less sends the more urgent one instead) | plan ends |
+| The period ended and the grace period began | plan ended, menu stays online until the date |
+| The grace period is over | menu went offline (only for 14 days after, then it stops writing) |
+
+Suspended or canceled restaurants are not emailed: that was the operator's decision. Each notice is recorded in `NotificationLog`, unique per restaurant, kind and ending date, and the row is claimed **before** sending, so running on several servers or twice never sends a duplicate. If nobody could be reached the row is removed and the next run tries again. A renewal moves the ending date, which starts a fresh set. The platform's restaurant page lists what was sent.
+
+Recording a payment also emails the owners the receipt (number, amount, date, the period it covers, a link). A failed email never undoes a payment.
+
+Links need `PUBLIC_BASE_URL`. The contact line uses `LANDING_CONTACT_WHATSAPP` or `LANDING_CONTACT_EMAIL`.
+
 ## Platform operator security
 
 - **Two step verification (authenticator app).** Required in production, optional elsewhere (`SUPER_REQUIRE_2FA=true|false` overrides). In production an operator who signs in without one is held on `/super/security` until they set it up. Codes are standard 6 digit TOTP, each code works once, five wrong codes lock the step for 15 minutes, and 10 single use recovery codes are given at setup (stored as hashes). The secret is stored encrypted with a key derived from `SESSION_SECRET`, so rotating `SESSION_SECRET` means operators set 2FA up again.
@@ -74,6 +91,5 @@ Used for:
 
 ## Left for later
 
-- More emails: renewal reminders and receipts. They need a scheduled job.
 - Support sign in as an owner.
 - Per plan branding limits and per tenant domains.
