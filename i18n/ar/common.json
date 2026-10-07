@@ -103,7 +103,8 @@
         "features": {
           "whatsappOrdering": "قائمة الاختيار على واتساب",
           "bulkTools": "الأدوات الجماعية وCSV",
-          "analytics": "الإحصاءات"
+          "analytics": "الإحصاءات",
+          "tableOrdering": "طلبات الطاولات إلى المطبخ"
         },
         "cta": "اختر هذه الباقة"
       },
@@ -426,7 +427,8 @@
       "printAll": "فتح صفحة الطباعة",
       "printButton": "طباعة",
       "scanToView": "امسح لعرض قائمتنا",
-      "downloadLinkLabel": "فتح رابط القائمة"
+      "downloadLinkLabel": "فتح رابط القائمة",
+      "tableOrderingHint": "أعد طباعة رموز الطاولات بعد تفعيل طلبات الطاولات في باقتك: الرموز الجديدة فقط تُرسل الطلبات إلى شاشة الطلبات."
     },
     "analytics": {
       "title": "الإحصائيات",
@@ -663,7 +665,8 @@
     "feature": {
       "bulkTools": "الأدوات الجماعية",
       "analytics": "الإحصائيات",
-      "whatsappOrdering": "قائمة الطلب عبر واتساب"
+      "whatsappOrdering": "قائمة الطلب عبر واتساب",
+      "tableOrdering": "طلبات الطاولات ونداء النادل"
     },
     "resource": {
       "menus": "القوائم",

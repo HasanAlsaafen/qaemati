@@ -74,6 +74,33 @@ export function buildMenuLabels(i18n: I18nService, locale: Locale) {
       messageTotalLine: t('common.menu.selection.messageTotalLine'),
       messageItemLine: t('common.menu.selection.messageItemLine'),
     },
+    tableOrder: {
+      sendOrder: t('common.menu.tableOrder.sendOrder'),
+      sending: t('common.menu.tableOrder.sending'),
+      checking: t('common.menu.tableOrder.checking'),
+      sentTitle: t('common.menu.tableOrder.sentTitle'),
+      sentText: t('common.menu.tableOrder.sentText'),
+      done: t('common.menu.tableOrder.done'),
+      callWaiter: t('common.menu.tableOrder.callWaiter'),
+      calling: t('common.menu.tableOrder.calling'),
+      called: t('common.menu.tableOrder.called'),
+      alreadyCalled: t('common.menu.tableOrder.alreadyCalled'),
+      locationNote: t('common.menu.tableOrder.locationNote'),
+      tableLine: t('common.menu.tableOrder.tableLine'),
+      network: t('common.menu.tableOrder.network'),
+      // Templates, filled in by the browser: {item} is a dish name.
+      errors: {
+        unknown_table: t('common.menu.tableOrder.errors.unknown_table'),
+        menu_offline: t('common.menu.tableOrder.errors.menu_offline'),
+        not_available: t('common.menu.tableOrder.errors.not_available'),
+        location_required: t('common.menu.tableOrder.errors.location_required'),
+        location_inaccurate: t('common.menu.tableOrder.errors.location_inaccurate'),
+        too_far: t('common.menu.tableOrder.errors.too_far'),
+        rate_limited: t('common.menu.tableOrder.errors.rate_limited'),
+        invalid_order: t('common.menu.tableOrder.errors.invalid_order'),
+        item_unavailable: t('common.menu.tableOrder.errors.item_unavailable'),
+      },
+    },
   };
 }
 

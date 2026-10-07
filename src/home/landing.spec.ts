@@ -57,7 +57,12 @@ describe('toLandingPlans', () => {
 
   it('marks which features a plan has and keeps empty limits as unlimited', () => {
     const [p] = toLandingPlans([plan({ features: ['analytics'], maxMenus: 2 })], 'en');
-    expect(p.features).toEqual({ whatsappOrdering: false, bulkTools: false, analytics: true });
+    expect(p.features).toEqual({
+      tableOrdering: false,
+      whatsappOrdering: false,
+      bulkTools: false,
+      analytics: true,
+    });
     expect(p.limits).toEqual({ menus: 2, categories: null, dishes: null, admins: null });
   });
 

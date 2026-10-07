@@ -34,7 +34,7 @@ export interface LandingPlan {
   popular: boolean;
 }
 
-const ALL_FEATURES = ['whatsappOrdering', 'bulkTools', 'analytics'];
+const ALL_FEATURES = ['tableOrdering', 'whatsappOrdering', 'bulkTools', 'analytics'];
 
 /** The plans a visitor can choose from, shaped for the page. The middle one of three or more is highlighted. */
 export function toLandingPlans(plans: Plan[], locale: 'ar' | 'en'): LandingPlan[] {

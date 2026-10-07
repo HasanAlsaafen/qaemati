@@ -19,6 +19,9 @@
 
 <section class="mt-6">
   <h2 class="font-sans text-lg font-bold text-text">{{ labels.qr.tablesTitle }}</h2>
+  {% if tenant and 'tableOrdering' in tenant.features %}
+    <p class="mt-1 max-w-2xl text-sm text-muted-text">{{ t('common.admin.qr.tableOrderingHint') }}</p>
+  {% endif %}
   {{ tablesList(tables, labels) }}
 </section>
 

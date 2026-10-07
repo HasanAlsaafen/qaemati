@@ -103,7 +103,8 @@
         "features": {
           "whatsappOrdering": "WhatsApp selection",
           "bulkTools": "Bulk tools and CSV",
-          "analytics": "Insights"
+          "analytics": "Insights",
+          "tableOrdering": "Table orders to the kitchen"
         },
         "cta": "Choose this plan"
       },
@@ -426,7 +427,8 @@
       "printAll": "Open printable page",
       "printButton": "Print",
       "scanToView": "Scan to view our menu",
-      "downloadLinkLabel": "Open menu link"
+      "downloadLinkLabel": "Open menu link",
+      "tableOrderingHint": "Reprint the table codes after table orders are switched on for your plan: only codes that carry the new table key send orders to the POS."
     },
     "analytics": {
       "title": "Analytics",
@@ -663,7 +665,8 @@
     "feature": {
       "bulkTools": "Bulk tools",
       "analytics": "Analytics",
-      "whatsappOrdering": "WhatsApp selection list"
+      "whatsappOrdering": "WhatsApp selection list",
+      "tableOrdering": "Table orders and waiter calls"
     },
     "resource": {
       "menus": "Menus",

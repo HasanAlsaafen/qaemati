@@ -9,8 +9,11 @@
 {% from "components/menu-filter-sheet.njk" import menuFilterSheet %}
 {% from "components/restaurant-footer.njk" import restaurantFooter %}
 {% from "components/menu-switcher.njk" import menuSwitcher %}
+{% from "components/waiter-button.njk" import waiterButton %}
 
 {% set hasWhatsapp = menu.whatsappUrl and menu.orderingEnabled %}
+{# At a table with table ordering on, the selection goes to the kitchen and WhatsApp is not used at all. #}
+{% set canOrder = true if (tableOrder or hasWhatsapp) else false %}
 
 {% block title %}{{ menu.name }}{% endblock %}
 {% block meta_description %}{{ menu.description or menu.name }}{% endblock %}
@@ -144,7 +147,7 @@
         </h2>
         <div class="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
           {% for item in category.items %}
-            {{ menuItemCard(item, t('common.menu.unavailable'), labels.selection, hasWhatsapp, labels.fromPrice, menu.logoUrl) }}
+            {{ menuItemCard(item, t('common.menu.unavailable'), labels.selection, canOrder, labels.fromPrice, menu.logoUrl) }}
           {% endfor %}
         </div>
       </section>
@@ -159,17 +162,20 @@
   instagram: t('common.menu.instagram'),
   facebook: t('common.menu.facebook'),
   openMap: t('common.menu.openMap'),
-  hasSelectionBar: hasWhatsapp
+  hasSelectionBar: canOrder
 }) }}
 
 <div class="print:hidden">
-  {{ itemDetailSheet(t('common.menu.unavailable'), hasWhatsapp, labels.selection.addButton, labels.selection.addedToast, labels.selectVariant, labels.addonsTitle, labels.selectVariantPrompt, labels.allergenNoteLabel, menu.logoUrl, t('common.menu.close')) }}
+  {{ itemDetailSheet(t('common.menu.unavailable'), canOrder, labels.selection.addButton, labels.selection.addedToast, labels.selectVariant, labels.addonsTitle, labels.selectVariantPrompt, labels.allergenNoteLabel, menu.logoUrl, t('common.menu.close')) }}
 </div>
 
-{% if hasWhatsapp %}
+{% if canOrder %}
   <div class="print:hidden">
-    {{ selectionBar(labels.selection, menu.name, menu.whatsappUrl, tableLabel) }}
+    {{ selectionBar(labels.selection, menu.name, menu.whatsappUrl, tableLabel, tableOrder, labels.tableOrder) }}
   </div>
+{% endif %}
+{% if tableOrder %}
+  {{ waiterButton(tableOrder, tableLabel, labels.tableOrder) }}
 {% endif %}
 {% endblock %}
 

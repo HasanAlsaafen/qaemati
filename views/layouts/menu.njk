@@ -9,9 +9,13 @@
      runs, not on DOMContentLoaded, so a store registered any later than
      this finds Alpine already started. See the comment in
      partials/head.njk for the full explanation. #}
-  {% if menu.whatsappUrl and menu.orderingEnabled %}
+  {% if (menu.whatsappUrl and menu.orderingEnabled) or tableOrder %}
     <script defer src="{{ asset('/js/whatsapp-message.js') }}"></script>
     <script defer src="{{ asset('/js/selection.js') }}"></script>
+  {% endif %}
+  {% if tableOrder %}
+    <meta name="csrf-token" content="{{ csrfToken }}">
+    <script defer src="{{ asset('/js/table-order.js') }}"></script>
   {% endif %}
   {% include "partials/head.njk" %}
   {% if seo and not embed %}

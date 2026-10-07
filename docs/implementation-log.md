@@ -290,6 +290,18 @@ The home page is now a bilingual marketing page for the product: hero with a pho
 - "Try it yourself" section removed, with the demo logins and reset button on the home page. The reset endpoint still exists (for the demo host) and is tested.
 - Tests: landing e2e is 21 cases (phone is live, localized, left to right in Arabic, absent when there is nothing real to show or the restaurant is suspended, framing allowed only by the same origin, no template tells in either language, no gradient anywhere in the page, no demo section in any mode) plus a seed placeholder unit test.
 
+## Phase N: table orders, POS and waiter calls
+
+Built from the request: when the menu is opened from a table the order goes to the cashier or kitchen screen instead of WhatsApp, staff change its status, a guest can call the waiter with a sound on the staff side, and an order from a table must come from inside the restaurant. Behavior, safeguards and limits are in `docs/table-ordering.md`.
+
+- Data (migrations `20261012000000_add_table_orders`, `20261012000001_recovery_codes_no_default`, `20261013000000_internal_plan_table_ordering`): `Order`, `OrderItem` (copies of names and prices), `WaiterCall`, a random key on each table (existing tables backfilled), a position, radius and switch on the restaurant, and an atomic order counter.
+- Guest side: `POST /m/:slug/orders` and `/waiter-calls` (JSON, CSRF header), the menu in table mode (send to the kitchen, call waiter, location prompt), the table QR codes now carry the key.
+- Staff side: `/admin/pos` board, status buttons, waiter call handling, the location settings form, a live websocket with sound, tab title count and connection indicator.
+- Found and fixed on the way: the selection sheet's quantity buttons were 36px (now 44px), staff POST routes that render answered 201 (the same Nest quirk as before).
+- Tests: 57 e2e for orders, pricing, tampering, tables, location, plans, abuse limits, waiter calls, staff transitions, races and tenant isolation, 9 for the websocket (own restaurant only, id only payload, no session, wrong origin, signed out, cannot choose a room), 10 for the menu in table mode and the QR codes, and 26 unit tests (distance, location rules, line keys and cents, event bus).
+- Browser check: a staff window and a guest window against a real server: staff showed Live, the guest's order arrived without a reload, moved New to Preparing to Ready, a waiter call raised the open call count and On my way cleared it, a guest 100 km away was refused with a message, and a guest who denied location was asked for it. axe clean at 375px and 1280px in Arabic and English for the POS screen and the table menu, including the open selection sheet.
+- Not verified by ear: I cannot listen to the sounds here. The tones are generated with the Web Audio API and the logic that starts and repeats them is exercised, but check them on a real device.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).

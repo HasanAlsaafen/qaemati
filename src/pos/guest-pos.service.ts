@@ -70,8 +70,20 @@ export class GuestPosService {
     });
     if (!table) return null;
     const context = await this.tenancy.getContext(restaurantId);
-    if (!isServable(context.access) || !context.features.has('tableOrdering')) return null;
-    return table;
+    const ordering = isServable(context.access) && context.features.has('tableOrdering');
+    const restaurant = await this.prisma.restaurant.findUniqueOrThrow({
+      where: { id: restaurantId },
+      select: { latitude: true, longitude: true, requireLocationCheck: true },
+    });
+    return {
+      label: table.label,
+      /** False when the plan has no table ordering, so the menu falls back to WhatsApp. */
+      ordering,
+      locationCheck:
+        restaurant.requireLocationCheck &&
+        restaurant.latitude !== null &&
+        restaurant.longitude !== null,
+    };
   }
 
   async placeOrder(slug: string, input: PlaceOrderInput, ip: string) {

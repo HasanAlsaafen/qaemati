@@ -2,14 +2,17 @@ import QRCode from 'qrcode';
 import { Request } from 'express';
 
 /**
+ * A table's code carries its unguessable token, not its name, so the menu can
+ * tell a real scan from someone typing a table name into the address.
+ *
  * Built from the request's own protocol/host rather than a configured base
  * URL, so QR codes always point at wherever this instance is actually
  * reachable (localhost in dev, whatever domain it's deployed behind) without
  * needing a separate env var to keep in sync.
  */
-export function buildMenuUrl(req: Request, slug: string, tableLabel?: string): string {
+export function buildMenuUrl(req: Request, slug: string, tableToken?: string): string {
   const base = `${req.protocol}://${req.get('host')}/m/${slug}`;
-  return tableLabel ? `${base}?table=${encodeURIComponent(tableLabel)}` : base;
+  return tableToken ? `${base}?t=${encodeURIComponent(tableToken)}` : base;
 }
 
 /**

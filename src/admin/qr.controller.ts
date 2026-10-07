@@ -165,7 +165,7 @@ export class QrController {
     const rows = await this.tables.listForRestaurant(restaurantId);
     return Promise.all(
       rows.map(async (row) => {
-        const url = buildMenuUrl(req, slug, row.label);
+        const url = buildMenuUrl(req, slug, row.token);
         return { id: row.id, label: row.label, url, qrSvg: await generateQrSvg(url) };
       }),
     );

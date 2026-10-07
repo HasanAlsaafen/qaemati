@@ -92,7 +92,7 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
         maxCategories: 20,
         maxItems: 150,
         maxAdminUsers: 3,
-        features: ['whatsappOrdering', 'analytics'],
+        features: ['whatsappOrdering', 'analytics', 'tableOrdering'],
         sortOrder: 2,
       },
     }),
@@ -104,7 +104,7 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
         currency: 'ILS',
         interval: 'MONTHLY',
         trialDays: 14,
-        features: ['bulkTools', 'analytics', 'whatsappOrdering'],
+        features: ['bulkTools', 'analytics', 'whatsappOrdering', 'tableOrdering'],
         sortOrder: 3,
       },
     }),
@@ -136,6 +136,15 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
         closeTime: restaurantData.closeTime,
         currency: restaurantData.currency,
         primaryColor: restaurantData.primaryColor,
+        // A demo visitor is not standing in the restaurant, so the location
+        // check is off. Turn it on from the POS page to see it work.
+        latitude: 31.5326,
+        longitude: 35.0998,
+        requireLocationCheck: false,
+        // Three tables, so the demo's QR page has codes that open the POS flow.
+        tables: {
+          create: ['1', '2', '3'].map((label, index) => ({ label, sortOrder: index })),
+        },
       },
     });
 

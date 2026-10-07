@@ -63,6 +63,10 @@ TARGET_URL=postgresql://user:pass@host:5432/qaemati_rehearsal scripts/restore.sh
 
 Then open it with the app (point a throwaway `DATABASE_URL` at it) and check a restaurant, its menu and a payment are there.
 
+## Live orders
+
+The staff screen uses a websocket on the same address. Caddy proxies it with no extra setting. If you put another proxy in front, it must pass `Upgrade` headers for `/socket.io/`. Several app instances work: live events travel through Postgres.
+
 ## Photos
 
 Uploaded photos are files on the `uploads` volume, so they survive redeploys and are in the backups. They are served by the app itself. If you outgrow one server, move them to object storage and serve them from a CDN. Until then, one server with a volume is the simplest thing that works.

@@ -1,0 +1,22 @@
+{#
+  "Call waiter": always in reach on a table menu, above the selection bar when
+  that is showing. It posts to the server, which checks the table and where the
+  guest is, and the staff screen sounds an alarm until someone answers.
+#}
+{% macro waiterButton(tableOrder, tableLabel, orderLabels) %}
+  <div
+    class="print:hidden"
+    x-data="{ ...tableOrderState({{ { slug: tableOrder.slug, token: tableOrder.token, locationCheck: tableOrder.locationCheck, tableLabel: tableLabel, labels: orderLabels } | dump }}) }"
+  >
+    <button
+      type="button"
+      x-on:click="callWaiter()"
+      x-bind:disabled="calling"
+      x-bind:class="$store.selection.count > 0 ? 'bottom-20' : 'bottom-4'"
+      class="fixed end-4 z-30 inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong bg-surface px-4 text-sm font-medium text-text shadow-overlay hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-60"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 17h12l-1.5-2V10a4.5 4.5 0 0 0-9 0v5z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+      <span x-text="orderText.callWaiter"></span>
+    </button>
+  </div>
+{% endmacro %}

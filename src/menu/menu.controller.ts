@@ -5,6 +5,7 @@ import { MenuService } from './menu.service';
 import { buildMenuLabels } from './menu-labels';
 import { AnalyticsService } from '../admin/analytics.service';
 import { buildRestaurantJsonLd, getBaseUrl, toAbsoluteUrl } from '../seo/seo';
+import { GuestPosService } from '../pos/guest-pos.service';
 
 @Controller('m')
 export class MenuController {
@@ -12,6 +13,7 @@ export class MenuController {
     private readonly menuService: MenuService,
     private readonly i18n: I18nService,
     private readonly analytics: AnalyticsService,
+    private readonly guestPos: GuestPosService,
   ) {}
 
   @Get(':slug')
@@ -19,6 +21,7 @@ export class MenuController {
   async show(
     @Param('slug') slug: string,
     @Query('table') table: string | undefined,
+    @Query('t') tableToken: string | undefined,
     @Query('menu') menuId: string | undefined,
     @Query('previewName') previewName: string | undefined,
     @Query('previewPrimaryColor') previewPrimaryColor: string | undefined,
@@ -60,6 +63,12 @@ export class MenuController {
         }
       : undefined;
     const menu = await this.menuService.getMenu(slug, locale, preview, menuId);
+    // The QR code carries an unguessable token. A bare ?table=name still shows
+    // the table on a WhatsApp order, but can never place one on the POS.
+    const restaurantIdForTable = await this.menuService.getRestaurantIdBySlug(slug);
+    const posTable = restaurantIdForTable
+      ? await this.guestPos.tableContext(restaurantIdForTable, tableToken?.trim())
+      : null;
     const baseUrl = getBaseUrl(req);
     const canonicalUrl = `${baseUrl}/m/${encodeURIComponent(slug)}`;
     const imageUrl = toAbsoluteUrl(baseUrl, menu.coverImageUrl ?? menu.logoUrl);
@@ -85,7 +94,11 @@ export class MenuController {
           ),
         }),
       },
-      tableLabel: table?.trim() || null,
+      tableLabel: posTable?.label ?? (table?.trim() || null),
+      tableOrder:
+        posTable?.ordering && tableToken
+          ? { token: tableToken.trim(), slug, locationCheck: posTable.locationCheck }
+          : null,
       // Purely cosmetic (hides the scrollbar inside the branding page's
       // iframe preview, see src/styles/app.css's .embed-frame rule) --
       // never gated, since it reveals nothing and changes nothing a

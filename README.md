@@ -106,6 +106,12 @@ down in `afterAll`, so files can run back-to-back without clobbering each other'
 Dockerfile, a production compose file with automatic HTTPS, backup and restore scripts and a CI
 workflow are included. See `docs/deployment.md`.
 
+## Table orders and the POS
+
+A menu opened from a table QR code sends its orders to a live staff screen at `/admin/pos`, with a
+waiter call button and a location check. Details: `docs/table-ordering.md`. After switching it on,
+reprint the table QR codes.
+
 ## Email (Gmail)
 
 Password reset and owner invitations are sent through Gmail SMTP. Enable 2 step verification on the
