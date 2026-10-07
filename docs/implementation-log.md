@@ -225,6 +225,7 @@ What was built
 Bugs found on the way
 - The demo reset button asked for confirmation with an inline handler, which the page's CSP blocks, so the destructive reset ran without asking. It now uses Alpine, with a test.
 - Nunjucks has no `min` filter, found by the first test with a plan limit.
+- A real Chrome run of the new restaurant form showed that a validation failure kept only the offending field, so the owner retyped everything else. The validation pipe now keeps the whole submitted form (secrets still dropped), with unit and e2e tests.
 
 Verification
 - 164 unit tests and 215 e2e tests pass. The e2e suites for this work are `tenant-isolation` (27), `subscription-enforcement` (19) and `super-admin` (43): login separation, creating a restaurant (invalid, reserved and taken addresses, owner email, keeping what was typed), suspend and reactivate against the live menu, plan changes and archived plans, owner accounts and their limit, payment date arithmetic (early, late, lapsed, suspended), refused amounts and dates, sequential receipts, voiding, ledger filters, receipts per owner, plans, metrics, search and the audit trail. The CSRF sweep from Phase A covers every new route automatically.

@@ -1,4 +1,4 @@
-import { ValidationError, ValidationPipe } from '@nestjs/common';
+import { ArgumentMetadata, ValidationError, ValidationPipe } from '@nestjs/common';
 import { FieldErrorKeys, ValidationFailedException } from './validation-failed.exception';
 
 const FALLBACK_KEY = 'invalid';
@@ -17,6 +17,35 @@ function collect(errors: ValidationError[], prefix: string, into: FieldErrorKeys
   }
 }
 
+function withoutSecrets(body: object): Record<string, unknown> {
+  const copy: Record<string, unknown> = { ...body };
+  for (const field of SENSITIVE_FIELDS) delete copy[field];
+  return copy;
+}
+
+/**
+ * Keeps the whole submitted form on the failure, not just the field that was
+ * wrong. A plain form that is sent back with its messages needs every other
+ * value too, or the user retypes the lot.
+ */
+class FormValidationPipe extends ValidationPipe {
+  async transform(value: unknown, metadata: ArgumentMetadata): Promise<unknown> {
+    try {
+      return await super.transform(value, metadata);
+    } catch (error) {
+      if (
+        error instanceof ValidationFailedException &&
+        metadata.type === 'body' &&
+        value &&
+        typeof value === 'object'
+      ) {
+        throw new ValidationFailedException(error.fieldErrors, withoutSecrets(value));
+      }
+      throw error;
+    }
+  }
+}
+
 /**
  * DTO decorators carry a short message key (for example `tooLong`) rather
  * than prose, so the same failure can be rendered in either locale by
@@ -25,7 +54,7 @@ function collect(errors: ValidationError[], prefix: string, into: FieldErrorKeys
  * collapses to the generic `invalid` key.
  */
 export function createValidationPipe(): ValidationPipe {
-  return new ValidationPipe({
+  return new FormValidationPipe({
     whitelist: true,
     forbidNonWhitelisted: true,
     transform: true,

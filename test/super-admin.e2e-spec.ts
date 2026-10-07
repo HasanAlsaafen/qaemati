@@ -278,6 +278,23 @@ describe('Super admin (e2e)', () => {
       expect(await prisma.restaurant.count({ where: { nameEn: { in: ['Dup', 'Dup2'] } } })).toBe(0);
     });
 
+    it('keeps every other typed value when the form fails validation (found in a real browser)', async () => {
+      const res = await post(agent, '/super/restaurants/new', '/super/restaurants', {
+        nameAr: 'مطعمي',
+        nameEn: 'Kept On Validation',
+        slug: 'Bad Slug!',
+        planId,
+        startMode: 'TRIAL',
+        adminName: 'Kept Owner',
+        adminEmail: 'kept-validation@sa-test.example.com',
+      });
+      const form = await agent.get(res.headers.location).set('Cookie', 'qaemati_locale=en');
+      expect(form.text).toContain('field-slug-error');
+      expect(form.text).toContain('value="Kept On Validation"');
+      expect(form.text).toContain('value="Kept Owner"');
+      expect(form.text).toContain('value="kept-validation@sa-test.example.com"');
+    });
+
     it('keeps what was typed when it refuses', async () => {
       const res = await post(agent, '/super/restaurants/new', '/super/restaurants', {
         nameAr: 'مطعمي',

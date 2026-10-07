@@ -108,4 +108,20 @@ describe('admin DTOs through the global pipe', () => {
     expect(error?.values).not.toHaveProperty('password');
     expect(error?.values.email).toBe('x'.repeat(300));
   });
+
+  it('keeps every submitted value on a failure, not only the field that failed, and still drops secrets', async () => {
+    const { error } = await run(LoginDto, {
+      email: 'x'.repeat(300),
+      password: 'secret',
+      redirect: '/admin',
+    });
+    expect(error?.values).toMatchObject({ redirect: '/admin' });
+    expect(error?.values).not.toHaveProperty('password');
+    const category = await run(CreateCategoryDto, {
+      nameAr: 'مشروبات',
+      nameEn: 'x'.repeat(121),
+      csrf_token: 'abc',
+    });
+    expect(category.error?.values).toEqual({ nameAr: 'مشروبات', nameEn: 'x'.repeat(121) });
+  });
 });
