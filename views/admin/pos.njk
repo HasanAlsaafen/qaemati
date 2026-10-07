@@ -1,0 +1,54 @@
+{% extends "layouts/admin.njk" %}
+{% from "components/input.njk" import input %}
+
+{% set P = 'common.admin.pos.' %}
+{% block title %}{{ t(P + 'title') }}{% endblock %}
+
+{% block content %}
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <h1 class="font-sans text-2xl font-bold text-text">{{ t(P + 'title') }}</h1>
+  <div class="flex flex-wrap items-center gap-3">
+    <p class="inline-flex min-h-11 items-center gap-2 text-sm text-text" role="status" data-pos-connection data-live="{{ t(P + 'live') }}" data-connecting="{{ t(P + 'connecting') }}" data-offline="{{ t(P + 'offline') }}">
+      <span class="h-2.5 w-2.5 rounded-full bg-muted-text" data-pos-dot aria-hidden="true"></span>
+      <span data-pos-connection-label>{{ t(P + 'connecting') }}</span>
+    </p>
+    <button type="button" data-pos-sound data-on="{{ t(P + 'soundOn') }}" data-off="{{ t(P + 'soundOff') }}" aria-pressed="false" class="inline-flex min-h-11 items-center rounded-md border border-border-strong px-4 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(P + 'soundOff') }}</button>
+  </div>
+</div>
+
+<p hidden data-pos-sound-blocked class="mt-3 rounded-md bg-warning/10 px-3 py-2 text-sm text-warning-text" role="alert">{{ t(P + 'soundBlocked') }}</p>
+
+{% if location.requireLocationCheck and (not (location.latitude is number) or not (location.longitude is number)) %}
+  <p class="mt-3 rounded-md bg-warning/10 px-3 py-2 text-sm text-warning-text" role="status">{{ t(P + 'locationMissing') }}</p>
+{% endif %}
+
+<div id="pos-board" hx-get="/admin/pos/board" hx-trigger="pos-refresh from:body, every 30s" hx-swap="innerHTML" aria-live="polite">
+  {% include "admin/partials/pos-board.njk" %}
+</div>
+
+<details class="mt-10 rounded-lg border border-border bg-surface p-4" id="location">
+  <summary class="inline-flex min-h-11 cursor-pointer items-center font-sans text-lg font-bold text-text">{{ t(P + 'settingsTitle') }}</summary>
+  <p class="mt-2 max-w-2xl text-sm text-muted-text">{{ t(P + 'settingsIntro') }}</p>
+  <form hx-post="/admin/pos/settings" hx-swap="none" class="mt-4 grid max-w-2xl gap-4 sm:grid-cols-2">
+    {{ input('latitude', t(P + 'latitude'), 'text', location.latitude, '', none, none, 'inputmode="decimal"', 'ltr') }}
+    {{ input('longitude', t(P + 'longitude'), 'text', location.longitude, '', none, none, 'inputmode="decimal"', 'ltr') }}
+    <div class="sm:col-span-2">
+      <button type="button" data-pos-locate data-busy="{{ t(P + 'locating') }}" data-denied="{{ t(P + 'locateDenied') }}" class="inline-flex min-h-11 items-center rounded-md border border-border-strong px-4 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(P + 'useMyLocation') }}</button>
+    </div>
+    {{ input('orderRadiusMeters', t(P + 'radius'), 'text', location.orderRadiusMeters, '', none, t(P + 'radiusHint'), 'inputmode="numeric"', 'ltr') }}
+    <label class="flex min-h-11 items-center gap-3 text-sm text-text sm:col-span-2">
+      <input type="checkbox" name="requireLocationCheck" {{ 'checked' if location.requireLocationCheck }} class="h-5 w-5">
+      {{ t(P + 'requireCheck') }}
+    </label>
+    <p class="text-sm text-muted-text sm:col-span-2">{{ t(P + 'settingsNote') }}</p>
+    <div class="sm:col-span-2">
+      <button type="submit" class="inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(P + 'save') }}</button>
+    </div>
+  </form>
+</details>
+{% endblock %}
+
+{% block scripts %}
+  <script defer src="{{ asset('/js/vendor/socket.io.min.js') }}"></script>
+  <script defer src="{{ asset('/js/pos.js') }}"></script>
+{% endblock %}

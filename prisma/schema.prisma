@@ -23,14 +23,27 @@ model Restaurant {
 
   slug String @unique
 
+  /// Where the restaurant is, for checking that a table order comes from
+  /// inside it. Both null means the check cannot run (the POS page warns).
+  latitude             Decimal? @db.Decimal(9, 6)
+  longitude            Decimal? @db.Decimal(9, 6)
+  /// How far from that point a guest may be, in meters.
+  orderRadiusMeters    Int      @default(150)
+  requireLocationCheck Boolean  @default(true)
+  /// Next order number, taken with an atomic update so numbers never repeat.
+  nextOrderNumber      Int      @default(1)
+
+  orders      Order[]
+  waiterCalls WaiterCall[]
+
   nameAr String
   nameEn String
 
   descriptionAr String?
   descriptionEn String?
 
-  logoPath        String?
-  coverImagePath  String?
+  logoPath       String?
+  coverImagePath String?
 
   /// A4: hex color, e.g. "#44603C". Null means "use the default Zaytoun
   /// palette" (src/styles/tokens.css's own --color-primary), not black
@@ -163,16 +176,16 @@ model Restaurant {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  adminUsers AdminUser[]
-  menus      Menu[]
-  subscription Subscription?
-  payments     Payment[]
-  categories Category[]
-  items      Item[]
-  tables     RestaurantTable[]
-  itemVariants ItemVariant[]
-  itemAddons   ItemAddon[]
-  menuViews    MenuView[]
+  adminUsers        AdminUser[]
+  menus             Menu[]
+  subscription      Subscription?
+  payments          Payment[]
+  categories        Category[]
+  items             Item[]
+  tables            RestaurantTable[]
+  itemVariants      ItemVariant[]
+  itemAddons        ItemAddon[]
+  menuViews         MenuView[]
   bulkOperationLogs BulkOperationLog[]
 }
 
@@ -296,18 +309,18 @@ model Item {
   allergenNoteAr String?
   allergenNoteEn String?
 
-  available Boolean @default(true)
+  available       Boolean @default(true)
   /// A3: "Today's special" banner flag -- owner-toggled, not date-scoped
   /// (there's no "which day" concept in this app), so it's exactly as
   /// current as the owner keeps it, same honesty tradeoff as `available`.
   isTodaysSpecial Boolean @default(false)
-  sortOrder Int     @default(0)
+  sortOrder       Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  variants ItemVariant[]
-  addons   ItemAddon[]
+  variants  ItemVariant[]
+  addons    ItemAddon[]
   menuViews MenuView[]
 
   @@index([restaurantId])
@@ -425,7 +438,14 @@ model RestaurantTable {
 
   label String
 
+  /// What the table's QR code carries. Unguessable, so an order cannot be
+  /// placed for a table by typing its name into the address.
+  token String @unique @default(uuid())
+
   sortOrder Int @default(0)
+
+  orders      Order[]
+  waiterCalls WaiterCall[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -477,11 +497,11 @@ model Plan {
   interval    BillingInterval @default(MONTHLY)
   trialDays   Int             @default(0)
 
-  maxMenus       Int?
-  maxCategories  Int?
-  maxItems       Int?
-  maxAdminUsers  Int?
-  features       String[]
+  maxMenus      Int?
+  maxCategories Int?
+  maxItems      Int?
+  maxAdminUsers Int?
+  features      String[]
 
   /// Archived plans stay on the tenants that have them but cannot be chosen
   /// for new ones.
@@ -540,11 +560,11 @@ model Payment {
   subscriptionId String
   subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
 
-  amount   Decimal       @db.Decimal(10, 2)
-  currency String
-  method   PaymentMethod
+  amount    Decimal       @db.Decimal(10, 2)
+  currency  String
+  method    PaymentMethod
   reference String?
-  status   PaymentStatus @default(PAID)
+  status    PaymentStatus @default(PAID)
 
   paidAt      DateTime
   periodStart DateTime
@@ -593,12 +613,12 @@ model SuperAdmin {
 model AuditLog {
   id String @id @default(cuid())
 
-  actorType  String
-  actorId    String?
-  actorLabel String?
-  action     String
+  actorType    String
+  actorId      String?
+  actorLabel   String?
+  action       String
   restaurantId String?
-  meta       Json?
+  meta         Json?
 
   createdAt DateTime @default(now())
 
@@ -634,4 +654,98 @@ model RateLimitBucket {
   resetAt DateTime
 
   @@index([resetAt])
+}
+
+// ---------------------------------------------------------------------------
+// Table orders and waiter calls (the POS)
+// ---------------------------------------------------------------------------
+
+enum OrderStatus {
+  NEW
+  PREPARING
+  READY
+  SERVED
+  CANCELED
+}
+
+enum WaiterCallStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+/// An order a guest sent from a table. Prices and names are copied in when it
+/// is placed, so editing the menu later never changes an order already taken.
+model Order {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  tableId    String?
+  table      RestaurantTable? @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  tableLabel String
+
+  number Int
+  status OrderStatus @default(NEW)
+  note   String?
+
+  total    Decimal @db.Decimal(10, 2)
+  currency String
+
+  /// How far from the restaurant the guest was, when it was checked.
+  distanceMeters Int?
+
+  items OrderItem[]
+
+  statusChangedAt   DateTime @default(now())
+  statusChangedById String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([restaurantId, number])
+  @@index([restaurantId, status, createdAt])
+}
+
+model OrderItem {
+  id String @id @default(cuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  /// Not a foreign key: the dish may be deleted later, the order keeps its copy.
+  itemId String?
+
+  nameAr String
+  nameEn String
+
+  quantity  Int
+  unitPrice Decimal @db.Decimal(10, 2)
+  lineTotal Decimal @db.Decimal(10, 2)
+
+  @@index([orderId])
+}
+
+model WaiterCall {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  tableId    String?
+  table      RestaurantTable? @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  tableLabel String
+
+  status WaiterCallStatus @default(OPEN)
+
+  distanceMeters Int?
+
+  acknowledgedAt DateTime?
+  resolvedAt     DateTime?
+  handledById    String?
+
+  createdAt DateTime @default(now())
+
+  @@index([restaurantId, status, createdAt])
 }

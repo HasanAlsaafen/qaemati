@@ -17,6 +17,7 @@ import { createValidationPipe } from './common/validation/create-validation-pipe
 import { accessLog } from './common/logging/access-log';
 import { getSessionSecret } from './config/env.validation';
 import { thmanyahEnabled } from './common/thmanyah';
+import { SessionIoAdapter } from './pos/session-io.adapter';
 import './auth/session.types';
 
 /**
@@ -118,33 +119,34 @@ export async function configureApp(app: NestExpressApplication): Promise<void> {
   app.use(app.get(LocaleViewMiddleware).use.bind(app.get(LocaleViewMiddleware)));
 
   const PgSession = connectPgSimple(session);
-  app.use(
-    session({
-      store: new PgSession({
-        conString: process.env.DATABASE_URL,
-        tableName: 'session',
-        createTableIfMissing: true,
-      }),
-      secret: getSessionSecret(),
-      resave: false,
-      // CSRF validation ties a token to req.session.id (see auth/csrf.ts).
-      // With saveUninitialized: false, an anonymous visitor's session is
-      // never persisted, so express-session hands out a fresh, unstable id
-      // on every request until something saves it -- meaning the id used
-      // to generate a token when the login page is rendered never matches
-      // the id seen when that form is submitted, and CSRF validation fails
-      // on the login form itself every time. true establishes a stable,
-      // cookied session from the first request.
-      saveUninitialized: true,
-      name: 'qaemati_session',
-      cookie: {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      },
+  const sessionMiddleware = session({
+    store: new PgSession({
+      conString: process.env.DATABASE_URL,
+      tableName: 'session',
+      createTableIfMissing: true,
     }),
-  );
+    secret: getSessionSecret(),
+    resave: false,
+    // CSRF validation ties a token to req.session.id (see auth/csrf.ts).
+    // With saveUninitialized: false, an anonymous visitor's session is
+    // never persisted, so express-session hands out a fresh, unstable id
+    // on every request until something saves it -- meaning the id used
+    // to generate a token when the login page is rendered never matches
+    // the id seen when that form is submitted, and CSRF validation fails
+    // on the login form itself every time. true establishes a stable,
+    // cookied session from the first request.
+    saveUninitialized: true,
+    name: 'qaemati_session',
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    },
+  });
+  app.use(sessionMiddleware);
+  // The staff screen's websocket reads the same session cookie.
+  app.useWebSocketAdapter(new SessionIoAdapter(app, sessionMiddleware));
   app.use(doubleCsrfProtection);
 
   app.useGlobalPipes(createValidationPipe());

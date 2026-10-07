@@ -27,6 +27,17 @@ export function configureNunjucks(app: NestExpressApplication): void {
   );
   env.addFilter('money', (value: unknown) => Number(value ?? 0).toFixed(2));
   env.addFilter('symbol', (code: string, locale: 'ar' | 'en') => currencySymbol(code, locale));
+  // 14:05 in the restaurant's own time, whatever the server clock says.
+  env.addFilter('clock', (value: Date | string | null | undefined) =>
+    value
+      ? new Intl.DateTimeFormat('en-GB', {
+          timeZone: 'Asia/Hebron',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        }).format(new Date(value))
+      : '',
+  );
   env.addFilter('receiptNo', (value: number) => `R-${String(value).padStart(6, '0')}`);
 
   app.set('view engine', 'njk');

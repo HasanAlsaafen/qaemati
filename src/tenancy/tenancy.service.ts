@@ -37,7 +37,7 @@ export class TenancyService {
       features: new Set(
         plan
           ? plan.features.filter(isPlanFeature)
-          : (['bulkTools', 'analytics', 'whatsappOrdering'] as PlanFeature[]),
+          : (['bulkTools', 'analytics', 'whatsappOrdering', 'tableOrdering'] as PlanFeature[]),
       ),
     };
   }

@@ -16,6 +16,10 @@ const files = [
     to: 'public/js/vendor/alpine.min.js',
   },
   {
+    from: 'node_modules/socket.io-client/dist/socket.io.min.js',
+    to: 'public/js/vendor/socket.io.min.js',
+  },
+  {
     from: 'node_modules/sortablejs/Sortable.min.js',
     to: 'public/js/vendor/sortable.min.js',
   },

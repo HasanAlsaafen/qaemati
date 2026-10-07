@@ -30,6 +30,8 @@
     "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^10.4.15",
     "@nestjs/platform-express": "^10.4.15",
+    "@nestjs/platform-socket.io": "^10.4.22",
+    "@nestjs/websockets": "^10.4.22",
     "@prisma/client": "^5.22.0",
     "alpinejs": "^3.17.4",
     "bcrypt": "^5.1.1",
@@ -46,9 +48,11 @@
     "nestjs-i18n": "^10.5.0",
     "nodemailer": "^10.0.15",
     "nunjucks": "^3.2.4",
+    "pg": "^8.23.1",
     "qrcode": "^1.5.4",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "socket.io-client": "^4.8.4",
     "sortablejs": "^1.15.7"
   },
   "devDependencies": {
@@ -67,6 +71,7 @@
     "@types/node": "^22.10.1",
     "@types/nodemailer": "^8.0.2",
     "@types/nunjucks": "^3.2.6",
+    "@types/pg": "^8.23.1",
     "@types/qrcode": "^1.5.5",
     "@types/sortablejs": "^1.15.9",
     "@types/supertest": "^7.2.1",

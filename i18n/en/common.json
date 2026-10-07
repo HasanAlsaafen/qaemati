@@ -243,7 +243,34 @@
     "menuHoursNote": "This menu is served from {from} to {to} only.",
     "menuClosedNow": "It is closed right now.",
     "allCategories": "All",
-    "close": "Close"
+    "close": "Close",
+    "tableOrder": {
+      "sendOrder": "Send order to the kitchen",
+      "sending": "Sending",
+      "checking": "Checking your location",
+      "sentTitle": "Order {number} is sent",
+      "sentText": "The kitchen has it. Your order will be brought to table {table}.",
+      "sentTotal": "Total",
+      "done": "Done",
+      "callWaiter": "Call waiter",
+      "calling": "Calling the waiter",
+      "called": "The waiter has been called",
+      "alreadyCalled": "The waiter is already on the way",
+      "locationNote": "Before sending, we check that you are at the restaurant.",
+      "tableLine": "Table {label}",
+      "network": "Could not reach the restaurant. Check your connection and try again.",
+      "errors": {
+        "unknown_table": "This table code is not valid. Scan the code on your table again.",
+        "menu_offline": "Ordering is not available right now.",
+        "not_available": "This restaurant does not take orders from the table yet. Please ask your waiter.",
+        "location_required": "We need your location to confirm you are at the restaurant. Allow location for this page and try again.",
+        "location_inaccurate": "Your phone could not find your position precisely enough. Move closer to a window or turn on precise location, then try again.",
+        "too_far": "You seem to be away from the restaurant, so the order was not sent. Please ask your waiter.",
+        "rate_limited": "Too many requests. Please wait a moment and try again.",
+        "invalid_order": "Something in your order is no longer valid. Please review it and try again.",
+        "item_unavailable": "{item} is not available right now. Remove it and send again."
+      }
+    }
   },
   "admin": {
     "auth": {
@@ -283,7 +310,8 @@
       "toggleMenu": "Menu",
       "branding": "Branding",
       "toggleSidebar": "Collapse sidebar",
-      "billing": "Subscription"
+      "billing": "Subscription",
+      "pos": "Orders"
     },
     "form": {
       "required": "This field is required.",
@@ -522,6 +550,50 @@
       "deletedToast": "Menu deleted, its categories moved",
       "lastMenuToast": "You need at least one menu.",
       "categoryMovedToast": "Category moved to the other menu"
+    },
+    "pos": {
+      "title": "Table orders",
+      "live": "Live",
+      "connecting": "Connecting",
+      "offline": "Disconnected. Orders show up when it reconnects.",
+      "soundOn": "Sound on",
+      "soundOff": "Turn on sound",
+      "soundBlocked": "Your browser blocked the sound. Tap Turn on sound.",
+      "colNew": "New",
+      "colPreparing": "Preparing",
+      "colReady": "Ready",
+      "emptyColumn": "Nothing here.",
+      "calls": "Waiter calls",
+      "callTitle": "Table {label} is calling",
+      "callAck": "On my way",
+      "callDone": "Done",
+      "callAcknowledged": "Someone is on the way",
+      "orderNo": "Order {number}",
+      "table": "Table {label}",
+      "note": "Note",
+      "start": "Start preparing",
+      "ready": "Mark ready",
+      "served": "Mark served",
+      "cancel": "Cancel order",
+      "cancelConfirm": "Cancel this order? The guest is not told.",
+      "recent": "Recently finished",
+      "statusServed": "Served",
+      "statusCanceled": "Canceled",
+      "noOrders": "No orders yet. They appear here the moment a guest sends one from a table.",
+      "locationMissing": "Your restaurant's location is not set, so table orders are accepted from anywhere. Set it under Location check below.",
+      "settingsTitle": "Location check",
+      "settingsIntro": "Table orders are accepted only from guests who are at the restaurant. Set where it is and how far away a guest may be.",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "useMyLocation": "Use my current location",
+      "locating": "Finding your position",
+      "locateDenied": "Could not get your position. Allow location for this site and try again.",
+      "radius": "Radius in meters",
+      "radiusHint": "Between 30 and 2000. Indoors a phone is often 20 to 50 meters off, so 100 to 200 is a good start.",
+      "requireCheck": "Only accept table orders from inside the radius",
+      "settingsNote": "The position comes from the guest's phone. It stops orders sent from home by mistake or as a prank, but a determined person can fake it, so treat it as a filter and not as proof.",
+      "save": "Save",
+      "saved": "Saved"
     }
   },
   "validation": {

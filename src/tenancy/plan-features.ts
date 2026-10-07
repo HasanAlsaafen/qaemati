@@ -1,5 +1,10 @@
 /** Feature keys a plan can switch on. Stored as text in Plan.features. */
-export const PLAN_FEATURES = ['bulkTools', 'analytics', 'whatsappOrdering'] as const;
+export const PLAN_FEATURES = [
+  'bulkTools',
+  'analytics',
+  'whatsappOrdering',
+  'tableOrdering',
+] as const;
 export type PlanFeature = (typeof PLAN_FEATURES)[number];
 
 export function isPlanFeature(value: string): value is PlanFeature {

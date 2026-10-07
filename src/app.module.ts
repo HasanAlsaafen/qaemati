@@ -10,6 +10,7 @@ import { AdminAuthMiddleware } from './auth/admin-auth.middleware';
 import { AdminLocalsMiddleware } from './auth/admin-locals.middleware';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
+import { PosModule } from './pos/pos.module';
 import { RateLimitModule } from './common/rate-limit/rate-limit.module';
 import { CsrfViewMiddleware } from './auth/csrf-view.middleware';
 import { AdminModule } from './admin/admin.module';
@@ -43,6 +44,7 @@ import { StyleguideModule } from './styleguide/styleguide.module';
     PrismaModule,
     MailModule,
     RateLimitModule,
+    PosModule,
     TenancyModule,
     SuperAdminModule,
     HomeModule,
