@@ -1,54 +1,68 @@
+import { MemoryRateLimitStore, RateLimitStore } from '../common/rate-limit/rate-limit-store';
 import { LoginRateLimiter } from './login-rate-limiter';
 
 describe('LoginRateLimiter', () => {
+  let now: number;
   let limiter: LoginRateLimiter;
 
   beforeEach(() => {
-    limiter = new LoginRateLimiter();
+    now = 1_000_000;
+    limiter = new LoginRateLimiter(new MemoryRateLimitStore(() => now));
   });
 
-  it('is not blocked before any failures', () => {
-    expect(limiter.isBlocked('1.2.3.4:a@b.com')).toBe(false);
+  const fail = async (key: string, times: number) => {
+    for (let i = 0; i < times; i++) await limiter.recordFailure(key);
+  };
+
+  it('is not blocked before any failures', async () => {
+    expect(await limiter.isBlocked('1.2.3.4:a@b.com')).toBe(false);
   });
 
-  it('blocks after 5 failures within the window', () => {
+  it('blocks after 5 failures within the window', async () => {
     const key = '1.2.3.4:a@b.com';
     for (let i = 0; i < 4; i++) {
-      limiter.recordFailure(key);
-      expect(limiter.isBlocked(key)).toBe(false);
+      await limiter.recordFailure(key);
+      expect(await limiter.isBlocked(key)).toBe(false);
     }
-    limiter.recordFailure(key);
-    expect(limiter.isBlocked(key)).toBe(true);
+    await limiter.recordFailure(key);
+    expect(await limiter.isBlocked(key)).toBe(true);
   });
 
-  it('keys attempts independently per ip+email', () => {
+  it('keys attempts independently per ip+email', async () => {
     const key = '1.2.3.4:a@b.com';
-    for (let i = 0; i < 5; i++) limiter.recordFailure(key);
-    expect(limiter.isBlocked(key)).toBe(true);
-    expect(limiter.isBlocked('5.6.7.8:a@b.com')).toBe(false);
-    expect(limiter.isBlocked('1.2.3.4:c@d.com')).toBe(false);
+    await fail(key, 5);
+    expect(await limiter.isBlocked(key)).toBe(true);
+    expect(await limiter.isBlocked('5.6.7.8:a@b.com')).toBe(false);
+    expect(await limiter.isBlocked('1.2.3.4:c@d.com')).toBe(false);
   });
 
-  it('reset clears the block', () => {
-    const key = '1.2.3.4:a@b.com';
-    for (let i = 0; i < 5; i++) limiter.recordFailure(key);
-    expect(limiter.isBlocked(key)).toBe(true);
-    limiter.reset(key);
-    expect(limiter.isBlocked(key)).toBe(false);
+  it('accepts a different maximum for a looser limit', async () => {
+    await fail('k', 5);
+    expect(await limiter.isBlocked('k')).toBe(true);
+    expect(await limiter.isBlocked('k', 20)).toBe(false);
   });
 
-  it('expires the window after 15 minutes', () => {
+  it('reset clears the block', async () => {
     const key = '1.2.3.4:a@b.com';
-    const realNow = Date.now;
-    let now = realNow();
-    jest.spyOn(Date, 'now').mockImplementation(() => now);
+    await fail(key, 5);
+    expect(await limiter.isBlocked(key)).toBe(true);
+    await limiter.reset(key);
+    expect(await limiter.isBlocked(key)).toBe(false);
+  });
 
-    for (let i = 0; i < 5; i++) limiter.recordFailure(key);
-    expect(limiter.isBlocked(key)).toBe(true);
-
+  it('expires the window after 15 minutes', async () => {
+    const key = '1.2.3.4:a@b.com';
+    await fail(key, 5);
+    expect(await limiter.isBlocked(key)).toBe(true);
     now += 15 * 60 * 1000 + 1;
-    expect(limiter.isBlocked(key)).toBe(false);
+    expect(await limiter.isBlocked(key)).toBe(false);
+  });
 
-    jest.spyOn(Date, 'now').mockRestore();
+  it('does not block, and does not throw, when the store is down', async () => {
+    const down = () => Promise.reject(new Error('db down'));
+    const broken = new LoginRateLimiter({ hit: down, count: down, reset: down } as RateLimitStore);
+    await expect(broken.recordFailure('k')).resolves.toBeUndefined();
+    await expect(broken.reset('k')).resolves.toBeUndefined();
+    expect(await broken.isBlocked('k')).toBe(false);
   });
 });

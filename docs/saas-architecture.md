@@ -72,4 +72,3 @@ Platform operators have no email reset yet. Reset one with `npm run super:create
 - More emails: renewal reminders and receipts. They need a scheduled job.
 - Support sign in as an owner.
 - Per plan branding limits and per tenant domains.
-- A shared store for the in memory rate limiters before running more than one instance.

@@ -1,45 +1,43 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { RATE_LIMIT_STORE, RateLimitStore } from '../common/rate-limit/rate-limit-store';
 
 const MAX_ATTEMPTS = 5;
 const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
-interface Attempt {
-  count: number;
-  firstAttemptAt: number;
-}
-
 /**
- * In-memory login rate limiter, keyed by "ip:email". Good enough for a
- * single-process demo; a real deployment behind multiple instances would
- * need this backed by Redis or the database instead, since in-memory state
- * isn't shared across processes.
+ * Failure counter keyed by something like "ip:email", kept in the shared
+ * rate limit store so it survives restarts and applies across instances. If
+ * the store cannot be reached it does not block: a sign in needs the same
+ * database and fails on its own then.
  */
 @Injectable()
 export class LoginRateLimiter {
-  private readonly attempts = new Map<string, Attempt>();
+  private readonly logger = new Logger(LoginRateLimiter.name);
 
-  isBlocked(key: string, max = MAX_ATTEMPTS): boolean {
-    const attempt = this.attempts.get(key);
-    if (!attempt) return false;
+  constructor(@Inject(RATE_LIMIT_STORE) private readonly store: RateLimitStore) {}
 
-    if (Date.now() - attempt.firstAttemptAt > WINDOW_MS) {
-      this.attempts.delete(key);
+  async isBlocked(key: string, max = MAX_ATTEMPTS): Promise<boolean> {
+    try {
+      return (await this.store.count(`login:${key}`)) >= max;
+    } catch (error) {
+      this.logger.error(`Reading a limit failed: ${error}`);
       return false;
     }
-
-    return attempt.count >= max;
   }
 
-  recordFailure(key: string): void {
-    const attempt = this.attempts.get(key);
-    if (!attempt || Date.now() - attempt.firstAttemptAt > WINDOW_MS) {
-      this.attempts.set(key, { count: 1, firstAttemptAt: Date.now() });
-      return;
+  async recordFailure(key: string): Promise<void> {
+    try {
+      await this.store.hit(`login:${key}`, WINDOW_MS);
+    } catch (error) {
+      this.logger.error(`Recording a failure failed: ${error}`);
     }
-    attempt.count += 1;
   }
 
-  reset(key: string): void {
-    this.attempts.delete(key);
+  async reset(key: string): Promise<void> {
+    try {
+      await this.store.reset(`login:${key}`);
+    } catch (error) {
+      this.logger.error(`Clearing a limit failed: ${error}`);
+    }
   }
 }

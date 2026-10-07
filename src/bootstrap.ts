@@ -12,6 +12,7 @@ import { doubleCsrfProtection } from './auth/csrf';
 import { CATEGORY_IMAGE_UPLOAD_DIR, ITEM_IMAGE_UPLOAD_DIR } from './admin/upload.config';
 import { LocaleViewMiddleware } from './common/middleware/locale-view.middleware';
 import { createRateLimiter } from './common/middleware/rate-limit';
+import { RATE_LIMIT_STORE } from './common/rate-limit/rate-limit-store';
 import { createValidationPipe } from './common/validation/create-validation-pipe';
 import { accessLog } from './common/logging/access-log';
 import { getSessionSecret } from './config/env.validation';
@@ -83,14 +84,16 @@ export async function configureApp(app: NestExpressApplication): Promise<void> {
   // Applied before CSRF so a flood of forged posts is cut off cheaply.
   // Login has its own per-account limiter on top of this.
   app.use(
-    createRateLimiter({
+    createRateLimiter(app.get(RATE_LIMIT_STORE), {
+      name: 'demo-reset',
       windowMs: 60_000,
       max: 3,
       match: (req) => req.method === 'POST' && req.path === '/demo/reset',
     }),
   );
   app.use(
-    createRateLimiter({
+    createRateLimiter(app.get(RATE_LIMIT_STORE), {
+      name: 'writes',
       windowMs: 60_000,
       max: 120,
       match: (req) => req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'OPTIONS',

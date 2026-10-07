@@ -234,7 +234,6 @@ Verification
 Left undone
 - Two factor sign in, emails (renewal reminders, receipts, first password), support sign in as an owner, a provider integration and custom domains. All are listed with their seams in the architecture doc.
 - Restaurants created through tests have no subscription row and count as unlimited. A real restaurant always gets one from the platform area.
-- The rate limiters are still in memory.
 
 ## Phase H: email, password reset and invitations
 
@@ -244,6 +243,15 @@ Gmail SMTP (app password) through a small `MailService`. Owners can reset their 
 - Anti abuse: identical answer for known and unknown addresses, at most 5 mails per address and 20 requests per IP per 15 minutes, all sessions of the account are ended on a successful reset, a new request cancels the older link.
 - Tests: 13 e2e (known and unknown address, hashed storage, one use, session end, short and mismatched passwords, expired and malformed links, replaced link, rate limit, Arabic mail, invitation and operator reset) and 3 unit.
 - Not verified against real Gmail, because that needs the owner's app password. The transport is the standard nodemailer Gmail SMTP setup. Send yourself a reset mail after setting the two variables.
+
+## Phase I: rate limits in Postgres
+
+The login, password reset and POST limiters counted in memory, so a restart cleared a lockout and several instances each allowed the full number. They now count in a `RateLimitBucket` table through one `RateLimitStore` interface (migration `20261010000000_add_rate_limit_bucket`).
+
+- One upsert counts and starts a fresh window, using the database clock, so simultaneous requests never lose a hit and servers with different clocks agree. Expired rows are purged every 10 minutes.
+- If the database cannot be reached the limiter lets the request through and logs, since a sign in needs that database anyway.
+- Tests use an in memory store per app, because they hammer limits on purpose and a database counter would carry over between runs. The database store has its own e2e suite: counting, sharing between instances, 25 simultaneous hits counted exactly, window expiry, reset, purge.
+- Checked by hand on a real process: six wrong sign ins on port 3111 locked the account, and after killing and restarting the process it was still locked.
 
 ## New risks noticed
 

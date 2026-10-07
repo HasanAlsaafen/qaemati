@@ -76,10 +76,10 @@ describe('Password reset and invitation email (e2e)', () => {
     await app.close();
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     mail.outbox.length = 0;
-    limiter.reset(`forgot-email:${email}`);
-    for (const ip of ['::ffff:127.0.0.1', '127.0.0.1', '::1']) limiter.reset(`forgot:${ip}`);
+    await limiter.reset(`forgot-email:${email}`);
+    for (const ip of ['::ffff:127.0.0.1', '127.0.0.1', '::1']) await limiter.reset(`forgot:${ip}`);
   });
 
   it('links to the forgot page from the sign in page', async () => {

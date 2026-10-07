@@ -29,7 +29,7 @@ export class SuperAuthController {
       res.status(200).render('super/login', { email, error: message });
     const t = (k: string) => this.i18n.t(`common.admin.auth.${k}`, { lang: locale });
 
-    if (this.limiter.isBlocked(key)) return void fail(t('tooManyAttempts'));
+    if (await this.limiter.isBlocked(key)) return void fail(t('tooManyAttempts'));
     const admin =
       email && body.password ? await this.prisma.superAdmin.findUnique({ where: { email } }) : null;
     // Compared even when the account does not exist, so timing does not reveal it.
@@ -37,10 +37,10 @@ export class SuperAuthController {
       admin?.passwordHash ?? '$2b$10$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalid.';
     const matches = await bcrypt.compare(body.password ?? '', hash).catch(() => false);
     if (!admin || !matches) {
-      this.limiter.recordFailure(key);
+      await this.limiter.recordFailure(key);
       return void fail(t('invalidCredentials'));
     }
-    this.limiter.reset(key);
+    await this.limiter.reset(key);
     await new Promise<void>((resolve, reject) =>
       req.session.regenerate((err) => (err ? reject(err) : resolve())),
     );

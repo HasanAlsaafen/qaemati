@@ -45,7 +45,7 @@ export class AuthController {
     const renderError = (error: string) =>
       res.status(200).render('admin/login', { redirect: safeRedirect, email, error });
 
-    if (this.rateLimiter.isBlocked(rateLimitKey)) {
+    if (await this.rateLimiter.isBlocked(rateLimitKey)) {
       renderError(this.i18n.t('common.admin.auth.tooManyAttempts', { lang: locale }));
       return;
     }
@@ -55,7 +55,7 @@ export class AuthController {
     });
 
     if (!email || !password) {
-      this.rateLimiter.recordFailure(rateLimitKey);
+      await this.rateLimiter.recordFailure(rateLimitKey);
       renderError(invalidCredentialsError);
       return;
     }
@@ -68,12 +68,12 @@ export class AuthController {
     const passwordMatches = admin ? await bcrypt.compare(password, admin.passwordHash) : false;
 
     if (!admin || !passwordMatches) {
-      this.rateLimiter.recordFailure(rateLimitKey);
+      await this.rateLimiter.recordFailure(rateLimitKey);
       renderError(invalidCredentialsError);
       return;
     }
 
-    this.rateLimiter.reset(rateLimitKey);
+    await this.rateLimiter.reset(rateLimitKey);
 
     // Regenerate the session on login so a session id issued before
     // authentication (e.g. to an attacker who shared a login link) can't be

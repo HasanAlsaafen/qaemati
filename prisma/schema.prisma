@@ -611,3 +611,13 @@ model PasswordResetToken {
 
   @@index([adminUserId])
 }
+
+/// Counters for rate limits, shared by every instance. Rows disappear when their
+/// window ends (see RateLimitModule).
+model RateLimitBucket {
+  key     String   @id
+  count   Int
+  resetAt DateTime
+
+  @@index([resetAt])
+}

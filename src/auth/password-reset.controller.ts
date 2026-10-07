@@ -31,16 +31,16 @@ export class PasswordResetController {
   ): Promise<void> {
     const email = (body.email ?? '').trim().toLowerCase();
     const ipKey = `forgot:${req.ip}`;
-    if (this.rateLimiter.isBlocked(ipKey, 20)) {
+    if (await this.rateLimiter.isBlocked(ipKey, 20)) {
       res.status(429).render('admin/forgot', { email, error: this.t(req, 'tooManyAttempts') });
       return;
     }
-    this.rateLimiter.recordFailure(ipKey);
+    await this.rateLimiter.recordFailure(ipKey);
 
     // A second limit per address stops someone from filling an inbox.
     const emailKey = `forgot-email:${email}`;
-    if (email && !this.rateLimiter.isBlocked(emailKey)) {
-      this.rateLimiter.recordFailure(emailKey);
+    if (email && !(await this.rateLimiter.isBlocked(emailKey))) {
+      await this.rateLimiter.recordFailure(emailKey);
       await this.resets.requestReset(email, getBaseUrl(req), req.locale === 'en' ? 'en' : 'ar');
     }
     res.status(200).render('admin/forgot', { sent: true, email });
