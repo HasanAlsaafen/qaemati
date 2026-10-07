@@ -32,6 +32,18 @@ class EnvironmentVariables {
 
   @IsOptional()
   @IsString()
+  MAIL_USER?: string;
+
+  @IsOptional()
+  @IsString()
+  MAIL_APP_PASSWORD?: string;
+
+  @IsOptional()
+  @IsString()
+  MAIL_FROM?: string;
+
+  @IsOptional()
+  @IsString()
   DEMO_MODE?: string;
 
   @IsOptional()
@@ -78,6 +90,11 @@ export function validateEnv(raw: Record<string, unknown>): Record<string, unknow
     }
     if (problems.length > 0) {
       throw new Error(`Invalid environment configuration:\n  ${problems.join('\n  ')}`);
+    }
+    if (!config.MAIL_USER || !config.MAIL_APP_PASSWORD) {
+      logger.warn(
+        'MAIL_USER and MAIL_APP_PASSWORD are not set: password reset and invite emails will not be sent',
+      );
     }
     if (config.DEMO_MODE === 'true') {
       logger.warn('DEMO_MODE is on in production: demo credentials are shown on the home page');

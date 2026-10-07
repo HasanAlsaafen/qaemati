@@ -55,10 +55,21 @@ Create the first operator with `npm run super:create -- you@example.org "Your Na
 
 The ledger is the single place that extends a subscription: `PaymentsService.record`. A provider integration would verify its webhook, then call that method with the amount, `method: 'CARD'` and the provider's transaction id as `reference`. Idempotency on that reference, refunds (a void plus a provider call) and renewal reminders are the parts to add. No provider code exists today on purpose.
 
+## Email
+
+`MailService` sends through Gmail SMTP. Turn 2 step verification on the Google account, create an app password at https://myaccount.google.com/apppasswords and set `MAIL_USER` and `MAIL_APP_PASSWORD` (spaces are ignored), and optionally `MAIL_FROM`. With them unset nothing is sent, and production logs a warning at start.
+
+Used for:
+- Forgot password at `/admin/forgot`, which emails a link to `/admin/reset/:token`.
+- The invitation an owner gets when the operator creates a restaurant or adds an account, so the owner can choose a password instead of keeping the generated one. The generated password is still shown to the operator once, as a fallback if the mail does not arrive.
+- A reset link when the operator resets an owner's password.
+
+Platform operators have no email reset yet. Reset one with `npm run super:create`.
+
 ## Left for later
 
-- Two factor sign in for super admins.
-- Emails: renewal reminders, receipts, the owner's first password.
+- Two factor sign in for super admins, and a reset flow for them.
+- More emails: renewal reminders and receipts. They need a scheduled job.
 - Support sign in as an owner.
 - Per plan branding limits and per tenant domains.
 - A shared store for the in memory rate limiters before running more than one instance.

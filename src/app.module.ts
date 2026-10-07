@@ -9,6 +9,7 @@ import { LocaleViewMiddleware } from './common/middleware/locale-view.middleware
 import { AdminAuthMiddleware } from './auth/admin-auth.middleware';
 import { AdminLocalsMiddleware } from './auth/admin-locals.middleware';
 import { AuthModule } from './auth/auth.module';
+import { MailModule } from './mail/mail.module';
 import { CsrfViewMiddleware } from './auth/csrf-view.middleware';
 import { AdminModule } from './admin/admin.module';
 import { HomeModule } from './home/home.module';
@@ -38,6 +39,7 @@ import { StyleguideModule } from './styleguide/styleguide.module';
       ],
     }),
     PrismaModule,
+    MailModule,
     TenancyModule,
     SuperAdminModule,
     HomeModule,
@@ -61,10 +63,16 @@ export class AppModule implements NestModule {
     // the comment there for why (error pages rendered by middleware that
     // runs before this one need `t` to already be set).
     consumer.apply(CsrfViewMiddleware).forRoutes('*');
-    consumer.apply(AdminAuthMiddleware).exclude('admin/login', 'admin/logout').forRoutes('admin');
+    consumer
+      .apply(AdminAuthMiddleware)
+      .exclude('admin/login', 'admin/logout', 'admin/forgot', 'admin/reset/(.*)')
+      .forRoutes('admin');
     consumer.apply(FlashMiddleware).forRoutes('super');
     consumer.apply(SuperAdminAuthMiddleware).exclude('super/login').forRoutes('super');
-    consumer.apply(TenantContextMiddleware).exclude('admin/login').forRoutes('admin');
+    consumer
+      .apply(TenantContextMiddleware)
+      .exclude('admin/login', 'admin/forgot', 'admin/reset/(.*)')
+      .forRoutes('admin');
     consumer.apply(AdminLocalsMiddleware).forRoutes('admin');
   }
 }

@@ -193,6 +193,8 @@ model AdminUser {
   /// restaurantSlug/adminName in AdminLocalsMiddleware.
   hasSeenTour Boolean @default(false)
 
+  passwordResets PasswordResetToken[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -593,4 +595,19 @@ model AuditLog {
 
   @@index([restaurantId, createdAt])
   @@index([createdAt])
+}
+
+/// One use link to choose a new password. Only a hash of the token is kept, so a
+/// copy of the database cannot be used to take over an account.
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  adminUserId String
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+
+  @@index([adminUserId])
 }

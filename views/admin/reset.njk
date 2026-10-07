@@ -1,0 +1,27 @@
+{% extends "layouts/base.njk" %}
+
+{% from "components/input.njk" import input %}
+{% from "components/button.njk" import button %}
+
+{% block title %}{{ t('common.admin.auth.resetTitle') }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-sm rounded-xl border border-border bg-surface p-8 shadow-raised">
+  <h1 class="font-sans text-2xl font-bold text-text">{{ t('common.admin.auth.resetTitle') }}</h1>
+
+  {% if invalid %}
+    <p class="mt-4 rounded-md bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">{{ t('common.admin.auth.resetInvalid') }}</p>
+    <a href="/admin/forgot" class="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline">{{ t('common.admin.auth.forgotSubmit') }}</a>
+  {% else %}
+    {% if error %}
+      <p class="mt-4 rounded-md bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">{{ error }}</p>
+    {% endif %}
+    <form method="post" action="/admin/reset/{{ token }}" class="mt-6 flex flex-col gap-4">
+      <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+      {{ input('password', t('common.admin.auth.newPassword'), 'password', '', '', fieldErrors.password, t('common.admin.auth.passwordHint'), 'required minlength="10" autocomplete="new-password"') }}
+      {{ input('confirm', t('common.admin.auth.confirmPassword'), 'password', '', '', fieldErrors.confirm, none, 'required minlength="10" autocomplete="new-password"') }}
+      {{ button(t('common.admin.auth.resetSubmit'), 'primary', 'md', 'submit') }}
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

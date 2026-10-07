@@ -236,6 +236,15 @@ Left undone
 - Restaurants created through tests have no subscription row and count as unlimited. A real restaurant always gets one from the platform area.
 - The rate limiters are still in memory.
 
+## Phase H: email, password reset and invitations
+
+Gmail SMTP (app password) through a small `MailService`. Owners can reset their own password from `/admin/forgot`, and a restaurant the operator creates now emails its owner a link to choose a password.
+
+- New table `PasswordResetToken` (migration `20261009000000_add_password_reset`), hash only, single use, expiring.
+- Anti abuse: identical answer for known and unknown addresses, at most 5 mails per address and 20 requests per IP per 15 minutes, all sessions of the account are ended on a successful reset, a new request cancels the older link.
+- Tests: 13 e2e (known and unknown address, hashed storage, one use, session end, short and mismatched passwords, expired and malformed links, replaced link, rate limit, Arabic mail, invitation and operator reset) and 3 unit.
+- Not verified against real Gmail, because that needs the owner's app password. The transport is the standard nodemailer Gmail SMTP setup. Send yourself a reset mail after setting the two variables.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).

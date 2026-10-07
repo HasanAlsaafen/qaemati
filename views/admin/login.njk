@@ -15,6 +15,9 @@
       {{ t('common.admin.nav.dashboard') }}
     </a>
   {% else %}
+    {% if resetDone %}
+      <p class="mt-4 rounded-md bg-success/10 px-3 py-2 text-sm text-success" role="status">{{ t('common.admin.auth.resetDone') }}</p>
+    {% endif %}
     {% if error %}
       <p class="mt-4 rounded-md bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">{{ error }}</p>
     {% endif %}
@@ -28,6 +31,7 @@
 
       {{ button(t('common.admin.auth.submit'), 'primary', 'md', 'submit') }}
     </form>
+    <a href="/admin/forgot" class="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline">{{ t('common.admin.auth.forgotLink') }}</a>
   {% endif %}
 </div>
 {% endblock %}

@@ -23,11 +23,13 @@ export function flashSuccess(
   i18n: I18nService,
   key: string,
   secret?: Flash['secret'],
+  mailedTo?: string,
 ): void {
   req.session.flash = {
     type: 'success',
     message: translate(i18n, req, `super.flash.${key}`),
     secret,
+    mailedTo,
   };
 }
 

@@ -16,11 +16,15 @@ export class AuthController {
 
   @Get('login')
   @Render('admin/login')
-  loginForm(@Query('redirect') redirect: string | undefined, @Req() req: Request) {
+  loginForm(
+    @Query('redirect') redirect: string | undefined,
+    @Query('reset') reset: string | undefined,
+    @Req() req: Request,
+  ) {
     if (req.session.adminUserId) {
       return { alreadyLoggedIn: true, redirect: redirect ?? '/admin' };
     }
-    return { redirect: redirect ?? '/admin', email: '' };
+    return { redirect: redirect ?? '/admin', email: '', resetDone: reset === '1' };
   }
 
   @Post('login')

@@ -1,6 +1,9 @@
 import { Body, Controller, Get, Param, Post, Query, Render, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
+import { PasswordResetService } from '../auth/password-reset.service';
+import { MailService } from '../mail/mail.service';
+import { getBaseUrl } from '../seo/seo';
 import { PlanLimitException } from '../tenancy/tenancy.exceptions';
 import {
   ChangePlanDto,
@@ -20,7 +23,13 @@ export class SuperTenantsController {
     private readonly tenants: TenantsService,
     private readonly plans: PlansService,
     private readonly i18n: I18nService,
+    private readonly resets: PasswordResetService,
+    private readonly mail: MailService,
   ) {}
+
+  private locale(req: Request): 'ar' | 'en' {
+    return req.locale === 'en' ? 'en' : 'ar';
+  }
 
   @Get()
   @Render('super/tenants')
@@ -50,10 +59,15 @@ export class SuperTenantsController {
   ): Promise<void> {
     try {
       const { restaurant, password } = await this.tenants.create(actorOf(req), body);
-      flashSuccess(req, this.i18n, 'tenantCreated', {
-        label: body.adminEmail.trim().toLowerCase(),
-        value: password,
-      });
+      const email = body.adminEmail.trim().toLowerCase();
+      const mailed = await this.resets.sendInviteToEmail(email, getBaseUrl(req), this.locale(req));
+      flashSuccess(
+        req,
+        this.i18n,
+        'tenantCreated',
+        { label: email, value: password },
+        mailed ? email : undefined,
+      );
       res.redirect(303, `/super/restaurants/${restaurant.id}`);
     } catch (error) {
       if (error instanceof FieldError)
@@ -120,10 +134,15 @@ export class SuperTenantsController {
     const back = `/super/restaurants/${id}`;
     try {
       const password = await this.tenants.addAdmin(actorOf(req), id, body);
-      flashSuccess(req, this.i18n, 'adminCreated', {
-        label: body.email.trim().toLowerCase(),
-        value: password,
-      });
+      const email = body.email.trim().toLowerCase();
+      const mailed = await this.resets.sendInviteToEmail(email, getBaseUrl(req), this.locale(req));
+      flashSuccess(
+        req,
+        this.i18n,
+        'adminCreated',
+        { label: email, value: password },
+        mailed ? email : undefined,
+      );
       res.redirect(303, back);
     } catch (error) {
       if (error instanceof FieldError)
@@ -141,7 +160,15 @@ export class SuperTenantsController {
     @Res() res: Response,
   ): Promise<void> {
     const { email, password } = await this.tenants.resetAdminPassword(actorOf(req), id, adminId);
-    flashSuccess(req, this.i18n, 'passwordReset', { label: email, value: password });
+    await this.resets.requestReset(email, getBaseUrl(req), this.locale(req));
+    const mailed = this.mail.configured || process.env.NODE_ENV === 'test';
+    flashSuccess(
+      req,
+      this.i18n,
+      'passwordReset',
+      { label: email, value: password },
+      mailed ? email : undefined,
+    );
     res.redirect(303, `/super/restaurants/${id}`);
   }
 

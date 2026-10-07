@@ -101,6 +101,13 @@ down in `afterAll`, so files can run back-to-back without clobbering each other'
 - `prisma/` - Prisma schema and migrations
 - `docs/` - design system and progress notes
 
+## Email (Gmail)
+
+Password reset and owner invitations are sent through Gmail SMTP. Enable 2 step verification on the
+Google account, create an app password at https://myaccount.google.com/apppasswords and set
+`MAIL_USER` and `MAIL_APP_PASSWORD` in `.env`. Without them no mail is sent and development prints
+each message in the terminal. See `.env.example`.
+
 ## Platform admin (SaaS)
 
 Restaurants are tenants with plans, subscriptions and a manual payment ledger, run from `/super`

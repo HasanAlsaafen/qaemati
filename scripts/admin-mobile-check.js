@@ -42,6 +42,9 @@ const ADMIN = [
   ['analytics', '/admin/analytics?lang=en'],
   ['qr', '/admin/qr?lang=en'],
   ['qr-print', '/admin/qr/print?lang=en'],
+  ['forgot', '/admin/forgot?lang=en'],
+  ['forgot-ar', '/admin/forgot?lang=ar'],
+  ['reset-invalid', `/admin/reset/${'a'.repeat(64)}?lang=en`],
   ['billing', '/admin/billing?lang=en'],
   ['billing-ar', '/admin/billing?lang=ar'],
 ];

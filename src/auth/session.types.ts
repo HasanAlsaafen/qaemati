@@ -9,6 +9,8 @@ export interface Flash {
   values?: Record<string, unknown>;
   /** Shown once, for example a generated password. */
   secret?: { label: string; value: string };
+  /** The address a sign in link was emailed to, when mail is configured. */
+  mailedTo?: string;
 }
 
 declare module 'express-session' {

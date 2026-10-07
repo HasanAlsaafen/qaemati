@@ -38,4 +38,5 @@ Owner decisions from the audit approval, plus the defaults taken from section 9 
 34. Visitors reach a menu by path slug. Custom domains and subdomains are left as a documented seam.
 35. Platform operators live in their own table and session, so no restaurant account can become one. Passwords are generated and shown once.
 36. The demo reset confirmation moved from an inline handler, which the CSP blocks, to Alpine, because the destructive reset otherwise ran without asking.
-
+37. Email goes through Gmail SMTP with an app password (nodemailer), configured by MAIL_USER and MAIL_APP_PASSWORD. Without them nothing is sent and development prints the message. Gmail is fine for a launch but caps sending at roughly 500 messages a day, so move to a transactional provider when volume grows. Only the transport in `MailService` would change.
+38. Password links are random, single use, expire (60 minutes for a reset, 3 days for an invitation) and only a hash is stored. The reset form answers identically for known and unknown addresses, limits requests per address and per IP, and signs the account out of every open session when the password changes.

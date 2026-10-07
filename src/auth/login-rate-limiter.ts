@@ -18,7 +18,7 @@ interface Attempt {
 export class LoginRateLimiter {
   private readonly attempts = new Map<string, Attempt>();
 
-  isBlocked(key: string): boolean {
+  isBlocked(key: string, max = MAX_ATTEMPTS): boolean {
     const attempt = this.attempts.get(key);
     if (!attempt) return false;
 
@@ -27,7 +27,7 @@ export class LoginRateLimiter {
       return false;
     }
 
-    return attempt.count >= MAX_ATTEMPTS;
+    return attempt.count >= max;
   }
 
   recordFailure(key: string): void {

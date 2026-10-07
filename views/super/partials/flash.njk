@@ -13,5 +13,8 @@
       </p>
       <p class="mt-2 text-xs text-muted-text">{{ t('common.super.secretOnce') }}</p>
     {% endif %}
+    {% if flash.mailedTo %}
+      <p class="mt-2 text-text">{{ t('common.super.mailedTo', { email: flash.mailedTo }) }}</p>
+    {% endif %}
   </div>
 {% endif %}
