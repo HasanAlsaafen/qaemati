@@ -57,3 +57,6 @@ Owner decisions from the audit approval, plus the defaults taken from section 9 
 53. Self sign up creates nothing until the owner confirms their email, and uses no CAPTCHA at first: a confirmation step, a honeypot, a minimum fill time and rate limits are enough to start with, and the form answers the same for a known email so it cannot reveal customers. Add a CAPTCHA if bots get through.
 54. Restaurant creation lives in one `TenantProvisioner` used by the platform area and by self sign up.
 
+
+55. Reports cover table orders only and say so, because WhatsApp orders never reach the restaurant. Days are the restaurant's own (Asia/Hebron) and are grouped in the database, so the grouping and the range edges use one clock. Revenue excludes canceled orders and money is never added across currencies.
+

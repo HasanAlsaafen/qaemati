@@ -333,6 +333,14 @@ Order status for the guest, the first of five follow ups (guest status, staff ro
 - Tests: 33 e2e (form and plans, closing it, production without email, validation with kept values, taken and reserved addresses, replaced requests, known emails answered identically with no leak, creation, sign in afterwards, single use under concurrency, expired and malformed links, an address taken meanwhile, bots, rate limits per device and per inbox, CSRF). Browser: the form, the emailed link, confirming and landing in the admin with the tour, axe clean at 375 and 1280 in both languages.
 - Not done: a CAPTCHA, terms of service, and an email to you when someone signs up.
 
+## Phase O (5/5): reports
+
+- `/admin/reports` and `/admin/reports/export.csv` (`src/reports`): range parsing that refuses impossible dates, reversed or over a year ranges and SQL in the query (unit tested), aggregations done in SQL in the restaurant's time zone, a page with bars as semantic tables, and a spreadsheet safe CSV.
+- Found in the browser: the daily table was wider than a phone and the scroll area it sat in failed the accessibility rule, so the decorative bar column is hidden on small screens.
+- Tests: 19 + 6 unit (ranges, dates, CSV) and 25 e2e (totals excluding canceled and out of range orders, midnight in the restaurant's zone at both ends of a range, zero days, hours, dishes across sizes, tables, waiter call answer time, another restaurant never counted, mixed currencies, empty state, Arabic, bad ranges and an injection attempt, the CSV file and formula defusing, who can open it). Browser: axe clean at 375 and 1280 in both languages, no horizontal scroll.
+
+All five follow ups are now done: guest order status, cashier and kitchen accounts, renewal reminders and receipts, self sign up, reports.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).

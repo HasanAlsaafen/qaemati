@@ -330,7 +330,8 @@
       "toggleSidebar": "Collapse sidebar",
       "billing": "Subscription",
       "pos": "Orders",
-      "team": "Team"
+      "team": "Team",
+      "reports": "Reports"
     },
     "form": {
       "required": "This field is required.",
@@ -637,6 +638,42 @@
       "secretTitle": "Give them these sign in details",
       "secretOnce": "The password is shown only now.",
       "mailed": "A link to choose their own password was also emailed to {email}."
+    },
+    "reports": {
+      "title": "Reports",
+      "scope": "Numbers for orders sent from tables, in your restaurant's own time. Orders sent on WhatsApp are not counted, because the restaurant never sees them. Canceled orders are not in the revenue.",
+      "export": "Download CSV",
+      "rangeLabel": "Period",
+      "presettoday": "Today",
+      "preset7d": "7 days",
+      "preset30d": "30 days",
+      "preset90d": "90 days",
+      "from": "From",
+      "to": "To",
+      "show": "Show",
+      "empty": "No table orders in this period.",
+      "orders": "Orders",
+      "revenue": "Revenue",
+      "average": "Average order",
+      "items": "Dishes sold",
+      "canceled": "Canceled",
+      "revenueNote": "Revenue and averages count orders that were not canceled.",
+      "mixedNote": "Orders in more than one currency were found, only the busiest currency is added up here.",
+      "perDay": "Orders per day",
+      "date": "Date",
+      "share": "Share of the busiest day",
+      "perHour": "Busiest hours",
+      "topDishes": "Most ordered dishes",
+      "dish": "Dish",
+      "sold": "Sold",
+      "topTables": "Busiest tables",
+      "table": "Table",
+      "calls": "Waiter calls",
+      "callsTotal": "Calls",
+      "callsAnswer": "Average time to answer",
+      "seconds": "{n} seconds",
+      "minutes": "{n} minutes",
+      "none": "Nothing in this period."
     }
   },
   "validation": {

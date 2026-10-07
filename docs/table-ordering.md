@@ -30,6 +30,16 @@ Order steps: New, Preparing, Ready, Served, and Canceled from any of the first t
 
 Waiter calls: Open, On my way (stops the sound), Done. A second tap from the same table while a call is open does not make a second call.
 
+## Reports
+
+`/admin/reports` (owners only, plans with analytics). Numbers for **table orders** in the restaurant's own time (Asia/Hebron), for today, the last 7, 30 or 90 days, or any range of up to a year:
+
+- Orders, revenue, average order, dishes sold, and canceled orders with their share. Canceled orders are never in the revenue.
+- Orders and revenue per day (days with nothing show as zero), the busiest hours, the most ordered dishes (sizes of one dish add up as that dish), the busiest tables, and waiter calls with the average time to answer.
+- **Download CSV**: one row per ordered dish for the chosen period, canceled orders included and marked, for accounting. It opens correctly in Excel in Arabic, and any cell that begins with `=`, `+`, `-` or `@` is defused so a dish named like a formula cannot run anything.
+- Orders sent on WhatsApp are not counted, because the restaurant never sees them. If orders in more than one currency exist only the busiest currency is added up, and the page says so.
+- A day is the restaurant's day: an order placed at 00:30 local time is on the new day even though it is still the previous day in UTC. This is tested around midnight at both ends of a range.
+
 ## Is the guest at the restaurant
 
 Settings are under "Location check" on the POS page: the restaurant's latitude and longitude (with a "use my current location" button to fill them from the phone you are holding), a radius in meters (30 to 2000, 150 by default) and an on/off switch.
