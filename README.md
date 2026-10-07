@@ -101,6 +101,11 @@ down in `afterAll`, so files can run back-to-back without clobbering each other'
 - `prisma/` - Prisma schema and migrations
 - `docs/` - design system and progress notes
 
+## Deploying
+
+Dockerfile, a production compose file with automatic HTTPS, backup and restore scripts and a CI
+workflow are included. See `docs/deployment.md`.
+
 ## Email (Gmail)
 
 Password reset and owner invitations are sent through Gmail SMTP. Enable 2 step verification on the

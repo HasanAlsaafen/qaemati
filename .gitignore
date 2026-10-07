@@ -14,3 +14,5 @@ coverage/
 # Claude Code skill-sync artifacts (from /reload-skills), not project content.
 .agents/
 skills-lock.json
+backups/
+.env.production

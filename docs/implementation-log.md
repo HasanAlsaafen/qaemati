@@ -253,6 +253,13 @@ The login, password reset and POST limiters counted in memory, so a restart clea
 - Tests use an in memory store per app, because they hammer limits on purpose and a database counter would carry over between runs. The database store has its own e2e suite: counting, sharing between instances, 25 simultaneous hits counted exactly, window expiry, reset, purge.
 - Checked by hand on a real process: six wrong sign ins on port 3111 locked the account, and after killing and restarting the process it was still locked.
 
+## Phase J: deployment, backups and CI
+
+Dockerfile (runs migrations on start, health check, non root, uploads volume), `docker-compose.prod.yml` (app, Postgres not exposed, Caddy with automatic HTTPS), `.env.production.example`, `scripts/backup.sh` and `scripts/restore.sh`, a GitHub Actions workflow (lint, types, build, contrast, unit, migrations, e2e) and `docs/deployment.md` with the first deployment, updates, nightly backup, restore rehearsal and a pre launch checklist.
+
+- Verified: a real backup of the dev database restored into a scratch database with identical counts for restaurants, dishes, payments, owners and subscriptions; retention kept only the newest N; the restore refuses without typing the confirmation; the compose file renders; shell syntax and the CI YAML parse.
+- Not verified: the image build, the running container and the certificate step (no Docker daemon access here), and the CI run on GitHub. The first real build may need a small fix.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).

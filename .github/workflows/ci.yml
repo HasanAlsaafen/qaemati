@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: qaemati
+          POSTGRES_PASSWORD: qaemati
+          POSTGRES_DB: qaemati_test
+        ports:
+          - 5435:5432
+        options: >-
+          --health-cmd "pg_isready -U qaemati"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://qaemati:qaemati@localhost:5435/qaemati_test?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm run build
+      - run: npm run contrast:check
+      - run: npx jest
+      - run: npx prisma migrate deploy
+      - run: cp .env.test.example .env.test
+      - run: npm run test:e2e
