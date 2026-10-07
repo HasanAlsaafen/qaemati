@@ -17,7 +17,7 @@ describe('Demo mode (e2e)', () => {
   let agent: ReturnType<typeof request.agent>;
 
   async function csrfToken(): Promise<string> {
-    const res = await agent.get('/?lang=en').set('Cookie', 'qaemati_locale=en');
+    const res = await agent.get('/admin/login?lang=en').set('Cookie', 'qaemati_locale=en');
     return /name="csrf_token" value="([^"]*)"/.exec(res.text)?.[1] ?? '';
   }
 
@@ -34,10 +34,17 @@ describe('Demo mode (e2e)', () => {
     await app.close();
   });
 
-  it('shows the demo panel on the home page', async () => {
+  it('keeps demo logins and the reset button off the landing page', async () => {
     const res = await agent.get('/?lang=en').set('Cookie', 'qaemati_locale=en');
     expect(res.status).toBe(200);
-    expect(res.text).toContain('Try the admin panel');
+    for (const text of [
+      'Try it yourself',
+      'Qaemati@Demo123',
+      'super@qaemati.example.com',
+      '/demo/reset',
+    ]) {
+      expect(res.text).not.toContain(text);
+    }
   });
 
   it('re-seeds the demo restaurants on reset and redirects with a success flag', async () => {
@@ -74,25 +81,9 @@ describe('Demo mode (e2e)', () => {
     await deleteTestRestaurant(prisma, throwaway.id);
   });
 
-  it('shows the credentials for a seeded restaurant and the success banner after a reset redirect', async () => {
+  it('still renders the landing page after a reset redirect', async () => {
     const res = await agent.get('/?demoReset=success&lang=en').set('Cookie', 'qaemati_locale=en');
-    expect(res.text).toContain('Demo data has been reset');
-    expect(res.text).toContain('Qaemati@Demo123');
-    expect(res.text).toContain('admin@baytalzaytoun.example.com');
-  });
-
-  it('asks for confirmation before a reset through a handler the CSP allows', async () => {
-    const res = await agent.get('/?lang=en').set('Cookie', 'qaemati_locale=en');
-    // An inline onsubmit is blocked by script-src-attr 'none', so the reset
-    // would have run with no question.
-    expect(res.text).not.toContain('onsubmit=');
-    expect(res.text).toContain('x-on:submit="if (!confirm(');
-    expect(res.headers['content-security-policy']).toContain("script-src-attr 'none'");
-  });
-
-  it('lists the platform admin demo login', async () => {
-    const res = await agent.get('/?lang=en').set('Cookie', 'qaemati_locale=en');
-    expect(res.text).toContain('super@qaemati.example.com');
-    expect(res.text).toContain('/super/login');
+    expect(res.status).toBe(200);
+    expect(res.text).not.toContain('Qaemati@Demo123');
   });
 });

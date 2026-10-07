@@ -1,17 +1,17 @@
 /**
- * Generates a deterministic gradient SVG placeholder for seed data, so demo
+ * Generates a deterministic flat color SVG placeholder for seed data, so demo
  * items and restaurant logos never depend on real (and possibly
  * copyrighted) photography. Same input string always produces the same
- * gradient, so re-running the seed produces identical output.
+ * color, so re-running the seed produces identical output.
  */
 
-const GRADIENT_PAIRS: [string, string][] = [
-  ['#1565C0', '#4A8FD8'], // primary blue
-  ['#07808D', '#3FB0BD'], // teal
-  ['#9A5700', '#E58A00'], // secondary-text to a deeper orange
-  ['#E2B04A', '#F0CC80'], // gold
-  ['#0F52A0', '#1565C0'], // primary-hover to primary
-  ['#2E7D4F', '#52A374'], // success
+const COLORS = [
+  '#1565C0', // primary blue
+  '#07808D', // teal
+  '#9A5700', // secondary-text
+  '#B7871F', // gold, darkened so the glyph stays visible
+  '#0F52A0', // primary-hover
+  '#2E7D4F', // success
 ];
 
 // Material Symbols "restaurant" glyph (fork and knife), 24x24 viewBox,
@@ -40,18 +40,10 @@ function hashString(value: string): number {
 }
 
 function buildSvg(seed: string, iconPath: string, iconScale: number): string {
-  const pair = GRADIENT_PAIRS[hashString(seed) % GRADIENT_PAIRS.length];
-  const [from, to] = pair;
-  const angle = hashString(seed + 'angle') % 360;
+  const color = COLORS[hashString(seed) % COLORS.length];
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
-  <defs>
-    <linearGradient id="g" gradientTransform="rotate(${angle} 0.5 0.5)">
-      <stop offset="0%" stop-color="${from}" />
-      <stop offset="100%" stop-color="${to}" />
-    </linearGradient>
-  </defs>
-  <rect width="480" height="480" fill="url(#g)" />
+  <rect width="480" height="480" fill="${color}" />
   <circle cx="240" cy="240" r="170" fill="#FFFFFF" fill-opacity="0.1" />
   <circle cx="240" cy="240" r="170" fill="none" stroke="#FFFFFF" stroke-opacity="0.22" stroke-width="2" />
   <g transform="translate(240,240) scale(${iconScale}) translate(-12,-12)" fill="#FFFFFF" fill-opacity="0.55">

@@ -281,6 +281,15 @@ The home page is now a bilingual marketing page for the product: hero with a pho
 - Found on the way: Nunjucks does not allow a chained inline `if ... else ... if`, and a crashed test run left a fixture restaurant in the test database that blocked the next run (removed by hand).
 - Not done: a real product photo or screenshot (the phone is drawn from the page's own colors), a contact form, and a public sign up. The contact buttons are the only way in until you decide on self signup.
 
+## Phase M: landing page rework
+
+- The phone is an iPhone drawn at real proportions (390 x 844 screen, bezel, Dynamic Island, status bar, side buttons, home indicator) around an iframe of an existing live demo menu in the visitor's language. On desktop it is interactive, below 1024px a link covers it so a tap opens the real menu and the page keeps scrolling. It appears only when the chosen menu exists, has a menu and is not switched off, so it is never faked. `public/js/landing.js` reloads the frame if its first navigation is dropped (seen when a service worker takes over the page as it loads).
+- AI-tells audit of the landing page against `docs/ux/ai-tells.md`, and fixes: gradient hero (removed), 9 icon cards in a grid (now a definition list), 3 identical step cards with number circles (now a ruled list), three plan cards with a "Most popular" badge that had no data behind it (now a price list, no badge), check mark bullets and an eyebrow pill (now one plain sentence), generic headlines and unverifiable claims such as "built with restaurant owners" (rewritten), a gradient on the phone frame (flat), blur on the header (solid), shadows on buttons (gone), and the same section padding everywhere (varied, with a two column header layout).
+- Gradients removed from the seed placeholder images too (flat color now, the existing local seed files were flattened in place). The dot, grid and stripe background options in `app.css` use gradient syntax only to draw flat repeating lines, so they stay.
+- " -- " used as a dash in older admin copy was replaced in both languages.
+- "Try it yourself" section removed, with the demo logins and reset button on the home page. The reset endpoint still exists (for the demo host) and is tested.
+- Tests: landing e2e is 21 cases (phone is live, localized, left to right in Arabic, absent when there is nothing real to show or the restaurant is suspended, framing allowed only by the same origin, no template tells in either language, no gradient anywhere in the page, no demo section in any mode) plus a seed placeholder unit test.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).

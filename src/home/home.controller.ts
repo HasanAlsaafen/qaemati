@@ -1,15 +1,33 @@
-import { Controller, Get, Query, Render, Req } from '@nestjs/common';
+import { Controller, Get, Render, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { PrismaService } from '../prisma/prisma.service';
 import { isDemoModeEnabled } from '../common/demo-mode';
 import { thmanyahEnabled } from '../common/thmanyah';
 import { getBaseUrl, serializeJsonLd } from '../seo/seo';
+import { TenancyService } from '../tenancy/tenancy.service';
+import { isServable } from '../tenancy/tenant-access';
 import { landingContact, toLandingPlans } from './landing';
-import { DEMO_ADMIN_PASSWORD, DEMO_SUPER_ADMIN_EMAIL } from '../prisma-seed/run-seed';
 
 @Controller()
 export class HomeController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly tenancy: TenancyService,
+  ) {}
+
+  /** A menu the landing page can show live: it exists, and it is not switched off. */
+  private async liveDemoSlug(candidates: (string | undefined)[]): Promise<string | null> {
+    for (const slug of candidates) {
+      if (!slug) continue;
+      const restaurant = await this.prisma.restaurant.findUnique({
+        where: { slug },
+        select: { id: true, menus: { select: { id: true }, take: 1 } },
+      });
+      if (!restaurant || restaurant.menus.length === 0) continue;
+      if (isServable((await this.tenancy.getContext(restaurant.id)).access)) return slug;
+    }
+    return null;
+  }
 
   /** B4: the service worker's offline fallback (public/sw.js) serves
    *  this page -- precached at install time -- for any navigation that
@@ -22,33 +40,32 @@ export class HomeController {
     return {};
   }
 
+  /** On a demo site the sample restaurants, so the phone has a menu to show. */
+  private async demoSlugs(): Promise<string[]> {
+    const rows = await this.prisma.restaurant.findMany({
+      select: { slug: true },
+      orderBy: { nameEn: 'asc' },
+    });
+    return rows.map((row) => row.slug);
+  }
+
   @Get()
   @Render('pages/home')
-  async index(@Query('demoReset') demoReset: string | undefined, @Req() req: Request) {
+  async index(@Req() req: Request) {
     const locale = req.locale === 'en' ? 'en' : 'ar';
     const demoMode = isDemoModeEnabled();
     const baseUrl = getBaseUrl(req);
 
-    // Other customers' restaurants are listed only on a demo site. A real
-    // deployment never advertises who its customers are.
-    const restaurants = demoMode
-      ? await this.prisma.restaurant.findMany({
-          select: {
-            slug: true,
-            nameAr: true,
-            nameEn: true,
-            adminUsers: { select: { email: true }, take: 1 },
-          },
-          orderBy: { nameEn: 'asc' },
-        })
-      : [];
     const plans = await this.prisma.plan.findMany({
       where: { isActive: true },
       orderBy: [{ sortOrder: 'asc' }, { priceAmount: 'asc' }],
     });
     const landingPlans = toLandingPlans(plans, locale);
     const contact = landingContact();
-    const demoSlug = process.env.LANDING_DEMO_SLUG?.trim() || restaurants[0]?.slug || null;
+    const demoSlug = await this.liveDemoSlug([
+      process.env.LANDING_DEMO_SLUG?.trim(),
+      ...(demoMode ? await this.demoSlugs() : []),
+    ]);
 
     return {
       seo: {
@@ -75,15 +92,6 @@ export class HomeController {
       contact,
       demoSlug,
       year: new Date().getFullYear(),
-      restaurants: restaurants.map((restaurant) => ({
-        slug: restaurant.slug,
-        name: locale === 'ar' ? restaurant.nameAr : restaurant.nameEn,
-        demoAdminEmail: restaurant.adminUsers?.[0]?.email ?? null,
-      })),
-      demoMode,
-      demoAdminPassword: demoMode ? DEMO_ADMIN_PASSWORD : null,
-      demoSuperAdminEmail: demoMode ? DEMO_SUPER_ADMIN_EMAIL : null,
-      demoResetSucceeded: demoReset === 'success',
     };
   }
 }

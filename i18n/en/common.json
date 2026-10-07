@@ -6,59 +6,30 @@
     "title": "Qaemati demo restaurants",
     "subtitle": "Two sample menus, built to show what a restaurant’s own Qaemati menu looks like.",
     "description": "Pick a restaurant to open its live menu:",
-    "demo": {
-      "panelTitle": "Try the admin panel",
-      "panelDescription": "This is a demo environment. Sign in to either restaurant's admin panel with the credentials below -- no account needed.",
-      "emailLabel": "Email",
-      "passwordLabel": "Password",
-      "loginLink": "Go to admin login",
-      "resetButton": "Reset demo data",
-      "resetConfirm": "This restores both demo restaurants to their original sample menus and undoes any changes made in the admin panel. Continue?",
-      "resetSuccessMessage": "Demo data has been reset.",
-      "platformTitle": "Platform admin",
-      "platformHint": "Subscriptions, plans and payments for every restaurant.",
-      "platformLink": "Go to platform sign in"
-    },
     "landing": {
       "metaTitle": "Qaemati: digital QR menus for restaurants and cafes",
-      "metaDescription": "A fast, beautiful menu in Arabic and English for your restaurant. Guests scan a QR code, browse and send their order on WhatsApp. You edit it from your phone.",
+      "metaDescription": "Put your restaurant's menu on your guests' phones in Arabic and English. They scan a QR code, browse and send their order to your WhatsApp. You edit it from your phone.",
       "nav": {
-        "features": "Features",
+        "features": "What you get",
         "how": "How it works",
-        "pricing": "Pricing",
-        "faq": "FAQ",
+        "pricing": "Plans",
+        "faq": "Questions",
         "signIn": "Owner sign in",
-        "menu": "Menu",
-        "demo": "Try the demo"
+        "menu": "Menu"
       },
       "hero": {
-        "eyebrow": "Digital menus for restaurants and cafes",
         "title": "Your menu, one scan away.",
-        "text": "Qaemati gives every restaurant a fast, beautiful menu in Arabic and English. Guests scan a QR code, browse and send their order on WhatsApp. You change prices and dishes in seconds, from your phone.",
+        "text": "Qaemati puts your restaurant's menu on your guests' phones, in Arabic and English. They scan a QR code, browse, and send their order to your WhatsApp. You edit prices and dishes from your own phone.",
+        "note": "No app to install. No commission on orders. Nothing you create is ever deleted.",
         "primary": "Get in touch",
         "primaryTrial": "Start your free trial",
-        "secondary": "See a live menu",
-        "points": [
-          "No app to install for guests",
-          "No commission on orders",
-          "Your data is never deleted"
-        ]
-      },
-      "mock": {
-        "search": "Search the menu",
-        "all": "All",
-        "starters": "Starters",
-        "grill": "Grill",
-        "drinks": "Drinks",
-        "sweets": "Sweets",
-        "d1": "Hummus",
-        "d2": "Falafel",
-        "d3": "Mint lemonade",
-        "d4": "Knafeh"
+        "secondary": "Open the live menu",
+        "phoneDesktop": "This is a real menu. Scroll it, search it, open a dish.",
+        "phoneTouch": "This is a real menu. Tap the phone to open it.",
+        "phoneTitle": "A live sample menu, shown inside a phone"
       },
       "how": {
-        "title": "Up and running in an afternoon",
-        "intro": "No developer, no hardware, no contract to sign before you try it.",
+        "title": "How it works",
         "steps": [
           {
             "title": "Add your menu",
@@ -66,90 +37,82 @@
           },
           {
             "title": "Print your QR codes",
-            "text": "One code for the whole restaurant, or one per table. Print-ready sheets are one click away."
+            "text": "One for the whole restaurant, or one for each table. Print-ready sheets are one click away."
           },
           {
             "title": "Guests scan and order",
-            "text": "The menu opens instantly on any phone. They pick dishes and send the order straight to your WhatsApp."
+            "text": "The menu opens on any phone, with no app. Guests pick their dishes and send the order to your WhatsApp."
           }
         ]
       },
       "features": {
-        "title": "Everything a menu should do",
-        "intro": "Built with restaurant owners, for the way guests actually use their phones.",
+        "title": "What you get",
         "items": [
           {
-            "title": "Arabic first, English too",
-            "text": "Every page works right to left and left to right. Guests switch language in one tap."
+            "title": "Arabic and English",
+            "text": "Every page works right to left and left to right. Guests switch language with one tap."
           },
           {
-            "title": "A QR code for every table",
-            "text": "Print-ready codes per table, so each WhatsApp order arrives with the table number."
+            "title": "A QR code for each table",
+            "text": "Print-ready codes per table, so a WhatsApp order arrives with the table number."
           },
           {
             "title": "Orders on WhatsApp",
-            "text": "Guests choose dishes and send a ready message. Nothing to set up, no payment fees."
+            "text": "Guests build a selection and send it as a ready message. There is nothing to connect and no payment fee."
           },
           {
-            "title": "Several menus, real hours",
-            "text": "Breakfast, lunch, drinks. Show each menu and category only when you serve it."
+            "title": "Several menus",
+            "text": "Breakfast, lunch, drinks. Each menu and each category has its own opening hours."
           },
           {
-            "title": "Edit in seconds",
-            "text": "Change a price, hide a sold out dish or mark today's special. It is live at once."
+            "title": "Edits go live at once",
+            "text": "Change a price, hide a dish that sold out, or mark today's special. Guests see it straight away."
           },
           {
             "title": "Bulk tools",
-            "text": "Change prices by a percentage, import and export CSV, duplicate dishes and undo the last change."
+            "text": "Change prices by a percentage, import and export CSV, duplicate dishes, undo the last change."
           },
           {
-            "title": "Your brand, readable",
-            "text": "Your logo, cover, colors and fonts, with contrast kept readable automatically."
+            "title": "Your branding",
+            "text": "Your logo, cover, colors and font. The menu keeps text readable whatever colors you pick."
           },
           {
-            "title": "See what guests open",
-            "text": "Learn which dishes and categories get the most attention."
+            "title": "Insights",
+            "text": "See which dishes and categories your guests open most."
           },
           {
-            "title": "Fast, even offline",
-            "text": "Loads quickly on slow mobile data, installs like an app and still opens without a connection."
+            "title": "Works on a weak connection",
+            "text": "Pages are small, the menu can be installed like an app, and it opens again without a connection."
           }
         ]
       },
       "pricing": {
-        "title": "Simple prices",
-        "intro": "Pick a plan, change it any time. Every plan includes Arabic and English menus and QR codes.",
+        "title": "Plans",
+        "intro": "Every plan includes menus in Arabic and English and QR codes. You can change plan later.",
         "month": "month",
         "year": "year",
         "trial": "{days} days free",
-        "popular": "Most popular",
         "menus": "Menus",
         "categories": "Categories",
         "dishes": "Dishes",
         "admins": "Owner accounts",
-        "unlimited": "Unlimited",
-        "upTo": "Up to {count}",
+        "unlimited": "unlimited",
+        "upTo": "up to {count}",
+        "includes": "Includes",
+        "excludes": "Not included",
         "features": {
-          "whatsappOrdering": "Order selection on WhatsApp",
+          "whatsappOrdering": "WhatsApp selection",
           "bulkTools": "Bulk tools and CSV",
           "analytics": "Insights"
         },
-        "included": "Included",
-        "notIncluded": "Not included",
         "cta": "Choose this plan"
       },
-      "demo": {
-        "title": "Try it yourself",
-        "intro": "This is a demo environment with sample restaurants. Open a live menu, or sign in to the admin with the details below.",
-        "menus": "Live sample menus",
-        "panelTitle": "Try the admin panel"
-      },
       "faq": {
-        "title": "Questions owners ask",
+        "title": "Questions",
         "items": [
           {
             "q": "Do my guests need to install an app?",
-            "a": "No. The menu opens in the phone's browser after scanning the code, and it can be added to the home screen if they like."
+            "a": "No. The menu opens in the phone's browser after scanning the code, and they can add it to the home screen if they like."
           },
           {
             "q": "Can the menu be in Arabic and English?",
@@ -165,7 +128,7 @@
           },
           {
             "q": "Do you take a commission on orders?",
-            "a": "No. Orders go straight from your guest to your WhatsApp. You only pay your plan."
+            "a": "No. Orders go straight from your guest to your WhatsApp. You only pay for your plan."
           },
           {
             "q": "What happens if I stop paying?",
@@ -178,10 +141,9 @@
         ]
       },
       "cta": {
-        "title": "Ready to put your menu on every table?",
-        "text": "Tell us about your restaurant and we will set up your menu with you.",
-        "button": "Get in touch",
-        "signIn": "Already a customer? Sign in"
+        "title": "Put your menu on the tables.",
+        "text": "Write to us with your restaurant's name.",
+        "button": "Get in touch"
       },
       "contact": {
         "email": "Email us",
@@ -342,7 +304,7 @@
       "tagsLabel": "Tags",
       "allergenNoteArLabel": "Allergen note (Arabic)",
       "allergenNoteEnLabel": "Allergen note (English)",
-      "allergenNoteHint": "Optional -- for anything the tags above don't cover, e.g. \"fried in the same oil as shellfish.\"",
+      "allergenNoteHint": "Optional: for anything the tags above don't cover, e.g. \"fried in the same oil as shellfish.\"",
       "moveUp": "Move up",
       "moveDown": "Move down",
       "dragToReorder": "Drag to reorder"
@@ -464,8 +426,8 @@
       "appearanceTitle": "Appearance",
       "primaryColorLabel": "Primary color",
       "primaryColorHint": "Used for buttons and highlights on your public menu. Must stay readable with white text.",
-      "contrastPassLabel": "{ratio}:1 contrast with white text -- passes AA",
-      "contrastFailLabel": "{ratio}:1 contrast with white text -- too light, pick a darker color",
+      "contrastPassLabel": "{ratio}:1 contrast with white text, passes AA",
+      "contrastFailLabel": "{ratio}:1 contrast with white text, too light, pick a darker color",
       "resetColor": "Reset to default",
       "logoLabel": "Logo",
       "coverImageLabel": "Cover image",
@@ -536,13 +498,13 @@
       "done": "Done",
       "stepLabel": "Step {current} of {total}",
       "step1Title": "Your menu is ready",
-      "step1Body": "This dashboard is where you manage your categories and items. Add a category, then add items to it -- every change appears on your public menu immediately.",
+      "step1Body": "This dashboard is where you manage your categories and items. Add a category, then add items to it, every change appears on your public menu immediately.",
       "step2Title": "Specials, variants, and add-ons",
       "step2Body": "Open any item to set sizes (variants), extras (add-ons), or mark it as today's special. Categories can also have their own time window, e.g. a Breakfast category shown only in the morning.",
       "step3Title": "QR codes",
-      "step3Body": "The QR codes page generates a printable code for your tables and a general one for your door or receipts -- each one opens your public menu directly.",
+      "step3Body": "The QR codes page generates a printable code for your tables and a general one for your door or receipts, each one opens your public menu directly.",
       "step4Title": "Branding",
-      "step4Body": "The Branding page is where you set your logo, cover image, primary color, and currency -- your public menu picks these up automatically."
+      "step4Body": "The Branding page is where you set your logo, cover image, primary color, and currency, your public menu picks these up automatically."
     },
     "menus": {
       "tabsLabel": "Menus",

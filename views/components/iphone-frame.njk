@@ -1,0 +1,32 @@
+{#
+  An iPhone drawn at its real proportions (a 390 x 844 screen, a 12px titanium
+  bezel, the Dynamic Island, the status bar, the side buttons and the home
+  indicator) and scaled with --s. The screen is a live page, not a picture.
+  The frame is physical, so it stays left to right in an Arabic page.
+  On small screens a link covers the screen so a tap opens the real page,
+  because scrolling inside a small frame would trap the visitor's scroll.
+#}
+{% macro iphoneFrame(src, title, openLabel) %}
+  <div class="iphone" dir="ltr">
+    <div class="iphone__body">
+      <span class="iphone__button" style="top:128px;height:30px"></span>
+      <span class="iphone__button" style="top:186px;height:58px"></span>
+      <span class="iphone__button" style="top:256px;height:58px"></span>
+      <span class="iphone__button iphone__button--right" style="top:214px;height:92px"></span>
+      <div class="iphone__screen">
+        <div class="iphone__status" aria-hidden="true">
+          <span class="iphone__time">9:41</span>
+          <span class="iphone__icons">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+            <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1.5 4.2a10 10 0 0 1 14 0M4 7a6.4 6.4 0 0 1 9 0"/><circle cx="8.5" cy="10" r="1.2" fill="currentColor" stroke="none"/></svg>
+            <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3.6" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="19" height="9" rx="2.4" fill="currentColor"/><path d="M24.2 4.4v4.2c.9-.3 1.6-1.2 1.6-2.1s-.7-1.8-1.6-2.1z" fill="currentColor" opacity=".5"/></svg>
+          </span>
+        </div>
+        <span class="iphone__island" aria-hidden="true"></span>
+        <iframe src="{{ src }}" title="{{ title }}" loading="lazy" class="iphone__page"></iframe>
+        <a href="{{ src }}" class="iphone__cover" aria-label="{{ openLabel }}"></a>
+        <span class="iphone__home" aria-hidden="true"></span>
+      </div>
+    </div>
+  </div>
+{% endmacro %}

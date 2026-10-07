@@ -21,7 +21,7 @@ A single server (a small VPS is enough to start) runs three containers: the app,
 
 Optional: restrict the platform area to your own addresses with `SUPER_ALLOWED_IPS` in `.env.production` (see `docs/saas-architecture.md`).
 
-`DEMO_MODE` is forced off in the compose file, so the demo panel and the reset endpoint do not exist in production. Do not run the seed there: it wipes data.
+`DEMO_MODE` is forced off in the compose file, so the demo reset endpoint does not exist in production. Do not run the seed there: it wipes data.
 
 ## Updating
 

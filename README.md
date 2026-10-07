@@ -51,7 +51,7 @@ Nunjucks templates, Tailwind CSS, Prisma/PostgreSQL, and bilingual (Arabic/Engli
    npm run start:dev
    ```
 
-6. Open http://localhost:3000 for the home page (lists the seeded demo menus), or go straight to
+6. Open http://localhost:3000 for the landing page (its phone shows a live demo menu), or go straight to
    a menu: http://localhost:3000/m/bayt-al-zaytoun or http://localhost:3000/m/al-sanabel. Arabic
    is the default language; the switcher sets a cookie that persists the choice.
 
@@ -72,7 +72,7 @@ Nunjucks templates, Tailwind CSS, Prisma/PostgreSQL, and bilingual (Arabic/Engli
 
 ## Running the e2e tests
 
-The e2e suite runs against its own database (`qaemati_test`), never the dev `qaemati` one, so
+The e2e suite runs against its own database (`qaemati_test`), did never the dev `qaemati` one, so
 tests can freely create/delete data without touching anything you're looking at in the browser.
 
 1. Copy the test environment file and create the database once:

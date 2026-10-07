@@ -29,6 +29,9 @@ describe('Landing page (e2e)', () => {
     prisma = app.get(PrismaService);
     const { restaurant } = await createTestRestaurant(prisma, 'landing');
     restaurantId = restaurant.id;
+    await prisma.menu.create({
+      data: { restaurantId, nameAr: 'القائمة', nameEn: 'Menu', sortOrder: 0 },
+    });
     for (const [nameEn, price, active] of [
       [`Landing Basic ${tag}`, 30, true],
       [`Landing Archived ${tag}`, 99, false],
@@ -98,27 +101,108 @@ describe('Landing page (e2e)', () => {
   });
 
   describe('who it names', () => {
-    it('lists sample restaurants and demo logins on a demo site', async () => {
-      process.env.DEMO_MODE = 'true';
-      const res = await page('en');
-      expect(res.text).toContain('id="demo"');
-      expect(res.text).toContain('/m/test-restaurant-landing');
-      expect(res.text).toContain('super@qaemati.example.com');
-    });
-
-    it('never lists restaurants or credentials on a real site', async () => {
-      process.env.DEMO_MODE = 'false';
-      const res = await page('en');
-      expect(res.text).not.toContain('test-restaurant-landing');
-      expect(res.text).not.toContain('id="demo"');
-      expect(res.text).not.toContain('super@qaemati.example.com');
-      expect(res.text).not.toContain('Qaemati@Demo123');
+    it('has no demo section, demo logins or customer list, in any mode', async () => {
+      for (const mode of ['true', 'false']) {
+        process.env.DEMO_MODE = mode;
+        const res = await page('en');
+        expect(res.text).not.toContain('id="demo"');
+        expect(res.text).not.toContain('Try it yourself');
+        expect(res.text).not.toContain('Qaemati@Demo123');
+        expect(res.text).not.toContain('super@qaemati.example.com');
+        expect(res.text).not.toContain('/demo/reset');
+        expect(res.text).not.toContain('Test Restaurant');
+      }
     });
 
     it('points the live menu button at the chosen sample menu', async () => {
       process.env.DEMO_MODE = 'false';
-      process.env.LANDING_DEMO_SLUG = 'my-showcase';
-      expect((await page('en')).text).toContain('href="/m/my-showcase"');
+      process.env.LANDING_DEMO_SLUG = 'test-restaurant-landing';
+      expect((await page('en')).text).toContain('href="/m/test-restaurant-landing"');
+    });
+
+    it('on a demo site shows the first sample restaurant in the phone with nothing configured', async () => {
+      process.env.DEMO_MODE = 'true';
+      delete process.env.LANDING_DEMO_SLUG;
+      expect((await page('en')).text).toMatch(/<iframe src="\/m\/[a-z0-9-]+\?lang=en"/);
+    });
+  });
+
+  describe('the phone', () => {
+    it('is an iPhone showing the real menu, in the language being read', async () => {
+      process.env.DEMO_MODE = 'false';
+      process.env.LANDING_DEMO_SLUG = 'test-restaurant-landing';
+      const en = (await page('en')).text;
+      expect(en).toContain('class="iphone"');
+      expect(en).toContain('iphone__island');
+      expect(en).toContain('iphone__home');
+      expect(en).toMatch(/<iframe src="\/m\/test-restaurant-landing\?lang=en" title="[^"]+"/);
+      expect((await page('ar')).text).toContain('src="/m/test-restaurant-landing?lang=ar"');
+      expect(en).toContain('<a href="/m/test-restaurant-landing?lang=en" class="iphone__cover"');
+    });
+
+    it('stays left to right in the Arabic page, like the real device', async () => {
+      process.env.DEMO_MODE = 'false';
+      process.env.LANDING_DEMO_SLUG = 'test-restaurant-landing';
+      expect((await page('ar')).text).toContain('<div class="iphone" dir="ltr">');
+    });
+
+    it('is left out when there is no real menu to show, rather than faked', async () => {
+      process.env.DEMO_MODE = 'false';
+      delete process.env.LANDING_DEMO_SLUG;
+      expect((await page('en')).text).not.toContain('class="iphone"');
+      process.env.LANDING_DEMO_SLUG = 'a-menu-that-does-not-exist';
+      expect((await page('en')).text).not.toContain('class="iphone"');
+    });
+
+    it('is left out when the restaurant behind it is switched off', async () => {
+      process.env.DEMO_MODE = 'false';
+      process.env.LANDING_DEMO_SLUG = 'test-restaurant-landing';
+      await prisma.subscription.create({
+        data: { restaurantId, planId: planIds[0], status: 'SUSPENDED' },
+      });
+      try {
+        expect((await page('en')).text).not.toContain('class="iphone"');
+      } finally {
+        await prisma.subscription.delete({ where: { restaurantId } });
+      }
+    });
+
+    it('can be framed by the page itself and by nobody else', async () => {
+      const res = await request(app.getHttpServer()).get('/m/test-restaurant-landing');
+      expect(res.headers['x-frame-options']).toBe('SAMEORIGIN');
+      expect(res.headers['content-security-policy']).toContain("frame-ancestors 'self'");
+    });
+  });
+
+  describe('looks designed, not generated', () => {
+    it('has none of the template tells, and no gradient anywhere in the page', async () => {
+      process.env.DEMO_MODE = 'false';
+      process.env.LANDING_DEMO_SLUG = 'test-restaurant-landing';
+      for (const lang of ['en', 'ar']) {
+        const html = (await page(lang)).text;
+        expect(html).not.toMatch(/gradient/i);
+        const body = html.slice(html.indexOf('<header'), html.indexOf('</footer>'));
+        expect(body).not.toMatch(/bg-gradient|from-primary|text-transparent/);
+        expect(body).not.toMatch(/backdrop-blur|shadow-(raised|overlay)/);
+        expect(body).not.toMatch(/ring-2/);
+        const text = body.replace(
+          /<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<[^>]+>/g,
+          ' ',
+        );
+        expect(text).not.toMatch(/[\u2013\u2014]|--/);
+        expect(text.replace('©', '')).not.toMatch(/\p{Extended_Pictographic}/u);
+        expect(text).not.toMatch(/popular|most chosen|الأكثر اختيارا|seamless|all-in-one/i);
+      }
+    });
+
+    it('does not dress features and steps up as a grid of identical icon cards', async () => {
+      const html = (await page('en')).text;
+      const features = /id="features"[\s\S]*?<\/section>/.exec(html)![0];
+      expect(features).toContain('<dl');
+      expect(features).not.toContain('<svg');
+      expect(features).not.toContain('rounded-card');
+      const how = /id="how"[\s\S]*?<\/section>/.exec(html)![0];
+      expect(how).not.toContain('rounded-full');
     });
   });
 

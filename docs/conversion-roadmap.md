@@ -5,7 +5,7 @@ The seams already exist. This lists what to build on each one, in order.
 1. **Environment.** Set `NODE_ENV=production`, real `SESSION_SECRET` and `CSRF_SECRET`, and `PUBLIC_BASE_URL` so canonical, Open Graph and sitemap URLs use your domain and never the request Host header. Set `DEMO_MODE=false` to remove the demo credentials from the home page.
 2. **Hosting.** Run `npm run build`, then `npm start`. Put it behind a TLS proxy. Point uptime checks at `/health` (returns 503 when the database is down).
 3. **Tenants.** Each restaurant is a `Restaurant` row, created from the platform area at `/super` with its first menu, subscription and owner account. A public self signup flow is the next step if you want one. See `docs/saas-architecture.md`.
-4. **Home page.** Replace the demo index at `src/home/home.controller.ts` with a real landing page, or redirect `/` to a marketing site.
+4. **Home page.** Done: `/` is a marketing landing page. Set `LANDING_CONTACT_WHATSAPP` or `LANDING_CONTACT_EMAIL`, and `LANDING_DEMO_SLUG` to the menu the phone should show.
 5. **Custom domains.** Resolve the restaurant from the Host header in `MenuController` before falling back to the slug. Update `getBaseUrl` in `src/seo/seo.ts` to return that domain.
 6. **Images.** Uploads go to `public/uploads` (`src/admin/upload.config.ts`). Move to object storage and a resizing step before running more than one instance.
 7. **Sessions and rate limits.** Sessions already live in Postgres, so multiple instances work. Rate limits (the login limiter and the POST limiter) count in the `RateLimitBucket` table, so every instance and every restart agree. Set `TRUST_PROXY` behind a proxy so limits apply per client.
