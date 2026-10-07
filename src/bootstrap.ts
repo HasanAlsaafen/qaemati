@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import session from 'express-session';
 import connectPgSimple from 'connect-pg-simple';
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { join } from 'path';
 import { mkdirSync } from 'fs';
 import { configureNunjucks } from './common/view/nunjucks';
@@ -16,6 +16,7 @@ import { RATE_LIMIT_STORE } from './common/rate-limit/rate-limit-store';
 import { createValidationPipe } from './common/validation/create-validation-pipe';
 import { accessLog } from './common/logging/access-log';
 import { getSessionSecret } from './config/env.validation';
+import { thmanyahEnabled } from './common/thmanyah';
 import './auth/session.types';
 
 /**
@@ -60,6 +61,11 @@ export async function configureApp(app: NestExpressApplication): Promise<void> {
   app.use(accessLog);
   app.use(compression());
   app.use(cookieParser());
+  // The font license does not allow serving these files without permission.
+  app.use('/fonts/thmanyah', (_req: Request, res: Response, next: NextFunction) => {
+    if (thmanyahEnabled()) return next();
+    res.status(404).end();
+  });
   app.useStaticAssets(join(__dirname, '..', 'public'), {
     maxAge: '1h',
     setHeaders: (res, filePath) => {

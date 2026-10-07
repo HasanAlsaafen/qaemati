@@ -48,6 +48,22 @@ class EnvironmentVariables {
 
   @IsOptional()
   @IsIn(['true', 'false'])
+  THMANYAH_WEB_LICENSED?: string;
+
+  @IsOptional()
+  @IsString()
+  LANDING_CONTACT_EMAIL?: string;
+
+  @IsOptional()
+  @IsString()
+  LANDING_CONTACT_WHATSAPP?: string;
+
+  @IsOptional()
+  @IsString()
+  LANDING_DEMO_SLUG?: string;
+
+  @IsOptional()
+  @IsIn(['true', 'false'])
   SUPER_REQUIRE_2FA?: string;
 
   @IsOptional()

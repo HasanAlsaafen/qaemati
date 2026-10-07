@@ -27,7 +27,7 @@ Owner decisions from the audit approval, plus the defaults taken from section 9 
 23. The reference's own teal measured 3.55:1 against white, so the demo cafe uses a slightly deeper teal and the system keeps requiring 4.5:1 for primary colors.
 24. The between dishes logo divider from Phase C was removed before release. On the real page the logo is the placeholder picture for dishes and categories without a photo, so that is what was built, with no setting.
 25. Only the category row is sticky. Search scrolls away, because two sticky rows would take about a fifth of a phone screen.
-26. The Thmanyah font files stay in the repository because they are a licensed asset the owner supplied, but nothing loads them any more.
+26. The Thmanyah font files stay in the repository because they are a licensed asset the owner supplied. They are used only on the landing page (decision 43), and nowhere else.
 27. Text on a restaurant's soft primary tint uses a derived color that is darkened only when needed, so any brand color that passes on white also reads on its tint.
 28. Stylesheet and script URLs carry a version string and the service worker fetches the stylesheet from the network first, because the files are not content hashed and a cached copy otherwise outlives every deploy.
 29. The admin gets the same AR | EN pill as the public menu, so language is a visible choice in both places.
@@ -44,3 +44,6 @@ Owner decisions from the audit approval, plus the defaults taken from section 9 
 40. One server with Docker Compose and Caddy is the first deployment target. Caddy was chosen over nginx because it handles certificates with no extra tooling. Uploads stay on a volume until traffic justifies object storage.
 41. Operators use a standard authenticator app (TOTP) rather than SMS or email codes, which cannot be intercepted by a SIM swap or a hacked mailbox. It is required in production and optional elsewhere so development stays quick.
 42. A password reset never bypasses two step verification, so access to an operator's mailbox alone is not enough to take over the platform.
+43. The landing page is set in Thmanyah (Sans for text, Serif Display for headings), as the owner asked. The Thmanyah license (`public/fonts/thmanyah/LICENSE.pdf`) allows commercial use in a website only as part of a compiled, packaged or obfuscated product, and forbids hosting the files or making them downloadable, including through web embedding, unless thmanyah grants it separately (ask@thmanyah.com). A plain `@font-face` pointing at public `.woff2` files is exactly the forbidden case. So the files are served on developer machines, and in production only when `THMANYAH_WEB_LICENSED=true` is set to say that permission exists. Without it the page falls back to Tajawal and `/fonts/thmanyah/*` answers 404. The files are also committed to the repository, which is worth clearing in the same email.
+44. The home page is now a marketing page. It lists sample restaurants and demo logins only when `DEMO_MODE` is on, because a real deployment must not advertise its customers. Prices come from the active plans, so changing a plan in the platform area changes the page.
+

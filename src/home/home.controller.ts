@@ -2,7 +2,9 @@ import { Controller, Get, Query, Render, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { PrismaService } from '../prisma/prisma.service';
 import { isDemoModeEnabled } from '../common/demo-mode';
-import { getBaseUrl } from '../seo/seo';
+import { thmanyahEnabled } from '../common/thmanyah';
+import { getBaseUrl, serializeJsonLd } from '../seo/seo';
+import { landingContact, toLandingPlans } from './landing';
 import { DEMO_ADMIN_PASSWORD, DEMO_SUPER_ADMIN_EMAIL } from '../prisma-seed/run-seed';
 
 @Controller()
@@ -23,20 +25,56 @@ export class HomeController {
   @Get()
   @Render('pages/home')
   async index(@Query('demoReset') demoReset: string | undefined, @Req() req: Request) {
-    const locale = req.locale ?? 'ar';
+    const locale = req.locale === 'en' ? 'en' : 'ar';
     const demoMode = isDemoModeEnabled();
-    const restaurants = await this.prisma.restaurant.findMany({
-      select: {
-        slug: true,
-        nameAr: true,
-        nameEn: true,
-        adminUsers: demoMode ? { select: { email: true }, take: 1 } : false,
-      },
-      orderBy: { nameEn: 'asc' },
+    const baseUrl = getBaseUrl(req);
+
+    // Other customers' restaurants are listed only on a demo site. A real
+    // deployment never advertises who its customers are.
+    const restaurants = demoMode
+      ? await this.prisma.restaurant.findMany({
+          select: {
+            slug: true,
+            nameAr: true,
+            nameEn: true,
+            adminUsers: { select: { email: true }, take: 1 },
+          },
+          orderBy: { nameEn: 'asc' },
+        })
+      : [];
+    const plans = await this.prisma.plan.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { priceAmount: 'asc' }],
     });
+    const landingPlans = toLandingPlans(plans, locale);
+    const contact = landingContact();
+    const demoSlug = process.env.LANDING_DEMO_SLUG?.trim() || restaurants[0]?.slug || null;
 
     return {
-      seo: { canonicalUrl: `${getBaseUrl(req)}/` },
+      seo: {
+        canonicalUrl: `${baseUrl}/`,
+        jsonLd: serializeJsonLd({
+          '@context': 'https://schema.org',
+          '@type': 'SoftwareApplication',
+          name: 'Qaemati',
+          applicationCategory: 'BusinessApplication',
+          operatingSystem: 'Web',
+          url: `${baseUrl}/`,
+          inLanguage: ['ar', 'en'],
+          offers: plans.map((plan) => ({
+            '@type': 'Offer',
+            name: plan.nameEn,
+            price: Number(plan.priceAmount).toFixed(2),
+            priceCurrency: plan.currency,
+          })),
+        }),
+      },
+      thmanyah: thmanyahEnabled(),
+      plans: landingPlans,
+      hasTrial: landingPlans.some((plan) => plan.trialDays > 0),
+      contact,
+      demoSlug,
+      year: new Date().getFullYear(),
       restaurants: restaurants.map((restaurant) => ({
         slug: restaurant.slug,
         name: locale === 'ar' ? restaurant.nameAr : restaurant.nameEn,

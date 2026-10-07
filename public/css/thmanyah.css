@@ -1,0 +1,33 @@
+/*
+  Thmanyah, for the landing page only. Loaded only when thmanyahEnabled()
+  (src/common/thmanyah.ts): see docs/decisions.md for why this is gated.
+  Hand written on purpose, it is not part of the Tailwind build.
+*/
+@font-face {
+  font-family: 'Thmanyah Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/thmanyah/thmanyahsans-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Thmanyah Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/thmanyah/thmanyahsans-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Thmanyah Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/thmanyah/thmanyahsans-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Thmanyah Serif Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/thmanyah/thmanyahserifdisplay-Bold.woff2') format('woff2');
+}

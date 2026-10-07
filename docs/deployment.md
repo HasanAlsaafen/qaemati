@@ -80,4 +80,5 @@ Uploaded photos are files on the `uploads` volume, so they survive redeploys and
 - [ ] Gmail app password works (send yourself a password reset)
 - [ ] First backup taken and a restore rehearsed
 - [ ] Backups copied off the server
+- [ ] Landing page contact set (`LANDING_CONTACT_WHATSAPP` or `LANDING_CONTACT_EMAIL`), and the Thmanyah web license confirmed before `THMANYAH_WEB_LICENSED=true`
 - [ ] Platform operator created, two step verification on, recovery codes saved, demo accounts absent

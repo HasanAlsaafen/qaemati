@@ -1,0 +1,34 @@
+{% from "components/language-switcher.njk" import languageSwitcher %}
+<!DOCTYPE html>
+<html lang="{{ locale }}" dir="{{ dir }}">
+<head>
+  <title>{{ t('common.home.landing.metaTitle') }}</title>
+  <meta name="description" content="{{ t('common.home.landing.metaDescription') }}">
+  {% include "partials/head.njk" %}
+  {% if thmanyah %}
+    {# Landing page type. Only when thmanyahEnabled(): the font license does not
+       allow serving the files publicly without permission. #}
+    <link rel="preload" href="/fonts/thmanyah/thmanyahsans-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/thmanyah/thmanyahserifdisplay-Bold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{{ asset('/css/thmanyah.css') }}">
+  {% endif %}
+  <style>
+    body.landing {
+      --font-sans: 'Thmanyah Sans', 'Tajawal', 'IBM Plex Sans Arabic', 'Inter', 'Segoe UI', Tahoma, sans-serif;
+      --font-display: 'Thmanyah Serif Display', 'Thmanyah Sans', 'Tajawal', 'IBM Plex Sans Arabic', 'Inter', Tahoma, serif;
+    }
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+  <link rel="canonical" href="{{ seo.canonicalUrl }}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ t('common.home.landing.metaTitle') }}">
+  <meta property="og:description" content="{{ t('common.home.landing.metaDescription') }}">
+  <meta property="og:url" content="{{ seo.canonicalUrl }}">
+  <script type="application/ld+json">{{ seo.jsonLd | safe }}</script>
+</head>
+<body class="landing min-h-screen bg-bg text-text font-sans antialiased" x-data="{ navOpen: false }">
+  {% include "partials/skip-link.njk" %}
+  {% block body %}{% endblock %}
+</body>
+</html>

@@ -18,6 +18,179 @@
       "platformTitle": "Platform admin",
       "platformHint": "Subscriptions, plans and payments for every restaurant.",
       "platformLink": "Go to platform sign in"
+    },
+    "landing": {
+      "metaTitle": "Qaemati: digital QR menus for restaurants and cafes",
+      "metaDescription": "A fast, beautiful menu in Arabic and English for your restaurant. Guests scan a QR code, browse and send their order on WhatsApp. You edit it from your phone.",
+      "nav": {
+        "features": "Features",
+        "how": "How it works",
+        "pricing": "Pricing",
+        "faq": "FAQ",
+        "signIn": "Owner sign in",
+        "menu": "Menu",
+        "demo": "Try the demo"
+      },
+      "hero": {
+        "eyebrow": "Digital menus for restaurants and cafes",
+        "title": "Your menu, one scan away.",
+        "text": "Qaemati gives every restaurant a fast, beautiful menu in Arabic and English. Guests scan a QR code, browse and send their order on WhatsApp. You change prices and dishes in seconds, from your phone.",
+        "primary": "Get in touch",
+        "primaryTrial": "Start your free trial",
+        "secondary": "See a live menu",
+        "points": [
+          "No app to install for guests",
+          "No commission on orders",
+          "Your data is never deleted"
+        ]
+      },
+      "mock": {
+        "search": "Search the menu",
+        "all": "All",
+        "starters": "Starters",
+        "grill": "Grill",
+        "drinks": "Drinks",
+        "sweets": "Sweets",
+        "d1": "Hummus",
+        "d2": "Falafel",
+        "d3": "Mint lemonade",
+        "d4": "Knafeh"
+      },
+      "how": {
+        "title": "Up and running in an afternoon",
+        "intro": "No developer, no hardware, no contract to sign before you try it.",
+        "steps": [
+          {
+            "title": "Add your menu",
+            "text": "Create categories and dishes, upload photos, set prices and opening hours."
+          },
+          {
+            "title": "Print your QR codes",
+            "text": "One code for the whole restaurant, or one per table. Print-ready sheets are one click away."
+          },
+          {
+            "title": "Guests scan and order",
+            "text": "The menu opens instantly on any phone. They pick dishes and send the order straight to your WhatsApp."
+          }
+        ]
+      },
+      "features": {
+        "title": "Everything a menu should do",
+        "intro": "Built with restaurant owners, for the way guests actually use their phones.",
+        "items": [
+          {
+            "title": "Arabic first, English too",
+            "text": "Every page works right to left and left to right. Guests switch language in one tap."
+          },
+          {
+            "title": "A QR code for every table",
+            "text": "Print-ready codes per table, so each WhatsApp order arrives with the table number."
+          },
+          {
+            "title": "Orders on WhatsApp",
+            "text": "Guests choose dishes and send a ready message. Nothing to set up, no payment fees."
+          },
+          {
+            "title": "Several menus, real hours",
+            "text": "Breakfast, lunch, drinks. Show each menu and category only when you serve it."
+          },
+          {
+            "title": "Edit in seconds",
+            "text": "Change a price, hide a sold out dish or mark today's special. It is live at once."
+          },
+          {
+            "title": "Bulk tools",
+            "text": "Change prices by a percentage, import and export CSV, duplicate dishes and undo the last change."
+          },
+          {
+            "title": "Your brand, readable",
+            "text": "Your logo, cover, colors and fonts, with contrast kept readable automatically."
+          },
+          {
+            "title": "See what guests open",
+            "text": "Learn which dishes and categories get the most attention."
+          },
+          {
+            "title": "Fast, even offline",
+            "text": "Loads quickly on slow mobile data, installs like an app and still opens without a connection."
+          }
+        ]
+      },
+      "pricing": {
+        "title": "Simple prices",
+        "intro": "Pick a plan, change it any time. Every plan includes Arabic and English menus and QR codes.",
+        "month": "month",
+        "year": "year",
+        "trial": "{days} days free",
+        "popular": "Most popular",
+        "menus": "Menus",
+        "categories": "Categories",
+        "dishes": "Dishes",
+        "admins": "Owner accounts",
+        "unlimited": "Unlimited",
+        "upTo": "Up to {count}",
+        "features": {
+          "whatsappOrdering": "Order selection on WhatsApp",
+          "bulkTools": "Bulk tools and CSV",
+          "analytics": "Insights"
+        },
+        "included": "Included",
+        "notIncluded": "Not included",
+        "cta": "Choose this plan"
+      },
+      "demo": {
+        "title": "Try it yourself",
+        "intro": "This is a demo environment with sample restaurants. Open a live menu, or sign in to the admin with the details below.",
+        "menus": "Live sample menus",
+        "panelTitle": "Try the admin panel"
+      },
+      "faq": {
+        "title": "Questions owners ask",
+        "items": [
+          {
+            "q": "Do my guests need to install an app?",
+            "a": "No. The menu opens in the phone's browser after scanning the code, and it can be added to the home screen if they like."
+          },
+          {
+            "q": "Can the menu be in Arabic and English?",
+            "a": "Yes. You write each name and description in both languages, and guests switch with one tap. Arabic pages are laid out right to left."
+          },
+          {
+            "q": "How do orders reach me?",
+            "a": "Guests pick dishes and tap send. A message with their selection opens in WhatsApp, addressed to your number, with the table number if they scanned a table code."
+          },
+          {
+            "q": "Can I have more than one menu?",
+            "a": "Yes. Plans include several menus, each with its own opening hours, for example breakfast, lunch and drinks."
+          },
+          {
+            "q": "Do you take a commission on orders?",
+            "a": "No. Orders go straight from your guest to your WhatsApp. You only pay your plan."
+          },
+          {
+            "q": "What happens if I stop paying?",
+            "a": "After your plan ends there is a grace period. Then the public menu goes offline and your admin becomes read only. Your data is never deleted, and paying again brings the menu back."
+          },
+          {
+            "q": "Can I change how the menu looks?",
+            "a": "Yes. Add your logo and cover, choose colors and a font style, and pick how dishes are shown. The menu keeps text readable whatever colors you choose."
+          }
+        ]
+      },
+      "cta": {
+        "title": "Ready to put your menu on every table?",
+        "text": "Tell us about your restaurant and we will set up your menu with you.",
+        "button": "Get in touch",
+        "signIn": "Already a customer? Sign in"
+      },
+      "contact": {
+        "email": "Email us",
+        "whatsapp": "Message us on WhatsApp"
+      },
+      "footer": {
+        "tagline": "Digital menus for restaurants and cafes.",
+        "rights": "All rights reserved."
+      }
     }
   },
   "nav": {

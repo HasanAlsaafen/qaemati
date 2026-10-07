@@ -270,6 +270,17 @@ Dockerfile (runs migrations on start, health check, non root, uploads volume), `
 - Tests: 22 e2e (setup, wrong first code, hashed recovery codes, password then code, replay, recovery use once, lockout, required mode, disable, renew codes, password change ending sessions, reset links, allowlist) and 16 unit (RFC vectors, drift window, replay, encryption, tamper, allowlist ranges). axe at 375px clean on the new pages.
 - Not covered: signing the operator out of other devices when 2FA is turned on or off, and a notification email on operator sign in.
 
+## Phase L: landing page
+
+The home page is now a bilingual marketing page for the product: hero with a phone sketch, how it works, nine features, pricing from the active plans, FAQ, a closing call to action and a footer. A demo section with sample menus and logins appears only in demo mode. The earlier page listed every restaurant in the database, which on a real deployment would publish the customer list, so that is gone outside demo mode.
+
+- Type: Thmanyah Sans and Serif Display on the landing page only, behind a license gate (see decision 43). The gate is `THMANYAH_WEB_LICENSED`; off in production by default, the page then uses Tajawal and the font files answer 404.
+- Contact buttons use `LANDING_CONTACT_WHATSAPP`, else `LANDING_CONTACT_EMAIL`, else owner sign in, so there is never a dead button. `LANDING_DEMO_SLUG` picks the "see a live menu" target.
+- SEO: title, description, canonical, Open Graph and `SoftwareApplication` structured data with the plans as offers.
+- Tests: 14 e2e (both languages, plans and archived plans, structured data, what is named in demo and real mode, contact fallbacks, font gate in development, production off, production confirmed, other pages unaffected) and 6 unit. axe is clean at 375px and 1280px in Arabic and English, no horizontal scroll, no control under 44px.
+- Found on the way: Nunjucks does not allow a chained inline `if ... else ... if`, and a crashed test run left a fixture restaurant in the test database that blocked the next run (removed by hand).
+- Not done: a real product photo or screenshot (the phone is drawn from the page's own colors), a contact form, and a public sign up. The contact buttons are the only way in until you decide on self signup.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).
