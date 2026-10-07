@@ -24,6 +24,7 @@ const RESTAURANTS_IMAGE_DIR = join(UPLOADS_DIR, 'restaurants');
 const CATEGORIES_IMAGE_DIR = join(UPLOADS_DIR, 'categories');
 
 export const DEMO_ADMIN_PASSWORD = 'Qaemati@Demo123';
+export const DEMO_SUPER_ADMIN_EMAIL = 'super@qaemati.example.com';
 
 function slugify(value: string): string {
   return value
@@ -46,6 +47,11 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
   mkdirSync(CATEGORIES_IMAGE_DIR, { recursive: true });
 
   // Seed data is meant to be re-run from a clean slate; delete in FK order.
+  await prisma.payment.deleteMany();
+  await prisma.subscription.deleteMany();
+  await prisma.plan.deleteMany();
+  await prisma.auditLog.deleteMany();
+  await prisma.superAdmin.deleteMany();
   await prisma.item.deleteMany();
   await prisma.category.deleteMany();
   await prisma.menu.deleteMany();
@@ -54,6 +60,60 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
 
   const passwordHash = await bcrypt.hash(DEMO_ADMIN_PASSWORD, 10);
   const summary: string[] = [];
+
+  // Demo plans, platform operator and billing history. A real deployment
+  // creates its own super admin with `npm run super:create` instead.
+  const plans = {
+    starter: await prisma.plan.create({
+      data: {
+        nameAr: 'الأساسية',
+        nameEn: 'Starter',
+        priceAmount: 30,
+        currency: 'ILS',
+        interval: 'MONTHLY',
+        trialDays: 14,
+        maxMenus: 1,
+        maxCategories: 8,
+        maxItems: 40,
+        maxAdminUsers: 1,
+        features: [],
+        sortOrder: 1,
+      },
+    }),
+    standard: await prisma.plan.create({
+      data: {
+        nameAr: 'المتوسطة',
+        nameEn: 'Standard',
+        priceAmount: 60,
+        currency: 'ILS',
+        interval: 'MONTHLY',
+        trialDays: 14,
+        maxMenus: 2,
+        maxCategories: 20,
+        maxItems: 150,
+        maxAdminUsers: 3,
+        features: ['whatsappOrdering', 'analytics'],
+        sortOrder: 2,
+      },
+    }),
+    pro: await prisma.plan.create({
+      data: {
+        nameAr: 'المتقدمة',
+        nameEn: 'Pro',
+        priceAmount: 120,
+        currency: 'ILS',
+        interval: 'MONTHLY',
+        trialDays: 14,
+        features: ['bulkTools', 'analytics', 'whatsappOrdering'],
+        sortOrder: 3,
+      },
+    }),
+  };
+  const superAdmin = await prisma.superAdmin.create({
+    data: { email: DEMO_SUPER_ADMIN_EMAIL, name: 'Platform Owner', passwordHash },
+  });
+  summary.push(`Super admin: ${DEMO_SUPER_ADMIN_EMAIL} (sign in at /super/login)`);
+  const day = 24 * 60 * 60 * 1000;
 
   for (const restaurantData of seedRestaurants) {
     const logoFilename = `${restaurantData.slug}-logo.svg`;
@@ -87,6 +147,46 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
         name: restaurantData.adminName,
       },
     });
+
+    // The cafe is a paying Pro customer, the restaurant is still on a trial.
+    if (restaurantData.slug === 'bayt-al-zaytoun') {
+      const periodEnd = new Date(Date.now() + 24 * day);
+      const subscription = await prisma.subscription.create({
+        data: {
+          restaurantId: restaurant.id,
+          planId: plans.pro.id,
+          status: 'ACTIVE',
+          currentPeriodStart: new Date(Date.now() - 6 * day),
+          currentPeriodEnd: periodEnd,
+        },
+      });
+      for (const [index, daysAgo] of [66, 36, 6].entries()) {
+        const paidAt = new Date(Date.now() - daysAgo * day);
+        await prisma.payment.create({
+          data: {
+            restaurantId: restaurant.id,
+            subscriptionId: subscription.id,
+            amount: 120,
+            currency: 'ILS',
+            method: index === 1 ? 'BANK_TRANSFER' : 'CASH',
+            reference: index === 1 ? 'TRF-20260905' : null,
+            paidAt,
+            periodStart: paidAt,
+            periodEnd: new Date(paidAt.getTime() + 30 * day),
+            recordedById: superAdmin.id,
+          },
+        });
+      }
+    } else {
+      await prisma.subscription.create({
+        data: {
+          restaurantId: restaurant.id,
+          planId: plans.standard.id,
+          status: 'TRIALING',
+          trialEndsAt: new Date(Date.now() + 9 * day),
+        },
+      });
+    }
 
     const menuDefinitions = restaurantData.menus ?? [
       { key: 'main', nameAr: 'القائمة الرئيسية', nameEn: 'Main menu' },

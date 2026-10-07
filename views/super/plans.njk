@@ -1,0 +1,42 @@
+{% extends "layouts/super.njk" %}
+{% set section = 'plans' %}
+
+{% block title %}{{ t('common.super.nav.plans') }}{% endblock %}
+
+{% block content %}
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <h1 class="font-display text-2xl font-bold text-text">{{ t('common.super.nav.plans') }}</h1>
+  <a href="/super/plans/new" class="inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover">{{ t('common.super.plans.add') }}</a>
+</div>
+
+<ul class="mt-4 grid gap-4 sm:grid-cols-2">
+  {% for plan in plans %}
+    <li class="flex flex-col rounded-card border border-border bg-surface p-4 {{ 'bg-muted-surface' if not plan.isActive }}">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h2 class="font-display text-lg font-bold text-text">{{ plan.nameEn if locale == 'en' else plan.nameAr }}</h2>
+          <p class="text-sm text-muted-text" dir="ltr">{{ plan.priceAmount | money }} {{ plan.currency | symbol(locale) }} / {{ t('common.billing.interval.' + plan.interval) }}</p>
+        </div>
+        {% if not plan.isActive %}<span class="rounded-sm bg-muted-surface px-2 py-0.5 text-xs text-muted-text">{{ t('common.super.plans.archived') }}</span>{% endif %}
+      </div>
+      <dl class="mt-3 grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
+        {% for r in [['menus', plan.maxMenus], ['categories', plan.maxCategories], ['items', plan.maxItems], ['adminUsers', plan.maxAdminUsers]] %}
+          <dt class="text-muted-text">{{ t('common.billing.resource.' + r[0]) }}</dt>
+          <dd class="text-text" dir="ltr">{% if r[1] is number %}{{ r[1] }}{% else %}{{ t('common.billing.unlimited') }}{% endif %}</dd>
+        {% endfor %}
+      </dl>
+      <p class="mt-3 text-sm text-muted-text">
+        {% for feature in plan.features %}{{ t('common.billing.feature.' + feature) }}{{ ', ' if not loop.last }}{% else %}{{ t('common.super.plans.noFeatures') }}{% endfor %}
+      </p>
+      <p class="mt-2 text-xs text-muted-text">{{ t('common.super.plans.tenantCount', { count: plan._count.subscriptions }) }}</p>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <a href="/super/plans/{{ plan.id }}" class="inline-flex min-h-11 items-center rounded-md border border-border-strong px-4 text-sm font-medium text-text hover:bg-muted-surface">{{ t('common.admin.form.edit') }}</a>
+        <form method="post" action="/super/plans/{{ plan.id }}/{{ 'archive' if plan.isActive else 'restore' }}">
+          <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+          <button type="submit" class="inline-flex min-h-11 items-center rounded-md border border-border-strong px-4 text-sm font-medium text-text hover:bg-muted-surface">{{ t('common.super.plans.archive') if plan.isActive else t('common.super.plans.restore') }}</button>
+        </form>
+      </div>
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

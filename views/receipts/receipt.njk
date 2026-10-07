@@ -5,7 +5,7 @@
 {% block content %}
 <div class="mx-auto max-w-xl px-4 py-8">
   <div class="print:hidden mb-4 flex items-center justify-between gap-3">
-    <a href="{{ '/admin/billing' if layout == 'tenant' else '/super/payments' }}" class="inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline">{{ t('common.billing.receipt.back') }}</a>
+    <a href="{{ '/admin/billing' if layout == 'tenant' else '/super/payments' }}" class="inline-flex min-h-11 min-w-11 items-center text-sm font-medium text-primary hover:underline">{{ t('common.billing.receipt.back') }}</a>
     <button type="button" x-data x-on:click="window.print()" class="inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover">{{ t('common.billing.receipt.print') }}</button>
   </div>
 
@@ -57,5 +57,20 @@
       <p class="mt-3 text-sm text-muted-text">{{ payment.voidReason }}</p>
     {% endif %}
   </article>
+
+  {% if layout == 'super' and payment.status == 'PAID' %}
+    <details class="print:hidden mt-4 rounded-card border border-border bg-surface p-4">
+      <summary class="inline-flex min-h-11 cursor-pointer items-center text-sm font-medium text-danger">{{ t('common.super.payments.voidTitle') }}</summary>
+      <form method="post" action="/super/payments/{{ payment.id }}/void" class="mt-3 flex flex-col gap-3">
+        <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+        <div class="flex flex-col gap-1.5">
+          <label for="void-reason" class="text-sm font-medium text-text">{{ t('common.super.payments.voidReason') }}</label>
+          <input id="void-reason" name="reason" type="text" required maxlength="200" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        </div>
+        <p class="text-xs text-muted-text">{{ t('common.super.payments.voidHint') }}</p>
+        <button type="submit" class="inline-flex min-h-11 w-fit items-center rounded-md border border-border-strong px-4 text-sm font-medium text-danger hover:bg-muted-surface">{{ t('common.super.payments.voidConfirm') }}</button>
+      </form>
+    </details>
+  {% endif %}
 </div>
 {% endblock %}

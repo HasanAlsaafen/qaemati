@@ -1,0 +1,86 @@
+{% extends "layouts/super.njk" %}
+{% set section = 'dashboard' %}
+
+{% block title %}{{ t('common.super.nav.dashboard') }}{% endblock %}
+
+{% block content %}
+<h1 class="font-display text-2xl font-bold text-text">{{ t('common.super.nav.dashboard') }}</h1>
+
+<section class="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label="{{ t('common.super.dash.tenants') }}">
+  {% set tiles = [
+    { label: t('common.super.dash.tenants'), value: summary.tenants, href: '/super/restaurants' },
+    { label: t('common.billing.access.ok'), value: summary.states.ok, href: '/super/restaurants?state=ok' },
+    { label: t('common.billing.access.trial'), value: summary.states.trial, href: '/super/restaurants?state=trial' },
+    { label: t('common.billing.access.grace'), value: summary.states.grace, href: '/super/restaurants?state=grace' },
+    { label: t('common.billing.access.blocked'), value: summary.states.blocked, href: '/super/restaurants?state=blocked' },
+    { label: t('common.super.dash.newTenants'), value: summary.newTenants, href: '/super/restaurants' }
+  ] %}
+  {% for tile in tiles %}
+    <a href="{{ tile.href }}" class="rounded-card border border-border bg-surface p-4 hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary">
+      <p class="text-sm text-muted-text">{{ tile.label }}</p>
+      <p class="mt-1 font-display text-3xl font-bold text-text" dir="ltr">{{ tile.value }}</p>
+    </a>
+  {% endfor %}
+</section>
+
+<section class="mt-6 grid gap-3 sm:grid-cols-3" aria-label="{{ t('common.super.dash.money') }}">
+  {% set moneyTiles = [
+    { label: t('common.super.dash.mrr'), hint: t('common.super.dash.mrrHint'), rows: summary.mrr },
+    { label: t('common.super.dash.thisMonth'), hint: '', rows: summary.revenueThisMonth },
+    { label: t('common.super.dash.lastMonth'), hint: '', rows: summary.revenueLastMonth }
+  ] %}
+  {% for tile in moneyTiles %}
+    <div class="rounded-card border border-border bg-surface p-4">
+      <p class="text-sm text-muted-text">{{ tile.label }}</p>
+      {% if tile.rows.length %}
+        {% for row in tile.rows %}
+          <p class="mt-1 font-display text-2xl font-bold text-text" dir="ltr">{{ row.amount | money }} {{ row.currency | symbol(locale) }}</p>
+        {% endfor %}
+      {% else %}
+        <p class="mt-1 font-display text-2xl font-bold text-muted-text" dir="ltr">0.00</p>
+      {% endif %}
+      {% if tile.hint %}<p class="mt-1 text-xs text-muted-text">{{ tile.hint }}</p>{% endif %}
+    </div>
+  {% endfor %}
+</section>
+
+<div class="mt-6 grid gap-6 lg:grid-cols-2">
+  <section class="rounded-card border border-border bg-surface p-4" aria-labelledby="expiring-heading">
+    <h2 id="expiring-heading" class="font-display text-lg font-bold text-text">{{ t('common.super.dash.expiring') }}</h2>
+    {% if summary.expiring.length %}
+      <ul class="mt-3 divide-y divide-border">
+        {% for row in summary.expiring %}
+          <li class="flex items-center justify-between gap-3 py-2 text-sm">
+            <a href="/super/restaurants/{{ row.restaurant.id }}" class="inline-flex min-h-11 items-center font-medium text-primary hover:underline">{{ row.restaurant.nameEn if locale == 'en' else row.restaurant.nameAr }}</a>
+            <span class="text-muted-text" dir="ltr">{{ row.endsAt | isoDate }} · {{ row.daysLeft }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="mt-3 text-sm text-muted-text">{{ t('common.super.dash.nothingExpiring') }}</p>
+    {% endif %}
+  </section>
+
+  <section class="rounded-card border border-border bg-surface p-4" aria-labelledby="recent-heading">
+    <div class="flex items-center justify-between gap-3">
+      <h2 id="recent-heading" class="font-display text-lg font-bold text-text">{{ t('common.super.dash.recentPayments') }}</h2>
+      <a href="/super/payments/new" class="inline-flex min-h-11 items-center rounded-md bg-primary px-3 text-sm font-medium text-primary-on hover:bg-primary-hover">{{ t('common.super.payments.record') }}</a>
+    </div>
+    {% if summary.recentPayments.length %}
+      <ul class="mt-3 divide-y divide-border">
+        {% for payment in summary.recentPayments %}
+          <li class="flex items-center justify-between gap-3 py-2 text-sm">
+            <div>
+              <p class="font-medium text-text">{{ payment.restaurant.nameEn if locale == 'en' else payment.restaurant.nameAr }}</p>
+              <p class="text-muted-text" dir="ltr">{{ payment.paidAt | isoDate }} · {{ payment.receiptNo | receiptNo }}</p>
+            </div>
+            <a href="/super/payments/{{ payment.id }}/receipt" class="inline-flex min-h-11 items-center font-medium text-primary hover:underline" dir="ltr">{{ payment.amount | money }} {{ payment.currency | symbol(locale) }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="mt-3 text-sm text-muted-text">{{ t('common.super.payments.none') }}</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

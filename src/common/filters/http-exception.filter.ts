@@ -192,6 +192,35 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return;
     }
 
+    // Plain forms in the super admin area post and redirect, so the answer is
+    // a redirect back with the messages carried in the session.
+    if (
+      request.method === 'POST' &&
+      request.path.startsWith('/super') &&
+      request.headers['hx-request'] !== 'true' &&
+      request.accepts(['html', 'json']) === 'html'
+    ) {
+      const referer = request.get('referer');
+      let back = '/super';
+      try {
+        const url = referer ? new URL(referer) : null;
+        // Only the path is used, so a Referer from this host is enough.
+        if (url && url.hostname === request.hostname && url.pathname.startsWith('/super')) {
+          back = url.pathname + url.search;
+        }
+      } catch {
+        // An unparseable referer falls back to the dashboard.
+      }
+      request.session.flash = {
+        type: 'danger',
+        message: summary,
+        errors: Object.fromEntries(Object.entries(errors).map(([field, list]) => [field, list[0]])),
+        values: exception.values,
+      };
+      response.redirect(303, back);
+      return;
+    }
+
     // htmx does not swap a 4xx response, so the form on screen keeps what
     // was typed. public/js/form-errors.js reads this body and marks the
     // fields; the toast covers anything it cannot place.

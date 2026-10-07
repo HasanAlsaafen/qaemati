@@ -1,0 +1,65 @@
+{% extends "layouts/super.njk" %}
+{% set section = 'payments' %}
+
+{% block title %}{{ t('common.super.nav.payments') }}{% endblock %}
+
+{% block content %}
+{% set fieldClass = 'min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary' %}
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <h1 class="font-display text-2xl font-bold text-text">{{ t('common.super.nav.payments') }}</h1>
+  <a href="/super/payments/new" class="inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover">{{ t('common.super.payments.record') }}</a>
+</div>
+
+<form method="get" action="/super/payments" class="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-6 lg:items-end">
+  <div class="flex flex-col gap-1.5 lg:col-span-2">
+    <label for="f-restaurant" class="text-sm font-medium text-text">{{ t('common.super.payments.restaurant') }}</label>
+    <select id="f-restaurant" name="restaurantId" class="{{ fieldClass }}">
+      <option value="">{{ t('common.super.all') }}</option>
+      {% for r in restaurants %}<option value="{{ r.id }}" {% if filter.restaurantId == r.id %}selected{% endif %}>{{ r.nameEn if locale == 'en' else r.nameAr }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="flex flex-col gap-1.5">
+    <label for="f-method" class="text-sm font-medium text-text">{{ t('common.super.payments.method') }}</label>
+    <select id="f-method" name="method" class="{{ fieldClass }}">
+      <option value="">{{ t('common.super.all') }}</option>
+      {% for m in ['CASH', 'BANK_TRANSFER', 'CARD', 'OTHER'] %}<option value="{{ m }}" {% if filter.method == m %}selected{% endif %}>{{ t('common.billing.method.' + m) }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="flex flex-col gap-1.5">
+    <label for="f-status" class="text-sm font-medium text-text">{{ t('common.billing.page.status') }}</label>
+    <select id="f-status" name="status" class="{{ fieldClass }}">
+      <option value="">{{ t('common.super.all') }}</option>
+      <option value="PAID" {% if filter.status == 'PAID' %}selected{% endif %}>{{ t('common.super.payments.paid') }}</option>
+      <option value="VOID" {% if filter.status == 'VOID' %}selected{% endif %}>{{ t('common.billing.page.void') }}</option>
+    </select>
+  </div>
+  <div class="flex flex-col gap-1.5">
+    <label for="f-from" class="text-sm font-medium text-text">{{ t('common.super.payments.from') }}</label>
+    <input id="f-from" name="from" type="date" dir="ltr" value="{{ filter.from }}" class="{{ fieldClass }}">
+  </div>
+  <div class="flex flex-col gap-1.5">
+    <label for="f-to" class="text-sm font-medium text-text">{{ t('common.super.payments.to') }}</label>
+    <input id="f-to" name="to" type="date" dir="ltr" value="{{ filter.to }}" class="{{ fieldClass }}">
+  </div>
+  <button type="submit" class="inline-flex min-h-11 items-center justify-center rounded-md border border-border-strong px-4 text-sm font-medium text-text hover:bg-muted-surface sm:col-span-3 lg:col-span-6 lg:w-fit">{{ t('common.super.filter') }}</button>
+</form>
+
+{% if payments.length %}
+  <ul class="mt-4 divide-y divide-border rounded-card border border-border bg-surface">
+    {% for payment in payments %}
+      <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm">
+        <div class="min-w-0">
+          <a href="/super/restaurants/{{ payment.restaurant.id }}" class="inline-flex min-h-11 items-center font-medium text-primary hover:underline">{{ payment.restaurant.nameEn if locale == 'en' else payment.restaurant.nameAr }}</a>
+          <p class="text-muted-text" dir="ltr">{{ payment.paidAt | isoDate }} · {{ payment.receiptNo | receiptNo }} · {{ t('common.billing.method.' + payment.method) }}{% if payment.reference %} · {{ payment.reference }}{% endif %}</p>
+        </div>
+        <div class="flex items-center gap-3">
+          {% if payment.status == 'VOID' %}<span class="rounded-sm bg-muted-surface px-2 py-0.5 text-xs text-muted-text">{{ t('common.billing.page.void') }}</span>{% endif %}
+          <a href="/super/payments/{{ payment.id }}/receipt" class="inline-flex min-h-11 items-center font-bold text-text hover:underline" dir="ltr">{{ payment.amount | money }} {{ payment.currency | symbol(locale) }}</a>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="mt-6 rounded-card border border-border bg-surface p-6 text-sm text-muted-text">{{ t('common.super.payments.none') }}</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "layouts/super.njk" %}
+{% set section = 'payments' %}
+{% from "components/input.njk" import input %}
+{% from "components/select.njk" import select %}
+
+{% block title %}{{ t('common.super.payments.record') }}{% endblock %}
+
+{% block content %}
+{% set v = flash.values if flash and flash.values else {} %}
+{% set e = flash.errors if flash and flash.errors else {} %}
+<h1 class="font-display text-2xl font-bold text-text">{{ t('common.super.payments.record') }}</h1>
+
+{% if not selected %}
+  <form method="get" action="/super/payments/new" class="mt-4 flex max-w-md flex-col gap-4 rounded-card border border-border bg-surface p-4">
+    {% set options = [] %}
+    {% for r in restaurants %}{% set _added = options.push({ value: r.id, label: (r.nameEn if locale == 'en' else r.nameAr) }) %}{% endfor %}
+    {{ select('restaurantId', t('common.super.payments.restaurant'), options, none) }}
+    <button type="submit" class="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover">{{ t('common.super.continue') }}</button>
+  </form>
+{% else %}
+  <p class="mt-1 text-sm text-muted-text">
+    {{ selected.restaurant.nameEn if locale == 'en' else selected.restaurant.nameAr }} ·
+    {{ selected.plan.nameEn if locale == 'en' else selected.plan.nameAr }}
+    (<span dir="ltr">{{ selected.plan.priceAmount | money }} {{ selected.plan.currency | symbol(locale) }} / {{ t('common.billing.interval.' + selected.plan.interval) }}</span>)
+  </p>
+  <form method="post" action="/super/payments" class="mt-4 grid gap-4 rounded-card border border-border bg-surface p-4 sm:grid-cols-2">
+    <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+    <input type="hidden" name="restaurantId" value="{{ selected.restaurantId }}">
+    {{ input(name='amount', label=t('common.super.payments.amount') + ' (' + selected.plan.currency + ')', value=v.amount or (selected.plan.priceAmount | money), error=e.amount, dir='ltr', attrs='required inputmode="decimal"') }}
+    {{ input(name='periods', label=t('common.super.payments.periods', { unit: t('common.billing.interval.' + selected.plan.interval) }), type='number', value=v.periods or '1', error=e.periods, hint=t('common.super.payments.periodsHint'), attrs='min="1" max="36" required') }}
+    {{ select('method', t('common.super.payments.method'), [{ value: 'CASH', label: t('common.billing.method.CASH') }, { value: 'BANK_TRANSFER', label: t('common.billing.method.BANK_TRANSFER') }, { value: 'CARD', label: t('common.billing.method.CARD') }, { value: 'OTHER', label: t('common.billing.method.OTHER') }], v.method or 'CASH', e.method) }}
+    {{ input(name='paidAt', label=t('common.super.payments.paidAt'), type='date', value=v.paidAt or today, error=e.paidAt, dir='ltr', attrs='required') }}
+    {{ input(name='reference', label=t('common.super.payments.reference'), value=v.reference or '', error=e.reference, dir='ltr', attrs='maxlength="100"') }}
+    {{ input(name='note', label=t('common.super.tenants.note'), value=v.note or '', error=e.note, attrs='maxlength="300"') }}
+    <p class="text-sm text-muted-text sm:col-span-2">{{ t('common.super.payments.effect') }}</p>
+    <div class="flex flex-wrap gap-3 sm:col-span-2">
+      <button type="submit" class="inline-flex min-h-11 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-on hover:bg-primary-hover">{{ t('common.super.payments.save') }}</button>
+      <a href="/super/payments" class="inline-flex min-h-11 items-center rounded-md border border-border-strong px-5 text-sm font-medium text-text hover:bg-muted-surface">{{ t('common.admin.form.cancel') }}</a>
+    </div>
+  </form>
+{% endif %}
+{% endblock %}

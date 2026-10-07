@@ -1,0 +1,17 @@
+{#
+  The one message carried over a redirect (FlashMiddleware). A secret, such as
+  a generated password, is shown once and never stored in the page again.
+#}
+{% if flash %}
+  <div role="{{ 'alert' if flash.type == 'danger' else 'status' }}" class="mb-4 rounded-md border px-4 py-3 text-sm {{ 'border-danger/30 bg-danger/10 text-danger' if flash.type == 'danger' else 'border-success/30 bg-success/10 text-success' }}">
+    <p class="font-medium">{{ flash.message }}</p>
+    {% if flash.secret %}
+      <p class="mt-2 text-text">{{ t('common.super.secretIntro') }}</p>
+      <p class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-text" dir="ltr">
+        <span>{{ flash.secret.label }}</span>
+        <code class="rounded-sm bg-surface px-2 py-1 font-mono text-base font-bold" data-secret>{{ flash.secret.value }}</code>
+      </p>
+      <p class="mt-2 text-xs text-muted-text">{{ t('common.super.secretOnce') }}</p>
+    {% endif %}
+  </div>
+{% endif %}

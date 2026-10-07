@@ -1,0 +1,21 @@
+{% extends "layouts/base.njk" %}
+{% from "components/input.njk" import input %}
+{% from "components/button.njk" import button %}
+
+{% block title %}{{ t('common.super.login.title') }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-sm rounded-card border border-border bg-surface p-8">
+  <p class="text-xs font-bold uppercase tracking-wide text-muted-text">{{ t('common.super.platform') }}</p>
+  <h1 class="mt-1 font-display text-2xl font-bold text-text">{{ t('common.super.login.title') }}</h1>
+  {% if error %}
+    <p class="mt-4 rounded-md bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">{{ error }}</p>
+  {% endif %}
+  <form method="post" action="/super/login" class="mt-6 flex flex-col gap-4">
+    <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+    {{ input('email', t('common.admin.auth.emailLabel'), 'email', email, '', fieldErrors.email, none, 'required autocomplete="username"') }}
+    {{ input('password', t('common.admin.auth.passwordLabel'), 'password', '', '', fieldErrors.password, none, 'required autocomplete="current-password"') }}
+    {{ button(t('common.admin.auth.submit'), 'primary', 'md', 'submit') }}
+  </form>
+</div>
+{% endblock %}

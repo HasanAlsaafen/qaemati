@@ -13,6 +13,9 @@ import { CsrfViewMiddleware } from './auth/csrf-view.middleware';
 import { AdminModule } from './admin/admin.module';
 import { HomeModule } from './home/home.module';
 import { TenancyModule } from './tenancy/tenancy.module';
+import { SuperAdminModule } from './super-admin/super-admin.module';
+import { SuperAdminAuthMiddleware } from './super-admin/super-admin-auth.middleware';
+import { FlashMiddleware } from './common/middleware/flash.middleware';
 import { FeatureGuard } from './tenancy/requires-feature';
 import { TenantContextMiddleware } from './tenancy/tenant-context.middleware';
 import { MenuModule } from './menu/menu.module';
@@ -36,6 +39,7 @@ import { StyleguideModule } from './styleguide/styleguide.module';
     }),
     PrismaModule,
     TenancyModule,
+    SuperAdminModule,
     HomeModule,
     MenuModule,
     StyleguideModule,
@@ -58,6 +62,8 @@ export class AppModule implements NestModule {
     // runs before this one need `t` to already be set).
     consumer.apply(CsrfViewMiddleware).forRoutes('*');
     consumer.apply(AdminAuthMiddleware).exclude('admin/login', 'admin/logout').forRoutes('admin');
+    consumer.apply(FlashMiddleware).forRoutes('super');
+    consumer.apply(SuperAdminAuthMiddleware).exclude('super/login').forRoutes('super');
     consumer.apply(TenantContextMiddleware).exclude('admin/login').forRoutes('admin');
     consumer.apply(AdminLocalsMiddleware).forRoutes('admin');
   }

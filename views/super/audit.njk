@@ -1,0 +1,23 @@
+{% extends "layouts/super.njk" %}
+{% set section = 'audit' %}
+
+{% block title %}{{ t('common.super.nav.audit') }}{% endblock %}
+
+{% block content %}
+<h1 class="font-display text-2xl font-bold text-text">{{ t('common.super.nav.audit') }}</h1>
+{% if entries.length %}
+  <ul class="mt-4 divide-y divide-border rounded-card border border-border bg-surface text-sm">
+    {% for entry in entries %}
+      <li class="px-4 py-3">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <span class="font-medium text-text" dir="ltr">{{ entry.action }}</span>
+          <span class="text-muted-text" dir="ltr">{{ entry.createdAt | isoDate }} · {{ entry.actorLabel }}</span>
+        </div>
+        {% if entry.restaurantId %}<a href="/super/restaurants/{{ entry.restaurantId }}" class="inline-flex min-h-11 items-center text-primary hover:underline">{{ t('common.super.audit.viewRestaurant') }}</a>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="mt-6 rounded-card border border-border bg-surface p-6 text-sm text-muted-text">{{ t('common.super.audit.none') }}</p>
+{% endif %}
+{% endblock %}

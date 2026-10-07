@@ -1,0 +1,65 @@
+{% extends "layouts/super.njk" %}
+{% set section = 'plans' %}
+{% from "components/input.njk" import input %}
+{% from "components/select.njk" import select %}
+
+{% block title %}{{ t('common.super.plans.add') if not plan else (plan.nameEn) }}{% endblock %}
+
+{% block content %}
+{% set v = flash.values if flash and flash.values else {} %}
+{% set e = flash.errors if flash and flash.errors else {} %}
+{% set p = plan or {} %}
+<h1 class="font-display text-2xl font-bold text-text">{{ t('common.super.plans.add') if not plan else (plan.nameEn if locale == 'en' else plan.nameAr) }}</h1>
+
+<form method="post" action="{{ '/super/plans' if not plan else '/super/plans/' + plan.id }}" class="mt-4 flex flex-col gap-6">
+  <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+
+  <section class="rounded-card border border-border bg-surface p-4">
+    <div class="grid gap-4 sm:grid-cols-2">
+      {{ input(name='nameAr', label=t('common.admin.form.nameArLabel'), value=v.nameAr or p.nameAr or '', error=e.nameAr, dir='rtl', attrs='required maxlength="80"') }}
+      {{ input(name='nameEn', label=t('common.admin.form.nameEnLabel'), value=v.nameEn or p.nameEn or '', error=e.nameEn, dir='ltr', attrs='required maxlength="80"') }}
+      {{ input(name='descriptionAr', label=t('common.super.plans.descriptionAr'), value=v.descriptionAr or p.descriptionAr or '', error=e.descriptionAr, dir='rtl', attrs='maxlength="300"') }}
+      {{ input(name='descriptionEn', label=t('common.super.plans.descriptionEn'), value=v.descriptionEn or p.descriptionEn or '', error=e.descriptionEn, dir='ltr', attrs='maxlength="300"') }}
+    </div>
+  </section>
+
+  <section class="rounded-card border border-border bg-surface p-4">
+    <h2 class="font-display text-lg font-bold text-text">{{ t('common.super.plans.pricing') }}</h2>
+    <div class="mt-4 grid gap-4 sm:grid-cols-4">
+      {{ input(name='priceAmount', label=t('common.super.plans.price'), value=v.priceAmount or (p.priceAmount | money if plan else ''), error=e.priceAmount, dir='ltr', attrs='required inputmode="decimal"') }}
+      {{ input(name='currency', label=t('common.admin.branding.currencyLabel'), value=v.currency or p.currency or 'ILS', error=e.currency, dir='ltr', attrs='required maxlength="3" autocapitalize="characters"') }}
+      {{ select('interval', t('common.super.plans.interval'), [{ value: 'MONTHLY', label: t('common.billing.interval.MONTHLY') }, { value: 'YEARLY', label: t('common.billing.interval.YEARLY') }], v.interval or p.interval or 'MONTHLY', e.interval) }}
+      {{ input(name='trialDays', label=t('common.super.plans.trialDays'), type='number', value=v.trialDays or (p.trialDays if plan else 0), error=e.trialDays, attrs='min="0" max="365"') }}
+    </div>
+  </section>
+
+  <section class="rounded-card border border-border bg-surface p-4">
+    <h2 class="font-display text-lg font-bold text-text">{{ t('common.super.plans.limits') }}</h2>
+    <p class="mt-1 text-sm text-muted-text">{{ t('common.super.plans.limitsHint') }}</p>
+    <div class="mt-4 grid gap-4 sm:grid-cols-4">
+      {{ input(name='maxMenus', label=t('common.billing.resource.menus'), type='number', value=v.maxMenus if v.maxMenus is defined else (p.maxMenus if p.maxMenus is number else ''), error=e.maxMenus, attrs='min="0"') }}
+      {{ input(name='maxCategories', label=t('common.billing.resource.categories'), type='number', value=v.maxCategories if v.maxCategories is defined else (p.maxCategories if p.maxCategories is number else ''), error=e.maxCategories, attrs='min="0"') }}
+      {{ input(name='maxItems', label=t('common.billing.resource.items'), type='number', value=v.maxItems if v.maxItems is defined else (p.maxItems if p.maxItems is number else ''), error=e.maxItems, attrs='min="0"') }}
+      {{ input(name='maxAdminUsers', label=t('common.billing.resource.adminUsers'), type='number', value=v.maxAdminUsers if v.maxAdminUsers is defined else (p.maxAdminUsers if p.maxAdminUsers is number else ''), error=e.maxAdminUsers, attrs='min="0"') }}
+    </div>
+  </section>
+
+  <fieldset class="rounded-card border border-border bg-surface p-4">
+    <legend class="px-1 font-display text-lg font-bold text-text">{{ t('common.billing.page.features') }}</legend>
+    <div class="mt-2 flex flex-col">
+      {% for feature in allFeatures %}
+        <label class="flex min-h-11 items-center gap-3 text-sm text-text">
+          <input type="checkbox" name="features" value="{{ feature }}" class="h-5 w-5 accent-primary" {% if (p.features and feature in p.features) %}checked{% endif %}>
+          {{ t('common.billing.feature.' + feature) }}
+        </label>
+      {% endfor %}
+    </div>
+    {% if e.features %}<p id="field-features-error" class="mt-1 text-sm text-danger" role="alert">{{ e.features }}</p>{% endif %}
+  </fieldset>
+
+  <div class="flex flex-wrap gap-3">
+    <button type="submit" class="inline-flex min-h-11 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-on hover:bg-primary-hover">{{ t('common.admin.form.save') }}</button>
+    <a href="/super/plans" class="inline-flex min-h-11 items-center rounded-md border border-border-strong px-5 text-sm font-medium text-text hover:bg-muted-surface">{{ t('common.admin.form.cancel') }}</a>
+  </div>
+</form>
+{% endblock %}

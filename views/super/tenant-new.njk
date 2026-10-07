@@ -1,0 +1,55 @@
+{% extends "layouts/super.njk" %}
+{% set section = 'restaurants' %}
+{% from "components/input.njk" import input %}
+{% from "components/select.njk" import select %}
+
+{% block title %}{{ t('common.super.tenants.add') }}{% endblock %}
+
+{% block content %}
+{% set v = flash.values if flash and flash.values else {} %}
+{% set e = flash.errors if flash and flash.errors else {} %}
+<h1 class="font-display text-2xl font-bold text-text">{{ t('common.super.tenants.add') }}</h1>
+<p class="mt-1 text-sm text-muted-text">{{ t('common.super.tenants.addHint') }}</p>
+
+<form method="post" action="/super/restaurants" class="mt-4 flex flex-col gap-6">
+  <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+
+  <section class="rounded-card border border-border bg-surface p-4">
+    <h2 class="font-display text-lg font-bold text-text">{{ t('common.super.tenants.restaurant') }}</h2>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      {{ input(name='nameAr', label=t('common.admin.form.nameArLabel'), value=v.nameAr or '', error=e.nameAr, dir='rtl', attrs='required maxlength="120"') }}
+      {{ input(name='nameEn', label=t('common.admin.form.nameEnLabel'), value=v.nameEn or '', error=e.nameEn, dir='ltr', attrs='required maxlength="120"') }}
+      <div class="sm:col-span-2">
+        {{ input(name='slug', label=t('common.super.tenants.slug'), value=v.slug or '', error=e.slug, hint=t('common.super.tenants.slugHint'), dir='ltr', attrs='required maxlength="40" autocapitalize="none" spellcheck="false"') }}
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-card border border-border bg-surface p-4">
+    <h2 class="font-display text-lg font-bold text-text">{{ t('common.super.tenants.subscription') }}</h2>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      {% set planOptions = [] %}
+      {% for plan in plans %}
+        {% set _added = planOptions.push({ value: plan.id, label: (plan.nameEn if locale == 'en' else plan.nameAr) + ' (' + (plan.priceAmount | money) + ' ' + plan.currency + ')' }) %}
+      {% endfor %}
+      {{ select('planId', t('common.super.tenants.plan'), planOptions, v.planId, e.planId) }}
+      {{ select('startMode', t('common.super.tenants.startMode'), [{ value: 'TRIAL', label: t('common.super.tenants.startTrial') }, { value: 'ACTIVE', label: t('common.super.tenants.startActive') }], v.startMode or 'TRIAL', e.startMode) }}
+      {{ input(name='paidUntil', label=t('common.super.tenants.paidUntil'), type='date', value=v.paidUntil or '', error=e.paidUntil, hint=t('common.super.tenants.paidUntilHint'), dir='ltr') }}
+    </div>
+  </section>
+
+  <section class="rounded-card border border-border bg-surface p-4">
+    <h2 class="font-display text-lg font-bold text-text">{{ t('common.super.tenants.firstAdmin') }}</h2>
+    <p class="mt-1 text-sm text-muted-text">{{ t('common.super.tenants.passwordHint') }}</p>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      {{ input(name='adminName', label=t('common.super.tenants.adminName'), value=v.adminName or '', error=e.adminName, attrs='required maxlength="120"') }}
+      {{ input(name='adminEmail', label=t('common.admin.auth.emailLabel'), type='email', value=v.adminEmail or '', error=e.adminEmail, attrs='required autocomplete="off"') }}
+    </div>
+  </section>
+
+  <div class="flex flex-wrap gap-3">
+    <button type="submit" class="inline-flex min-h-11 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-on hover:bg-primary-hover">{{ t('common.super.tenants.create') }}</button>
+    <a href="/super/restaurants" class="inline-flex min-h-11 items-center rounded-md border border-border-strong px-5 text-sm font-medium text-text hover:bg-muted-surface">{{ t('common.admin.form.cancel') }}</a>
+  </div>
+</form>
+{% endblock %}
