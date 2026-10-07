@@ -64,11 +64,16 @@ Used for:
 - The invitation an owner gets when the operator creates a restaurant or adds an account, so the owner can choose a password instead of keeping the generated one. The generated password is still shown to the operator once, as a fallback if the mail does not arrive.
 - A reset link when the operator resets an owner's password.
 
-Platform operators have no email reset yet. Reset one with `npm run super:create`.
+## Platform operator security
+
+- **Two step verification (authenticator app).** Required in production, optional elsewhere (`SUPER_REQUIRE_2FA=true|false` overrides). In production an operator who signs in without one is held on `/super/security` until they set it up. Codes are standard 6 digit TOTP, each code works once, five wrong codes lock the step for 15 minutes, and 10 single use recovery codes are given at setup (stored as hashes). The secret is stored encrypted with a key derived from `SESSION_SECRET`, so rotating `SESSION_SECRET` means operators set 2FA up again.
+- **Forgot password** at `/super/forgot`, with at least 12 characters. A reset link changes the password only, it never bypasses the authenticator, and an owner's link does not work on the platform side or the other way round.
+- **Change password** on the security page, which signs the operator out everywhere.
+- **IP allowlist.** `SUPER_ALLOWED_IPS=203.0.113.7,198.51.100.0/24` makes `/super` answer a plain 404 to every other address, including the login page. It uses the address Express sees, so set `TRUST_PROXY` correctly behind a proxy. Restaurant owners and the public menu are unaffected. Do not set it before you know your own address, or you lock yourself out (clear the variable and restart).
+- **Lost phone and recovery codes.** `npm run super:create -- you@example.org "Your Name" --reset-2fa` turns the authenticator off for that account, with a new password printed.
 
 ## Left for later
 
-- Two factor sign in for super admins, and a reset flow for them.
 - More emails: renewal reminders and receipts. They need a scheduled job.
 - Support sign in as an owner.
 - Per plan branding limits and per tenant domains.

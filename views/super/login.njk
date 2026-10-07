@@ -8,6 +8,9 @@
 <div class="mx-auto max-w-sm rounded-card border border-border bg-surface p-8">
   <p class="text-xs font-bold uppercase tracking-wide text-muted-text">{{ t('common.super.platform') }}</p>
   <h1 class="mt-1 font-display text-2xl font-bold text-text">{{ t('common.super.login.title') }}</h1>
+  {% if resetDone %}
+    <p class="mt-4 rounded-md bg-success/10 px-3 py-2 text-sm text-success" role="status">{{ t('common.admin.auth.resetDone') }}</p>
+  {% endif %}
   {% if error %}
     <p class="mt-4 rounded-md bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">{{ error }}</p>
   {% endif %}
@@ -17,5 +20,6 @@
     {{ input('password', t('common.admin.auth.passwordLabel'), 'password', '', '', fieldErrors.password, none, 'required autocomplete="current-password"') }}
     {{ button(t('common.admin.auth.submit'), 'primary', 'md', 'submit') }}
   </form>
+  <a href="/super/forgot" class="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline">{{ t('common.admin.auth.forgotLink') }}</a>
 </div>
 {% endblock %}

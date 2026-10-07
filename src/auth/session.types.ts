@@ -25,6 +25,13 @@ declare module 'express-session' {
     /** Platform operators. Never set together with adminUserId. */
     superAdminId?: string;
     superAdminName?: string;
+    /** Whether this operator signed in with an authenticator code. */
+    superTwoFactor?: boolean;
+    /** Password was right, the authenticator code is still to come. */
+    pendingSuperAdminId?: string;
+    pendingSuperAdminAt?: number;
+    /** A secret being set up, encrypted, until its first code is confirmed. */
+    pendingTotpSecret?: string;
     /** One message carried across a redirect, see FlashMiddleware. */
     flash?: Flash;
   }

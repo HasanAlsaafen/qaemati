@@ -31,6 +31,10 @@ const SUPER = [
   ['super-payments', '/super/payments?lang=en'],
   ['super-pay-new', '/super/payments/new?lang=en'],
   ['super-audit', '/super/audit?lang=en'],
+  ['super-security', '/super/security?lang=en'],
+  ['super-security-ar', '/super/security?lang=ar'],
+  ['super-2fa-setup', '/super/security/setup?lang=en'],
+  ['super-forgot', '/super/forgot?lang=en'],
 ];
 const ADMIN = [
   ['dash', '/admin?lang=en'],

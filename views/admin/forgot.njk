@@ -5,6 +5,7 @@
 
 {% block title %}{{ t('common.admin.auth.forgotTitle') }}{% endblock %}
 
+{% set area = area or 'admin' %}
 {% block content %}
 <div class="mx-auto max-w-sm rounded-xl border border-border bg-surface p-8 shadow-raised">
   <h1 class="font-sans text-2xl font-bold text-text">{{ t('common.admin.auth.forgotTitle') }}</h1>
@@ -16,12 +17,12 @@
     {% if error %}
       <p class="mt-4 rounded-md bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">{{ error }}</p>
     {% endif %}
-    <form method="post" action="/admin/forgot" class="mt-6 flex flex-col gap-4">
+    <form method="post" action="/{{ area }}/forgot" class="mt-6 flex flex-col gap-4">
       <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
       {{ input('email', t('common.admin.auth.emailLabel'), 'email', email, '', none, none, 'required autocomplete="username"') }}
       {{ button(t('common.admin.auth.forgotSubmit'), 'primary', 'md', 'submit') }}
     </form>
   {% endif %}
-  <a href="/admin/login" class="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline">{{ t('common.admin.auth.backToLogin') }}</a>
+  <a href="/{{ area }}/login" class="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline">{{ t('common.admin.auth.backToLogin') }}</a>
 </div>
 {% endblock %}

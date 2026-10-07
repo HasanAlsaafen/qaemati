@@ -573,7 +573,16 @@ model SuperAdmin {
   passwordHash String
   name         String
 
-  payments Payment[]
+  /// Authenticator app secret, encrypted (see super-admin/totp-crypto.ts).
+  totpSecretEnc String?
+  totpEnabledAt DateTime?
+  /// The last 30 second step accepted, so a code cannot be used twice.
+  totpLastStep  Int?
+  /// SHA-256 of each unused recovery code.
+  recoveryCodes String[]
+
+  passwordResets PasswordResetToken[]
+  payments       Payment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -606,10 +615,15 @@ model PasswordResetToken {
   usedAt    DateTime?
   createdAt DateTime  @default(now())
 
-  adminUserId String
-  adminUser   AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  /// Exactly one of these is set: a restaurant owner or a platform operator.
+  adminUserId String?
+  adminUser   AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+
+  superAdminId String?
+  superAdmin   SuperAdmin? @relation(fields: [superAdminId], references: [id], onDelete: Cascade)
 
   @@index([adminUserId])
+  @@index([superAdminId])
 }
 
 /// Counters for rate limits, shared by every instance. Rows disappear when their

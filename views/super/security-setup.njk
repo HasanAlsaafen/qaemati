@@ -1,0 +1,29 @@
+{% extends "layouts/super.njk" %}
+{% from "components/input.njk" import input %}
+{% from "components/button.njk" import button %}
+
+{% block title %}{{ t('common.super.security.setupTitle') }}{% endblock %}
+
+{% block content %}
+<h1 class="font-display text-2xl font-bold text-text">{{ t('common.super.security.setupTitle') }}</h1>
+<ol class="mt-4 list-decimal ps-5 text-sm text-text">
+  <li>{{ t('common.super.security.step1') }}</li>
+  <li class="mt-1">{{ t('common.super.security.step2') }}</li>
+  <li class="mt-1">{{ t('common.super.security.step3') }}</li>
+</ol>
+<div class="mt-6 flex flex-col items-start gap-6 rounded-card border border-border bg-surface p-5 sm:flex-row">
+  <img src="{{ qr }}" width="220" height="220" alt="{{ t('common.super.security.qrAlt') }}" class="rounded-md border border-border bg-white">
+  <div class="min-w-0">
+    <p class="text-sm text-muted-text">{{ t('common.super.security.manualKey') }}</p>
+    <p class="mt-1 break-all font-mono text-base font-bold text-text" dir="ltr" data-secret>{{ secret }}</p>
+    {% if error %}
+      <p class="mt-4 rounded-md bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">{{ error }}</p>
+    {% endif %}
+    <form method="post" action="/super/security/enable" class="mt-4 flex max-w-xs flex-col gap-3">
+      <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+      {{ input('code', t('common.super.security.codeLabel'), 'text', '', '', none, t('common.super.security.confirmHint'), 'required autocomplete="one-time-code" inputmode="numeric" autofocus', 'ltr') }}
+      {{ button(t('common.super.security.confirmButton'), 'primary', 'md', 'submit') }}
+    </form>
+  </div>
+</div>
+{% endblock %}

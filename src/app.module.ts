@@ -16,6 +16,7 @@ import { AdminModule } from './admin/admin.module';
 import { HomeModule } from './home/home.module';
 import { TenancyModule } from './tenancy/tenancy.module';
 import { SuperAdminModule } from './super-admin/super-admin.module';
+import { SuperIpMiddleware } from './super-admin/super-ip.middleware';
 import { SuperAdminAuthMiddleware } from './super-admin/super-admin-auth.middleware';
 import { FlashMiddleware } from './common/middleware/flash.middleware';
 import { FeatureGuard } from './tenancy/requires-feature';
@@ -70,7 +71,11 @@ export class AppModule implements NestModule {
       .exclude('admin/login', 'admin/logout', 'admin/forgot', 'admin/reset/(.*)')
       .forRoutes('admin');
     consumer.apply(FlashMiddleware).forRoutes('super');
-    consumer.apply(SuperAdminAuthMiddleware).exclude('super/login').forRoutes('super');
+    consumer.apply(SuperIpMiddleware).forRoutes('super');
+    consumer
+      .apply(SuperAdminAuthMiddleware)
+      .exclude('super/login', 'super/login/verify', 'super/forgot', 'super/reset/(.*)')
+      .forRoutes('super');
     consumer
       .apply(TenantContextMiddleware)
       .exclude('admin/login', 'admin/forgot', 'admin/reset/(.*)')

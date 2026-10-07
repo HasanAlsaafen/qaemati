@@ -1,0 +1,14 @@
+{% extends "layouts/super.njk" %}
+
+{% block title %}{{ t('common.super.security.codesTitle') }}{% endblock %}
+
+{% block content %}
+<h1 class="font-display text-2xl font-bold text-text">{{ t('common.super.security.codesTitle') }}</h1>
+<p class="mt-2 rounded-md bg-success/10 px-3 py-2 text-sm text-success" role="status">{{ t('common.super.security.codesEnabled') if title == 'enabled' else t('common.super.security.codesRenewed') }}</p>
+<p class="mt-4 text-sm text-text">{{ t('common.super.security.codesIntro') }}</p>
+<ul class="mt-4 grid max-w-md grid-cols-2 gap-2 rounded-card border border-border bg-surface p-4 font-mono text-base font-bold text-text" dir="ltr" data-recovery-codes>
+  {% for code in codes %}<li>{{ code }}</li>{% endfor %}
+</ul>
+<p class="mt-3 text-xs text-muted-text">{{ t('common.super.security.codesOnce') }}</p>
+<a href="/super/security" class="mt-4 inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover">{{ t('common.super.security.codesDone') }}</a>
+{% endblock %}

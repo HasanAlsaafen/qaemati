@@ -5,6 +5,9 @@ import { DashboardService } from './dashboard.service';
 import { PaymentsService } from './payments.service';
 import { PlansService } from './plans.service';
 import { SuperAuthController } from './super-auth.controller';
+import { SuperPasswordResetController } from './super-password-reset.controller';
+import { SuperSecurityController } from './super-security.controller';
+import { TwoFactorService } from './two-factor.service';
 import { SuperDashboardController } from './super-dashboard.controller';
 import { SuperPaymentsController } from './super-payments.controller';
 import { SuperPlansController } from './super-plans.controller';
@@ -15,11 +18,20 @@ import { TenantsService } from './tenants.service';
   imports: [AuthModule],
   controllers: [
     SuperAuthController,
+    SuperPasswordResetController,
+    SuperSecurityController,
     SuperDashboardController,
     SuperTenantsController,
     SuperPlansController,
     SuperPaymentsController,
   ],
-  providers: [AuditService, PlansService, TenantsService, PaymentsService, DashboardService],
+  providers: [
+    TwoFactorService,
+    AuditService,
+    PlansService,
+    TenantsService,
+    PaymentsService,
+    DashboardService,
+  ],
 })
 export class SuperAdminModule {}

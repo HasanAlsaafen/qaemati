@@ -44,6 +44,14 @@ class EnvironmentVariables {
 
   @IsOptional()
   @IsString()
+  SUPER_ALLOWED_IPS?: string;
+
+  @IsOptional()
+  @IsIn(['true', 'false'])
+  SUPER_REQUIRE_2FA?: string;
+
+  @IsOptional()
+  @IsString()
   DEMO_MODE?: string;
 
   @IsOptional()

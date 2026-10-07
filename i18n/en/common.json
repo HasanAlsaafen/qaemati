@@ -135,7 +135,8 @@
       "passwordMismatch": "The two passwords do not match.",
       "fixErrors": "Some fields need attention.",
       "resetInvalid": "This link has expired or was already used. Request a new one.",
-      "resetDone": "Your password was changed. Sign in with the new one."
+      "resetDone": "Your password was changed. Sign in with the new one.",
+      "passwordHintMin": "At least {min} characters."
     },
     "nav": {
       "dashboard": "Dashboard",
@@ -508,7 +509,8 @@
       "restaurants": "Restaurants",
       "plans": "Plans",
       "payments": "Payments",
-      "audit": "Activity log"
+      "audit": "Activity log",
+      "security": "Security"
     },
     "login": {
       "title": "Platform sign in"
@@ -629,8 +631,51 @@
       "planArchived": "Plan archived. Restaurants on it keep it.",
       "planRestored": "Plan restored.",
       "paymentRecorded": "Payment recorded and the subscription extended.",
-      "paymentVoided": "Payment voided."
+      "paymentVoided": "Payment voided.",
+      "twoFactorOff": "Two step verification is off."
     },
-    "mailedTo": "A sign in link was also emailed to {email}."
+    "mailedTo": "A sign in link was also emailed to {email}.",
+    "security": {
+      "verifyTitle": "Two step verification",
+      "verifyIntro": "Enter the 6 digit code from your authenticator app, or one of your recovery codes.",
+      "codeLabel": "Code",
+      "codeHint": "For example 123456, or abcde-fghjk",
+      "verifySubmit": "Verify",
+      "wrongCode": "That code is not right. Check the time on your phone and try again.",
+      "twoFactorTitle": "Two step verification",
+      "twoFactorIntro": "Signing in also needs a 6 digit code from an authenticator app on your phone, so a stolen password is not enough to get in.",
+      "on": "On",
+      "off": "Off",
+      "mustEnable": "Two step verification is required. Turn it on to keep using the platform area.",
+      "setupButton": "Set up two step verification",
+      "setupTitle": "Set up two step verification",
+      "step1": "Install an authenticator app such as Google Authenticator, Microsoft Authenticator or Aegis.",
+      "step2": "Scan the code below, or type the key into the app.",
+      "step3": "Enter the 6 digit code the app shows to confirm.",
+      "qrAlt": "QR code to scan with your authenticator app",
+      "manualKey": "Or type this key:",
+      "confirmHint": "The 6 digit code from the app",
+      "confirmButton": "Turn on",
+      "recoveryLeft": "Recovery codes left: {count}",
+      "renewHint": "Enter a current code to get 10 new recovery codes. The old ones stop working.",
+      "renewButton": "Get new recovery codes",
+      "disableTitle": "Turn off two step verification",
+      "disableButton": "Turn off",
+      "cannotDisable": "Two step verification is required on this server and cannot be turned off.",
+      "wrongPasswordOrCode": "The password or the code is not right.",
+      "twoFactorOff": "Two step verification is off.",
+      "codesTitle": "Recovery codes",
+      "codesEnabled": "Two step verification is on.",
+      "codesRenewed": "New recovery codes are ready. The old ones no longer work.",
+      "codesIntro": "Keep these somewhere safe, like a password manager. Each one works once if you lose your phone.",
+      "codesOnce": "They are shown only now.",
+      "codesDone": "Done",
+      "passwordTitle": "Password",
+      "passwordIntro": "Changing it signs you out everywhere.",
+      "currentPassword": "Current password",
+      "wrongCurrentPassword": "The current password is not right.",
+      "passwordTooShort": "Use at least {min} characters.",
+      "passwordMismatch": "The two passwords do not match."
+    }
   }
 }

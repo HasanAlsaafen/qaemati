@@ -120,6 +120,8 @@ Restaurants are tenants with plans, subscriptions and a manual payment ledger, r
 
 - Create the first operator: `npm run super:create -- you@example.org "Your Name"` (prints a
   generated password once, or set `SUPER_ADMIN_PASSWORD`).
+- Production requires an authenticator app for operators. `npm run super:create -- <email> <name> --reset-2fa`
+  clears it for a locked out operator. `SUPER_ALLOWED_IPS` limits who can reach `/super`.
 - The demo seed adds a platform operator, `super@qaemati.example.com`, with the shared demo password.
 - A restaurant whose subscription is over goes offline after its grace period and its admin turns
   read only. Nothing is deleted.

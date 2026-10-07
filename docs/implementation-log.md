@@ -260,6 +260,16 @@ Dockerfile (runs migrations on start, health check, non root, uploads volume), `
 - Verified: a real backup of the dev database restored into a scratch database with identical counts for restaurants, dishes, payments, owners and subscriptions; retention kept only the newest N; the restore refuses without typing the confirmation; the compose file renders; shell syntax and the CI YAML parse.
 - Not verified: the image build, the running container and the certificate step (no Docker daemon access here), and the CI run on GitHub. The first real build may need a small fix.
 
+## Phase K: platform operator security
+
+- Authenticator app (TOTP, RFC 6238, checked against the RFC test vectors) with single use codes, 10 hashed recovery codes, encrypted secret, lockout after five wrong codes, and enforcement in production.
+- Forgot and change password for operators (12 character minimum, link separate from the owner link, never bypasses the authenticator, change ends every session).
+- IP allowlist for `/super` (plain 404 for others), `--reset-2fa` for a locked out operator.
+- Migration `20261011000000_super_admin_security`: authenticator fields on `SuperAdmin`, reset tokens now belong to exactly one kind of account (database check).
+- Bug found by the new tests: pages rendered from a POST handler answered 201 (Nest default) instead of 200, the same quirk the owner login documents.
+- Tests: 22 e2e (setup, wrong first code, hashed recovery codes, password then code, replay, recovery use once, lockout, required mode, disable, renew codes, password change ending sessions, reset links, allowlist) and 16 unit (RFC vectors, drift window, replay, encryption, tamper, allowlist ranges). axe at 375px clean on the new pages.
+- Not covered: signing the operator out of other devices when 2FA is turned on or off, and a notification email on operator sign in.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).

@@ -16,7 +16,10 @@ A single server (a small VPS is enough to start) runs three containers: the app,
    ```
    docker compose -f docker-compose.prod.yml --env-file .env.production exec app npm run super:create -- you@example.org "Your Name"
    ```
-7. Sign in at `/super/login`, create a plan, then create your first restaurant.
+7. Sign in at `/super/login`. In production you are taken straight to set up two step verification with an authenticator app, and shown 10 recovery codes. Save them in a password manager.
+8. Create a plan, then create your first restaurant.
+
+Optional: restrict the platform area to your own addresses with `SUPER_ALLOWED_IPS` in `.env.production` (see `docs/saas-architecture.md`).
 
 `DEMO_MODE` is forced off in the compose file, so the demo panel and the reset endpoint do not exist in production. Do not run the seed there: it wipes data.
 
@@ -77,4 +80,4 @@ Uploaded photos are files on the `uploads` volume, so they survive redeploys and
 - [ ] Gmail app password works (send yourself a password reset)
 - [ ] First backup taken and a restore rehearsed
 - [ ] Backups copied off the server
-- [ ] Platform operator created, demo accounts absent
+- [ ] Platform operator created, two step verification on, recovery codes saved, demo accounts absent
