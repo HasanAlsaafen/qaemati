@@ -95,7 +95,7 @@
         "menus": "Menus",
         "categories": "Categories",
         "dishes": "Dishes",
-        "admins": "Owner accounts",
+        "admins": "Team accounts",
         "unlimited": "unlimited",
         "upTo": "up to {count}",
         "includes": "Includes",
@@ -328,7 +328,8 @@
       "branding": "Branding",
       "toggleSidebar": "Collapse sidebar",
       "billing": "Subscription",
-      "pos": "Orders"
+      "pos": "Orders",
+      "team": "Team"
     },
     "form": {
       "required": "This field is required.",
@@ -612,6 +613,29 @@
       "settingsNote": "The position comes from the guest's phone. It stops orders sent from home by mistake or as a prank, but a determined person can fake it, so treat it as a filter and not as proof.",
       "save": "Save",
       "saved": "Saved"
+    },
+    "team": {
+      "title": "Team",
+      "intro": "Who can sign in to this restaurant. Cashiers and kitchen staff only see the orders screen.",
+      "usage": "{used} of {limit} accounts used",
+      "usageUnlimited": "{used} accounts",
+      "you": "you",
+      "roleLabel": "Role",
+      "roleOWNER": "Owner: everything",
+      "roleCASHIER": "Cashier: orders, prices and waiter calls",
+      "roleKITCHEN": "Kitchen: what to cook, no prices",
+      "roleHelp": "A cashier takes orders through to served and answers waiter calls. The kitchen sees only the dishes and marks them started or ready.",
+      "addTitle": "Add someone",
+      "name": "Name",
+      "email": "Email",
+      "add": "Add account",
+      "reset": "Reset password",
+      "resetConfirm": "Reset this password? They are signed out and get a new one.",
+      "remove": "Remove",
+      "removeConfirm": "Remove this account? They are signed out at once.",
+      "secretTitle": "Give them these sign in details",
+      "secretOnce": "The password is shown only now.",
+      "mailed": "A link to choose their own password was also emailed to {email}."
     }
   },
   "validation": {
@@ -626,7 +650,8 @@
     "invalidSlug": "Use lowercase letters, numbers and hyphens, at least 3 characters.",
     "invalidDate": "Enter a date like 2026-10-08.",
     "invalidAmount": "Enter an amount above zero, for example 60.00.",
-    "invalidInteger": "Enter a whole number."
+    "invalidInteger": "Enter a whole number.",
+    "emailTaken": "That email already has an account."
   },
   "billing": {
     "blockedToast": "Your subscription has ended, so changes are turned off. Renew to continue.",
@@ -788,7 +813,7 @@
       "graceDays": "Grace days",
       "graceHint": "Days the menu stays up after the paid time ends.",
       "note": "Internal note",
-      "admins": "Owner accounts",
+      "admins": "Team accounts",
       "resetPassword": "Reset password",
       "addAdmin": "Add account"
     },

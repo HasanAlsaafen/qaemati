@@ -5,6 +5,7 @@ import { I18nService } from 'nestjs-i18n';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginRateLimiter } from './login-rate-limiter';
 import { LoginDto } from './dto/login.dto';
+import { canOpen, homeFor } from '../pos/roles';
 
 @Controller('admin')
 export class AuthController {
@@ -86,11 +87,13 @@ export class AuthController {
     req.session.restaurantId = admin.restaurantId;
     req.session.restaurantSlug = admin.restaurant.slug;
     req.session.adminName = admin.name;
+    req.session.adminRole = admin.role;
     req.session.hasSeenTour = admin.hasSeenTour;
 
     req.session.save((err) => {
       if (err) throw err;
-      res.redirect(safeRedirect);
+      // A cashier or kitchen account lands on the orders screen, whatever it asked for.
+      res.redirect(canOpen(admin.role, safeRedirect) ? safeRedirect : homeFor(admin.role));
     });
   }
 

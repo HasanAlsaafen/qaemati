@@ -1,0 +1,63 @@
+{% from "components/input.njk" import input %}
+{% set P = 'common.admin.team.' %}
+
+{% if secret %}
+  <div role="status" class="mt-4 rounded-lg border border-success/40 bg-success/10 p-4 text-sm text-text">
+    <p class="font-bold">{{ t(P + 'secretTitle') }}</p>
+    <p class="mt-2" dir="ltr">{{ secret.email }}</p>
+    <p class="mt-1 flex flex-wrap items-center gap-3" dir="ltr"><code class="rounded-sm bg-surface px-2 py-1 font-mono text-base font-bold" data-secret>{{ secret.password }}</code></p>
+    <p class="mt-2 text-xs text-muted-text">{{ t(P + 'secretOnce') }}</p>
+    {% if secret.mailed %}<p class="mt-1 text-xs text-muted-text">{{ t(P + 'mailed', { email: secret.email }) }}</p>{% endif %}
+  </div>
+{% endif %}
+
+<p class="mt-6 text-sm text-text">
+  {% if limit is number %}{{ t(P + 'usage', { used: used, limit: limit }) }}{% else %}{{ t(P + 'usageUnlimited', { used: used }) }}{% endif %}
+</p>
+
+<ul class="mt-3 divide-y divide-border rounded-lg border border-border bg-surface">
+  {% for member in members %}
+    <li class="flex flex-wrap items-center justify-between gap-3 p-4" data-member="{{ member.id }}">
+      <div class="min-w-0">
+        <p class="truncate font-medium text-text">{{ member.name }}{% if member.id == me %} <span class="text-muted-text">({{ t(P + 'you') }})</span>{% endif %}</p>
+        <p class="truncate text-sm text-muted-text" dir="ltr">{{ member.email }}</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        {% if member.id == me %}
+          <span class="inline-flex min-h-11 items-center px-2 text-sm font-medium text-text">{{ t(P + 'role' + member.role) }}</span>
+        {% else %}
+          <form hx-post="/admin/team/{{ member.id }}/role" hx-target="#team-panel" hx-swap="innerHTML" hx-trigger="change">
+            <label class="sr-only" for="role-{{ member.id }}">{{ t(P + 'roleLabel') }}</label>
+            <select id="role-{{ member.id }}" name="role" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-sm text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+              {% for role in ['OWNER', 'CASHIER', 'KITCHEN'] %}
+                <option value="{{ role }}" {{ 'selected' if role == member.role }}>{{ t(P + 'role' + role) }}</option>
+              {% endfor %}
+            </select>
+          </form>
+          <button type="button" hx-post="/admin/team/{{ member.id }}/reset-password" hx-target="#team-panel" hx-swap="innerHTML" hx-confirm="{{ t(P + 'resetConfirm') }}" class="inline-flex min-h-11 items-center rounded-md border border-border-strong px-3 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(P + 'reset') }}</button>
+          <button type="button" hx-post="/admin/team/{{ member.id }}/remove" hx-target="#team-panel" hx-swap="innerHTML" hx-confirm="{{ t(P + 'removeConfirm') }}" class="inline-flex min-h-11 items-center rounded-md border border-border-strong px-3 text-sm font-medium text-danger hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(P + 'remove') }}</button>
+        {% endif %}
+      </div>
+    </li>
+  {% endfor %}
+</ul>
+
+<section class="mt-8" aria-labelledby="add-member-title">
+  <h2 id="add-member-title" class="font-sans text-lg font-bold text-text">{{ t(P + 'addTitle') }}</h2>
+  <form hx-post="/admin/team" hx-target="#team-panel" hx-swap="innerHTML" class="mt-3 grid max-w-2xl gap-4 sm:grid-cols-2">
+    {{ input('name', t(P + 'name'), 'text', '', '', none, none, 'required autocomplete="off"') }}
+    {{ input('email', t(P + 'email'), 'email', '', '', none, none, 'required autocomplete="off"') }}
+    <div class="flex flex-col gap-1.5 sm:col-span-2">
+      <label for="member-role" class="text-sm font-medium text-text">{{ t(P + 'roleLabel') }}</label>
+      <select id="member-role" name="role" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        <option value="CASHIER">{{ t(P + 'roleCASHIER') }}</option>
+        <option value="KITCHEN">{{ t(P + 'roleKITCHEN') }}</option>
+        <option value="OWNER">{{ t(P + 'roleOWNER') }}</option>
+      </select>
+      <p class="text-sm text-muted-text">{{ t(P + 'roleHelp') }}</p>
+    </div>
+    <div class="sm:col-span-2">
+      <button type="submit" class="inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(P + 'add') }}</button>
+    </div>
+  </form>
+</section>

@@ -189,8 +189,18 @@ model Restaurant {
   bulkOperationLogs BulkOperationLog[]
 }
 
+enum StaffRole {
+  OWNER
+  CASHIER
+  KITCHEN
+}
+
 model AdminUser {
   id String @id @default(cuid())
+
+  /// OWNER can do everything. CASHIER works the orders screen and sees what a
+  /// guest pays. KITCHEN sees what to cook and marks it started or ready.
+  role StaffRole @default(OWNER)
 
   restaurantId String
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)

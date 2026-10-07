@@ -14,13 +14,15 @@ export class AdminLocalsMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction): Promise<void> {
     res.locals.adminName = req.session.adminName;
+    res.locals.adminRole = req.session.adminRole ?? 'OWNER';
     res.locals.restaurantSlug = req.session.restaurantSlug;
     // A5: show the first-login guided tour until dismissed (see
     // tour.controller.ts). req.session.hasSeenTour is undefined for any
     // session that predates this feature -- treated as "not seen" so
     // existing logged-in sessions get the tour too, not just new logins.
     res.locals.showTour =
-      req.session.hasSeenTour === false || req.session.hasSeenTour === undefined;
+      (req.session.adminRole ?? 'OWNER') === 'OWNER' &&
+      (req.session.hasSeenTour === false || req.session.hasSeenTour === undefined);
     // The category blocks that offer "move to another menu" are rendered
     // by several controllers. Loading the list here means none of them
     // can forget it. A handler that changes the menus passes a fresh list

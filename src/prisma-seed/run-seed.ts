@@ -156,6 +156,16 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
         name: restaurantData.adminName,
       },
     });
+    // A cashier and a kitchen account, so the orders screen can be tried as each.
+    const domain = restaurantData.adminEmail.split('@')[1];
+    for (const [local, name, role] of [
+      ['cashier', 'Demo Cashier', 'CASHIER'],
+      ['kitchen', 'Demo Kitchen', 'KITCHEN'],
+    ] as const) {
+      await prisma.adminUser.create({
+        data: { restaurantId: restaurant.id, email: `${local}@${domain}`, passwordHash, name, role },
+      });
+    }
 
     // The cafe is a paying Pro customer, the restaurant is still on a trial.
     if (restaurantData.slug === 'bayt-al-zaytoun') {

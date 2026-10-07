@@ -2,6 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { OrderStatus, WaiterCallStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { PosEventBus } from './pos-event-bus';
+import { canHandleCalls, Role } from './roles';
 
 /** The only ways an order moves. A finished or canceled order stays that way. */
 export const ORDER_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -35,7 +36,7 @@ export class PosService {
     private readonly bus: PosEventBus,
   ) {}
 
-  async board(restaurantId: string) {
+  async board(restaurantId: string, role: Role = 'OWNER') {
     const since = new Date(Date.now() - RECENT_MS);
     const [orders, calls] = await Promise.all([
       this.prisma.order.findMany({
@@ -50,14 +51,17 @@ export class PosService {
         orderBy: { createdAt: 'asc' },
         take: 200,
       }),
-      this.prisma.waiterCall.findMany({
-        where: {
-          restaurantId,
-          OR: [{ status: { not: 'RESOLVED' } }, { resolvedAt: { gte: since } }],
-        },
-        orderBy: { createdAt: 'asc' },
-        take: 100,
-      }),
+      // The kitchen cooks. Guests' calls are for whoever is on the floor.
+      canHandleCalls(role)
+        ? this.prisma.waiterCall.findMany({
+            where: {
+              restaurantId,
+              OR: [{ status: { not: 'RESOLVED' } }, { resolvedAt: { gte: since } }],
+            },
+            orderBy: { createdAt: 'asc' },
+            take: 100,
+          })
+        : Promise.resolve([]),
     ]);
     return {
       orders,

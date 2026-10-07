@@ -7,10 +7,12 @@ import { AcceptLanguageResolver, CookieResolver, I18nModule, QueryResolver } fro
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LocaleViewMiddleware } from './common/middleware/locale-view.middleware';
 import { AdminAuthMiddleware } from './auth/admin-auth.middleware';
+import { AdminRoleMiddleware } from './auth/admin-role.middleware';
 import { AdminLocalsMiddleware } from './auth/admin-locals.middleware';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { PosModule } from './pos/pos.module';
+import { TeamModule } from './team/team.module';
 import { RateLimitModule } from './common/rate-limit/rate-limit.module';
 import { CsrfViewMiddleware } from './auth/csrf-view.middleware';
 import { AdminModule } from './admin/admin.module';
@@ -45,6 +47,7 @@ import { StyleguideModule } from './styleguide/styleguide.module';
     MailModule,
     RateLimitModule,
     PosModule,
+    TeamModule,
     TenancyModule,
     SuperAdminModule,
     HomeModule,
@@ -70,6 +73,10 @@ export class AppModule implements NestModule {
     consumer.apply(CsrfViewMiddleware).forRoutes('*');
     consumer
       .apply(AdminAuthMiddleware)
+      .exclude('admin/login', 'admin/logout', 'admin/forgot', 'admin/reset/(.*)')
+      .forRoutes('admin');
+    consumer
+      .apply(AdminRoleMiddleware)
       .exclude('admin/login', 'admin/logout', 'admin/forgot', 'admin/reset/(.*)')
       .forRoutes('admin');
     consumer.apply(FlashMiddleware).forRoutes('super');

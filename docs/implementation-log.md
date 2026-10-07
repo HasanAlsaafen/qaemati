@@ -311,6 +311,15 @@ Order status for the guest, the first of five follow ups (guest status, staff ro
 - Bug found in the browser: Alpine's object spread (`...tableOrderState()`) copies a getter's value once instead of keeping it live, so status text never updated. The state uses methods instead of getters.
 - Tests: status endpoint (private token, status only, follows staff changes, rejects ids/guesses/other restaurants, Arabic), `/track` websocket (initial status, live change, status only, other orders not heard, bad tokens, other origin, other restaurant staff cannot move it), and the menu wiring. Browser check with a guest phone and a staff screen in English and Arabic: live update, reload, finish, axe clean.
 
+## Phase O (2/5): cashier and kitchen accounts
+
+- Migration `20261015000000_staff_roles` adds `AdminUser.role` (OWNER default, so every existing account stays an owner).
+- `AdminRoleMiddleware` restricts cashier and kitchen sessions to the orders screen, sign out and the tour dismiss, by default deny. Dot segments and percent encoded dots are refused so a prefix cannot be walked out of (found by a unit test).
+- Orders screen by role: the kitchen sees no prices, no waiter calls and no cancel or serve buttons; cashiers see prices and calls but not the location settings; the websocket sends waiter calls to owners and cashiers only. The server refuses the same actions, tested.
+- New Team page (`/admin/team`) for owners: add (generated password shown once plus invitation mail), change role, reset password, remove, with the plan limit, last owner and self protections, and sessions ended on change. "Owner accounts" is now "Team accounts" in the plan screens.
+- The admin sidebar, mobile menu, billing banner, preview link and first login tour are hidden from staff. Seed: each demo restaurant has cashier@ and kitchen@ accounts with the demo password.
+- Tests: 31 e2e (sign in routing, access matrix, forbidden writes with a valid token, what each role sees and can change, floor versus kitchen sockets, the team page, limits, isolation) and 9 unit. Browser: cashier redirected from billing, kitchen board has no prices, axe clean on the team page at 375px in both languages and 1280px.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).

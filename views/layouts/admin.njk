@@ -61,15 +61,16 @@
       <nav class="flex flex-1 flex-col gap-1 px-2 py-2 text-sm">
         {% set navItems = [
           { href: '/admin', label: t('common.admin.nav.categories'), icon: 'categories' },
-          { href: '/admin/pos', label: t('common.admin.nav.pos'), icon: 'pos', feature: 'tableOrdering' },
+          { href: '/admin/pos', label: t('common.admin.nav.pos'), icon: 'pos', feature: 'tableOrdering', staff: true },
           { href: '/admin/analytics', label: t('common.admin.nav.analytics'), icon: 'analytics', feature: 'analytics' },
           { href: '/admin/bulk', label: t('common.admin.nav.bulk'), icon: 'bulk', feature: 'bulkTools' },
           { href: '/admin/qr', label: t('common.admin.nav.qr'), icon: 'qr' },
           { href: '/admin/branding', label: t('common.admin.nav.branding'), icon: 'branding' },
+          { href: '/admin/team', label: t('common.admin.nav.team'), icon: 'team' },
           { href: '/admin/billing', label: t('common.admin.nav.billing'), icon: 'billing' }
         ] %}
         {% for item in navItems %}
-          {% if not item.feature or (tenant and item.feature in tenant.features) %}
+          {% if (adminRole == 'OWNER' or item.staff) and (not item.feature or (tenant and item.feature in tenant.features)) %}
           <a
             href="{{ item.href }}"
             title="{{ item.label }}"
@@ -82,7 +83,7 @@
           {% endif %}
         {% endfor %}
 
-        {% if restaurantSlug %}
+        {% if restaurantSlug and adminRole == 'OWNER' %}
           <a
             href="/m/{{ restaurantSlug }}"
             target="_blank"
@@ -136,11 +137,11 @@
         <div id="admin-mobile-nav" x-show="navOpen" x-cloak class="border-t border-border px-4 py-3">
           <nav class="flex flex-col gap-1 text-sm">
             {% for item in navItems %}
-              {% if not item.feature or (tenant and item.feature in tenant.features) %}
+              {% if (adminRole == 'OWNER' or item.staff) and (not item.feature or (tenant and item.feature in tenant.features)) %}
                 <a href="{{ item.href }}" class="min-h-11 inline-flex items-center rounded-md px-3 hover:bg-muted-surface">{{ item.label }}</a>
               {% endif %}
             {% endfor %}
-            {% if restaurantSlug %}
+            {% if restaurantSlug and adminRole == 'OWNER' %}
               <a href="/m/{{ restaurantSlug }}" target="_blank" rel="noopener noreferrer" class="min-h-11 inline-flex items-center rounded-md px-3 hover:bg-muted-surface">{{ t('common.admin.nav.previewMenu') }}</a>
             {% endif %}
           </nav>
@@ -166,7 +167,7 @@
         both squeezed into ~700px, producing a squashed form with a
         cut-off phone preview.
       #}
-      {% include "admin/components/billing-banner.njk" %}
+      {% if adminRole == 'OWNER' %}{% include "admin/components/billing-banner.njk" %}{% endif %}
 
       <main id="main-content" tabindex="-1" class="mx-auto w-full {% block mainWidth %}max-w-3xl{% endblock %} px-4 py-8 focus:outline-none">
         {% block content %}{% endblock %}

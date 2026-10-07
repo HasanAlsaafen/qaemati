@@ -19,6 +19,8 @@ declare module 'express-session' {
     restaurantId?: string;
     restaurantSlug?: string;
     adminName?: string;
+    /** OWNER, CASHIER or KITCHEN. A session from before roles existed has none and was an owner. */
+    adminRole?: 'OWNER' | 'CASHIER' | 'KITCHEN';
     /** A5: cached once at login (see auth.controller.ts) rather than
      *  re-queried on every admin page request. */
     hasSeenTour?: boolean;

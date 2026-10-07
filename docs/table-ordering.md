@@ -18,7 +18,13 @@ When a guest opens the menu from a table's QR code, the selection goes to the re
 - Browsers only allow sound after a tap on the page, so the screen has a "Turn on sound" button. If it was on last time the screen says the browser blocked it, instead of staying silently quiet.
 - The tab title shows how many things need attention, for example `(3) Table orders`.
 - A dot shows whether the live connection is up. If it drops, the board refreshes by itself when it returns, so nothing that happened meanwhile is missed, and it also refreshes every 30 seconds as a safety net.
-- Any signed in account of the restaurant can move an order. There are no separate cashier and kitchen roles yet.
+- Accounts have a role, set on the Team page (`/admin/team`, owners only):
+  - **Owner**: everything.
+  - **Cashier**: only the orders screen. Sees prices, moves orders through served or canceled, answers waiter calls. Cannot change the location settings.
+  - **Kitchen**: only the orders screen, with no prices, no waiter calls and no cancel button. Can mark an order preparing and then ready, and nothing after that. Its live connection never receives waiter calls.
+  - A cashier or kitchen account lands on the orders screen after signing in. Every other page under `/admin` is refused to them **by default** (a page added later is owners only until someone opens it to staff), and the same rules are enforced on the server for each action, so a hidden button is not the only barrier.
+  - Changing someone's role, resetting their password or removing them signs them out immediately. The last owner of a restaurant can never be demoted or removed, and nobody can change their own role or remove themselves.
+  - Staff accounts count toward the plan's account limit (shown as "Team accounts"). A new account gets a generated password, shown once, and an email with a link to choose their own.
 
 Order steps: New, Preparing, Ready, Served, and Canceled from any of the first three. Steps cannot be skipped and a served or canceled order cannot be reopened. If two people tap at once, one wins and the other is told the order changed.
 
@@ -56,6 +62,6 @@ The order response carries a random `track` token. The menu keeps it in the brow
 
 ## Not built
 
-- Separate cashier and kitchen accounts, kitchen printers, payment at the table, splitting a bill.
+- Kitchen printers, payment at the table, splitting a bill, a waiter role distinct from cashier.
 - Notification when no staff screen is open (orders wait on the board until someone opens it).
 - A stronger proof of presence than the phone's position (for example a code printed on the table that changes daily).

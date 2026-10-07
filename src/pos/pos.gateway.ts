@@ -10,9 +10,11 @@ import { Namespace, Socket } from 'socket.io';
 import { PosEvent, PosEventBus } from './pos-event-bus';
 
 export const roomFor = (restaurantId: string): string => `restaurant:${restaurantId}`;
+/** Owners and cashiers: the people who answer a guest's call. */
+export const floorRoomFor = (restaurantId: string): string => `floor:${restaurantId}`;
 
 interface SessionRequest extends IncomingMessage {
-  session?: { adminUserId?: string; restaurantId?: string };
+  session?: { adminUserId?: string; restaurantId?: string; adminRole?: string };
 }
 
 /**
@@ -33,7 +35,11 @@ export class PosGateway implements OnGatewayInit, OnGatewayConnection, OnModuleD
 
   afterInit(): void {
     this.unsubscribe = this.bus.subscribe((event: PosEvent) => {
-      this.server.to(roomFor(event.restaurantId)).emit(event.type, { id: event.id });
+      // A waiter call is for the floor. The kitchen hears about orders only.
+      const room = event.type.startsWith('call.')
+        ? floorRoomFor(event.restaurantId)
+        : roomFor(event.restaurantId);
+      this.server.to(room).emit(event.type, { id: event.id });
     });
   }
 
@@ -45,6 +51,7 @@ export class PosGateway implements OnGatewayInit, OnGatewayConnection, OnModuleD
       return;
     }
     void socket.join(roomFor(session.restaurantId));
+    if (session.adminRole !== 'KITCHEN') void socket.join(floorRoomFor(session.restaurantId));
     this.logger.debug(`Staff screen connected for ${session.restaurantId}`);
   }
 

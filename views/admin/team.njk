@@ -1,0 +1,13 @@
+{% extends "layouts/admin.njk" %}
+
+{% set P = 'common.admin.team.' %}
+{% block title %}{{ t(P + 'title') }}{% endblock %}
+
+{% block content %}
+<h1 class="font-sans text-2xl font-bold text-text">{{ t(P + 'title') }}</h1>
+<p class="mt-2 max-w-2xl text-sm text-muted-text">{{ t(P + 'intro') }}</p>
+
+<div id="team-panel">
+  {% include "admin/partials/team-panel.njk" %}
+</div>
+{% endblock %}

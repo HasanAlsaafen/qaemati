@@ -12,13 +12,13 @@
       <span class="h-2.5 w-2.5 rounded-full bg-muted-text" data-pos-dot aria-hidden="true"></span>
       <span data-pos-connection-label>{{ t(P + 'connecting') }}</span>
     </p>
-    <button type="button" data-pos-sound data-on="{{ t(P + 'soundOn') }}" data-off="{{ t(P + 'soundOff') }}" aria-pressed="false" class="inline-flex min-h-11 items-center rounded-md border border-border-strong px-4 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(P + 'soundOff') }}</button>
+    <button type="button" data-role="{{ role }}" data-pos-sound data-on="{{ t(P + 'soundOn') }}" data-off="{{ t(P + 'soundOff') }}" aria-pressed="false" class="inline-flex min-h-11 items-center rounded-md border border-border-strong px-4 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(P + 'soundOff') }}</button>
   </div>
 </div>
 
 <p hidden data-pos-sound-blocked class="mt-3 rounded-md bg-warning/10 px-3 py-2 text-sm text-warning-text" role="alert">{{ t(P + 'soundBlocked') }}</p>
 
-{% if location.requireLocationCheck and (not (location.latitude is number) or not (location.longitude is number)) %}
+{% if role == 'OWNER' and location and location.requireLocationCheck and (not (location.latitude is number) or not (location.longitude is number)) %}
   <p class="mt-3 rounded-md bg-warning/10 px-3 py-2 text-sm text-warning-text" role="status">{{ t(P + 'locationMissing') }}</p>
 {% endif %}
 
@@ -26,6 +26,7 @@
   {% include "admin/partials/pos-board.njk" %}
 </div>
 
+{% if role == 'OWNER' and location %}
 <details class="mt-10 rounded-lg border border-border bg-surface p-4" id="location">
   <summary class="inline-flex min-h-11 cursor-pointer items-center font-sans text-lg font-bold text-text">{{ t(P + 'settingsTitle') }}</summary>
   <p class="mt-2 max-w-2xl text-sm text-muted-text">{{ t(P + 'settingsIntro') }}</p>
@@ -46,6 +47,7 @@
     </div>
   </form>
 </details>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
