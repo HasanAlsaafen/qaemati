@@ -302,6 +302,15 @@ Built from the request: when the menu is opened from a table the order goes to t
 - Browser check: a staff window and a guest window against a real server: staff showed Live, the guest's order arrived without a reload, moved New to Preparing to Ready, a waiter call raised the open call count and On my way cleared it, a guest 100 km away was refused with a message, and a guest who denied location was asked for it. axe clean at 375px and 1280px in Arabic and English for the POS screen and the table menu, including the open selection sheet.
 - Not verified by ear: I cannot listen to the sounds here. The tones are generated with the Web Audio API and the logic that starts and repeats them is exercised, but check them on a real device.
 
+## Phase O (1/5): the guest follows their order
+
+Order status for the guest, the first of five follow ups (guest status, staff roles, renewal reminders, self signup, reports).
+
+- Each order has a private random token (migration `20261014000000_order_public_token`). `GET /m/:slug/orders/:token` returns the number and status only, and a websocket namespace `/track` pushes changes to whoever holds that token. Both are rate limited, tenant scoped and answer 404 for anything else.
+- The menu shows a progress panel in the selection sheet, a pill to reopen it, remembers the order across reloads, and clears it when the guest taps Done after served or canceled. Arabic and English.
+- Bug found in the browser: Alpine's object spread (`...tableOrderState()`) copies a getter's value once instead of keeping it live, so status text never updated. The state uses methods instead of getters.
+- Tests: status endpoint (private token, status only, follows staff changes, rejects ids/guesses/other restaurants, Arabic), `/track` websocket (initial status, live change, status only, other orders not heard, bad tokens, other origin, other restaurant staff cannot move it), and the menu wiring. Browser check with a guest phone and a staff screen in English and Arabic: live update, reload, finish, axe clean.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).

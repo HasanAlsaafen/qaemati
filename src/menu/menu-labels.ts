@@ -88,6 +88,21 @@ export function buildMenuLabels(i18n: I18nService, locale: Locale) {
       locationNote: t('common.menu.tableOrder.locationNote'),
       tableLine: t('common.menu.tableOrder.tableLine'),
       network: t('common.menu.tableOrder.network'),
+      sentTotal: t('common.menu.tableOrder.sentTotal'),
+      statusTitle: t('common.menu.tableOrder.statusTitle'),
+      pill: t('common.menu.tableOrder.pill'),
+      stepsLabel: t('common.menu.tableOrder.stepsLabel'),
+      stepNew: t('common.menu.tableOrder.stepNew'),
+      stepPreparing: t('common.menu.tableOrder.stepPreparing'),
+      stepReady: t('common.menu.tableOrder.stepReady'),
+      stepServed: t('common.menu.tableOrder.stepServed'),
+      status: {
+        NEW: t('common.menu.tableOrder.status.NEW'),
+        PREPARING: t('common.menu.tableOrder.status.PREPARING'),
+        READY: t('common.menu.tableOrder.status.READY'),
+        SERVED: t('common.menu.tableOrder.status.SERVED'),
+        CANCELED: t('common.menu.tableOrder.status.CANCELED'),
+      },
       // Templates, filled in by the browser: {item} is a dish name.
       errors: {
         unknown_table: t('common.menu.tableOrder.errors.unknown_table'),

@@ -17,6 +17,7 @@ interface Restaurant {
   slug: string;
   email: string;
   tableToken: string;
+  tableId: string;
   itemId: string;
 }
 
@@ -55,6 +56,7 @@ describe('Staff screen websocket (e2e)', () => {
       slug: restaurant.slug,
       email: admin.email,
       tableToken: table.token,
+      tableId: table.id,
       itemId: item.id,
     };
   }
@@ -123,7 +125,14 @@ describe('Staff screen websocket (e2e)', () => {
     });
 
   /** A guest sends an order, with its own session and CSRF token, over real HTTP. */
-  async function guestOrders(r: Restaurant): Promise<{ id: string }> {
+  async function guestOrders(r: Restaurant): Promise<{ id: string; track: string }> {
+    // This suite sends many orders from one address and table on purpose.
+    const limits = app.get<RateLimitStore>(RATE_LIMIT_STORE);
+    await Promise.all(
+      ['127.0.0.1', '::ffff:127.0.0.1']
+        .map((ip) => limits.reset(`order-ip:${ip}`))
+        .concat(limits.reset(`order-table:${r.tableId}`)),
+    );
     const page = await fetch(`${base}/admin/login`);
     const csrf = /name="csrf_token" value="([^"]*)"/.exec(await page.text())![1];
     const res = await fetch(`${base}/m/${r.slug}/orders`, {
@@ -158,6 +167,35 @@ describe('Staff screen websocket (e2e)', () => {
     });
     expect(res.status).toBe(201);
     return res.json();
+  }
+
+  /** A guest follows one order, with nothing but its token. */
+  function follow(token: unknown, headers: Record<string, string> = {}): Socket {
+    const socket = io(`${base}/track`, {
+      transports: ['websocket'],
+      reconnection: false,
+      auth: { token },
+      extraHeaders: headers,
+    });
+    sockets.push(socket);
+    return socket;
+  }
+
+  /** Staff move an order along, over real HTTP with their own session. */
+  async function staffMoves(email: string, orderId: string, status: string): Promise<number> {
+    const cookie = await signIn(email);
+    const page = await fetch(`${base}/admin`, { headers: { Cookie: cookie } });
+    const csrf = /name="csrf_token" value="([^"]*)"/.exec(await page.text())?.[1] ?? '';
+    const res = await fetch(`${base}/admin/pos/orders/${orderId}/status`, {
+      method: 'POST',
+      headers: {
+        Cookie: mergeCookies(cookie.split('; '), cookiesOf(page)),
+        'X-CSRF-Token': csrf,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({ status }),
+    });
+    return res.status;
   }
 
   beforeAll(async () => {
@@ -283,5 +321,59 @@ describe('Staff screen websocket (e2e)', () => {
     const heard = silent(staffA, 'order.new');
     await guestOrders(b);
     expect(await heard).toBe(false);
+  });
+
+  describe('a guest following their own order', () => {
+    it('is told where the order stands, and hears every change after that', async () => {
+      const placed = await guestOrders(a);
+      const guest = follow(placed.track);
+      const first = once<{ status: string }>(guest, 'status');
+      await connected(guest);
+      expect(await first).toEqual({ status: 'NEW' });
+
+      const next = once<{ status: string }>(guest, 'status');
+      expect(await staffMoves(a.email, placed.id, 'PREPARING')).toBe(200);
+      expect(await next).toEqual({ status: 'PREPARING' });
+    });
+
+    it('is sent the status only, never anything about what was ordered', async () => {
+      const placed = await guestOrders(a);
+      const guest = follow(placed.track);
+      const first = once<Record<string, unknown>>(guest, 'status');
+      await first.then((payload) => expect(Object.keys(payload)).toEqual(['status']));
+    });
+
+    it('hears nothing about anyone else order', async () => {
+      const mine = await guestOrders(a);
+      const theirs = await guestOrders(a);
+      const guest = follow(mine.track);
+      await once(guest, 'status');
+      const heard = silent(guest, 'status', 800);
+      expect(await staffMoves(a.email, theirs.id, 'PREPARING')).toBe(200);
+      expect(await heard).toBe(false);
+    });
+
+    it.each([
+      ['no token', undefined],
+      ['a made up token', '00000000-0000-0000-0000-000000000000'],
+      ['an order id instead of its token', 'cmsomeorderidthatisnotatoken1234567'],
+      ['something that is not text', 12345],
+    ])('is turned away with %s', async (_label, token) => {
+      const guest = follow(token);
+      await once(guest, 'unknown_order');
+      await new Promise((r) => setTimeout(r, 150));
+      expect(guest.connected).toBe(false);
+    });
+
+    it('cannot be opened by another website', async () => {
+      const placed = await guestOrders(a);
+      const guest = follow(placed.track, { Origin: 'https://evil.example' });
+      await expect(connected(guest)).rejects.toBeDefined();
+    });
+
+    it('staff of another restaurant cannot move the order the guest is following', async () => {
+      const placed = await guestOrders(a);
+      expect(await staffMoves(b.email, placed.id, 'PREPARING')).toBe(404);
+    });
   });
 });

@@ -18,7 +18,8 @@ export type GuestErrorCode =
   | 'too_far'
   | 'rate_limited'
   | 'invalid_order'
-  | 'item_unavailable';
+  | 'item_unavailable'
+  | 'unknown_order';
 
 /** A refusal the guest can be told about, with the HTTP status that fits it. */
 export class GuestPosError extends Error {
@@ -117,9 +118,21 @@ export class GuestPosService {
     return {
       id: order.id,
       number: order.number,
+      track: order.publicToken,
       total: fromCents(priced.totalCents),
       currency: priced.currency,
     };
+  }
+
+  /** The guest's view of their own order: a number and where it is, nothing else. */
+  async orderStatus(slug: string, token: string, ip: string) {
+    await this.limit(`track-ip:${ip}`, 60_000, 90);
+    const order = await this.prisma.order.findFirst({
+      where: { publicToken: token, restaurant: { slug } },
+      select: { number: true, status: true },
+    });
+    if (!order) throw new GuestPosError('unknown_order', 404);
+    return order;
   }
 
   async callWaiter(slug: string, input: GuestPosPosition & { table: string }, ip: string) {

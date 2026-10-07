@@ -15,6 +15,7 @@
   {% endif %}
   {% if tableOrder %}
     <meta name="csrf-token" content="{{ csrfToken }}">
+    <script defer src="{{ asset('/js/vendor/socket.io.min.js') }}"></script>
     <script defer src="{{ asset('/js/table-order.js') }}"></script>
   {% endif %}
   {% include "partials/head.njk" %}

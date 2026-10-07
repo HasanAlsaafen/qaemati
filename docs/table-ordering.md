@@ -6,7 +6,7 @@ When a guest opens the menu from a table's QR code, the selection goes to the re
 
 - The table's QR code opens the menu with the table's key in the address (`?t=<key>`). The menu says which table it is, the selection button reads "Send order to the kitchen", and a "Call waiter" button stays on screen.
 - Before sending, the phone is asked where it is. If the restaurant checks location (see below) and the guest says no, nothing is sent and the guest is told why. There is deliberately no WhatsApp fallback from a table.
-- After sending, the guest sees "Order 12 is sent" with the table. There is no order tracking on the guest side yet.
+- After sending, the guest sees their order with a four step progress bar (Received, Preparing, Ready, Served) that **updates live** as staff move it, or a clear message if the restaurant canceled it. It survives a reload: a small "Order 12: Preparing" button stays on the menu until the guest taps Done after it is served or canceled. The guest follows the order with a private random token only they hold; it shows the number and status and nothing about what was ordered.
 - A table name typed into the address (`?table=5`, which older printed codes use) still labels a WhatsApp order, but it can never place a POS order: only the unguessable key can. Reprint table codes after switching table ordering on. The QR page says so.
 
 ## What the staff see
@@ -34,6 +34,10 @@ The guest's phone reports where it is. The server measures the distance to the r
 - Be honest with yourself about what this is: the position comes from the guest's phone, and someone determined can fake it. It stops orders sent from home by mistake or as a prank. It is not proof of presence. The unguessable table key, per table and per device rate limits, and staff being able to cancel an order are the other layers.
 - The demo restaurants have the check off, because a demo visitor is not in Hebron.
 
+## How the guest follows an order
+
+The order response carries a random `track` token. The menu keeps it in the browser, asks `GET /m/:slug/orders/:token` for the status, and also listens on a websocket namespace `/track` where the token is the only way in and only that one order's status is ever sent. If websockets are unavailable it polls every 8 seconds. A wrong, guessed or foreign token, an order id, or another restaurant's slug all answer 404 / `unknown_order`.
+
 ## Safeguards
 
 - The server prices every order from the database. The browser sends only which dish, which size and which extras, and quantities. Names, prices and totals it might add are rejected, and a dish that is switched off, outside its serving hours, or belongs to another restaurant is refused.
@@ -52,7 +56,6 @@ The guest's phone reports where it is. The server measures the distance to the r
 
 ## Not built
 
-- The guest cannot see their order's progress.
 - Separate cashier and kitchen accounts, kitchen printers, payment at the table, splitting a bill.
 - Notification when no staff screen is open (orders wait on the board until someone opens it).
 - A stronger proof of presence than the phone's position (for example a code printed on the table that changes daily).

@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Param, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 import { CallWaiterDto, PlaceOrderDto } from './dto/guest-pos.dto';
@@ -25,6 +25,21 @@ export class GuestPosController {
     );
   }
 
+  @Get('orders/:token')
+  async status(
+    @Param('slug') slug: string,
+    @Param('token') token: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.respond(
+      req,
+      res,
+      () => this.guest.orderStatus(slug, token, req.ip ?? 'unknown'),
+      200,
+    );
+  }
+
   @Post('waiter-calls')
   @HttpCode(201)
   async call(
@@ -42,10 +57,11 @@ export class GuestPosController {
     req: Request,
     res: Response,
     run: () => Promise<T>,
+    okStatus = 201,
   ): Promise<void> {
     res.setHeader('Cache-Control', 'no-store');
     try {
-      res.status(201).json(await run());
+      res.status(okStatus).json(await run());
     } catch (error) {
       if (!(error instanceof GuestPosError)) throw error;
       const lang = req.locale ?? 'ar';

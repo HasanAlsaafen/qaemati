@@ -509,6 +509,52 @@ describe('Table orders and waiter calls (e2e)', () => {
     });
   });
 
+  describe('following an order', () => {
+    const status = (slugName: string, trackToken: string) =>
+      request(app.getHttpServer())
+        .get(`/m/${slugName}/orders/${trackToken}`)
+        .set('Cookie', 'qaemati_locale=en');
+
+    it('gives the guest a private token and shows only the number and the status', async () => {
+      const placed = await order([{ key: burger.id, qty: 1 }]);
+      expect(placed.body.track).toMatch(/^[0-9a-f-]{36}$/);
+      expect(placed.body.track).not.toBe(placed.body.id);
+      const res = await status(slug, placed.body.track);
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ number: placed.body.number, status: 'NEW' });
+      expect(res.headers['cache-control']).toBe('no-store');
+    });
+
+    it('follows the order as staff move it along', async () => {
+      const placed = await order([{ key: burger.id, qty: 1 }]);
+      await prisma.order.update({ where: { id: placed.body.id }, data: { status: 'READY' } });
+      expect((await status(slug, placed.body.track)).body.status).toBe('READY');
+      await prisma.order.update({ where: { id: placed.body.id }, data: { status: 'CANCELED' } });
+      expect((await status(slug, placed.body.track)).body.status).toBe('CANCELED');
+    });
+
+    it('does not find an order by its id, a guess, or through another restaurant', async () => {
+      const placed = await order([{ key: burger.id, qty: 1 }]);
+      for (const [slugName, token] of [
+        [slug, placed.body.id],
+        [slug, 'not-a-token'],
+        [slug, '00000000-0000-0000-0000-000000000000'],
+        [other.slug, placed.body.track],
+      ]) {
+        const res = await status(slugName, token);
+        expect(res.status).toBe(404);
+        expect(res.body.error).toBe('unknown_order');
+      }
+    });
+
+    it('answers in Arabic for an Arabic reader', async () => {
+      const res = await request(app.getHttpServer())
+        .get(`/m/${slug}/orders/00000000-0000-0000-0000-000000000000`)
+        .set('Cookie', 'qaemati_locale=ar');
+      expect(res.body.message).toMatch(/[\u0600-\u06FF]/);
+    });
+  });
+
   describe('calling the waiter', () => {
     it('creates one call, and a second tap while it is open is not a second call', async () => {
       const first = await post(`/m/${slug}/waiter-calls`, { table: tableB.token, ...near });

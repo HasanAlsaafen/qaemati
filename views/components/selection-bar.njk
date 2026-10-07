@@ -18,7 +18,7 @@
 {% macro selectionBar(labels, restaurantName, whatsappUrl, tableLabel, tableOrder=none, orderLabels=none) %}
   <div
     x-data="{
-      {% if tableOrder %}...tableOrderState({{ { slug: tableOrder.slug, token: tableOrder.token, locationCheck: tableOrder.locationCheck, tableLabel: tableLabel, labels: orderLabels } | dump }}),{% endif %}
+      {% if tableOrder %}...tableOrderState({{ { slug: tableOrder.slug, token: tableOrder.token, locationCheck: tableOrder.locationCheck, tableLabel: tableLabel, labels: orderLabels, track: true } | dump }}),{% endif %}
       open: false,
       labels: {{ labels | dump }},
       tableLabel: {{ tableLabel | dump }},
@@ -45,9 +45,20 @@
       },
       {% endif %}
     }"
-    x-show="{{ "$store.selection.count > 0 || phase === 'sent'" if tableOrder else '$store.selection.count > 0' }}"
+    x-show="{{ "$store.selection.count > 0 || tracking" if tableOrder else '$store.selection.count > 0' }}"
     x-cloak
   >
+    {% if tableOrder %}
+    <button
+      type="button"
+      x-show="tracking && $store.selection.count === 0"
+      x-cloak
+      x-on:click="open = true"
+      class="fixed bottom-4 start-4 z-30 inline-flex min-h-11 max-w-[60vw] items-center gap-2 rounded-full bg-primary px-4 text-sm font-medium text-primary-on shadow-overlay hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    >
+      <span class="truncate" x-text="pillText()"></span>
+    </button>
+    {% endif %}
     <button
       x-show="$store.selection.count > 0"
       type="button"
@@ -103,14 +114,22 @@
         </div>
 
         {% if tableOrder %}
-        <div x-show="phase === 'sent'" x-cloak class="flex flex-col gap-4 p-6 text-center" role="status">
-          <h3 class="font-sans text-xl font-bold text-text" x-text="sent && sent.title"></h3>
-          <p class="text-sm text-muted-text" x-text="sent && sent.text"></p>
-          <p class="text-base font-bold text-text" dir="ltr" x-text="sent && (sent.total + ' ' + sent.currency)"></p>
-          <button type="button" x-on:click="finish()" class="inline-flex min-h-11 items-center justify-center rounded-button bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" x-text="orderText.done"></button>
-        </div>
+        <section x-show="tracking" x-cloak class="flex flex-col gap-3 border-b border-border p-4" aria-labelledby="order-status-title" data-order-status>
+          <h3 id="order-status-title" class="font-sans text-lg font-bold text-text" x-text="tracking && orderText.statusTitle.split('{number}').join(tracking.number)"></h3>
+          <p role="status" class="text-sm font-medium text-text" x-text="statusText()"></p>
+          <ol x-show="tracking && tracking.status !== 'CANCELED'" class="grid grid-cols-4 gap-1 text-center text-xs" x-bind:aria-label="orderText.stepsLabel">
+            <template x-for="(name, index) in [orderText.stepNew, orderText.stepPreparing, orderText.stepReady, orderText.stepServed]" x-bind:key="index">
+              <li x-bind:aria-current="index === step() ? 'step' : null" class="flex flex-col items-center gap-1">
+                <span class="h-1.5 w-full rounded-full" x-bind:class="index <= step() ? 'bg-primary' : 'bg-border'"></span>
+                <span x-bind:class="index === step() ? 'font-bold text-text' : 'text-muted-text'" x-text="name"></span>
+              </li>
+            </template>
+          </ol>
+          <p x-show="tracking && tracking.status !== 'CANCELED'" class="text-sm text-muted-text"><span x-text="orderText.sentTotal"></span> <span dir="ltr" x-text="tracking && (tracking.total + ' ' + tracking.currency)"></span></p>
+          <button type="button" x-show="finished()" x-on:click="finish()" class="inline-flex min-h-11 items-center justify-center rounded-button bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" x-text="orderText.done"></button>
+        </section>
         {% endif %}
-        <div class="flex flex-col gap-4 p-4" {% if tableOrder %}x-show="phase !== 'sent'"{% endif %}>
+        <div class="flex flex-col gap-4 p-4" {% if tableOrder %}x-show="$store.selection.count > 0 || !tracking"{% endif %}>
           <template x-if="$store.selection.list.length === 0">
             <p class="py-6 text-center text-sm text-muted-text" x-text="labels.emptyDescription"></p>
           </template>

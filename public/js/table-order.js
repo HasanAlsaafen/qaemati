@@ -51,6 +51,7 @@ function toastMessage(message, variant) {
 
 function tableOrderState(config) {
   var text = config.labels;
+  var storageKey = 'qaemati:order:' + config.slug;
 
   function describe(error) {
     var template = (text.errors && text.errors[error.error]) || error.message || text.network;
@@ -76,10 +77,99 @@ function tableOrderState(config) {
 
   return {
     orderText: text,
-    phase: 'idle', // idle, locating, sending, sent
+    phase: 'idle', // idle, locating, sending
     message: '',
-    sent: null,
     calling: false,
+    // The order this guest is following: { token, number, status, total, currency }.
+    tracking: null,
+    _socket: null,
+    _poll: null,
+
+    init: function () {
+      if (!config.track) return;
+      var saved = null;
+      try {
+        saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
+      } catch (e) {
+        saved = null;
+      }
+      if (saved && saved.token) {
+        this.tracking = { token: saved.token, number: saved.number, status: 'NEW', total: saved.total, currency: saved.currency };
+        this.follow();
+      }
+    },
+
+    statusText: function () {
+      return this.tracking ? text.status[this.tracking.status] || '' : '';
+    },
+
+    pillText: function () {
+      return this.tracking
+        ? fill(text.pill, { number: this.tracking.number, status: this.statusText() })
+        : '';
+    },
+
+    finished: function () {
+      return !!this.tracking && (this.tracking.status === 'SERVED' || this.tracking.status === 'CANCELED');
+    },
+
+    // 0 to 3: how far along the order is. Canceled has no position.
+    step: function () {
+      return this.tracking ? ['NEW', 'PREPARING', 'READY', 'SERVED'].indexOf(this.tracking.status) : -1;
+    },
+
+    setStatus: function (status) {
+      if (!this.tracking || !status) return;
+      this.tracking = Object.assign({}, this.tracking, { status: status });
+      if (this.finished()) this.stopFollowing();
+    },
+
+    forget: function () {
+      this.stopFollowing();
+      this.tracking = null;
+      try {
+        localStorage.removeItem(storageKey);
+      } catch (e) {
+        // Nothing stored, nothing to remove.
+      }
+    },
+
+    // Live over a websocket when the browser has it, otherwise a slow poll.
+    follow: function () {
+      var self = this;
+      var url = '/m/' + encodeURIComponent(config.slug) + '/orders/' + encodeURIComponent(self.tracking.token);
+      function check() {
+        fetch(url, { credentials: 'same-origin', headers: { Accept: 'application/json' } })
+          .then(function (response) {
+            if (response.status === 404) return self.forget();
+            return response.json().then(function (body) {
+              self.setStatus(body.status);
+            });
+          })
+          .catch(function () {
+            // Offline for a moment. The next poll or the socket catches up.
+          });
+      }
+      check();
+      if (window.io) {
+        self._socket = window.io('/track', { auth: { token: self.tracking.token }, transports: ['websocket', 'polling'] });
+        self._socket.on('status', function (payload) {
+          self.setStatus(payload.status);
+        });
+        self._socket.on('unknown_order', function () {
+          self.forget();
+        });
+        self._socket.on('connect', check);
+      }
+      self._poll = setInterval(check, window.io ? 30000 : 8000);
+    },
+
+    stopFollowing: function () {
+      if (this._socket) this._socket.disconnect();
+      if (this._poll) clearInterval(this._poll);
+      this._socket = null;
+      this._poll = null;
+    },
 
     sendOrder: function () {
       var store = Alpine.store('selection');
@@ -109,15 +199,22 @@ function tableOrderState(config) {
         .then(function (result) {
           if (!result) return;
           if (result.ok) {
-            self.sent = {
+            self.tracking = {
+              token: result.body.track,
               number: result.body.number,
+              status: 'NEW',
               total: result.body.total,
               currency: store.currencySymbol,
-              text: fill(text.sentText, { table: config.tableLabel }),
-              title: fill(text.sentTitle, { number: result.body.number }),
             };
+            try {
+              localStorage.setItem(storageKey, JSON.stringify(self.tracking));
+            } catch (e) {
+              // The order still goes through and updates, it just is not remembered on reload.
+            }
             store.clear();
-            self.phase = 'sent';
+            self.phase = 'idle';
+            self.open = true;
+            self.follow();
           } else {
             self.message = words(result);
             self.phase = 'idle';
@@ -130,8 +227,7 @@ function tableOrderState(config) {
     },
 
     finish: function () {
-      this.sent = null;
-      this.phase = 'idle';
+      if (this.finished()) this.forget();
       this.open = false;
     },
 

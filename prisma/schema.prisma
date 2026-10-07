@@ -690,6 +690,10 @@ model Order {
   status OrderStatus @default(NEW)
   note   String?
 
+  /// What the guest's phone holds to follow this one order. Random, so only
+  /// the person who sent the order can look it up.
+  publicToken String @unique @default(uuid())
+
   total    Decimal @db.Decimal(10, 2)
   currency String
 

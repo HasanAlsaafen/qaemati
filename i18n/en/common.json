@@ -269,8 +269,24 @@
         "too_far": "You seem to be away from the restaurant, so the order was not sent. Please ask your waiter.",
         "rate_limited": "Too many requests. Please wait a moment and try again.",
         "invalid_order": "Something in your order is no longer valid. Please review it and try again.",
-        "item_unavailable": "{item} is not available right now. Remove it and send again."
-      }
+        "item_unavailable": "{item} is not available right now. Remove it and send again.",
+        "unknown_order": "We could not find this order."
+      },
+      "statusTitle": "Order {number}",
+      "status": {
+        "NEW": "Received by the kitchen",
+        "PREPARING": "Being prepared",
+        "READY": "Ready, on its way to you",
+        "SERVED": "Served. Enjoy your meal.",
+        "CANCELED": "Canceled by the restaurant. Please ask your waiter."
+      },
+      "pill": "Order {number}: {status}",
+      "viewOrder": "View my order",
+      "stepsLabel": "Order progress",
+      "stepNew": "Received",
+      "stepPreparing": "Preparing",
+      "stepReady": "Ready",
+      "stepServed": "Served"
     }
   },
   "admin": {

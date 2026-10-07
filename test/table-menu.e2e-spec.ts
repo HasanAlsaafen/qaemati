@@ -74,6 +74,17 @@ describe('The menu opened from a table (e2e)', () => {
     expect(res.text).toContain('Table 12');
   });
 
+  it('can follow the order live, and says so in Arabic too', async () => {
+    const en = await page(`t=${table.token}`);
+    expect(en.text).toContain('/js/vendor/socket.io.min.js');
+    expect(en.text).toContain('&quot;track&quot;:true');
+    expect(en.text).toContain('Being prepared');
+    expect(en.text).toContain('data-order-status');
+    const ar = await page(`t=${table.token}`, 'ar');
+    expect(ar.text).toContain('قيد التحضير');
+    expect((await page('')).text).not.toContain('socket.io.min.js');
+  });
+
   it('carries the table token and the slug to the script, and tells it whether to ask for a location', async () => {
     const on = await page(`t=${table.token}`);
     expect(on.text).toContain(`&quot;token&quot;:&quot;${table.token}&quot;`);
