@@ -51,7 +51,7 @@
      tokens (src/styles/tokens.css) for this page only -- scoped here
      via inline :root, not by editing the shared stylesheet, so every
      other restaurant's menu keeps the default palette. #}
-  {% if menu.primaryColorCss or menu.secondaryColorCss or menu.fontTheme == 'modern' or menu.cornerStyleCss or menu.backgroundColorCss or menu.buttonShapeCss %}
+  {% if menu.primaryColorCss or menu.secondaryColorCss or menu.fontTheme == 'modern' or menu.fontTheme == 'clean' or menu.cornerStyleCss or menu.backgroundColorCss or menu.buttonShapeCss %}
     <style>
       :root {
         {% if menu.primaryColorCss %}
@@ -66,7 +66,10 @@
         --color-secondary-text: {{ menu.secondaryColorCss.secondaryText }};
         --color-secondary-soft: {{ menu.secondaryColorCss.secondarySoft }};
         {% endif %}
-        {% if menu.fontTheme == 'modern' %}
+        {% if menu.fontTheme == 'clean' %}
+        --font-sans: 'Inter', 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+        --font-display: 'Inter', 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+        {% elif menu.fontTheme == 'modern' %}
         {# The "modern" theme swaps Tajawal for IBM Plex Sans Arabic, which is
            already self-hosted, so nothing new is loaded. #}
         --font-sans: 'IBM Plex Sans Arabic', 'Inter', 'Segoe UI', Tahoma, sans-serif;
@@ -94,6 +97,15 @@
   data-menu-density="{{ menu.menuDensity }}"
   data-card-style="{{ menu.cardStyle }}"
   data-category-divider="{{ menu.categoryDivider }}"
+  data-menu-layout="{{ menu.menuLayout }}"
+  data-custom-bg="{{ 'true' if (menu.backgroundColorCss or menu.backgroundStyle == 'pattern') else 'false' }}"
+  data-item-images="{{ menu.itemImages }}"
+  data-image-shape="{{ menu.itemImageShape }}"
+  data-category-marker="{{ menu.categoryMarker }}"
+  data-logo-shape="{{ menu.logoShape }}"
+  data-cover-height="{{ menu.coverHeight }}"
+  data-price-style="{{ menu.priceStyle }}"
+  data-heading-align="{{ menu.headingAlign }}"
   data-background-style="{{ menu.backgroundStyle }}"
   data-background-pattern="{{ menu.backgroundPattern }}"
   data-section-spacing="{{ menu.sectionSpacing }}"

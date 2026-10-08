@@ -10,7 +10,7 @@
             <img src="{{ restaurant.logoPath }}" alt="" width="64" height="64" class="h-full w-full object-cover">
           {% endif %}
         </span>
-        {{ fileInput('branding-logo-input', 'image', 'image/jpeg,image/png,image/webp', 'hx-post="/admin/branding/logo" hx-trigger="change" hx-target="#branding-images" hx-swap="outerHTML" hx-encoding="multipart/form-data"') }}
+        {{ fileInput('branding-logo-input', 'image', 'image/jpeg,image/png,image/webp', 'data-crop-aspect="1" data-crop-round="true" hx-post="/admin/branding/logo" hx-trigger="change" hx-target="#branding-images" hx-swap="outerHTML" hx-encoding="multipart/form-data"') }}
       </div>
     </div>
 
@@ -22,7 +22,7 @@
             <img src="{{ restaurant.coverImagePath }}" alt="" width="112" height="64" class="h-full w-full object-cover">
           {% endif %}
         </span>
-        {{ fileInput('branding-cover-input', 'image', 'image/jpeg,image/png,image/webp', 'hx-post="/admin/branding/cover" hx-trigger="change" hx-target="#branding-images" hx-swap="outerHTML" hx-encoding="multipart/form-data"') }}
+        {{ fileInput('branding-cover-input', 'image', 'image/jpeg,image/png,image/webp', 'data-crop-aspect="1.7778" hx-post="/admin/branding/cover" hx-trigger="change" hx-target="#branding-images" hx-swap="outerHTML" hx-encoding="multipart/form-data"') }}
       </div>
     </div>
   </div>

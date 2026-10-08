@@ -63,6 +63,108 @@ body[data-category-divider='dashed'] [data-category-section]:not(:first-child) {
 }
 
 /*
+  Admin customization: menuLayout, itemImages, itemImageShape and
+  categoryMarker (views/layouts/menu.njk sets data-menu-layout,
+  data-item-images, data-image-shape and data-category-marker on <body>).
+  The defaults (grid, show, standard, none) are the original look and
+  need no rule here.
+*/
+body[data-menu-layout='list'] [data-menu-grid],
+body[data-menu-layout='large'] [data-menu-grid] {
+  grid-template-columns: minmax(0, 1fr);
+}
+body[data-menu-layout='large'] [data-menu-grid] {
+  gap: 1.25rem;
+}
+body[data-menu-layout='large'] .menu-item-card__image {
+  aspect-ratio: 16 / 9;
+}
+@media (min-width: 640px) {
+  body[data-menu-layout='large'] [data-menu-grid] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+body[data-menu-layout='list'] .menu-item-card > button {
+  flex-direction: row;
+  align-items: stretch;
+}
+body[data-menu-layout='list'] .menu-item-card__image {
+  width: 7rem;
+  flex-shrink: 0;
+  aspect-ratio: auto;
+  min-height: 7rem;
+}
+body[data-menu-layout='list'] .menu-item-card > button > span:last-child {
+  padding-inline-end: 3.5rem;
+}
+
+body[data-image-shape='wide'] .menu-item-card__image {
+  aspect-ratio: 16 / 9;
+}
+body[data-image-shape='square'] .menu-item-card__image {
+  aspect-ratio: 1 / 1;
+}
+body[data-image-shape='round'] .menu-item-card__image {
+  aspect-ratio: 1 / 1;
+  width: 62%;
+  margin: 0.75rem auto 0;
+  border-radius: 9999px;
+}
+body[data-menu-layout='list'][data-image-shape='round'] .menu-item-card__image {
+  width: 6rem;
+  min-height: 0;
+  height: 6rem;
+  margin: 0.75rem;
+}
+body[data-menu-layout='list'][data-image-shape='wide'] .menu-item-card__image,
+body[data-menu-layout='list'][data-image-shape='square'] .menu-item-card__image {
+  aspect-ratio: auto;
+}
+
+body[data-item-images='filled'] .menu-item-card__image--empty,
+body[data-item-images='hide'] .menu-item-card__image {
+  display: none;
+}
+body[data-item-images='hide'] .item-sheet__photo {
+  display: none;
+}
+body[data-item-images='hide'] .item-sheet__photo-wrap {
+  min-height: 3.5rem;
+}
+body[data-item-images='filled'] .menu-item-card__image--empty + span,
+body[data-item-images='hide'] .menu-item-card > button > span:last-child {
+  padding-inline-end: 3.5rem;
+}
+
+body[data-category-marker='bar'] [data-category-section] > h2,
+body[data-category-marker='dot'] [data-category-section] > h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+body[data-category-marker='bar'] [data-category-section] > h2::before {
+  content: '';
+  width: 0.25rem;
+  height: 1.4em;
+  border-radius: 9999px;
+  background: rgb(var(--color-primary));
+  flex-shrink: 0;
+}
+body[data-category-marker='dot'] [data-category-section] > h2::before {
+  content: '';
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 9999px;
+  background: rgb(var(--color-primary));
+  flex-shrink: 0;
+}
+body[data-category-marker='underline'] [data-category-section] > h2 {
+  width: fit-content;
+  padding-bottom: 0.35rem;
+  border-bottom: 3px solid rgb(var(--color-primary));
+}
+
+/*
   Admin customization: backgroundStyle/backgroundPattern (views/layouts/
   menu.njk sets data-background-style/data-background-pattern on <body>).
   Only applied when backgroundStyle is 'pattern' -- 'solid' (the default)
@@ -130,4 +232,243 @@ body[data-section-spacing='spacious'] main {
   display: none;
   width: 0;
   height: 0;
+}
+
+/* The phone is drawn at real size (414 x 868) and scaled; --s is that scale. */
+.iphone {
+  --s: 0.66;
+  position: relative;
+  width: calc(414px * var(--s));
+  height: calc(868px * var(--s));
+  margin-inline: auto;
+}
+@media (min-width: 640px) {
+  .iphone {
+    --s: 0.76;
+  }
+}
+@media (min-width: 1024px) {
+  .iphone {
+    --s: 0.82;
+  }
+}
+.iphone__body {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 414px;
+  height: 868px;
+  transform: scale(var(--s));
+  transform-origin: top left;
+  border-radius: 64px;
+  background: #1d1e21;
+  box-shadow:
+    inset 0 0 0 2px #5b5e64,
+    inset 0 0 0 4px #0c0d0e,
+    0 30px 60px -20px rgba(15, 25, 35, 0.45);
+}
+.iphone__button {
+  position: absolute;
+  left: -3px;
+  width: 4px;
+  border-radius: 2px 0 0 2px;
+  background: #2a2c30;
+}
+.iphone__button--right {
+  left: auto;
+  right: -3px;
+  border-radius: 0 2px 2px 0;
+}
+.iphone__screen {
+  position: absolute;
+  inset: 12px;
+  overflow: hidden;
+  border-radius: 52px;
+  background: rgb(var(--color-surface));
+}
+.iphone__status {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 32px 0 40px;
+  color: #111;
+  font:
+    600 17px/1 system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  z-index: 2;
+}
+.iphone__icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.iphone__island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  width: 122px;
+  height: 36px;
+  margin-left: -61px;
+  border-radius: 20px;
+  background: #000;
+  z-index: 3;
+}
+.iphone__page {
+  position: absolute;
+  top: 54px;
+  left: 0;
+  width: 390px;
+  height: 790px;
+  border: 0;
+  background: rgb(var(--color-bg));
+}
+.iphone__cover {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+}
+@media (min-width: 1024px) {
+  .iphone__cover {
+    display: none;
+  }
+}
+.iphone__home {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  width: 134px;
+  height: 5px;
+  margin-left: -67px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 3;
+  pointer-events: none;
+}
+
+/*
+  A chosen background color or pattern shows through the header, the tabs and
+  the footer instead of being hidden behind solid bands. The sticky bar stays
+  solid, in the page color, because content scrolls under it. A background
+  photo keeps the solid bands so text stays readable over it.
+*/
+body[data-custom-bg='true'] .menu-band {
+  background-color: transparent;
+}
+body[data-custom-bg='true'] .menu-band--sticky {
+  background-color: rgb(var(--color-bg));
+}
+
+/* Header and text looks: data-logo-shape, data-cover-height, data-price-style, data-heading-align. */
+body[data-logo-shape='round'] .menu-logo {
+  border-radius: 9999px;
+}
+body[data-logo-shape='square'] .menu-logo {
+  border-radius: 2px;
+}
+body[data-cover-height='small'] .menu-cover {
+  height: 6.5rem;
+}
+body[data-cover-height='large'] .menu-cover {
+  height: 15rem;
+}
+body[data-price-style='badge'] .menu-price {
+  align-self: flex-start;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  background: rgb(var(--color-primary-soft));
+  color: rgb(var(--color-primary-text));
+}
+body[data-price-style='muted'] .menu-price {
+  color: rgb(var(--color-text));
+  font-weight: 500;
+}
+body[data-heading-align='center'] [data-category-section] > h2 {
+  text-align: center;
+  justify-content: center;
+  margin-inline: auto;
+}
+
+/* More choices for the existing settings. */
+body[data-card-style='outlined'] .menu-item-card {
+  border-width: 2px;
+  border-color: rgb(var(--color-border-strong));
+}
+body[data-card-style='tinted'] .menu-item-card {
+  background-color: rgb(var(--color-surface-muted));
+}
+body[data-menu-density='spacious'] .menu-item-card > button > span:last-child {
+  padding: 1.25rem;
+  gap: 0.5rem;
+}
+body[data-category-divider='dotted'] [data-category-section]:not(:first-child) {
+  padding-top: 2rem;
+  border-top: 2px dotted rgb(var(--color-border-strong));
+}
+body[data-category-divider='thick'] [data-category-section]:not(:first-child) {
+  padding-top: 2rem;
+  border-top: 4px solid rgb(var(--color-border));
+}
+body[data-menu-layout='grid3'] [data-menu-grid] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+body[data-menu-layout='grid3'] .menu-item-card__description {
+  display: none;
+}
+body[data-image-shape='tall'] .menu-item-card__image {
+  aspect-ratio: 3 / 4;
+}
+body[data-category-marker='square'] [data-category-section] > h2,
+body[data-category-marker='rule'] [data-category-section] > h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+body[data-category-marker='square'] [data-category-section] > h2::before {
+  content: '';
+  width: 0.65rem;
+  height: 0.65rem;
+  background: rgb(var(--color-primary));
+  flex-shrink: 0;
+}
+body[data-category-marker='rule'] [data-category-section] > h2::after {
+  content: '';
+  height: 2px;
+  flex: 1;
+  background: rgb(var(--color-primary) / 0.35);
+}
+body[data-background-style='pattern'][data-background-pattern='checks'] {
+  background-image:
+    linear-gradient(
+      45deg,
+      rgb(var(--color-primary) / 0.07) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgb(var(--color-primary) / 0.07) 75%
+    ),
+    linear-gradient(
+      45deg,
+      rgb(var(--color-primary) / 0.07) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgb(var(--color-primary) / 0.07) 75%
+    );
+  background-size: 28px 28px;
+  background-position:
+    0 0,
+    14px 14px;
+}
+body[data-background-style='pattern'][data-background-pattern='lines'] {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgb(var(--color-primary) / 0.08),
+    rgb(var(--color-primary) / 0.08) 1px,
+    transparent 1px,
+    transparent 12px
+  );
 }

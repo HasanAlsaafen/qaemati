@@ -125,7 +125,7 @@ export class ItemService {
     });
   }
 
-  async setImage(restaurantId: string, itemId: string, imagePath: string) {
+  async setImage(restaurantId: string, itemId: string, imagePath: string | null) {
     await this.assertOwnership(restaurantId, itemId);
     return this.prisma.item.update({
       where: { id: itemId },

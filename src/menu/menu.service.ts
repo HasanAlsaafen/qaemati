@@ -6,6 +6,7 @@ import { normalizeSearchText } from '../common/text/normalize-search-text';
 import { TAG_I18N_KEY, TAG_VARIANT } from '../common/tags';
 import {
   computeOpenStatus,
+  isMenuServingNow,
   isCategoryAvailableNow,
   nowInHebronMinutes,
 } from '../common/open-status';
@@ -90,6 +91,8 @@ export interface MenuTabView {
   id: string;
   name: string;
   active: boolean;
+  /** Outside its serving hours right now. */
+  closedNow: boolean;
 }
 
 export interface MenuView {
@@ -117,7 +120,13 @@ export interface MenuView {
    *  entry means the page shows no switcher. */
   menus: MenuTabView[];
   /** The menu on screen, with its serving hours as a sentence. */
-  activeMenu: { name: string; hoursNote: string | null } | null;
+  activeMenu: {
+    name: string;
+    hoursNote: string | null;
+    closedNow: boolean;
+    /** The sentence shown in the closed notice. */
+    closedNotice: string | null;
+  } | null;
   /** A4: "R G B" triplets to override --color-primary (and friends) for
    *  a restaurant that picked its own brand color -- null when the
    *  restaurant hasn't set one, in which case the layout falls back to
@@ -165,6 +174,14 @@ export interface MenuView {
   /** Admin customization: 'none' | 'line' | 'dashed' between category
    *  sections -- see Restaurant.categoryDivider. */
   categoryDivider: string;
+  logoShape: string;
+  coverHeight: string;
+  priceStyle: string;
+  headingAlign: string;
+  menuLayout: string;
+  itemImages: string;
+  itemImageShape: string;
+  categoryMarker: string;
   /** Admin customization: 'solid' | 'pattern' | 'image' -- see
    *  Restaurant.backgroundStyle. */
   backgroundStyle: string;
@@ -205,6 +222,14 @@ export interface MenuPreviewOverrides {
   cardStyle?: string;
   buttonShape?: string;
   categoryDivider?: string;
+  logoShape?: string;
+  coverHeight?: string;
+  priceStyle?: string;
+  headingAlign?: string;
+  menuLayout?: string;
+  itemImages?: string;
+  itemImageShape?: string;
+  categoryMarker?: string;
   backgroundStyle?: string;
   backgroundPattern?: string;
   sectionSpacing?: string;
@@ -283,6 +308,26 @@ export class MenuService {
       isPreviewOwner && preview!.categoryDivider
         ? preview!.categoryDivider
         : restaurant.categoryDivider;
+    const effectiveMenuLayout =
+      isPreviewOwner && preview!.menuLayout ? preview!.menuLayout : restaurant.menuLayout;
+    const effectiveItemImages =
+      isPreviewOwner && preview!.itemImages ? preview!.itemImages : restaurant.itemImages;
+    const effectiveItemImageShape =
+      isPreviewOwner && preview!.itemImageShape
+        ? preview!.itemImageShape
+        : restaurant.itemImageShape;
+    const effectiveCategoryMarker =
+      isPreviewOwner && preview!.categoryMarker
+        ? preview!.categoryMarker
+        : restaurant.categoryMarker;
+    const effectiveLogoShape =
+      isPreviewOwner && preview!.logoShape ? preview!.logoShape : restaurant.logoShape;
+    const effectiveCoverHeight =
+      isPreviewOwner && preview!.coverHeight ? preview!.coverHeight : restaurant.coverHeight;
+    const effectivePriceStyle =
+      isPreviewOwner && preview!.priceStyle ? preview!.priceStyle : restaurant.priceStyle;
+    const effectiveHeadingAlign =
+      isPreviewOwner && preview!.headingAlign ? preview!.headingAlign : restaurant.headingAlign;
     const effectiveBackgroundStyle =
       isPreviewOwner && preview!.backgroundStyle
         ? preview!.backgroundStyle
@@ -326,15 +371,14 @@ export class MenuService {
     // menu belong to the first one, so rows from before menus existed still
     // show up.
     const servingNow = (menu: { availableFrom: string | null; availableTo: string | null }) =>
-      !menu.availableFrom ||
-      !menu.availableTo ||
-      computeOpenStatus(menu.availableFrom, menu.availableTo, nowMinutes).isOpen;
+      isMenuServingNow(menu, nowMinutes);
     const activeMenuRow =
       restaurant.menus.find((menu) => menu.id === requestedMenuId) ??
       restaurant.menus.find(servingNow) ??
       restaurant.menus[0] ??
       null;
     const firstMenuId = restaurant.menus[0]?.id ?? null;
+    const menuServing = !activeMenuRow || servingNow(activeMenuRow);
 
     const categories = restaurant.categories
       .filter((category) => !activeMenuRow || (category.menuId ?? firstMenuId) === activeMenuRow.id)
@@ -380,7 +424,8 @@ export class MenuService {
             currencySymbol: currencySymbol(item.currency, locale),
             categoryName: pick(category.nameAr, category.nameEn),
             imageUrl: item.imagePath,
-            available: item.available,
+            // A dish on a menu that is closed cannot be ordered, whatever its own switch says.
+            available: item.available && menuServing,
             tags: item.tags.map((tag) => ({
               code: tag,
               label: this.i18n.t(TAG_I18N_KEY[tag], { lang: locale }),
@@ -430,10 +475,22 @@ export class MenuService {
         id: menu.id,
         name: pick(menu.nameAr, menu.nameEn),
         active: menu.id === activeMenuRow?.id,
+        closedNow: !servingNow(menu),
       })),
       activeMenu: activeMenuRow
         ? {
             name: pick(activeMenuRow.nameAr, activeMenuRow.nameEn),
+            closedNow: !menuServing,
+            closedNotice: menuServing
+              ? null
+              : this.i18n.t('common.menu.menuClosedNotice', {
+                  lang: locale,
+                  args: {
+                    name: pick(activeMenuRow.nameAr, activeMenuRow.nameEn),
+                    from: activeMenuRow.availableFrom ?? '',
+                    to: activeMenuRow.availableTo ?? '',
+                  },
+                }),
             hoursNote:
               activeMenuRow.availableFrom && activeMenuRow.availableTo
                 ? [
@@ -459,6 +516,14 @@ export class MenuService {
       cardStyle: effectiveCardStyle,
       buttonShapeCss: toButtonShapeCss(effectiveButtonShape),
       categoryDivider: effectiveCategoryDivider,
+      logoShape: effectiveLogoShape,
+      coverHeight: effectiveCoverHeight,
+      priceStyle: effectivePriceStyle,
+      headingAlign: effectiveHeadingAlign,
+      menuLayout: effectiveMenuLayout,
+      itemImages: effectiveItemImages,
+      itemImageShape: effectiveItemImageShape,
+      categoryMarker: effectiveCategoryMarker,
       backgroundStyle: effectiveBackgroundStyle,
       backgroundPattern: effectiveBackgroundPattern,
       backgroundImageUrl: restaurant.backgroundImagePath,
@@ -547,6 +612,9 @@ function toSecondaryColorCss(secondaryColor: string | null): {
 function toCornerStyleCss(
   cornerStyle: string,
 ): { radiusSm: string; radiusMd: string; radiusLg: string; radiusCard: string } | null {
+  if (cornerStyle === 'soft') {
+    return { radiusSm: '10px', radiusMd: '16px', radiusLg: '22px', radiusCard: '24px' };
+  }
   if (cornerStyle !== 'sharp') return null;
   return { radiusSm: '2px', radiusMd: '4px', radiusLg: '6px', radiusCard: '6px' };
 }
@@ -563,6 +631,7 @@ function toBackgroundColorCss(backgroundColor: string | null): string | null {
  *  default `--radius-button: var(--radius-md)` chain -- which already
  *  tracks cornerStyleCss's own --radius-md override when set. */
 function toButtonShapeCss(buttonShape: string): { radiusButton: string } | null {
+  if (buttonShape === 'square') return { radiusButton: '2px' };
   if (buttonShape !== 'pill') return null;
   return { radiusButton: '9999px' };
 }

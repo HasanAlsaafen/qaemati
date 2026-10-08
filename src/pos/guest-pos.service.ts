@@ -1,6 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { isCategoryAvailableNow, nowInHebronMinutes } from '../common/open-status';
+import {
+  isCategoryAvailableNow,
+  isMenuServingNow,
+  nowInHebronMinutes,
+} from '../common/open-status';
 import { RATE_LIMIT_STORE, RateLimitStore } from '../common/rate-limit/rate-limit-store';
 import { PrismaService } from '../prisma/prisma.service';
 import { TenancyService } from '../tenancy/tenancy.service';
@@ -238,10 +242,15 @@ export class GuestPosService {
         id: { in: [...new Set([...merged.values()].map((l) => l.parsed.itemId))] },
         restaurantId,
       },
-      include: { variants: true, addons: true, category: true },
+      include: { variants: true, addons: true, category: { include: { menu: true } } },
     });
     const byId = new Map(items.map((item) => [item.id, item]));
     const nowMinutes = nowInHebronMinutes();
+    // Dishes in no menu belong to the first one, the same rule the public menu uses.
+    const firstMenu = await this.prisma.menu.findFirst({
+      where: { restaurantId },
+      orderBy: { sortOrder: 'asc' },
+    });
 
     const out: Prisma.OrderItemCreateWithoutOrderInput[] = [];
     let totalCents = 0;
@@ -251,7 +260,15 @@ export class GuestPosService {
       if (!item) throw new GuestPosError('invalid_order', 422);
       const serving =
         item.available &&
-        isCategoryAvailableNow(item.category.availableFrom, item.category.availableTo, nowMinutes);
+        isCategoryAvailableNow(
+          item.category.availableFrom,
+          item.category.availableTo,
+          nowMinutes,
+        ) &&
+        isMenuServingNow(
+          item.category.menu ?? firstMenu ?? { availableFrom: null, availableTo: null },
+          nowMinutes,
+        );
       if (!serving)
         throw new GuestPosError('item_unavailable', 409, { ar: item.nameAr, en: item.nameEn });
 

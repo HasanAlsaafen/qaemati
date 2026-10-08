@@ -103,7 +103,7 @@
     >
       <template x-if="item">
         <div>
-          <div class="relative">
+          <div class="item-sheet__photo-wrap relative">
             {#
               width/height are inert for layout here (h-48 + w-full already
               fix both box dimensions via CSS, so there's no CLS to
@@ -117,9 +117,9 @@
               alt=""
               width="400"
               height="300"
-              class="aspect-[4/3] w-full object-cover"
+              class="item-sheet__photo aspect-[4/3] w-full object-cover"
             >
-            <span x-show="!item.imageUrl" class="flex aspect-[4/3] w-full items-center justify-center bg-muted-surface text-muted-text">
+            <span x-show="!item.imageUrl" class="item-sheet__photo flex aspect-[4/3] w-full items-center justify-center bg-muted-surface text-muted-text">
               {% if placeholderUrl %}
                 <img src="{{ placeholderUrl }}" alt="" width="160" height="160" class="h-28 w-28 object-contain opacity-80">
               {% else %}

@@ -370,3 +370,13 @@ The "All" chip in the category bar drew a malformed fork and knife that read as 
 - Owner reports show how many suggested dishes were added and which ones.
 - Verified: lint, tsc, 318 unit, 524 e2e; real browser at 375 and 1280 in Arabic and English with axe (no violations).
 - Not done: suggestions are not shown on the table order tracking view; popular fallback does not yet use the time of day.
+
+## Branding options, image editor, closed menus
+
+- Image editor before every image upload (logo, cover, background, dish, category), in Arabic and English, keyboard and touch friendly.
+- New settings (migrations `20261019000000_menu_look`, `20261019010000_more_branding`): menu layout, dish photos, photo shape, category marker, logo shape, cover height, price style, heading alignment; more values for font, density, corners, card style, button shape, divider, pattern. All have live preview, validation and tests.
+- Dish photo can be removed per dish (`DELETE /admin/items/:id/image`).
+- A closed menu is shown, enforced on table orders, and left out of suggestions.
+- Background color and pattern now reach the whole page, and the branding preview uses the landing page phone frame.
+- Verified: lint, tsc, 318 unit, 543 e2e; browser checks at 375 and 1280 in both languages with axe.
+- Not done: no new fonts beyond the three self hosted families; the photo editor has no filters.

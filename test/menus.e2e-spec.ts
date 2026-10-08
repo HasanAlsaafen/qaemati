@@ -113,14 +113,45 @@ describe('Multiple menus (e2e)', () => {
       const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en&menu=${closedMenuId}`);
       expect(res.text).toContain('Eggs');
       expect(res.text).not.toContain('>Grills<');
-      expect(res.text).toContain('This menu is served from');
-      expect(res.text).toContain('It is closed right now.');
+      expect(res.text).toContain('Breakfast is not available right now. It is served from');
+      expect(res.text).toContain('data-menu-closed');
+    });
+
+    it('marks the closed menu on its tab and leaves the open one alone', async () => {
+      const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
+      expect(res.text).toMatch(/>Breakfast <span[^>]*>· Closed now</);
+      expect(res.text).not.toMatch(/All day <span[^>]*>· Closed now/);
+      expect(res.text).not.toContain('data-menu-closed');
+    });
+
+    it('does not let a guest add a dish from a closed menu', async () => {
+      const category = await prisma.category.findFirstOrThrow({ where: { menuId: closedMenuId } });
+      const dish = await prisma.item.create({
+        data: {
+          restaurantId,
+          categoryId: category.id,
+          nameAr: 'بيضة',
+          nameEn: 'Omelette',
+          price: 5,
+          currency: 'ILS',
+        },
+      });
+      try {
+        const closed = await request(app.getHttpServer()).get(
+          `/m/${slug}?lang=en&menu=${closedMenuId}`,
+        );
+        expect(closed.text).toContain('Omelette');
+        expect(closed.text).toContain('&quot;available&quot;:false');
+        expect(closed.text).not.toContain('aria-label="Add Omelette');
+      } finally {
+        await prisma.item.delete({ where: { id: dish.id } });
+      }
     });
 
     it('translates the hours note into Arabic', async () => {
       const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=ar&menu=${closedMenuId}`);
-      expect(res.text).toContain('تُقدَّم هذه القائمة من');
-      expect(res.text).toContain('القائمة مغلقة الآن.');
+      expect(res.text).toContain('تُقدَّم من');
+      expect(res.text).toContain('غير متاحة الآن');
     });
 
     it('puts a category with no menu into the first menu', async () => {

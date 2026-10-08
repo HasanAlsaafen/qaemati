@@ -4,9 +4,9 @@
   without JavaScript. They sit with the header, above the search, because
   switching menu is rare and the sticky bar is kept for the category chips.
 #}
-{% macro menuSwitcher(menu, label, tableLabel) %}
+{% macro menuSwitcher(menu, label, tableLabel, closedTabLabel='') %}
   {% if menu.menus.length > 1 or (menu.activeMenu and menu.activeMenu.hoursNote) %}
-    <div class="print:hidden bg-surface">
+    <div class="menu-band print:hidden bg-surface">
       <div class="mx-auto max-w-4xl px-4 pb-3 sm:px-6">
         {% if menu.menus.length > 1 %}
           <nav aria-label="{{ label }}" class="flex gap-2 overflow-x-auto">
@@ -15,11 +15,13 @@
                 href="/m/{{ menu.slug }}?menu={{ entry.id }}{% if tableLabel %}&table={{ tableLabel | urlencode }}{% endif %}"
                 {% if entry.active %}aria-current="page"{% endif %}
                 class="inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'bg-primary text-primary-on' if entry.active else 'border border-border bg-surface text-muted-text hover:text-text' }}"
-              >{{ entry.name }}</a>
+              >{{ entry.name }}{% if entry.closedNow %} <span class="ms-1 text-xs font-normal">· {{ closedTabLabel }}</span>{% endif %}</a>
             {% endfor %}
           </nav>
         {% endif %}
-        {% if menu.activeMenu and menu.activeMenu.hoursNote %}
+        {% if menu.activeMenu and menu.activeMenu.closedNow %}
+          <p role="status" data-menu-closed class="{{ 'mt-2' if menu.menus.length > 1 }} rounded-md border border-warning bg-warning/10 px-3 py-2 text-sm font-medium text-warning-text">{{ menu.activeMenu.closedNotice }}</p>
+        {% elif menu.activeMenu and menu.activeMenu.hoursNote %}
           <p class="text-sm text-muted-text {{ 'mt-2' if menu.menus.length > 1 }}">{{ menu.activeMenu.hoursNote }}</p>
         {% endif %}
       </div>

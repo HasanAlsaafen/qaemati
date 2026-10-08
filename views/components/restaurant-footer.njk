@@ -9,7 +9,7 @@
   {% if menu.phoneUrl or menu.whatsappUrl or menu.instagramUrl or menu.facebookUrl or menu.address or menu.mapUrl or menu.workingHours %}
     {% set linkClass = 'inline-flex min-h-11 min-w-11 items-center gap-1.5 text-sm text-muted-text hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary' %}
     {% set pin = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>' %}
-    <footer class="mt-10 border-t border-border bg-surface py-8 shadow-raised {{ 'pb-28' if text.hasSelectionBar }}">
+    <footer class="menu-band mt-10 border-t border-border bg-surface py-8 shadow-raised {{ 'pb-28' if text.hasSelectionBar }}">
       {% if menu.address or menu.mapUrl %}
         <p class="mb-4 flex items-center justify-center gap-1.5 px-4 text-center text-sm text-muted-text sm:px-6">
           {% if menu.mapUrl %}

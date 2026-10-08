@@ -221,6 +221,19 @@ export class ItemsController {
     };
   }
 
+  @Delete('items/:id/image')
+  @Render('admin/partials/item')
+  async removeImage(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const locale = req.locale ?? 'ar';
+    const item = await this.items.setImage(req.session.restaurantId as string, id, null);
+    triggerToast(res, this.i18n.t('common.admin.items.imageRemovedToast', { lang: locale }));
+    return { item: toItemView(item), labels: buildAdminLabels(this.i18n, locale) };
+  }
+
   @Delete('items/:id')
   async remove(@Param('id') id: string, @Req() req: Request, @Res() res: Response): Promise<void> {
     const restaurantId = req.session.restaurantId as string;

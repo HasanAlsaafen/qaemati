@@ -8,14 +8,22 @@ import {
 } from '../common/color';
 import { isValidFacebook, isValidMapUrl, isValidPhone, toFacebookUrl } from '../common/contact';
 
-const FONT_THEMES = new Set(['classic', 'modern']);
-const MENU_DENSITIES = new Set(['comfortable', 'compact']);
-const CORNER_STYLES = new Set(['rounded', 'sharp']);
-const CARD_STYLES = new Set(['flat', 'raised']);
-const BUTTON_SHAPES = new Set(['rounded', 'pill']);
-const CATEGORY_DIVIDERS = new Set(['none', 'line', 'dashed']);
+const FONT_THEMES = new Set(['classic', 'modern', 'clean']);
+const MENU_DENSITIES = new Set(['comfortable', 'compact', 'spacious']);
+const CORNER_STYLES = new Set(['rounded', 'sharp', 'soft']);
+const CARD_STYLES = new Set(['flat', 'raised', 'outlined', 'tinted']);
+const BUTTON_SHAPES = new Set(['rounded', 'pill', 'square']);
+const CATEGORY_DIVIDERS = new Set(['none', 'line', 'dashed', 'dotted', 'thick']);
 const BACKGROUND_STYLES = new Set(['solid', 'pattern', 'image']);
-const BACKGROUND_PATTERNS = new Set(['dots', 'grid', 'diagonal']);
+const BACKGROUND_PATTERNS = new Set(['dots', 'grid', 'diagonal', 'checks', 'lines']);
+const MENU_LAYOUTS = new Set(['grid', 'grid3', 'list', 'large']);
+const ITEM_IMAGE_MODES = new Set(['show', 'filled', 'hide']);
+const ITEM_IMAGE_SHAPES = new Set(['standard', 'wide', 'square', 'tall', 'round']);
+const CATEGORY_MARKERS = new Set(['none', 'bar', 'dot', 'square', 'rule', 'underline']);
+const LOGO_SHAPES = new Set(['rounded', 'round', 'square']);
+const COVER_HEIGHTS = new Set(['medium', 'small', 'large']);
+const PRICE_STYLES = new Set(['plain', 'badge', 'muted']);
+const HEADING_ALIGNS = new Set(['start', 'center']);
 const SECTION_SPACINGS = new Set(['cozy', 'comfortable', 'spacious']);
 
 export interface RestaurantDetailsInput {
@@ -48,6 +56,14 @@ export interface RestaurantDetailsInput {
   cardStyle?: string;
   buttonShape?: string;
   categoryDivider?: string;
+  logoShape?: string;
+  coverHeight?: string;
+  priceStyle?: string;
+  headingAlign?: string;
+  menuLayout?: string;
+  itemImages?: string;
+  itemImageShape?: string;
+  categoryMarker?: string;
   backgroundStyle?: string;
   backgroundPattern?: string;
   sectionSpacing?: string;
@@ -120,6 +136,54 @@ export class RestaurantService {
       'none',
       'INVALID_CATEGORY_DIVIDER',
     );
+    const menuLayout = this.validateChoice(
+      input.menuLayout,
+      MENU_LAYOUTS,
+      'grid',
+      'INVALID_MENU_LAYOUT',
+    );
+    const itemImages = this.validateChoice(
+      input.itemImages,
+      ITEM_IMAGE_MODES,
+      'show',
+      'INVALID_ITEM_IMAGES',
+    );
+    const itemImageShape = this.validateChoice(
+      input.itemImageShape,
+      ITEM_IMAGE_SHAPES,
+      'standard',
+      'INVALID_ITEM_IMAGE_SHAPE',
+    );
+    const categoryMarker = this.validateChoice(
+      input.categoryMarker,
+      CATEGORY_MARKERS,
+      'none',
+      'INVALID_CATEGORY_MARKER',
+    );
+    const logoShape = this.validateChoice(
+      input.logoShape,
+      LOGO_SHAPES,
+      'rounded',
+      'INVALID_LOGO_SHAPE',
+    );
+    const coverHeight = this.validateChoice(
+      input.coverHeight,
+      COVER_HEIGHTS,
+      'medium',
+      'INVALID_COVER_HEIGHT',
+    );
+    const priceStyle = this.validateChoice(
+      input.priceStyle,
+      PRICE_STYLES,
+      'plain',
+      'INVALID_PRICE_STYLE',
+    );
+    const headingAlign = this.validateChoice(
+      input.headingAlign,
+      HEADING_ALIGNS,
+      'start',
+      'INVALID_HEADING_ALIGN',
+    );
     const backgroundStyle = this.validateChoice(
       input.backgroundStyle,
       BACKGROUND_STYLES,
@@ -169,6 +233,14 @@ export class RestaurantService {
         cardStyle,
         buttonShape,
         categoryDivider,
+        logoShape,
+        coverHeight,
+        priceStyle,
+        headingAlign,
+        menuLayout,
+        itemImages,
+        itemImageShape,
+        categoryMarker,
         backgroundStyle,
         backgroundPattern,
         sectionSpacing,

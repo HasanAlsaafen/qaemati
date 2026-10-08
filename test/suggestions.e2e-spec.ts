@@ -472,6 +472,25 @@ describe('Dish suggestions (e2e)', () => {
       );
     });
 
+    it("removes a dish photo, only for the owner's own dish", async () => {
+      await prisma.item.update({
+        where: { id: dish.cake },
+        data: { imagePath: '/uploads/items/x.jpg' },
+      });
+      const res = await owner
+        .delete(`/admin/items/${dish.cake}/image`)
+        .set('X-CSRF-Token', token)
+        .set('Cookie', 'qaemati_locale=en');
+      expect(res.status).toBe(200);
+      expect(
+        (await prisma.item.findUniqueOrThrow({ where: { id: dish.cake } })).imagePath,
+      ).toBeNull();
+      const foreignRes = await owner
+        .delete(`/admin/items/${foreign.itemId}/image`)
+        .set('X-CSRF-Token', token);
+      expect([403, 404]).toContain(foreignRes.status);
+    });
+
     it('is removed with the dish', async () => {
       const temp = await item(
         (await prisma.category.findFirstOrThrow({ where: { restaurantId, nameEn: 'Mains' } })).id,

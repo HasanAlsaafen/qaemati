@@ -71,6 +71,7 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale, defaultCurre
       hint: t('common.admin.pairings.hint'),
     },
     items: {
+      removeImage: t('common.admin.items.removeImage'),
       addItem: t('common.admin.items.addItem'),
       emptyTitle: t('common.admin.items.emptyTitle'),
       emptyDescription: t('common.admin.items.emptyDescription'),

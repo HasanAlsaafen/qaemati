@@ -322,7 +322,9 @@
       "added": "Added to your selection",
       "addAria": "Add {name}",
       "sheetTitle": "Goes well with"
-    }
+    },
+    "menuClosedNotice": "{name} is not available right now. It is served from {from} to {to}.",
+    "menuClosedTab": "Closed now"
   },
   "admin": {
     "auth": {
@@ -431,7 +433,9 @@
       "addonsHint": "Optional extras added on top of the price, e.g. \"Extra cheese\".",
       "addAddon": "Add extra",
       "removeOption": "Remove",
-      "todaysSpecialLabel": "Today's special"
+      "todaysSpecialLabel": "Today's special",
+      "removeImage": "Remove photo",
+      "imageRemovedToast": "Photo removed"
     },
     "bulk": {
       "title": "Bulk tools",
@@ -572,7 +576,98 @@
       "mapUrlHint": "An https link from Google Maps or any map service.",
       "invalidPhone": "Enter a valid phone number, for example 02 222 0111.",
       "invalidFacebook": "Enter a Facebook page name or its full link.",
-      "invalidMapUrl": "Enter a link that starts with https."
+      "invalidMapUrl": "Enter a link that starts with https.",
+      "look": {
+        "layout": {
+          "label": "Dish cards",
+          "grid": "Grid",
+          "list": "List",
+          "large": "Large",
+          "grid3": "Three columns"
+        },
+        "images": {
+          "label": "Dish photos",
+          "show": "Show",
+          "hide": "Hide",
+          "filled": "Only dishes with a photo"
+        },
+        "shape": {
+          "label": "Photo shape",
+          "standard": "Standard",
+          "wide": "Wide",
+          "square": "Square",
+          "round": "Round",
+          "tall": "Tall"
+        },
+        "marker": {
+          "label": "Mark before category titles",
+          "none": "None",
+          "bar": "Bar",
+          "dot": "Dot",
+          "underline": "Underline",
+          "square": "Square",
+          "rule": "Rule"
+        },
+        "logo": {
+          "label": "Logo shape",
+          "rounded": "Rounded",
+          "round": "Circle",
+          "square": "Square"
+        },
+        "cover": {
+          "label": "Cover height",
+          "medium": "Medium",
+          "small": "Small",
+          "large": "Large"
+        },
+        "price": {
+          "label": "Price style",
+          "plain": "Plain",
+          "badge": "Badge",
+          "muted": "Quiet"
+        },
+        "heading": {
+          "label": "Category titles",
+          "start": "Start",
+          "center": "Centered"
+        },
+        "extra": {
+          "fontTheme": {
+            "clean": "Clean"
+          },
+          "menuDensity": {
+            "spacious": "Spacious"
+          },
+          "cornerStyle": {
+            "soft": "Soft"
+          },
+          "cardStyle": {
+            "outlined": "Outlined",
+            "tinted": "Tinted"
+          },
+          "buttonShape": {
+            "square": "Square"
+          },
+          "categoryDivider": {
+            "dotted": "Dotted",
+            "thick": "Thick"
+          },
+          "backgroundPattern": {
+            "checks": "Checks",
+            "lines": "Lines"
+          },
+          "menuLayout": {
+            "grid3": "Three columns"
+          },
+          "itemImageShape": {
+            "tall": "Tall"
+          },
+          "categoryMarker": {
+            "square": "Square",
+            "rule": "Rule"
+          }
+        }
+      }
     },
     "tour": {
       "skip": "Skip",
@@ -720,6 +815,21 @@
       "save": "Save suggestions",
       "saved": "Suggestions saved",
       "none": "Add more dishes first, then you can pair them."
+    },
+    "imageEditor": {
+      "title": "Adjust the picture",
+      "stageLabel": "Picture. Drag to move, plus and minus to zoom.",
+      "hint": "Drag the picture to move it. Use the slider or your fingers to zoom.",
+      "shape": "Shape of the crop",
+      "square": "Square",
+      "free": "Free",
+      "zoom": "Zoom",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "rotate": "Rotate",
+      "reset": "Reset",
+      "cancel": "Cancel",
+      "apply": "Use this picture"
     }
   },
   "validation": {

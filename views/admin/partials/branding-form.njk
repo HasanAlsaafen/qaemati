@@ -195,50 +195,135 @@
       <div class="mt-6 flex flex-col gap-5">
         <fieldset class="flex flex-col gap-1.5">
           <legend class="text-sm font-medium text-text">{{ labels.branding.fontThemeLabel }}</legend>
-          <div class="grid max-w-sm grid-cols-2 gap-2">
+          <div class="grid max-w-sm grid-cols-2 sm:grid-cols-3 gap-2">
             {{ choiceCard('fontTheme', 'classic', labels.branding.fontThemeClassic, restaurant.fontTheme != 'modern', 'x-model="fontTheme" x-on:change="schedulePreview()"') }}
             {{ choiceCard('fontTheme', 'modern', labels.branding.fontThemeModern, restaurant.fontTheme == 'modern', 'x-model="fontTheme" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('fontTheme', 'clean', t('common.admin.branding.look.extra.fontTheme.clean'), restaurant.fontTheme == 'clean', 'x-model="fontTheme" x-on:change="schedulePreview()"') }}
           </div>
         </fieldset>
 
         <fieldset class="flex flex-col gap-1.5">
           <legend class="text-sm font-medium text-text">{{ labels.branding.menuDensityLabel }}</legend>
-          <div class="grid max-w-sm grid-cols-2 gap-2">
+          <div class="grid max-w-sm grid-cols-2 sm:grid-cols-3 gap-2">
             {{ choiceCard('menuDensity', 'comfortable', labels.branding.menuDensityComfortable, restaurant.menuDensity != 'compact', 'x-model="menuDensity" x-on:change="schedulePreview()"') }}
             {{ choiceCard('menuDensity', 'compact', labels.branding.menuDensityCompact, restaurant.menuDensity == 'compact', 'x-model="menuDensity" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('menuDensity', 'spacious', t('common.admin.branding.look.extra.menuDensity.spacious'), restaurant.menuDensity == 'spacious', 'x-model="menuDensity" x-on:change="schedulePreview()"') }}
           </div>
         </fieldset>
 
         <fieldset class="flex flex-col gap-1.5">
           <legend class="text-sm font-medium text-text">{{ labels.branding.cornerStyleLabel }}</legend>
-          <div class="grid max-w-sm grid-cols-2 gap-2">
+          <div class="grid max-w-sm grid-cols-2 sm:grid-cols-3 gap-2">
             {{ choiceCard('cornerStyle', 'rounded', labels.branding.cornerStyleRounded, restaurant.cornerStyle != 'sharp', 'x-model="cornerStyle" x-on:change="schedulePreview()"') }}
             {{ choiceCard('cornerStyle', 'sharp', labels.branding.cornerStyleSharp, restaurant.cornerStyle == 'sharp', 'x-model="cornerStyle" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('cornerStyle', 'soft', t('common.admin.branding.look.extra.cornerStyle.soft'), restaurant.cornerStyle == 'soft', 'x-model="cornerStyle" x-on:change="schedulePreview()"') }}
           </div>
         </fieldset>
 
         <fieldset class="flex flex-col gap-1.5">
           <legend class="text-sm font-medium text-text">{{ labels.branding.cardStyleLabel }}</legend>
-          <div class="grid max-w-sm grid-cols-2 gap-2">
+          <div class="grid max-w-sm grid-cols-2 sm:grid-cols-3 gap-2">
             {{ choiceCard('cardStyle', 'flat', labels.branding.cardStyleFlat, restaurant.cardStyle != 'raised', 'x-model="cardStyle" x-on:change="schedulePreview()"') }}
             {{ choiceCard('cardStyle', 'raised', labels.branding.cardStyleRaised, restaurant.cardStyle == 'raised', 'x-model="cardStyle" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('cardStyle', 'outlined', t('common.admin.branding.look.extra.cardStyle.outlined'), restaurant.cardStyle == 'outlined', 'x-model="cardStyle" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('cardStyle', 'tinted', t('common.admin.branding.look.extra.cardStyle.tinted'), restaurant.cardStyle == 'tinted', 'x-model="cardStyle" x-on:change="schedulePreview()"') }}
           </div>
         </fieldset>
 
         <fieldset class="flex flex-col gap-1.5">
           <legend class="text-sm font-medium text-text">{{ labels.branding.buttonShapeLabel }}</legend>
-          <div class="grid max-w-sm grid-cols-2 gap-2">
+          <div class="grid max-w-sm grid-cols-2 sm:grid-cols-3 gap-2">
             {{ choiceCard('buttonShape', 'rounded', labels.branding.buttonShapeRounded, restaurant.buttonShape != 'pill', 'x-model="buttonShape" x-on:change="schedulePreview()"') }}
             {{ choiceCard('buttonShape', 'pill', labels.branding.buttonShapePill, restaurant.buttonShape == 'pill', 'x-model="buttonShape" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('buttonShape', 'square', t('common.admin.branding.look.extra.buttonShape.square'), restaurant.buttonShape == 'square', 'x-model="buttonShape" x-on:change="schedulePreview()"') }}
           </div>
         </fieldset>
 
         <fieldset class="flex flex-col gap-1.5">
           <legend class="text-sm font-medium text-text">{{ labels.branding.categoryDividerLabel }}</legend>
-          <div class="grid max-w-md grid-cols-3 gap-2">
+          <div class="grid max-w-md grid-cols-2 sm:grid-cols-3 gap-2">
             {{ choiceCard('categoryDivider', 'none', labels.branding.categoryDividerNone, restaurant.categoryDivider != 'line' and restaurant.categoryDivider != 'dashed', 'x-model="categoryDivider" x-on:change="schedulePreview()"') }}
             {{ choiceCard('categoryDivider', 'line', labels.branding.categoryDividerLine, restaurant.categoryDivider == 'line', 'x-model="categoryDivider" x-on:change="schedulePreview()"') }}
             {{ choiceCard('categoryDivider', 'dashed', labels.branding.categoryDividerDashed, restaurant.categoryDivider == 'dashed', 'x-model="categoryDivider" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('categoryDivider', 'dotted', t('common.admin.branding.look.extra.categoryDivider.dotted'), restaurant.categoryDivider == 'dotted', 'x-model="categoryDivider" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('categoryDivider', 'thick', t('common.admin.branding.look.extra.categoryDivider.thick'), restaurant.categoryDivider == 'thick', 'x-model="categoryDivider" x-on:change="schedulePreview()"') }}
+          </div>
+        </fieldset>
+
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text">{{ t('common.admin.branding.look.layout.label') }}</legend>
+          <div class="grid max-w-md grid-cols-2 sm:grid-cols-3 gap-2">
+            {{ choiceCard('menuLayout', 'grid', t('common.admin.branding.look.layout.grid'), restaurant.menuLayout == 'grid' or not restaurant.menuLayout, 'x-model="menuLayout" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('menuLayout', 'list', t('common.admin.branding.look.layout.list'), restaurant.menuLayout == 'list', 'x-model="menuLayout" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('menuLayout', 'large', t('common.admin.branding.look.layout.large'), restaurant.menuLayout == 'large', 'x-model="menuLayout" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('menuLayout', 'grid3', t('common.admin.branding.look.extra.menuLayout.grid3'), restaurant.menuLayout == 'grid3', 'x-model="menuLayout" x-on:change="schedulePreview()"') }}
+          </div>
+        </fieldset>
+
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text">{{ t('common.admin.branding.look.images.label') }}</legend>
+          <div class="grid max-w-md grid-cols-3 gap-2">
+            {{ choiceCard('itemImages', 'show', t('common.admin.branding.look.images.show'), restaurant.itemImages == 'show' or not restaurant.itemImages, 'x-model="itemImages" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('itemImages', 'filled', t('common.admin.branding.look.images.filled'), restaurant.itemImages == 'filled', 'x-model="itemImages" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('itemImages', 'hide', t('common.admin.branding.look.images.hide'), restaurant.itemImages == 'hide', 'x-model="itemImages" x-on:change="schedulePreview()"') }}
+          </div>
+        </fieldset>
+
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text">{{ t('common.admin.branding.look.shape.label') }}</legend>
+          <div class="grid max-w-md grid-cols-2 sm:grid-cols-3 gap-2">
+            {{ choiceCard('itemImageShape', 'standard', t('common.admin.branding.look.shape.standard'), restaurant.itemImageShape == 'standard' or not restaurant.itemImageShape, 'x-model="itemImageShape" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('itemImageShape', 'wide', t('common.admin.branding.look.shape.wide'), restaurant.itemImageShape == 'wide', 'x-model="itemImageShape" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('itemImageShape', 'square', t('common.admin.branding.look.shape.square'), restaurant.itemImageShape == 'square', 'x-model="itemImageShape" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('itemImageShape', 'round', t('common.admin.branding.look.shape.round'), restaurant.itemImageShape == 'round', 'x-model="itemImageShape" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('itemImageShape', 'tall', t('common.admin.branding.look.extra.itemImageShape.tall'), restaurant.itemImageShape == 'tall', 'x-model="itemImageShape" x-on:change="schedulePreview()"') }}
+          </div>
+        </fieldset>
+
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text">{{ t('common.admin.branding.look.marker.label') }}</legend>
+          <div class="grid max-w-md grid-cols-2 sm:grid-cols-3 gap-2">
+            {{ choiceCard('categoryMarker', 'none', t('common.admin.branding.look.marker.none'), restaurant.categoryMarker == 'none' or not restaurant.categoryMarker, 'x-model="categoryMarker" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('categoryMarker', 'bar', t('common.admin.branding.look.marker.bar'), restaurant.categoryMarker == 'bar', 'x-model="categoryMarker" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('categoryMarker', 'dot', t('common.admin.branding.look.marker.dot'), restaurant.categoryMarker == 'dot', 'x-model="categoryMarker" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('categoryMarker', 'underline', t('common.admin.branding.look.marker.underline'), restaurant.categoryMarker == 'underline', 'x-model="categoryMarker" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('categoryMarker', 'square', t('common.admin.branding.look.extra.categoryMarker.square'), restaurant.categoryMarker == 'square', 'x-model="categoryMarker" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('categoryMarker', 'rule', t('common.admin.branding.look.extra.categoryMarker.rule'), restaurant.categoryMarker == 'rule', 'x-model="categoryMarker" x-on:change="schedulePreview()"') }}
+          </div>
+        </fieldset>
+
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text">{{ t('common.admin.branding.look.logo.label') }}</legend>
+          <div class="grid max-w-md grid-cols-3 gap-2">
+            {{ choiceCard('logoShape', 'rounded', t('common.admin.branding.look.logo.rounded'), restaurant.logoShape == 'rounded' or not restaurant.logoShape, 'x-model="logoShape" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('logoShape', 'round', t('common.admin.branding.look.logo.round'), restaurant.logoShape == 'round', 'x-model="logoShape" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('logoShape', 'square', t('common.admin.branding.look.logo.square'), restaurant.logoShape == 'square', 'x-model="logoShape" x-on:change="schedulePreview()"') }}
+          </div>
+        </fieldset>
+
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text">{{ t('common.admin.branding.look.cover.label') }}</legend>
+          <div class="grid max-w-md grid-cols-3 gap-2">
+            {{ choiceCard('coverHeight', 'medium', t('common.admin.branding.look.cover.medium'), restaurant.coverHeight == 'medium' or not restaurant.coverHeight, 'x-model="coverHeight" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('coverHeight', 'small', t('common.admin.branding.look.cover.small'), restaurant.coverHeight == 'small', 'x-model="coverHeight" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('coverHeight', 'large', t('common.admin.branding.look.cover.large'), restaurant.coverHeight == 'large', 'x-model="coverHeight" x-on:change="schedulePreview()"') }}
+          </div>
+        </fieldset>
+
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text">{{ t('common.admin.branding.look.price.label') }}</legend>
+          <div class="grid max-w-md grid-cols-3 gap-2">
+            {{ choiceCard('priceStyle', 'plain', t('common.admin.branding.look.price.plain'), restaurant.priceStyle == 'plain' or not restaurant.priceStyle, 'x-model="priceStyle" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('priceStyle', 'badge', t('common.admin.branding.look.price.badge'), restaurant.priceStyle == 'badge', 'x-model="priceStyle" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('priceStyle', 'muted', t('common.admin.branding.look.price.muted'), restaurant.priceStyle == 'muted', 'x-model="priceStyle" x-on:change="schedulePreview()"') }}
+          </div>
+        </fieldset>
+
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text">{{ t('common.admin.branding.look.heading.label') }}</legend>
+          <div class="grid max-w-md grid-cols-2 gap-2">
+            {{ choiceCard('headingAlign', 'start', t('common.admin.branding.look.heading.start'), restaurant.headingAlign == 'start' or not restaurant.headingAlign, 'x-model="headingAlign" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('headingAlign', 'center', t('common.admin.branding.look.heading.center'), restaurant.headingAlign == 'center', 'x-model="headingAlign" x-on:change="schedulePreview()"') }}
           </div>
         </fieldset>
 
@@ -257,10 +342,12 @@
           #}
           <div class="mt-3" x-show="backgroundStyle === 'pattern'" x-cloak>
             <span class="text-sm font-medium text-text">{{ labels.branding.backgroundPatternLabel }}</span>
-            <div class="mt-1.5 grid max-w-md grid-cols-3 gap-2">
+            <div class="mt-1.5 grid max-w-md grid-cols-2 sm:grid-cols-3 gap-2">
               {{ choiceCard('backgroundPattern', 'dots', labels.branding.backgroundPatternDots, restaurant.backgroundPattern != 'grid' and restaurant.backgroundPattern != 'diagonal', 'x-model="backgroundPattern" x-on:change="schedulePreview()"') }}
               {{ choiceCard('backgroundPattern', 'grid', labels.branding.backgroundPatternGrid, restaurant.backgroundPattern == 'grid', 'x-model="backgroundPattern" x-on:change="schedulePreview()"') }}
               {{ choiceCard('backgroundPattern', 'diagonal', labels.branding.backgroundPatternDiagonal, restaurant.backgroundPattern == 'diagonal', 'x-model="backgroundPattern" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('backgroundPattern', 'checks', t('common.admin.branding.look.extra.backgroundPattern.checks'), restaurant.backgroundPattern == 'checks', 'x-model="backgroundPattern" x-on:change="schedulePreview()"') }}
+            {{ choiceCard('backgroundPattern', 'lines', t('common.admin.branding.look.extra.backgroundPattern.lines'), restaurant.backgroundPattern == 'lines', 'x-model="backgroundPattern" x-on:change="schedulePreview()"') }}
             </div>
           </div>
 

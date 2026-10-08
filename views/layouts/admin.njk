@@ -177,6 +177,8 @@
   </div>
 
   {{ toastHost() }}
+  {% include "admin/components/image-editor.njk" %}
+  <script defer src="{{ asset('/js/image-editor.js') }}"></script>
   {% include "admin/components/guided-tour.njk" %}
   <script defer src="{{ asset('/js/form-errors.js') }}"></script>
   {% block scripts %}{% endblock %}

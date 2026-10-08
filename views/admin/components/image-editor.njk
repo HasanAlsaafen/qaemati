@@ -1,0 +1,37 @@
+{# Crop, zoom and move step shown before any image is uploaded. Driven by public/js/image-editor.js, which clones this template. #}
+{% set E = 'common.admin.imageEditor.' %}
+<template id="image-editor-template">
+  <div class="fixed inset-0 z-[70] flex items-end justify-center bg-text/50 p-0 sm:items-center sm:p-4" data-editor-overlay>
+    <div role="dialog" aria-modal="true" aria-labelledby="image-editor-title" class="flex max-h-[100dvh] w-full max-w-lg flex-col gap-4 overflow-y-auto rounded-t-[1.5rem] bg-surface p-4 shadow-overlay sm:rounded-[1.5rem] sm:p-6">
+      <h2 id="image-editor-title" class="font-sans text-lg font-bold text-text">{{ t(E + 'title') }}</h2>
+
+      <div data-editor-stage class="relative mx-auto w-full touch-none select-none overflow-hidden rounded-md bg-muted-surface" style="aspect-ratio: 1 / 1; cursor: grab" tabindex="0" role="application" aria-label="{{ t(E + 'stageLabel') }}">
+        <canvas data-editor-canvas class="absolute inset-0 h-full w-full"></canvas>
+        <span data-editor-circle class="pointer-events-none absolute inset-0 hidden rounded-full border-2 border-surface" aria-hidden="true"></span>
+      </div>
+      <p class="text-xs text-muted-text">{{ t(E + 'hint') }}</p>
+
+      <fieldset data-editor-shapes class="flex flex-wrap gap-2">
+        <legend class="mb-1 text-sm font-medium text-text">{{ t(E + 'shape') }}</legend>
+        <button type="button" data-aspect="1" aria-pressed="false" class="min-h-11 rounded-full border border-border-strong px-4 text-sm text-text aria-pressed:border-primary aria-pressed:bg-primary-soft aria-pressed:text-primary-text">{{ t(E + 'square') }}</button>
+        <button type="button" data-aspect="1.3333" aria-pressed="false" class="min-h-11 rounded-full border border-border-strong px-4 text-sm text-text aria-pressed:border-primary aria-pressed:bg-primary-soft aria-pressed:text-primary-text">4:3</button>
+        <button type="button" data-aspect="1.7778" aria-pressed="false" class="min-h-11 rounded-full border border-border-strong px-4 text-sm text-text aria-pressed:border-primary aria-pressed:bg-primary-soft aria-pressed:text-primary-text">16:9</button>
+        <button type="button" data-aspect="0.75" aria-pressed="false" class="min-h-11 rounded-full border border-border-strong px-4 text-sm text-text aria-pressed:border-primary aria-pressed:bg-primary-soft aria-pressed:text-primary-text">3:4</button>
+        <button type="button" data-aspect="free" aria-pressed="false" class="min-h-11 rounded-full border border-border-strong px-4 text-sm text-text aria-pressed:border-primary aria-pressed:bg-primary-soft aria-pressed:text-primary-text">{{ t(E + 'free') }}</button>
+      </fieldset>
+
+      <div class="flex items-center gap-3">
+        <button type="button" data-zoom-out aria-label="{{ t(E + 'zoomOut') }}" class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border-strong text-text hover:bg-muted-surface"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 8h10" stroke-linecap="round"/></svg></button>
+        <input data-zoom type="range" min="1" max="4" step="0.01" value="1" aria-label="{{ t(E + 'zoom') }}" class="h-11 min-w-0 flex-1">
+        <button type="button" data-zoom-in aria-label="{{ t(E + 'zoomIn') }}" class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border-strong text-text hover:bg-muted-surface"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg></button>
+        <button type="button" data-rotate aria-label="{{ t(E + 'rotate') }}" class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border-strong text-text hover:bg-muted-surface"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v5h-5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+
+      <div class="flex flex-wrap justify-end gap-2">
+        <button type="button" data-reset class="min-h-11 rounded-md px-4 text-sm font-medium text-text hover:bg-muted-surface">{{ t(E + 'reset') }}</button>
+        <button type="button" data-cancel class="min-h-11 rounded-md border border-border-strong px-4 text-sm font-medium text-text hover:bg-muted-surface">{{ t(E + 'cancel') }}</button>
+        <button type="button" data-apply class="min-h-11 rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover">{{ t(E + 'apply') }}</button>
+      </div>
+    </div>
+  </div>
+</template>

@@ -281,6 +281,174 @@ describe('Branding settings (e2e)', () => {
     expect(menuRes.text).toContain('data-section-spacing="spacious"');
   });
 
+  describe('the look of dish cards and category titles', () => {
+    const save = async (extra: Record<string, string>) => {
+      const token = await csrfToken('/admin/branding?lang=en');
+      return agent
+        .patch('/admin/branding')
+        .set('X-CSRF-Token', token)
+        .set('Cookie', 'qaemati_locale=en')
+        .type('form')
+        .send({ nameAr: 'مطعم تجريبي', nameEn: 'Test Restaurant', currency: 'JOD', ...extra });
+    };
+
+    it('saves layout, photo visibility, photo shape and category marker, and applies them to the public menu', async () => {
+      const res = await save({
+        menuLayout: 'list',
+        itemImages: 'hide',
+        itemImageShape: 'round',
+        categoryMarker: 'underline',
+      });
+      expect(res.status).toBe(200);
+      const saved = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+      expect(saved).toMatchObject({
+        menuLayout: 'list',
+        itemImages: 'hide',
+        itemImageShape: 'round',
+        categoryMarker: 'underline',
+      });
+      const menu = await request(app.getHttpServer()).get('/m/test-restaurant-branding?lang=en');
+      for (const attr of [
+        'data-menu-layout="list"',
+        'data-item-images="hide"',
+        'data-image-shape="round"',
+        'data-category-marker="underline"',
+      ]) {
+        expect(menu.text).toContain(attr);
+      }
+    });
+
+    it.each([['menuLayout'], ['itemImages'], ['itemImageShape'], ['categoryMarker']])(
+      'rejects an unknown %s and keeps what was saved',
+      async (field) => {
+        await save({
+          menuLayout: 'grid',
+          itemImages: 'show',
+          itemImageShape: 'standard',
+          categoryMarker: 'bar',
+        });
+        const res = await save({ [field]: 'sparkles' });
+        expect(res.status).not.toBe(500);
+        const saved = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+        expect((saved as Record<string, unknown>)[field]).not.toBe('sparkles');
+      },
+    );
+
+    it('saves the header and text looks and the extra choices, and applies them to the public menu', async () => {
+      const res = await save({
+        logoShape: 'round',
+        coverHeight: 'large',
+        priceStyle: 'badge',
+        headingAlign: 'center',
+        fontTheme: 'clean',
+        cornerStyle: 'soft',
+        cardStyle: 'outlined',
+        buttonShape: 'square',
+        menuLayout: 'grid3',
+        itemImageShape: 'tall',
+        categoryMarker: 'rule',
+        categoryDivider: 'dotted',
+        backgroundStyle: 'pattern',
+        backgroundPattern: 'checks',
+      });
+      expect(res.status).toBe(200);
+      const saved = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+      expect(saved).toMatchObject({
+        logoShape: 'round',
+        coverHeight: 'large',
+        priceStyle: 'badge',
+        headingAlign: 'center',
+        fontTheme: 'clean',
+        cornerStyle: 'soft',
+        cardStyle: 'outlined',
+        buttonShape: 'square',
+        menuLayout: 'grid3',
+        itemImageShape: 'tall',
+        categoryMarker: 'rule',
+        categoryDivider: 'dotted',
+        backgroundPattern: 'checks',
+      });
+      const menu = await request(app.getHttpServer()).get('/m/test-restaurant-branding?lang=en');
+      for (const attr of [
+        'data-logo-shape="round"',
+        'data-cover-height="large"',
+        'data-price-style="badge"',
+        'data-heading-align="center"',
+        'data-menu-layout="grid3"',
+        'data-image-shape="tall"',
+        'data-category-marker="rule"',
+      ]) {
+        expect(menu.text).toContain(attr);
+      }
+      expect(menu.text).toContain('--radius-card: 24px');
+      expect(menu.text).toContain('--radius-button: 2px');
+      expect(menu.text).toContain("'Inter'");
+    });
+
+    it('lets a chosen background color and pattern show through the page bands', async () => {
+      await save({ backgroundColor: '#F0E6D6', backgroundStyle: 'solid' });
+      const color = await request(app.getHttpServer()).get('/m/test-restaurant-branding?lang=en');
+      expect(color.text).toContain('data-custom-bg="true"');
+      await save({ backgroundColor: '', backgroundStyle: 'solid' });
+      const plain = await request(app.getHttpServer()).get('/m/test-restaurant-branding?lang=en');
+      expect(plain.text).toContain('data-custom-bg="false"');
+      expect(plain.text).toContain('menu-band');
+    });
+
+    it.each([['logoShape'], ['coverHeight'], ['priceStyle'], ['headingAlign']])(
+      'rejects an unknown %s',
+      async (field) => {
+        const res = await save({ [field]: 'sparkles' });
+        expect(res.status).not.toBe(500);
+        const saved = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+        expect((saved as Record<string, unknown>)[field]).not.toBe('sparkles');
+      },
+    );
+
+    it('draws the preview in the same phone frame as the landing page', async () => {
+      const res = await agent.get('/admin/branding').set('Cookie', 'qaemati_locale=en');
+      for (const part of [
+        'class="iphone"',
+        'iphone__island',
+        'iphone__home',
+        'class="iphone__page"',
+      ])
+        expect(res.text).toContain(part);
+      expect(res.text).not.toContain('rounded-[3rem]');
+    });
+
+    it('shows the four choices on the branding page in both languages', async () => {
+      const en = await agent.get('/admin/branding').set('Cookie', 'qaemati_locale=en');
+      for (const label of [
+        'Dish cards',
+        'Dish photos',
+        'Photo shape',
+        'Mark before category titles',
+      ])
+        expect(en.text).toContain(label);
+      const ar = await agent.get('/admin/branding').set('Cookie', 'qaemati_locale=ar');
+      for (const label of ['بطاقات الأطباق', 'صور الأطباق', 'شكل الصورة'])
+        expect(ar.text).toContain(label);
+    });
+
+    it('only previews an unsaved choice for the signed in owner', async () => {
+      await save({ menuLayout: 'grid' });
+      const guest = await request(app.getHttpServer()).get(
+        '/m/test-restaurant-branding?previewMenuLayout=large',
+      );
+      expect(guest.text).toContain('data-menu-layout="grid"');
+      const owner = await agent.get('/m/test-restaurant-branding?previewMenuLayout=large');
+      expect(owner.text).toContain('data-menu-layout="large"');
+    });
+
+    it('serves the image editor on every admin page that uploads', async () => {
+      const res = await agent.get('/admin/branding').set('Cookie', 'qaemati_locale=en');
+      expect(res.text).toContain('id="image-editor-template"');
+      expect(res.text).toContain('/js/image-editor.js');
+      expect(res.text).toContain('data-crop-aspect="1.7778"');
+    });
+  });
+
   it('uploads a background image and applies it as an inline style when backgroundStyle is image', async () => {
     const saveToken = await csrfToken('/admin/branding?lang=en');
     await agent

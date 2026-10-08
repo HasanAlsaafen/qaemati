@@ -72,3 +72,12 @@ export function nowInHebronMinutes(date: Date = new Date()): number {
   const minute = Number(parts.find((p) => p.type === 'minute')?.value ?? '0');
   return hour * 60 + minute;
 }
+
+/** A menu with no hours is always served. */
+export function isMenuServingNow(
+  menu: { availableFrom: string | null; availableTo: string | null },
+  nowMinutes: number,
+): boolean {
+  if (!menu.availableFrom || !menu.availableTo) return true;
+  return computeOpenStatus(menu.availableFrom, menu.availableTo, nowMinutes).isOpen;
+}

@@ -45,6 +45,8 @@
             type="file"
             accept="image/jpeg,image/png,image/webp"
             name="image"
+            data-crop-aspect="1"
+            data-crop-round="true"
             class="sr-only"
             hx-post="/admin/categories/{{ category.id }}/image"
             hx-trigger="change"

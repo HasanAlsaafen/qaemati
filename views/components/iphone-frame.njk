@@ -6,7 +6,7 @@
   On small screens a link covers the screen so a tap opens the real page,
   because scrolling inside a small frame would trap the visitor's scroll.
 #}
-{% macro iphoneFrame(src, title, openLabel) %}
+{% macro iphoneFrame(src, title, openLabel, live=false) %}
   <div class="iphone" dir="ltr">
     <div class="iphone__body">
       <span class="iphone__button" style="top:128px;height:30px"></span>
@@ -24,8 +24,13 @@
         </div>
         <span class="iphone__island" aria-hidden="true"></span>
         {# embed=1 is the menu's own frame mode: same page, same scrolling, no scrollbar drawn. #}
-        <iframe src="{{ src }}{{ '&' if '?' in src else '?' }}embed=1" title="{{ title }}" loading="lazy" class="iphone__page"></iframe>
-        <a href="{{ src }}" class="iphone__cover" aria-label="{{ openLabel }}"></a>
+        {% if live %}
+          {# The branding page passes an Alpine expression for the address, which already carries embed=1. #}
+          <iframe x-bind:src="{{ src }}" title="{{ title }}" class="iphone__page"></iframe>
+        {% else %}
+          <iframe src="{{ src }}{{ '&' if '?' in src else '?' }}embed=1" title="{{ title }}" loading="lazy" class="iphone__page"></iframe>
+          <a href="{{ src }}" class="iphone__cover" aria-label="{{ openLabel }}"></a>
+        {% endif %}
         <span class="iphone__home" aria-hidden="true"></span>
       </div>
     </div>

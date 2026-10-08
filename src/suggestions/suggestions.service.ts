@@ -1,6 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { isCategoryAvailableNow, nowInHebronMinutes } from '../common/open-status';
+import {
+  isCategoryAvailableNow,
+  isMenuServingNow,
+  nowInHebronMinutes,
+} from '../common/open-status';
 import { RATE_LIMIT_STORE, RateLimitStore } from '../common/rate-limit/rate-limit-store';
 import { parseLineKey } from '../pos/order-lines';
 import { PrismaService } from '../prisma/prisma.service';
@@ -67,6 +71,11 @@ export class SuggestionsService {
     const selected = requested.filter((id) => ownIds.has(id));
 
     const nowMinutes = nowInHebronMinutes();
+    const menus = await this.prisma.menu.findMany({
+      where: { restaurantId: restaurant.id },
+      orderBy: { sortOrder: 'asc' },
+    });
+    const menuById = new Map(menus.map((menu) => [menu.id, menu]));
     const [items, pairings, together, sold] = await Promise.all([
       this.prisma.item.findMany({
         where: { restaurantId: restaurant.id, available: true },
@@ -75,7 +84,7 @@ export class SuggestionsService {
           categoryId: true,
           tags: true,
           sortOrder: true,
-          category: { select: { availableFrom: true, availableTo: true } },
+          category: { select: { availableFrom: true, availableTo: true, menuId: true } },
         },
       }),
       this.prisma.itemPairing.findMany({
@@ -88,8 +97,18 @@ export class SuggestionsService {
     ]);
 
     const candidates: Candidate[] = items
-      .filter((item) =>
-        isCategoryAvailableNow(item.category.availableFrom, item.category.availableTo, nowMinutes),
+      .filter(
+        (item) =>
+          isCategoryAvailableNow(
+            item.category.availableFrom,
+            item.category.availableTo,
+            nowMinutes,
+          ) &&
+          isMenuServingNow(
+            menuById.get(item.category.menuId ?? '') ??
+              menus[0] ?? { availableFrom: null, availableTo: null },
+            nowMinutes,
+          ),
       )
       .map((item) => ({
         id: item.id,

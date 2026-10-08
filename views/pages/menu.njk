@@ -36,7 +36,7 @@
     category below. Tapping one opens the same shared detail sheet, so
     "add to selection" works from here without duplicating that logic.
   #}
-  <div class="print:hidden bg-surface" data-todays-specials>
+  <div class="menu-band print:hidden bg-surface" data-todays-specials>
     <div class="mx-auto max-w-4xl px-4 pb-3 sm:px-6">
       <h2 class="font-display text-sm font-bold text-text">{{ labels.todaysSpecial }}</h2>
       <div class="mt-2 flex gap-3 overflow-x-auto pb-1">
@@ -73,9 +73,9 @@
   </div>
 {% endif %}
 
-{{ menuSwitcher(menu, t('common.menu.menusLabel'), tableLabel) }}
+{{ menuSwitcher(menu, t('common.menu.menusLabel'), tableLabel, t('common.menu.menuClosedTab')) }}
 
-<div class="print:hidden bg-surface">
+<div class="menu-band print:hidden bg-surface">
   <div class="mx-auto flex max-w-4xl items-center gap-2 px-4 pb-3 sm:px-6">
     <div class="relative min-w-0 flex-1">
       <label class="sr-only" for="menu-search">{{ t('common.menu.searchPlaceholder') }}</label>
@@ -121,7 +121,7 @@
 
 {# Only the category row sticks: it is the navigation, and a second sticky
    row for search would take a fifth of a phone screen. #}
-<div class="print:hidden sticky top-0 z-30 border-b border-border bg-surface">
+<div class="menu-band menu-band--sticky print:hidden sticky top-0 z-30 border-b border-border bg-surface">
   <div class="mx-auto flex max-w-4xl gap-1 overflow-x-auto px-4 py-2 sm:px-6" data-category-bar>
     {% if menu.categories.length %}
       {{ categoryAllChip(t('common.menu.allCategories'), true) }}
@@ -141,7 +141,7 @@
     {% for category in menu.categories %}
       <section id="{{ category.anchor }}" data-category-section class="scroll-mt-32">
         <h2 class="font-display text-2xl font-bold leading-heading text-text">{{ category.name }}</h2>
-        <div class="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+        <div data-menu-grid class="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
           {% for item in category.items %}
             {{ menuItemCard(item, t('common.menu.unavailable'), labels.selection, canOrder, labels.fromPrice, menu.logoUrl) }}
           {% endfor %}

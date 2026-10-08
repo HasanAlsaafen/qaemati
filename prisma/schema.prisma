@@ -113,6 +113,21 @@ model Restaurant {
   /// change needed per category.
   categoryDivider String @default("none")
 
+  /// How the dish cards are laid out: grid, list or large. A data attribute on the page body, like the others.
+  menuLayout     String @default("grid")
+  /// Whether dish cards show their photo: show or hide.
+  itemImages     String @default("show")
+  /// The photo frame on dish cards: standard, wide, square or round.
+  itemImageShape String @default("standard")
+  /// The mark before each category title: none, bar, dot or underline.
+  categoryMarker String @default("none")
+
+  /// Header and text looks, each a data attribute on the page body.
+  logoShape    String @default("rounded")
+  coverHeight  String @default("medium")
+  priceStyle   String @default("plain")
+  headingAlign String @default("start")
+
   /// Admin customization: 'solid' (the original flat --color-bg,
   /// possibly itself overridden by backgroundColor) | 'pattern' (a
   /// subtle repeating CSS pattern tinted with --color-primary, see

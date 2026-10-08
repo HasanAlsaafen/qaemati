@@ -1,5 +1,6 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
+import { nowInHebronMinutes } from '../src/common/open-status';
 import { RATE_LIMIT_STORE, RateLimitStore } from '../src/common/rate-limit/rate-limit-store';
 import { PrismaService } from '../src/prisma/prisma.service';
 import {
@@ -314,6 +315,46 @@ describe('Table orders and waiter calls (e2e)', () => {
       const res = await order([{ key: other.itemId, qty: 1 }]);
       expect(res.status).toBe(422);
       expect(res.body.error).toBe('invalid_order');
+    });
+
+    it('refuses a dish whose whole menu is closed right now', async () => {
+      const now = nowInHebronMinutes();
+      const hhmm = (m: number) => {
+        const n = ((m % 1440) + 1440) % 1440;
+        return `${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}`;
+      };
+      const menu = await prisma.menu.create({
+        data: {
+          restaurantId,
+          nameAr: 'مغلقة',
+          nameEn: 'Closed menu',
+          sortOrder: 9,
+          availableFrom: hhmm(now + 120),
+          availableTo: hhmm(now + 180),
+        },
+      });
+      const category = await prisma.category.create({
+        data: { restaurantId, menuId: menu.id, nameAr: 'ك', nameEn: 'Closed cat' },
+      });
+      const dish = await prisma.item.create({
+        data: {
+          restaurantId,
+          categoryId: category.id,
+          nameAr: 'طبق',
+          nameEn: 'Closed dish',
+          price: 5,
+          currency: 'ILS',
+        },
+      });
+      try {
+        const res = await order([{ key: dish.id, qty: 1 }]);
+        expect(res.status).toBe(409);
+        expect(res.body).toMatchObject({ error: 'item_unavailable' });
+      } finally {
+        await prisma.item.delete({ where: { id: dish.id } });
+        await prisma.category.delete({ where: { id: category.id } });
+        await prisma.menu.delete({ where: { id: menu.id } });
+      }
     });
 
     it('refuses a dish that is switched off or outside its serving hours, naming it', async () => {

@@ -322,7 +322,9 @@
       "added": "أُضيف إلى اختياراتك",
       "addAria": "أضف {name}",
       "sheetTitle": "يناسبه"
-    }
+    },
+    "menuClosedNotice": "قائمة {name} غير متاحة الآن. تُقدَّم من {from} إلى {to}.",
+    "menuClosedTab": "مغلقة الآن"
   },
   "admin": {
     "auth": {
@@ -431,7 +433,9 @@
       "addonsHint": "إضافات اختيارية تُضاف فوق السعر، مثل \"جبنة إضافية\".",
       "addAddon": "إضافة مكوّن إضافي",
       "removeOption": "إزالة",
-      "todaysSpecialLabel": "عرض اليوم"
+      "todaysSpecialLabel": "عرض اليوم",
+      "removeImage": "احذف الصورة",
+      "imageRemovedToast": "تم حذف الصورة"
     },
     "bulk": {
       "title": "أدوات جماعية",
@@ -572,7 +576,98 @@
       "mapUrlHint": "رابط يبدأ بـ https من خرائط جوجل أو أي خدمة خرائط.",
       "invalidPhone": "أدخل رقم هاتف صالحًا، مثل 02 222 0111.",
       "invalidFacebook": "أدخل اسم صفحة فيسبوك أو رابطها الكامل.",
-      "invalidMapUrl": "أدخل رابطًا يبدأ بـ https."
+      "invalidMapUrl": "أدخل رابطًا يبدأ بـ https.",
+      "look": {
+        "layout": {
+          "label": "بطاقات الأطباق",
+          "grid": "شبكة",
+          "list": "قائمة",
+          "large": "كبيرة",
+          "grid3": "ثلاثة أعمدة"
+        },
+        "images": {
+          "label": "صور الأطباق",
+          "show": "إظهار",
+          "hide": "إخفاء",
+          "filled": "فقط الأطباق التي لها صورة"
+        },
+        "shape": {
+          "label": "شكل الصورة",
+          "standard": "عادي",
+          "wide": "عريض",
+          "square": "مربع",
+          "round": "دائري",
+          "tall": "طويل"
+        },
+        "marker": {
+          "label": "علامة قبل عنوان القسم",
+          "none": "بدون",
+          "bar": "شريط",
+          "dot": "نقطة",
+          "underline": "خط تحت",
+          "square": "مربع",
+          "rule": "خط"
+        },
+        "logo": {
+          "label": "شكل الشعار",
+          "rounded": "مدور الزوايا",
+          "round": "دائري",
+          "square": "مربع"
+        },
+        "cover": {
+          "label": "ارتفاع الغلاف",
+          "medium": "متوسط",
+          "small": "صغير",
+          "large": "كبير"
+        },
+        "price": {
+          "label": "شكل السعر",
+          "plain": "عادي",
+          "badge": "شارة",
+          "muted": "هادئ"
+        },
+        "heading": {
+          "label": "محاذاة عناوين الأقسام",
+          "start": "البداية",
+          "center": "المنتصف"
+        },
+        "extra": {
+          "fontTheme": {
+            "clean": "نظيف"
+          },
+          "menuDensity": {
+            "spacious": "واسع"
+          },
+          "cornerStyle": {
+            "soft": "ناعم"
+          },
+          "cardStyle": {
+            "outlined": "بإطار",
+            "tinted": "ملوّن"
+          },
+          "buttonShape": {
+            "square": "مربع"
+          },
+          "categoryDivider": {
+            "dotted": "منقّط",
+            "thick": "سميك"
+          },
+          "backgroundPattern": {
+            "checks": "مربعات",
+            "lines": "خطوط"
+          },
+          "menuLayout": {
+            "grid3": "ثلاثة أعمدة"
+          },
+          "itemImageShape": {
+            "tall": "طويل"
+          },
+          "categoryMarker": {
+            "square": "مربع",
+            "rule": "خط"
+          }
+        }
+      }
     },
     "tour": {
       "skip": "تخطّي",
@@ -720,6 +815,21 @@
       "save": "احفظ الاقتراحات",
       "saved": "تم حفظ الاقتراحات",
       "none": "أضف المزيد من الأطباق أولا ثم اربطها."
+    },
+    "imageEditor": {
+      "title": "عدّل الصورة",
+      "stageLabel": "الصورة. اسحب لتحريكها، زائد وناقص للتكبير.",
+      "hint": "اسحب الصورة لتحريكها. استخدم الشريط أو أصابعك للتكبير.",
+      "shape": "شكل القص",
+      "square": "مربع",
+      "free": "حر",
+      "zoom": "التكبير",
+      "zoomIn": "كبّر",
+      "zoomOut": "صغّر",
+      "rotate": "أدر",
+      "reset": "إعادة",
+      "cancel": "إلغاء",
+      "apply": "استخدم هذه الصورة"
     }
   },
   "validation": {
