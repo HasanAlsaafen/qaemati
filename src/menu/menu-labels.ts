@@ -99,6 +99,15 @@ export function buildMenuLabels(i18n: I18nService, locale: Locale) {
         locationRequired: t('common.menu.selection.contactErrors.locationRequired'),
       },
     },
+    suggestions: {
+      title: t('common.menu.suggestions.title'),
+      sheetTitle: t('common.menu.suggestions.sheetTitle'),
+      pairing: t('common.menu.suggestions.pairing'),
+      together: t('common.menu.suggestions.together'),
+      popular: t('common.menu.suggestions.popular'),
+      added: t('common.menu.suggestions.added'),
+      addAria: t('common.menu.suggestions.addAria'),
+    },
     tableOrder: {
       sendOrder: t('common.menu.tableOrder.sendOrder'),
       sending: t('common.menu.tableOrder.sending'),

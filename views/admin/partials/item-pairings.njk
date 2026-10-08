@@ -1,0 +1,34 @@
+{% set P = 'common.admin.pairings.' %}
+<form
+  hx-post="/admin/items/{{ item.id }}/pairings"
+  hx-target="#pairings-{{ item.id }}"
+  hx-swap="innerHTML"
+  x-data="{ q: '', picked: {{ selected | dump }}, max: {{ max }} }"
+  class="flex flex-col gap-3"
+>
+  {% if others.length %}
+    <div class="flex flex-col gap-1.5">
+      <label for="pairings-filter-{{ item.id }}" class="sr-only">{{ t(P + 'filter') }}</label>
+      <input id="pairings-filter-{{ item.id }}" type="search" x-model="q" placeholder="{{ t(P + 'filter') }}" class="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+    </div>
+    <ul class="max-h-64 overflow-y-auto rounded-md border border-border" tabindex="0" aria-label="{{ t(P + 'listLabel') }}">
+      {% for other in others %}
+        <li data-search="{{ other.nameEn | lower }} {{ other.nameAr }} {{ other.category.nameEn | lower }} {{ other.category.nameAr }}" x-show="!q || $el.dataset.search.includes(q.toLowerCase())" class="border-b border-border last:border-b-0">
+          <label class="flex min-h-11 cursor-pointer items-center gap-3 px-3 py-2 text-sm text-text">
+            <input type="checkbox" name="pairings" value="{{ other.id }}" x-model="picked" x-bind:disabled="picked.length >= max && !picked.includes('{{ other.id }}')" class="h-5 w-5 shrink-0">
+            <span class="min-w-0 flex-1">
+              <span class="block font-medium">{{ other.nameAr if locale == 'ar' else other.nameEn }}</span>
+              <span class="block text-xs text-muted-text">{{ other.category.nameAr if locale == 'ar' else other.category.nameEn }}</span>
+            </span>
+          </label>
+        </li>
+      {% endfor %}
+    </ul>
+    <p class="text-sm text-muted-text" role="status" x-text="'{{ t(P + 'count', { n: '__N__', max: max }) }}'.replace('__N__', picked.length)"></p>
+    <div>
+      <button type="submit" class="inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(P + 'save') }}</button>
+    </div>
+  {% else %}
+    <p class="text-sm text-muted-text">{{ t(P + 'none') }}</p>
+  {% endif %}
+</form>

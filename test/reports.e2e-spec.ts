@@ -190,6 +190,38 @@ describe('Reports (e2e)', () => {
   });
 
   describe('the numbers', () => {
+    it('reports the suggested dishes guests added in the range, most added first, and no other restaurant', async () => {
+      const at = (iso: string) => new Date(iso);
+      await prisma.suggestionAdd.createMany({
+        data: [
+          { restaurantId, itemId: dishX, reason: 'popular', createdAt: at('2026-11-16T10:00:00Z') },
+          { restaurantId, itemId: dishX, reason: 'pairing', createdAt: at('2026-11-17T10:00:00Z') },
+          {
+            restaurantId,
+            itemId: dishY,
+            reason: 'together',
+            createdAt: at('2026-11-17T11:00:00Z'),
+          },
+          {
+            restaurantId,
+            itemId: dishY,
+            reason: 'together',
+            createdAt: at('2026-12-30T11:00:00Z'),
+          },
+        ],
+      });
+      try {
+        const res = await page();
+        expect(res.text).toContain('Added from suggestions');
+        expect(res.text).toContain('Guests added 3 suggested dishes');
+        const section = res.text.slice(res.text.indexOf('suggested-title'));
+        expect(section.indexOf('Dish X')).toBeGreaterThan(-1);
+        expect(section.indexOf('Dish X')).toBeLessThan(section.indexOf('Dish Y'));
+      } finally {
+        await prisma.suggestionAdd.deleteMany({ where: { restaurantId } });
+      }
+    });
+
     it('counts orders that were not canceled, in the restaurant own days', async () => {
       const res = await page();
       expect(res.status).toBe(200);

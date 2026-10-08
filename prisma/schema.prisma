@@ -33,9 +33,11 @@ model Restaurant {
   /// Next order number, taken with an atomic update so numbers never repeat.
   nextOrderNumber      Int      @default(1)
 
-  orders      Order[]
-  waiterCalls WaiterCall[]
-  notices     NotificationLog[]
+  orders         Order[]
+  waiterCalls    WaiterCall[]
+  notices        NotificationLog[]
+  pairings       ItemPairing[]
+  suggestionAdds SuggestionAdd[]
 
   nameAr String
   nameEn String
@@ -330,9 +332,12 @@ model Item {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  variants  ItemVariant[]
-  addons    ItemAddon[]
-  menuViews MenuView[]
+  variants       ItemVariant[]
+  addons         ItemAddon[]
+  menuViews      MenuView[]
+  pairings       ItemPairing[]   @relation("PairingFrom")
+  pairedBy       ItemPairing[]   @relation("PairingTo")
+  suggestionAdds SuggestionAdd[]
 
   @@index([restaurantId])
   @@index([categoryId])
@@ -810,4 +815,43 @@ model SignupRequest {
   @@index([email])
   @@index([slug])
   @@index([expiresAt])
+}
+
+/// "Goes well with": a dish the owner picked to suggest next to another one.
+/// The order the owner gave is the order guests see.
+model ItemPairing {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  itemId String
+  item   Item   @relation("PairingFrom", fields: [itemId], references: [id], onDelete: Cascade)
+
+  pairedItemId String
+  pairedItem   Item   @relation("PairingTo", fields: [pairedItemId], references: [id], onDelete: Cascade)
+
+  sortOrder Int @default(0)
+
+  @@unique([itemId, pairedItemId])
+  @@index([restaurantId])
+}
+
+/// A guest tapped + on a suggestion. A count of taps for the owner's report, with
+/// no link to the guest.
+model SuggestionAdd {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  itemId String
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  /// pairing, together or popular: where the suggestion came from.
+  reason String
+
+  createdAt DateTime @default(now())
+
+  @@index([restaurantId, createdAt])
 }

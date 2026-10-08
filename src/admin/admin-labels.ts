@@ -66,6 +66,10 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale, defaultCurre
       imageUpdatedToast: t('common.admin.categories.imageUpdatedToast'),
       imageRemovedToast: t('common.admin.categories.imageRemovedToast'),
     },
+    pairings: {
+      title: t('common.admin.pairings.title'),
+      hint: t('common.admin.pairings.hint'),
+    },
     items: {
       addItem: t('common.admin.items.addItem'),
       emptyTitle: t('common.admin.items.emptyTitle'),

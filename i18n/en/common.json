@@ -313,6 +313,15 @@
       "stepPreparing": "Preparing",
       "stepReady": "Ready",
       "stepServed": "Served"
+    },
+    "suggestions": {
+      "title": "You might also like",
+      "pairing": "Goes well with it",
+      "together": "Often ordered together",
+      "popular": "Popular",
+      "added": "Added to your selection",
+      "addAria": "Add {name}",
+      "sheetTitle": "Goes well with"
     }
   },
   "admin": {
@@ -698,7 +707,19 @@
       "callsAnswer": "Average time to answer",
       "seconds": "{n} seconds",
       "minutes": "{n} minutes",
-      "none": "Nothing in this period."
+      "none": "Nothing in this period.",
+      "suggested": "Added from suggestions",
+      "suggestedCount": "Guests added {n} suggested dishes in this period. Most added:"
+    },
+    "pairings": {
+      "title": "Goes well with",
+      "hint": "Dishes offered next to this one when a guest adds it, up to 4. Leave it empty and the menu chooses on its own.",
+      "filter": "Find a dish",
+      "listLabel": "Dishes",
+      "count": "{n} of {max} chosen",
+      "save": "Save suggestions",
+      "saved": "Suggestions saved",
+      "none": "Add more dishes first, then you can pair them."
     }
   },
   "validation": {
@@ -714,7 +735,8 @@
     "invalidDate": "Enter a date like 2026-10-08.",
     "invalidAmount": "Enter an amount above zero, for example 60.00.",
     "invalidInteger": "Enter a whole number.",
-    "emailTaken": "That email already has an account."
+    "emailTaken": "That email already has an account.",
+    "tooMany": "Choose at most 4."
   },
   "billing": {
     "blockedToast": "Your subscription has ended, so changes are turned off. Renew to continue.",

@@ -166,12 +166,12 @@
 }) }}
 
 <div class="print:hidden">
-  {{ itemDetailSheet(t('common.menu.unavailable'), canOrder, labels.selection.addButton, labels.selection.addedToast, labels.selectVariant, labels.addonsTitle, labels.selectVariantPrompt, labels.allergenNoteLabel, menu.logoUrl, t('common.menu.close')) }}
+  {{ itemDetailSheet(t('common.menu.unavailable'), canOrder, labels.selection.addButton, labels.selection.addedToast, labels.selectVariant, labels.addonsTitle, labels.selectVariantPrompt, labels.allergenNoteLabel, menu.logoUrl, t('common.menu.close'), labels.suggestions) }}
 </div>
 
 {% if canOrder %}
   <div class="print:hidden">
-    {{ selectionBar(labels.selection, menu.name, menu.whatsappUrl, tableLabel, tableOrder, labels.tableOrder) }}
+    {{ selectionBar(labels.selection, menu.name, menu.whatsappUrl, tableLabel, tableOrder, labels.tableOrder, labels.suggestions) }}
   </div>
 {% endif %}
 {% if tableOrder %}

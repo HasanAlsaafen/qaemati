@@ -362,3 +362,11 @@ The "All" chip in the category bar drew a malformed fork and knife that read as 
 - Dev only: `url.parse()` deprecation warning appears at startup from a dependency, not from this code.
 - A new migration run on a database that already has menus is safe, but the Main menu backfill assumes menus did not exist: running `20261007010000_add_menus` twice by hand would add a second Main menu. Prisma applies it once.
 - Menu hours use the server clock in Asia/Hebron, same as category hours. A restaurant in another timezone needs that made configurable first.
+
+## Dish suggestions
+
+- Added `ItemPairing` and `SuggestionAdd` (migration `20261018000000_item_pairings`), the ranking in `src/suggestions/suggest.ts`, the public `GET /m/:slug/suggestions` and tap beacon, and the owner picker `GET/POST /admin/items/:id/pairings` (owners only, replaces the list in one transaction, drops itself and other restaurants' dishes).
+- Guest side: a "You might also like" list in the selection sheet (a dish with sizes or extras opens its own sheet instead of adding) and a "Goes well with" list in each dish sheet (owner picks and order patterns only, never filler). Works in WhatsApp and table modes.
+- Owner reports show how many suggested dishes were added and which ones.
+- Verified: lint, tsc, 318 unit, 524 e2e; real browser at 375 and 1280 in Arabic and English with axe (no violations).
+- Not done: suggestions are not shown on the table order tracking view; popular fallback does not yet use the time of day.

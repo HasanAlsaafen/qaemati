@@ -25,6 +25,7 @@ export interface Report {
   dishes: { nameAr: string; nameEn: string; quantity: number; revenue: number }[];
   tables: { label: string; orders: number; revenue: number }[];
   calls: { total: number; answered: number; averageSeconds: number | null };
+  suggested: { total: number; dishes: { nameAr: string; nameEn: string; count: number }[] };
   maxDayOrders: number;
   maxHourOrders: number;
 }
@@ -116,6 +117,18 @@ export class ReportsService {
     const revenue = main?.revenue ?? 0;
     const mainOrders = main?.orders ?? 0;
     const call = callRows[0];
+    const suggestedDishes = await this.prisma.$queryRaw<
+      { nameAr: string; nameEn: string; count: number }[]
+    >(Prisma.sql`
+      SELECT i."nameAr", i."nameEn", COUNT(*)::int AS "count"
+      FROM "SuggestionAdd" s JOIN "Item" i ON i."id" = s."itemId"
+      WHERE s."restaurantId" = ${restaurantId} AND ${this.inRange(range, Prisma.sql`((s."createdAt" AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Hebron')`)}
+      GROUP BY i."id", i."nameAr", i."nameEn" ORDER BY "count" DESC, i."nameEn" LIMIT 5
+    `);
+    const suggestedTotal = await this.prisma.$queryRaw<{ n: number }[]>(Prisma.sql`
+      SELECT COUNT(*)::int AS "n" FROM "SuggestionAdd" s
+      WHERE s."restaurantId" = ${restaurantId} AND ${this.inRange(range, Prisma.sql`((s."createdAt" AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Hebron')`)}
+    `);
 
     return {
       range,
@@ -139,6 +152,7 @@ export class ReportsService {
         averageSeconds:
           call?.seconds === null || call?.seconds === undefined ? null : Math.round(call.seconds),
       },
+      suggested: { total: suggestedTotal[0]?.n ?? 0, dishes: suggestedDishes },
       maxDayOrders: Math.max(0, ...days.map((d) => d.orders)),
       maxHourOrders: Math.max(0, ...hourRows.map((h) => h.orders)),
     };

@@ -15,9 +15,12 @@
   violate the brief's "hide gracefully" requirement more than just not
   showing the feature does.
 #}
-{% macro selectionBar(labels, restaurantName, whatsappUrl, tableLabel, tableOrder=none, orderLabels=none) %}
+{% macro selectionBar(labels, restaurantName, whatsappUrl, tableLabel, tableOrder=none, orderLabels=none, suggestionLabels={}) %}
   <div
+    x-init="suggInit()"
     x-data="{
+      ...suggestionsState(),
+      suggestionLabels: {{ suggestionLabels | dump }},
       {% if not tableOrder %}...guestContactState(),{% endif %}
       {% if tableOrder %}...tableOrderState({{ { slug: tableOrder.slug, token: tableOrder.token, locationCheck: tableOrder.locationCheck, tableLabel: tableLabel, labels: orderLabels, track: true } | dump }}),{% endif %}
       open: false,
@@ -159,6 +162,24 @@
               </div>
             </div>
           </template>
+
+          <section x-show="sugg.length > 0 && $store.selection.list.length > 0" x-cloak aria-labelledby="suggestions-title" data-suggestions>
+            <h3 id="suggestions-title" class="text-sm font-bold text-text" x-text="suggestionLabels.title"></h3>
+            <ul class="mt-1 divide-y divide-border">
+              <template x-for="entry in sugg" x-bind:key="entry.dish.id">
+                <li class="flex items-center gap-3 py-2">
+                  <img x-bind:src="entry.dish.imageUrl || '/images/category-fallback.svg'" alt="" width="48" height="48" loading="lazy" class="h-12 w-12 shrink-0 rounded-md object-cover">
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm font-bold text-text" x-text="entry.dish.name"></p>
+                    <p class="text-xs text-muted-text"><span dir="ltr" x-text="entry.dish.priceFormatted + ' ' + entry.dish.currencySymbol"></span> · <span x-text="suggReason(entry.reason)"></span></p>
+                  </div>
+                  <button type="button" x-on:click="suggAdd(entry)" x-bind:aria-label="suggestionLabels.addAria.replace('{name}', entry.dish.name)" class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border-strong text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
+                  </button>
+                </li>
+              </template>
+            </ul>
+          </section>
 
           <div x-show="$store.selection.list.length > 0" class="flex flex-col gap-1.5">
             <label for="selection-note" class="text-sm font-medium text-text" x-text="labels.noteLabel"></label>

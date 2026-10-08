@@ -15,7 +15,7 @@
   flat line item when added to the selection (A1), keeping that feature's
   cart model simple rather than teaching it about nested modifiers.
 #}
-{% macro itemDetailSheet(unavailableLabel, hasWhatsapp, addButtonLabel, addedToastMessage, selectVariantLabel, addonsTitleLabel, selectVariantPromptLabel, allergenNoteLabel, placeholderUrl=none, closeLabel='Close') %}
+{% macro itemDetailSheet(unavailableLabel, hasWhatsapp, addButtonLabel, addedToastMessage, selectVariantLabel, addonsTitleLabel, selectVariantPromptLabel, allergenNoteLabel, placeholderUrl=none, closeLabel='Close', suggestionLabels={}) %}
   <div
     x-data="{
       open: false,
@@ -30,6 +30,8 @@
       allergenNoteLabel: {{ allergenNoteLabel | dump }},
       selectedVariantId: null,
       selectedAddonIds: [],
+      suggestionLabels: {{ suggestionLabels | dump }},
+      suggestions: [],
       get selectedVariant() {
         if (!this.item || !this.item.variants) return null;
         return this.item.variants.find((v) => v.id === this.selectedVariantId) || null;
@@ -68,7 +70,7 @@
         fetch('/m/' + slug + '/items/' + itemId + '/view', { keepalive: true }).catch(function () {});
       },
     }"
-    x-on:open-item-sheet.window="item = $event.detail; open = true; selectedVariantId = null; selectedAddonIds = []; recordView(item.id)"
+    x-on:open-item-sheet.window="item = $event.detail; open = true; selectedVariantId = null; selectedAddonIds = []; recordView(item.id); suggestions = []; $el.querySelector('[role=dialog]').scrollTop = 0; if (window.loadSuggestions) loadSuggestions([item.id], ['pairing', 'together'], 'dish').then((found) => { if (found) suggestions = found })"
     x-on:keydown.escape.window="open = false"
     x-show="open"
     x-cloak
@@ -229,6 +231,23 @@
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke-linecap="round"/></svg>
               <span x-text="addButtonLabel"></span>
             </button>
+
+            <section x-show="suggestions.length > 0" x-cloak class="mt-5 border-t border-border pt-4" aria-labelledby="item-suggestions-title" data-dish-suggestions>
+              <h3 id="item-suggestions-title" class="text-sm font-bold text-text" x-text="suggestionLabels.sheetTitle"></h3>
+              <ul class="mt-1 divide-y divide-border">
+                <template x-for="entry in suggestions" x-bind:key="entry.dish.id">
+                  <li>
+                    <button type="button" x-on:click="$dispatch('open-item-sheet', entry.dish)" class="flex min-h-11 w-full items-center gap-3 py-2 text-start focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+                      <img x-bind:src="entry.dish.imageUrl || '/images/category-fallback.svg'" alt="" width="40" height="40" loading="lazy" class="h-10 w-10 shrink-0 rounded-md object-cover">
+                      <span class="min-w-0 flex-1">
+                        <span class="block truncate text-sm font-bold text-text" x-text="entry.dish.name"></span>
+                        <span dir="ltr" class="block text-xs text-muted-text" x-text="entry.dish.priceFormatted + ' ' + entry.dish.currencySymbol"></span>
+                      </span>
+                    </button>
+                  </li>
+                </template>
+              </ul>
+            </section>
           </div>
         </div>
       </template>

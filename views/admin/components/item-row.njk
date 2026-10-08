@@ -211,5 +211,12 @@
         {{ button(labels.form.cancel, 'ghost', 'sm', 'button', 'x-on:click="editing = false"') }}
       </div>
     </form>
+
+    {# What to suggest next to this dish. It loads when opened and saves on its own, apart from the form above. #}
+    <details x-show="editing" x-cloak class="mt-3 rounded-md border border-border p-3">
+      <summary class="inline-flex min-h-11 cursor-pointer items-center text-sm font-medium text-text" hx-get="/admin/items/{{ item.id }}/pairings" hx-trigger="click once" hx-target="#pairings-{{ item.id }}" hx-swap="innerHTML">{{ labels.pairings.title }}</summary>
+      <p class="mt-1 text-xs text-muted-text">{{ labels.pairings.hint }}</p>
+      <div id="pairings-{{ item.id }}" class="mt-3"></div>
+    </details>
   </div>
 {% endmacro %}
