@@ -46,14 +46,25 @@ describe('All chip (e2e)', () => {
     expect(all).toBeLessThan(first);
     expect(res.text).toMatch(/data-category-chip="#all"[^>]*aria-current="true"/);
     expect(res.text).toMatch(
-      /data-category-chip="#all"[\s\S]{0,900}data-chip-label[^>]*>\s*All\s*</,
+      /data-category-chip="#all"[\s\S]{0,1600}data-chip-label[^>]*>\s*All\s*</,
     );
+  });
+
+  it('draws the All chip as four squares in the restaurant accent, not a dish glyph', async () => {
+    const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=en`);
+    const chip = /data-category-chip="#all"[\s\S]*?<\/a>/.exec(res.text)![0];
+    expect(chip).toContain('data-all-icon');
+    expect(chip.match(/<rect /g)).toHaveLength(4);
+    expect(chip).toContain('bg-primary-soft');
+    expect(chip).toContain('text-primary-text');
+    // The earlier glyph drew a broken fork and knife.
+    expect(chip).not.toContain('M7 3v8a2 2 0 0 0 2 2v8');
   });
 
   it('translates the All chip', async () => {
     const res = await request(app.getHttpServer()).get(`/m/${slug}?lang=ar`);
     expect(res.text).toMatch(
-      /data-category-chip="#all"[\s\S]{0,900}data-chip-label[^>]*>\s*الكل\s*</,
+      /data-category-chip="#all"[\s\S]{0,1600}data-chip-label[^>]*>\s*الكل\s*</,
     );
   });
 

@@ -341,6 +341,10 @@ Order status for the guest, the first of five follow ups (guest status, staff ro
 
 All five follow ups are now done: guest order status, cashier and kitchen accounts, renewal reminders and receipts, self sign up, reports.
 
+## Menu: the All chip icon
+
+The "All" chip in the category bar drew a malformed fork and knife that read as a broken glyph, was small and pale next to the other chips, and did not say "all". It is now four squares, 24px, in the restaurant's accent colors (soft tint, accent glyph) so it follows the theme like the active ring does. Checked in both languages, active and inactive, axe clean, with a test that it is the four squares and not the old path.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).

@@ -20,8 +20,9 @@
       data-chip-circle
       class="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 p-0.5 {{ 'border-primary' if active else 'border-transparent' }}"
     >
-      <span class="flex h-full w-full items-center justify-center rounded-full bg-muted-surface text-muted-text">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v6M7 7h4M17 3c-2 2-3 5-3 8h3v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      {# Four squares: "everything". It takes the restaurant's own accent, like the ring around it. #}
+      <span class="flex h-full w-full items-center justify-center rounded-full bg-primary-soft text-primary-text" data-all-icon>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>
       </span>
     </span>
     <span data-chip-label class="line-clamp-2 text-xs font-medium leading-tight {{ 'text-text' if active else 'text-muted-text' }}">{{ label }}</span>
