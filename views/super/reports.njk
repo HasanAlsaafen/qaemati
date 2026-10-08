@@ -1,0 +1,129 @@
+{% extends "layouts/super.njk" %}
+
+{% set P = 'common.super.reports.' %}
+{% set r = report %}
+{% block title %}{{ t(P + 'title') }}{% endblock %}
+
+{% block content %}
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <h1 class="font-display text-2xl font-bold text-text">{{ t(P + 'title') }}</h1>
+  <a href="/super/reports/payments.csv?months={{ months }}" class="inline-flex min-h-11 items-center rounded-md border border-border-strong px-4 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(P + 'export') }}</a>
+</div>
+<p class="mt-2 max-w-2xl text-sm text-muted-text">{{ t(P + 'intro') }}</p>
+
+<nav aria-label="{{ t(P + 'periodLabel') }}" class="mt-4 flex flex-wrap gap-2">
+  {% for n in [6, 12, 24] %}
+    <a href="/super/reports?months={{ n }}" {% if months == n %}aria-current="true"{% endif %} class="inline-flex min-h-11 items-center rounded-md border px-4 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'border-primary bg-primary text-primary-on' if months == n else 'border-border-strong text-text hover:bg-muted-surface' }}">{{ t(P + 'months', { n: n }) }}</a>
+  {% endfor %}
+</nav>
+
+<dl class="mt-8 grid grid-cols-2 gap-x-6 gap-y-5 border-y border-border py-5 sm:grid-cols-4">
+  <div><dt class="text-sm text-muted-text">{{ t(P + 'stateOk') }}</dt><dd class="font-display text-3xl font-bold text-text" dir="ltr">{{ r.states.ok }}</dd></div>
+  <div><dt class="text-sm text-muted-text">{{ t(P + 'stateTrial') }}</dt><dd class="font-display text-3xl font-bold text-text" dir="ltr">{{ r.states.trial }}</dd></div>
+  <div><dt class="text-sm text-muted-text">{{ t(P + 'stateGrace') }}</dt><dd class="font-display text-3xl font-bold text-text" dir="ltr">{{ r.states.grace }}</dd></div>
+  <div><dt class="text-sm text-muted-text">{{ t(P + 'stateBlocked') }}</dt><dd class="font-display text-3xl font-bold text-text" dir="ltr">{{ r.states.blocked }}</dd></div>
+</dl>
+
+<section class="mt-10" aria-labelledby="revenue-title">
+  <h2 id="revenue-title" class="font-display text-lg font-bold text-text">{{ t(P + 'revenue') }}</h2>
+  <p class="mt-1 text-sm text-muted-text">{{ t(P + 'revenueNote') }}</p>
+  {% if r.revenue.currencies.length %}
+    <table class="mt-3 w-full text-sm">
+      <thead><tr>
+        <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'month') }}</th>
+        <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'payments') }}</th>
+        {% for currency in r.revenue.currencies %}<th scope="col" class="py-2 text-start font-medium text-muted-text" dir="ltr">{{ currency }}</th>{% endfor %}
+      </tr></thead>
+      <tbody class="divide-y divide-border">
+        {% for row in r.revenue.rows %}
+          <tr>
+            <th scope="row" class="py-2 text-start font-normal text-text" dir="ltr">{{ row.month }}</th>
+            <td class="py-2 text-text" dir="ltr">{{ row.payments }}</td>
+            {% for currency in r.revenue.currencies %}<td class="py-2 text-text" dir="ltr">{{ row.byCurrency[currency] | money }}</td>{% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot><tr class="border-t-2 border-border-strong">
+        <th scope="row" class="py-2 text-start font-bold text-text">{{ t(P + 'total') }}</th>
+        <td></td>
+        {% for currency in r.revenue.currencies %}<td class="py-2 font-bold text-text" dir="ltr">{{ r.revenue.totals[currency] | money }}</td>{% endfor %}
+      </tr></tfoot>
+    </table>
+  {% else %}<p class="mt-3 text-sm text-muted-text">{{ t(P + 'noPayments') }}</p>{% endif %}
+</section>
+
+<section class="mt-10" aria-labelledby="signups-title">
+  <h2 id="signups-title" class="font-display text-lg font-bold text-text">{{ t(P + 'signups') }}</h2>
+  <p class="mt-1 text-sm text-muted-text">{{ t(P + 'signupsNote') }}</p>
+  <table class="mt-3 w-full text-sm">
+    <thead><tr>
+      <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'month') }}</th>
+      <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'joined') }}</th>
+      <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'paid') }}</th>
+      <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'rate') }}</th>
+      <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'canceled') }}</th>
+      <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'lapsed') }}</th>
+    </tr></thead>
+    <tbody class="divide-y divide-border">
+      {% for row in r.signups %}
+        <tr>
+          <th scope="row" class="py-2 text-start font-normal text-text" dir="ltr">{{ row.month }}</th>
+          <td class="py-2 text-text" dir="ltr">{{ row.created }}</td>
+          <td class="py-2 text-text" dir="ltr">{{ row.converted }}</td>
+          <td class="py-2 text-text" dir="ltr">{% if row.created %}{{ (row.rate * 100) | round(0) }}%{% else %}-{% endif %}</td>
+          <td class="py-2 text-text" dir="ltr">{{ r.losses[loop.index0].canceled }}</td>
+          <td class="py-2 text-text" dir="ltr">{{ r.losses[loop.index0].lapsed }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<div class="mt-10 grid gap-10 lg:grid-cols-2">
+  <section aria-labelledby="plans-title">
+    <h2 id="plans-title" class="font-display text-lg font-bold text-text">{{ t(P + 'plans') }}</h2>
+    {% if r.plans.length %}
+      <table class="mt-3 w-full text-sm">
+        <thead><tr>
+          <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'plan') }}</th>
+          <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'running') }}</th>
+          <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'payingNow') }}</th>
+          <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'mrr') }}</th>
+        </tr></thead>
+        <tbody class="divide-y divide-border">
+          {% for plan in r.plans %}
+            <tr>
+              <th scope="row" class="py-2 text-start font-normal text-text">{{ plan.nameAr if locale == 'ar' else plan.nameEn }}</th>
+              <td class="py-2 text-text" dir="ltr">{{ plan.running }}</td>
+              <td class="py-2 text-text" dir="ltr">{{ plan.paying }}</td>
+              <td class="py-2 text-text" dir="ltr">{{ plan.mrr | money }} {{ plan.currency | symbol(locale) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}<p class="mt-3 text-sm text-muted-text">{{ t(P + 'none') }}</p>{% endif %}
+  </section>
+
+  <section aria-labelledby="renewals-title">
+    <h2 id="renewals-title" class="font-display text-lg font-bold text-text">{{ t(P + 'renewals') }}</h2>
+    {% if r.renewals.length %}
+      <table class="mt-3 w-full text-sm">
+        <thead><tr>
+          <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'restaurant') }}</th>
+          <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'ends') }}</th>
+          <th scope="col" class="py-2 text-start font-medium text-muted-text">{{ t(P + 'status') }}</th>
+        </tr></thead>
+        <tbody class="divide-y divide-border">
+          {% for item in r.renewals %}
+            <tr>
+              <th scope="row" class="py-2 text-start font-normal"><a href="/super/restaurants/{{ item.restaurant.id }}" class="inline-flex min-h-11 items-center text-primary-text underline underline-offset-4">{{ item.restaurant.nameAr if locale == 'ar' else item.restaurant.nameEn }}</a></th>
+              <td class="py-2 text-text" dir="ltr">{{ item.endsAt | isoDate }}</td>
+              <td class="py-2 text-text">{{ t(P + 'state_' + item.state) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}<p class="mt-3 text-sm text-muted-text">{{ t(P + 'noRenewals') }}</p>{% endif %}
+  </section>
+</div>
+{% endblock %}

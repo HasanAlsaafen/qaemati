@@ -799,7 +799,8 @@
       "plans": "Plans",
       "payments": "Payments",
       "audit": "Activity log",
-      "security": "Security"
+      "security": "Security",
+      "reports": "Reports"
     },
     "login": {
       "title": "Platform sign in"
@@ -974,6 +975,44 @@
       "wrongCurrentPassword": "The current password is not right.",
       "passwordTooShort": "Use at least {min} characters.",
       "passwordMismatch": "The two passwords do not match."
+    },
+    "reports": {
+      "title": "Reports",
+      "intro": "Money received, who joined and who stayed, what each plan brings in, and what is due to renew.",
+      "export": "Download payments CSV",
+      "periodLabel": "Period",
+      "months": "{n} months",
+      "stateOk": "In good standing",
+      "stateTrial": "On free trial",
+      "stateGrace": "In grace period",
+      "stateBlocked": "Menu offline",
+      "revenue": "Revenue received",
+      "revenueNote": "Payments recorded by month, voided ones left out. Different currencies are never added together.",
+      "month": "Month",
+      "payments": "Payments",
+      "total": "Total",
+      "noPayments": "No payments in this period.",
+      "signups": "Joined, paid, lost",
+      "signupsNote": "Paid counts restaurants that joined that month and have paid at least once, so recent months are still filling in. Canceled is by the month of cancellation. Lapsed is a plan that ran out and was not renewed, counted in the month its grace period ended. Suspensions are not counted.",
+      "joined": "Joined",
+      "paid": "Paid",
+      "rate": "Converted",
+      "canceled": "Canceled",
+      "lapsed": "Lapsed",
+      "plans": "Plans",
+      "plan": "Plan",
+      "running": "Running",
+      "payingNow": "Paying",
+      "mrr": "Monthly revenue",
+      "none": "Nothing yet.",
+      "renewals": "Due in the next 30 days",
+      "restaurant": "Restaurant",
+      "ends": "Ends",
+      "status": "Status",
+      "state_ok": "Paid",
+      "state_trial": "Trial",
+      "state_grace": "Past due, in grace",
+      "noRenewals": "Nothing is due in the next 30 days."
     }
   },
   "signup": {

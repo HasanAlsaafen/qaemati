@@ -6,6 +6,8 @@ import { AuditService } from './audit.service';
 import { DashboardService } from './dashboard.service';
 import { PaymentsService } from './payments.service';
 import { PlansService } from './plans.service';
+import { PlatformReportsService } from './platform-reports.service';
+import { SuperReportsController } from './super-reports.controller';
 import { SuperAuthController } from './super-auth.controller';
 import { SuperPasswordResetController } from './super-password-reset.controller';
 import { SuperSecurityController } from './super-security.controller';
@@ -20,6 +22,7 @@ import { TenantsService } from './tenants.service';
   imports: [AuthModule, BillingNoticesModule, ProvisioningModule],
   controllers: [
     SuperAuthController,
+    SuperReportsController,
     SuperPasswordResetController,
     SuperSecurityController,
     SuperDashboardController,
@@ -28,6 +31,7 @@ import { TenantsService } from './tenants.service';
     SuperPaymentsController,
   ],
   providers: [
+    PlatformReportsService,
     TwoFactorService,
     AuditService,
     PlansService,
