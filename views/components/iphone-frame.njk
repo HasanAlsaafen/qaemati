@@ -23,7 +23,8 @@
           </span>
         </div>
         <span class="iphone__island" aria-hidden="true"></span>
-        <iframe src="{{ src }}" title="{{ title }}" loading="lazy" class="iphone__page"></iframe>
+        {# embed=1 is the menu's own frame mode: same page, same scrolling, no scrollbar drawn. #}
+        <iframe src="{{ src }}{{ '&' if '?' in src else '?' }}embed=1" title="{{ title }}" loading="lazy" class="iphone__page"></iframe>
         <a href="{{ src }}" class="iphone__cover" aria-label="{{ openLabel }}"></a>
         <span class="iphone__home" aria-hidden="true"></span>
       </div>

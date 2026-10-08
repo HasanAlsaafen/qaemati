@@ -123,7 +123,7 @@ describe('Landing page (e2e)', () => {
     it('on a demo site shows the first sample restaurant in the phone with nothing configured', async () => {
       process.env.DEMO_MODE = 'true';
       delete process.env.LANDING_DEMO_SLUG;
-      expect((await page('en')).text).toMatch(/<iframe src="\/m\/[a-z0-9-]+\?lang=en"/);
+      expect((await page('en')).text).toMatch(/<iframe src="\/m\/[a-z0-9-]+\?lang=en&amp;embed=1"/);
     });
   });
 
@@ -135,9 +135,27 @@ describe('Landing page (e2e)', () => {
       expect(en).toContain('class="iphone"');
       expect(en).toContain('iphone__island');
       expect(en).toContain('iphone__home');
-      expect(en).toMatch(/<iframe src="\/m\/test-restaurant-landing\?lang=en" title="[^"]+"/);
-      expect((await page('ar')).text).toContain('src="/m/test-restaurant-landing?lang=ar"');
+      expect(en).toMatch(
+        /<iframe src="\/m\/test-restaurant-landing\?lang=en&amp;embed=1" title="[^"]+"/,
+      );
+      expect((await page('ar')).text).toContain(
+        'src="/m/test-restaurant-landing?lang=ar&amp;embed=1"',
+      );
       expect(en).toContain('<a href="/m/test-restaurant-landing?lang=en" class="iphone__cover"');
+    });
+
+    it('shows the menu without a scrollbar while keeping it scrollable, and the tap through link opens the normal page', async () => {
+      process.env.DEMO_MODE = 'false';
+      process.env.LANDING_DEMO_SLUG = 'test-restaurant-landing';
+      const html = (await page('en')).text;
+      expect(html).toContain('embed=1" title');
+      expect(html).toContain('<a href="/m/test-restaurant-landing?lang=en" class="iphone__cover"');
+      const framed = await request(app.getHttpServer()).get(
+        '/m/test-restaurant-landing?lang=en&embed=1',
+      );
+      expect(framed.status).toBe(200);
+      expect(framed.text).toContain('embed-frame');
+      expect(framed.headers['x-frame-options']).toBe('SAMEORIGIN');
     });
 
     it('stays left to right in the Arabic page, like the real device', async () => {
