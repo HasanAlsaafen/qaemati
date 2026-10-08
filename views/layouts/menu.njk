@@ -11,6 +11,7 @@
      partials/head.njk for the full explanation. #}
   {% if (menu.whatsappUrl and menu.orderingEnabled) or tableOrder %}
     <script defer src="{{ asset('/js/whatsapp-message.js') }}"></script>
+    {% if not tableOrder %}<script defer src="{{ asset('/js/guest-contact.js') }}"></script>{% endif %}
     <script defer src="{{ asset('/js/selection.js') }}"></script>
   {% endif %}
   {% if tableOrder %}

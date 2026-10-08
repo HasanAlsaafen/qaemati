@@ -133,6 +133,42 @@ describe('The menu opened from a table (e2e)', () => {
     expect(res.text).toContain('whatsappHref');
   });
 
+  describe('asking a WhatsApp guest who they are', () => {
+    it('asks for a name, a phone and a location before the order is sent, in English and Arabic', async () => {
+      const en = (await page('')).text;
+      expect(en).toContain('data-guest-contact');
+      expect(en).toContain('/js/guest-contact.js');
+      expect(en).toContain('guestContactState()');
+      for (const id of ['guest-name', 'guest-phone', 'guest-address'])
+        expect(en).toContain(`id="${id}"`);
+      expect(en).toContain('autocomplete="tel"');
+      expect(en).toContain('guestSend($event)');
+      expect(en).toContain('Your details');
+      expect(en).toContain('Remember my details on this phone');
+      const ar = (await page('', 'ar')).text;
+      expect(ar).toContain('بياناتك');
+      expect(ar).toContain('تذكّر بياناتي على هذا الهاتف');
+    });
+
+    it('puts the lines for them in the message labels', async () => {
+      const en = (await page('')).text;
+      for (const label of [
+        'Name: {name}',
+        'Phone: {phone}',
+        'Address: {address}',
+        'Location: {url}',
+      ]) {
+        expect(en).toContain(label);
+      }
+    });
+
+    it('does not ask a guest at a table, who is already known by the table', async () => {
+      const res = await page(`t=${table.token}`);
+      expect(res.text).not.toContain('data-guest-contact');
+      expect(res.text).not.toContain('guest-contact.js');
+    });
+  });
+
   it('shows a table name typed into the address, but never orders for it', async () => {
     const res = await page('table=5');
     expect(res.text).toContain('Table 5');

@@ -108,3 +108,63 @@ describe('buildWhatsAppUrl', () => {
     expect(decodeURIComponent(url.split('?text=')[1])).toBe('قهوة');
   });
 });
+
+describe('buildWhatsAppMessage with the customer details', () => {
+  const withContact = {
+    ...labels,
+    messageNameLine: 'Name: {name}',
+    messagePhoneLine: 'Phone: {phone}',
+    messageAddressLine: 'Address: {address}',
+    messageLocationLine: 'Location: {url}',
+  };
+  const base = {
+    restaurantName: 'Bayt Al-Zaytoun',
+    tableLabel: null,
+    items: [{ name: 'Falafel', quantity: 1, priceFormatted: '8.00', currency: 'ILS' }],
+    note: '',
+    totalFormatted: '8.00',
+    currency: 'ILS',
+  };
+
+  it('puts who is ordering, how to reach them and where right under the restaurant name', () => {
+    const message = buildWhatsAppMessage({
+      ...base,
+      labels: withContact,
+      contact: {
+        name: 'Dana',
+        phone: '+970599123456',
+        address: 'Building 4, second floor',
+        mapUrl: 'https://maps.google.com/?q=31.5,35.1',
+      },
+    });
+    const lines = message.split('\n');
+    expect(lines.slice(0, 5)).toEqual([
+      'Bayt Al-Zaytoun',
+      'Name: Dana',
+      'Phone: +970599123456',
+      'Address: Building 4, second floor',
+      'Location: https://maps.google.com/?q=31.5,35.1',
+    ]);
+    expect(message.indexOf('Location:')).toBeLessThan(message.indexOf('1x Falafel'));
+  });
+
+  it('leaves out an address or a map link that was not given', () => {
+    const message = buildWhatsAppMessage({
+      ...base,
+      labels: withContact,
+      contact: {
+        name: 'Dana',
+        phone: '0599123456',
+        address: '',
+        mapUrl: 'https://maps.google.com/?q=1,2',
+      },
+    });
+    expect(message).not.toContain('Address:');
+    expect(message).toContain('Location: https://maps.google.com/?q=1,2');
+  });
+
+  it('adds nothing when there are no details, as before', () => {
+    const message = buildWhatsAppMessage({ ...base, labels: withContact });
+    expect(message).not.toMatch(/Name:|Phone:|Address:|Location:/);
+  });
+});

@@ -18,6 +18,7 @@
 {% macro selectionBar(labels, restaurantName, whatsappUrl, tableLabel, tableOrder=none, orderLabels=none) %}
   <div
     x-data="{
+      {% if not tableOrder %}...guestContactState(),{% endif %}
       {% if tableOrder %}...tableOrderState({{ { slug: tableOrder.slug, token: tableOrder.token, locationCheck: tableOrder.locationCheck, tableLabel: tableLabel, labels: orderLabels, track: true } | dump }}),{% endif %}
       open: false,
       labels: {{ labels | dump }},
@@ -37,6 +38,7 @@
             currencySymbol: item.currencySymbol,
           })),
           note: $store.selection.note,
+          contact: this.guestForMessage(),
           totalFormatted: $store.selection.total.toFixed(2),
           currency: $store.selection.currency,
           labels: this.labels,
@@ -170,6 +172,51 @@
             ></textarea>
           </div>
 
+          {% if not tableOrder %}
+          <fieldset x-show="$store.selection.list.length > 0" class="flex flex-col gap-3 rounded-card border border-border p-3" data-guest-contact>
+            <legend class="px-1 text-sm font-bold text-text" x-text="labels.contactTitle"></legend>
+            <p class="text-xs text-muted-text" x-text="labels.contactHint"></p>
+
+            <div class="flex flex-col gap-1.5">
+              <label for="guest-name" class="text-sm font-medium text-text" x-text="labels.nameLabel"></label>
+              <input id="guest-name" type="text" autocomplete="name" maxlength="60" x-model="guest.name" x-bind:aria-invalid="guestErrors.name ? 'true' : null" x-bind:aria-describedby="guestErrors.name ? 'guest-name-error' : null" x-bind:class="guestErrors.name ? 'border-danger' : 'border-border-strong'" class="min-h-11 w-full rounded-md border bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+              <p id="guest-name-error" x-show="guestErrors.name" x-cloak role="alert" class="text-sm text-danger" x-text="guestErrors.name && labels.contactErrors[guestErrors.name]"></p>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label for="guest-phone" class="text-sm font-medium text-text" x-text="labels.phoneLabel"></label>
+              <input id="guest-phone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" maxlength="30" x-model="guest.phone" x-bind:aria-invalid="guestErrors.phone ? 'true' : null" x-bind:aria-describedby="guestErrors.phone ? 'guest-phone-error' : 'guest-phone-hint'" x-bind:class="guestErrors.phone ? 'border-danger' : 'border-border-strong'" class="min-h-11 w-full rounded-md border bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+              <p id="guest-phone-hint" x-show="!guestErrors.phone" class="text-xs text-muted-text" x-text="labels.phoneHint"></p>
+              <p id="guest-phone-error" x-show="guestErrors.phone" x-cloak role="alert" class="text-sm text-danger" x-text="guestErrors.phone && labels.contactErrors[guestErrors.phone]"></p>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <span class="text-sm font-medium text-text" x-text="labels.locationLabel"></span>
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" x-on:click="guestShareLocation()" x-bind:disabled="guestLocating" class="inline-flex min-h-11 items-center gap-2 rounded-md border border-border-strong px-3 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-60">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21Z" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+                  <span x-text="guestLocating ? labels.locating : (guest.pin ? labels.updateLocation : labels.shareLocation)"></span>
+                </button>
+                <span x-show="guest.pin" x-cloak class="inline-flex min-h-11 items-center gap-2 text-sm text-success" role="status">
+                  <span x-text="labels.locationAdded"></span>
+                  <button type="button" x-on:click="guestRemovePin()" class="inline-flex min-h-11 items-center px-2 text-sm font-medium text-primary-text underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" x-text="labels.removeLocation"></button>
+                </span>
+              </div>
+              <p x-show="guestLocationNote" x-cloak role="status" class="text-sm text-muted-text" x-text="guestLocationNote"></p>
+              <label for="guest-address" class="sr-only" x-text="labels.addressLabel"></label>
+              <textarea id="guest-address" rows="2" maxlength="200" autocomplete="street-address" x-model="guest.address" x-bind:placeholder="labels.addressPlaceholder" x-bind:aria-invalid="guestErrors.location ? 'true' : null" x-bind:aria-describedby="guestErrors.location ? 'guest-location-error' : null" x-bind:class="guestErrors.location ? 'border-danger' : 'border-border-strong'" class="min-h-11 w-full rounded-md border bg-surface px-3 text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary py-2"></textarea>
+              <p id="guest-location-error" x-show="guestErrors.location" x-cloak role="alert" class="text-sm text-danger" x-text="guestErrors.location && labels.contactErrors[guestErrors.location]"></p>
+            </div>
+
+            <label class="flex min-h-11 items-center gap-3 text-sm text-text">
+              <input type="checkbox" x-model="guestRemember" class="h-5 w-5 shrink-0">
+              <span x-text="labels.remember"></span>
+            </label>
+            <button type="button" x-show="guestHasSaved" x-cloak x-on:click="guestForget()" class="inline-flex min-h-11 items-center self-start text-sm font-medium text-primary-text underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" x-text="labels.forget"></button>
+          </fieldset>
+          {% endif %}
+
+
           <div x-show="$store.selection.list.length > 0" class="flex items-center justify-between text-base font-bold text-text">
             <span x-text="labels.totalLabel"></span>
             <span dir="ltr" x-text="$store.selection.total.toFixed(2) + ' ' + $store.selection.currencySymbol"></span>
@@ -195,6 +242,7 @@
             {% else %}
             <a
               x-bind:href="whatsappHref"
+              x-on:click="guestSend($event)"
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex min-h-11 items-center justify-center gap-2 rounded-button bg-primary px-4 text-sm font-medium text-primary-on hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"

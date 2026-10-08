@@ -59,4 +59,5 @@ Owner decisions from the audit approval, plus the defaults taken from section 9 
 
 
 55. Reports cover table orders only and say so, because WhatsApp orders never reach the restaurant. Days are the restaurant's own (Asia/Hebron) and are grouped in the database, so the grouping and the range edges use one clock. Revenue excludes canceled orders and money is never added across currencies.
+56. A WhatsApp order from outside a table needs the guest's name, a phone number, and where they are (a shared position, a typed address, or both), because the restaurant otherwise has no way to reach or find them. The details live only in the guest's browser (localStorage, one key for the whole site, with a checkbox to not remember and a button to forget) and travel only inside the WhatsApp message the guest chooses to send. Nothing about them reaches our server. A guest at a table is not asked, the table identifies them. Rules are in `src/common/text/contact-details.ts` with unit tests and mirrored in `public/js/guest-contact.js`.
 

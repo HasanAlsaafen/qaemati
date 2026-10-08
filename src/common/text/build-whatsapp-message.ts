@@ -8,6 +8,8 @@
  * between server and browser.
  */
 
+import { Contact } from './contact-details';
+
 export interface SelectionItem {
   name: string;
   quantity: number;
@@ -20,12 +22,18 @@ export interface BuildWhatsAppMessageInput {
   tableLabel: string | null;
   items: SelectionItem[];
   note: string;
+  /** Who is ordering, when the restaurant asked for it (WhatsApp orders from outside a table). */
+  contact?: Contact | null;
   totalFormatted: string;
   currency: string;
   labels: {
     messageTableLine: string; // "Table: {name}"
     messageItemLine: string; // "{qty}x {name}: {price} {currency}"
     messageNoteLine: string; // "Note: {note}"
+    messageNameLine?: string; // "Name: {name}"
+    messagePhoneLine?: string; // "Phone: {phone}"
+    messageAddressLine?: string; // "Address: {address}"
+    messageLocationLine?: string; // "Location: {url}"
     messageTotalLine: string; // "Total: {total} {currency}"
     disclaimer: string;
   };
@@ -43,6 +51,19 @@ export function buildWhatsAppMessage(input: BuildWhatsAppMessageInput): string {
 
   if (input.tableLabel) {
     lines.push(interpolate(input.labels.messageTableLine, { name: input.tableLabel }));
+  }
+
+  if (input.contact) {
+    const { name, phone, address, mapUrl } = input.contact;
+    const labels = input.labels;
+    if (labels.messageNameLine) lines.push(interpolate(labels.messageNameLine, { name }));
+    if (labels.messagePhoneLine) lines.push(interpolate(labels.messagePhoneLine, { phone }));
+    if (address && labels.messageAddressLine) {
+      lines.push(interpolate(labels.messageAddressLine, { address }));
+    }
+    if (mapUrl && labels.messageLocationLine) {
+      lines.push(interpolate(labels.messageLocationLine, { url: mapUrl }));
+    }
   }
 
   lines.push('');

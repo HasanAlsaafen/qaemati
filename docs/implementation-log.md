@@ -345,6 +345,14 @@ All five follow ups are now done: guest order status, cashier and kitchen accoun
 
 The "All" chip in the category bar drew a malformed fork and knife that read as a broken glyph, was small and pale next to the other chips, and did not say "all". It is now four squares, 24px, in the restaurant's accent colors (soft tint, accent glyph) so it follows the theme like the active ring does. Checked in both languages, active and inactive, axe clean, with a test that it is the four squares and not the old path.
 
+## WhatsApp orders: name, phone and location
+
+- Before a WhatsApp order opens, the selection sheet asks for a name, a phone number and a location. Sending is blocked with a message on each missing field (focus goes to the first), Arabic and Eastern Arabic digits in the phone are turned into 0 to 9, a position can be shared with one tap (a map link goes in the message) or an address typed, and the details are remembered on that phone and shown again next time.
+- The message now starts with the restaurant, then Name, Phone, Address and Location lines, then the dishes. Nothing is stored on the server.
+- Privacy controls: "Remember my details on this phone" (on by default, unchecking stores nothing), "Forget my saved details", and a line saying the details only go in the WhatsApp message.
+- Tests: 38 unit (the rules, digits, line breaks and long text, the message layout) and 4 e2e (fields and labels in both languages, none for a table guest). Browser: empty send blocked, focus on the name, axe clean with errors showing and in Arabic, the real message captured with the details, remembered across a reload, forgotten, typed address only, remember off stores nothing, location denied shows the fallback.
+- Not done: a per restaurant switch for restaurants that do not want to ask.
+
 ## New risks noticed
 
 - Rate limit and login limiter counts are per process (unchanged, audit H7).

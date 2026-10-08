@@ -16,6 +16,19 @@ function buildWhatsAppMessage(input) {
     lines.push(interpolate(input.labels.messageTableLine, { name: input.tableLabel }));
   }
 
+  if (input.contact) {
+    var contact = input.contact;
+    var labels = input.labels;
+    if (labels.messageNameLine) lines.push(interpolate(labels.messageNameLine, { name: contact.name }));
+    if (labels.messagePhoneLine) lines.push(interpolate(labels.messagePhoneLine, { phone: contact.phone }));
+    if (contact.address && labels.messageAddressLine) {
+      lines.push(interpolate(labels.messageAddressLine, { address: contact.address }));
+    }
+    if (contact.mapUrl && labels.messageLocationLine) {
+      lines.push(interpolate(labels.messageLocationLine, { url: contact.mapUrl }));
+    }
+  }
+
   lines.push('');
 
   input.items.forEach((item) => {
