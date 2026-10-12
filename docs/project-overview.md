@@ -21,7 +21,7 @@ Roles in the system:
 - Socket.IO for the live staff screen and live order tracking, sharing the normal login session.
 - nestjs-i18n for Arabic and English. Arabic is the default.
 - nodemailer through Gmail SMTP for mail. csrf-csrf, helmet with a CSP, bcrypt, class-validator with a strict global ValidationPipe, multer for uploads, the qrcode library.
-- Tests: Jest unit tests next to the code (318 at last count) and Supertest end-to-end tests in `test/` (543 at last count, against a separate `qaemati_test` database), plus axe-core accessibility checks.
+- Tests: Jest unit tests next to the code (336 at last count) and Supertest end-to-end tests in `test/` (606 at last count, against a separate `qaemati_test` database), plus axe-core accessibility checks.
 - Deployment: Dockerfile, `docker-compose.prod.yml` with Caddy for automatic HTTPS, backup and restore scripts, GitHub Actions CI in `.github/workflows/ci.yml`.
 
 Code layout: `src/` has one module per area (`admin`, `auth`, `menu`, `pos`, `super-admin`, `tenancy`, `signup`, `billing-notices`, `reports`, `suggestions`, `mail`, `home`, `seo`, `team`, `provisioning`, `prisma-seed`, `common`, `config`). `views/` holds templates, `i18n/` the translations, `prisma/` the schema and 37 migrations, `public/` static files, fonts and demo photos, `docs/` the written record, `scripts/` the operator tools.
@@ -77,15 +77,15 @@ Everything below is built and covered by tests unless the "unverified" list furt
 
 ## Current state of the repository
 
-Branch: `refactor/human-ui-and-production-prep`. The last commit is `d1a22fe` (branding image editor and many menu look options). The following work is staged in git but not yet committed (153 files, about 5,100 lines added): table occupancy, bill request and checkout (migration `20261020000000_table_occupancy`), ready-made themes and decorations (migrations `20261021000000_theme_decor` and `20261022000000_brand_themes`), four new typefaces, the demo photos and richer demo data, the landing page tour, "remember me", and the dirty-form guard and password toggle scripts. Also new and untracked: `.agents/skills/caveman` and a symlink `.claude/skills/caveman` for the caveman terse-reply skill.
+Branch: `refactor/human-ui-and-production-prep`. The feature work was committed as `87fe888` on top of `d1a22fe` (branding image editor and many menu look options), 153 files and about 5,100 lines. It contains: table occupancy, bill request and checkout (migration `20261020000000_table_occupancy`), ready-made themes and decorations (migrations `20261021000000_theme_decor` and `20261022000000_brand_themes`), four new typefaces, the demo photos and richer demo data, the landing page tour, "remember me", and the dirty-form guard and password toggle scripts. Nothing is pushed yet. A local-only caveman terse-reply skill lives in `.agents/skills/caveman` (git-ignored) with a symlink in `.claude/skills/`.
 
-Last recorded verification (before the final staged changes): lint and type-check clean, 318 unit and 543 e2e tests passing.
+Last verification, run on 2026-10-12 before committing: lint and type-check clean, 336 unit and 606 e2e tests passing.
 
 ## What is left
 
 ### Must do before a real launch
 
-1. Commit the staged work, rerun the full suite (`npm run lint`, `npx tsc`, `npm test`, `npm run test:e2e`), and merge the branch to `main`.
+1. Push the branch and merge it to `main` (the full suite passed before the last commit).
 2. Build and run the Docker image on a real server. It has never been built or run in the environment where it was written, and the Caddy certificate step is untested. The CI workflow has also never run on GitHub.
 3. Go through the deployment checklist in `docs/deployment.md`: DNS, working Gmail app password, first backup, a rehearsed restore, backups copied off the server, landing page contact set, signup open or closed, first operator created with two step verification.
 4. Have a native Arabic speaker review all Arabic copy (decision 9).
