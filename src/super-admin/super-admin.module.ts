@@ -15,6 +15,8 @@ import { TwoFactorService } from './two-factor.service';
 import { SuperDashboardController } from './super-dashboard.controller';
 import { SuperPaymentsController } from './super-payments.controller';
 import { SuperPlansController } from './super-plans.controller';
+import { SuperThemesController } from './super-themes.controller';
+import { ThemesAdminService } from './themes-admin.service';
 import { SuperTenantsController } from './super-tenants.controller';
 import { TenantsService } from './tenants.service';
 
@@ -28,6 +30,7 @@ import { TenantsService } from './tenants.service';
     SuperDashboardController,
     SuperTenantsController,
     SuperPlansController,
+    SuperThemesController,
     SuperPaymentsController,
   ],
   providers: [
@@ -35,6 +38,7 @@ import { TenantsService } from './tenants.service';
     TwoFactorService,
     AuditService,
     PlansService,
+    ThemesAdminService,
     TenantsService,
     PaymentsService,
     DashboardService,

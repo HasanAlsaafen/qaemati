@@ -10,7 +10,18 @@
             <img src="{{ restaurant.logoPath }}" alt="" width="64" height="64" class="h-full w-full object-cover">
           {% endif %}
         </span>
-        {{ fileInput('branding-logo-input', 'image', 'image/jpeg,image/png,image/webp', 'data-crop-aspect="1" data-crop-round="true" hx-post="/admin/branding/logo" hx-trigger="change" hx-target="#branding-images" hx-swap="outerHTML" hx-encoding="multipart/form-data"') }}
+        {{ fileInput('branding-logo-input', 'image', 'image/jpeg,image/png,image/webp', 'data-crop-aspect="1" data-crop-round="true" hx-post="/admin/branding/logo" hx-trigger="change" hx-target="#branding-images" hx-swap="outerHTML" hx-encoding="multipart/form-data" hx-on::after-request="window.dispatchEvent(new Event(\'qaemati-preview-refresh\'))"') }}
+        {% if restaurant.logoPath %}
+          <button
+            type="button"
+            aria-label="{{ labels.branding.removeImage }}"
+            class="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-3 text-sm font-medium text-text transition-colors duration-fast ease-standard hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            hx-delete="/admin/branding/logo/image"
+            hx-target="#branding-images"
+            hx-swap="outerHTML"
+            hx-on::after-request="window.dispatchEvent(new Event('qaemati-preview-refresh'))"
+          >{{ labels.branding.removeImage }}</button>
+        {% endif %}
       </div>
     </div>
 
@@ -22,7 +33,18 @@
             <img src="{{ restaurant.coverImagePath }}" alt="" width="112" height="64" class="h-full w-full object-cover">
           {% endif %}
         </span>
-        {{ fileInput('branding-cover-input', 'image', 'image/jpeg,image/png,image/webp', 'data-crop-aspect="1.7778" hx-post="/admin/branding/cover" hx-trigger="change" hx-target="#branding-images" hx-swap="outerHTML" hx-encoding="multipart/form-data"') }}
+        {{ fileInput('branding-cover-input', 'image', 'image/jpeg,image/png,image/webp', 'data-crop-aspect="1.7778" hx-post="/admin/branding/cover" hx-trigger="change" hx-target="#branding-images" hx-swap="outerHTML" hx-encoding="multipart/form-data" hx-on::after-request="window.dispatchEvent(new Event(\'qaemati-preview-refresh\'))"') }}
+        {% if restaurant.coverImagePath %}
+          <button
+            type="button"
+            aria-label="{{ labels.branding.removeImage }}"
+            class="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-3 text-sm font-medium text-text transition-colors duration-fast ease-standard hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            hx-delete="/admin/branding/cover/image"
+            hx-target="#branding-images"
+            hx-swap="outerHTML"
+            hx-on::after-request="window.dispatchEvent(new Event('qaemati-preview-refresh'))"
+          >{{ labels.branding.removeImage }}</button>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -44,6 +66,18 @@
         {% endif %}
       </span>
       {{ fileInput('branding-background-input', 'image', 'image/jpeg,image/png,image/webp', 'hx-post="/admin/branding/background" hx-trigger="change" hx-target="#branding-images" hx-swap="outerHTML" hx-encoding="multipart/form-data" hx-on::after-request="window.dispatchEvent(new Event(\'qaemati-preview-refresh\'))"') }}
+      {% if restaurant.backgroundImagePath %}
+        <button
+          type="button"
+          aria-label="{{ labels.branding.removeImage }}"
+          class="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-3 text-sm font-medium text-text transition-colors duration-fast ease-standard hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          x-on:click="if (backgroundStyle === 'image') backgroundStyle = 'solid'"
+          hx-delete="/admin/branding/background/image"
+          hx-target="#branding-images"
+          hx-swap="outerHTML"
+          hx-on::after-request="window.dispatchEvent(new Event('qaemati-preview-refresh'))"
+        >{{ labels.branding.removeImage }}</button>
+      {% endif %}
     </div>
   </div>
 </section>

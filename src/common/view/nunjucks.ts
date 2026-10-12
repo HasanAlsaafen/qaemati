@@ -3,6 +3,7 @@ import * as nunjucks from 'nunjucks';
 import { join } from 'path';
 import { assetUrl } from './asset-url';
 import { currencySymbol } from '../currency';
+import { thmanyahEnabled } from '../thmanyah';
 
 /**
  * Wires Nunjucks as the Express view engine. Nest has no official Nunjucks
@@ -17,6 +18,7 @@ export function configureNunjucks(app: NestExpressApplication): void {
     express: app.getHttpAdapter().getInstance(),
   });
   env.addGlobal('asset', assetUrl);
+  env.addGlobal('thmanyahEnabled', thmanyahEnabled);
   // 2026-10-08, always Western digits and a fixed order, in both languages.
   env.addFilter('isoDate', (value: Date | string | null | undefined) =>
     value ? new Date(value).toISOString().slice(0, 10) : '',

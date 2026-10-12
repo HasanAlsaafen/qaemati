@@ -16,4 +16,10 @@ export class LoginDto extends BaseFormDto {
   @IsString({ message: 'invalid' })
   @MaxLength(512, { message: 'tooLong' })
   redirect?: string;
+
+  /** The "remember me" checkbox: a browser sends "on" when it is ticked and nothing otherwise. */
+  @IsOptional()
+  @IsString({ message: 'invalid' })
+  @MaxLength(8, { message: 'tooLong' })
+  remember?: string;
 }

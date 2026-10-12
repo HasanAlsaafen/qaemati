@@ -2,6 +2,8 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
+  Param,
   Get,
   Patch,
   Post,
@@ -18,6 +20,7 @@ import { buildAdminLabels } from './admin-labels';
 import { toRestaurantSettingsView } from './admin-view-model';
 import { RestaurantService } from './restaurant.service';
 import { triggerToast } from './htmx-toast';
+import { themesForForm } from './themes';
 import { restaurantImageMulterOptions } from './upload.config';
 import { UpdateBrandingDto } from './dto/branding.dto';
 
@@ -44,10 +47,13 @@ export class BrandingController {
     const restaurantId = req.session.restaurantId as string;
     const locale = req.locale ?? 'ar';
     const restaurant = await this.restaurants.findById(restaurantId);
+    const themes = await this.restaurants.activeThemes();
     return {
       restaurant: toRestaurantSettingsView(restaurant),
       labels: buildAdminLabels(this.i18n, locale),
       fieldErrors: {},
+      themes,
+      themeValues: themesForForm(themes),
     };
   }
 
@@ -90,6 +96,7 @@ export class BrandingController {
       coverHeight,
       priceStyle,
       headingAlign,
+      themeDecor,
       menuLayout,
       itemImages,
       itemImageShape,
@@ -149,6 +156,7 @@ export class BrandingController {
         coverHeight: coverHeight?.trim(),
         priceStyle: priceStyle?.trim(),
         headingAlign: headingAlign?.trim(),
+        themeDecor: themeDecor?.trim(),
         menuLayout: menuLayout?.trim(),
         itemImages: itemImages?.trim(),
         itemImageShape: itemImageShape?.trim(),
@@ -312,6 +320,26 @@ export class BrandingController {
       res,
       this.i18n.t('common.admin.branding.backgroundImageUpdatedToast', { lang: locale }),
     );
+    return {
+      restaurant: toRestaurantSettingsView(restaurant),
+      labels: buildAdminLabels(this.i18n, locale),
+    };
+  }
+
+  @Delete(':kind/image')
+  @Render('admin/partials/branding-images')
+  async removeImage(
+    @Param('kind') kind: string,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    if (kind !== 'logo' && kind !== 'cover' && kind !== 'background') {
+      throw new BadRequestException('Unknown image');
+    }
+    const restaurantId = req.session.restaurantId as string;
+    const locale = req.locale ?? 'ar';
+    const restaurant = await this.restaurants.removeImage(restaurantId, kind);
+    triggerToast(res, this.i18n.t('common.admin.branding.imageRemovedToast', { lang: locale }));
     return {
       restaurant: toRestaurantSettingsView(restaurant),
       labels: buildAdminLabels(this.i18n, locale),

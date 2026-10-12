@@ -1,0 +1,73 @@
+{% extends "layouts/super.njk" %}
+{% set section = 'themes' %}
+{% from "components/input.njk" import input %}
+{% from "components/select.njk" import select %}
+
+{% block title %}{{ t('common.super.themes.add') if not theme else theme.nameEn }}{% endblock %}
+
+{% block content %}
+{% set v = flash.values if flash and flash.values else {} %}
+{% set e = flash.errors if flash and flash.errors else {} %}
+{% set p = theme or {} %}
+<h1 class="font-display text-2xl font-bold text-text">{{ t('common.super.themes.add') if not theme else (theme.nameEn if locale == 'en' else theme.nameAr) }}</h1>
+
+{# Each color is a picker and a hex box that follow each other. #}
+<form method="post" action="{{ '/super/themes' if not theme else '/super/themes/' + theme.id }}" class="mt-4 flex flex-col gap-6"
+  x-data="{ primaryColor: {{ (v.primaryColor or p.primaryColor or '#1565C0') | dump }}, secondaryColor: {{ (v.secondaryColor or p.secondaryColor or '#FF9800') | dump }}, backgroundColor: {{ (v.backgroundColor or p.backgroundColor or '#F2F9FA') | dump }} }">
+  <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+
+  <section class="rounded-card border border-border bg-surface p-4">
+    <div class="grid gap-4 sm:grid-cols-2">
+      {% if not theme %}
+        {{ input(name='key', label=t('common.super.themes.key'), value=v.key or '', error=e.key, hint=t('common.super.themes.keyHint'), dir='ltr', attrs='required maxlength="31" pattern="[a-z][a-zA-Z0-9]{1,30}"') }}
+      {% else %}
+        <div class="flex flex-col gap-1.5"><span class="text-sm font-medium text-text">{{ t('common.super.themes.key') }}</span><span class="min-h-11 rounded-md bg-muted-surface px-3 py-2.5 text-text" dir="ltr">{{ theme.key }}</span></div>
+      {% endif %}
+      {{ input(name='sortOrder', label=t('common.super.themes.sortOrder'), type='number', value=v.sortOrder or (p.sortOrder if theme else 0), error=e.sortOrder, attrs='min="0" max="9999"') }}
+      {{ input(name='nameAr', label=t('common.admin.form.nameArLabel'), value=v.nameAr or p.nameAr or '', error=e.nameAr, dir='rtl', attrs='required maxlength="80"') }}
+      {{ input(name='nameEn', label=t('common.admin.form.nameEnLabel'), value=v.nameEn or p.nameEn or '', error=e.nameEn, dir='ltr', attrs='required maxlength="80"') }}
+      {{ input(name='descriptionAr', label=t('common.super.plans.descriptionAr'), value=v.descriptionAr or p.descriptionAr or '', error=e.descriptionAr, dir='rtl', attrs='maxlength="200"') }}
+      {{ input(name='descriptionEn', label=t('common.super.plans.descriptionEn'), value=v.descriptionEn or p.descriptionEn or '', error=e.descriptionEn, dir='ltr', attrs='maxlength="200"') }}
+    </div>
+  </section>
+
+  <section class="rounded-card border border-border bg-surface p-4">
+    <h2 class="font-display text-lg font-bold text-text">{{ t('common.super.themes.colors') }}</h2>
+    <p class="mt-1 text-sm text-muted-text">{{ t('common.super.themes.colorsHint') }}</p>
+    <div class="mt-4 grid gap-4 sm:grid-cols-3">
+      {% for field in ['primaryColor', 'secondaryColor', 'backgroundColor'] %}
+        <div class="flex flex-col gap-1.5">
+          <label for="field-{{ field }}" class="text-sm font-medium text-text">{{ t('common.super.themes.fields.' + field) }}</label>
+          <div class="flex items-center gap-2">
+            <input type="color" x-model="{{ field }}" aria-hidden="true" tabindex="-1" class="h-11 w-14 cursor-pointer rounded-md border border-border-strong bg-surface">
+            <input id="field-{{ field }}" name="{{ field }}" type="text" dir="ltr" x-model="{{ field }}" required maxlength="7" pattern="#[0-9a-fA-F]{6}" {% if e[field] %}aria-invalid="true"{% endif %} class="min-h-11 w-28 rounded-md border bg-surface px-3 text-base text-text {{ 'border-danger' if e[field] else 'border-border-strong' }}">
+          </div>
+          {% if e[field] %}<p class="text-sm text-danger" role="alert">{{ e[field] }}</p>{% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="rounded-card border border-border bg-surface p-4">
+    <h2 class="font-display text-lg font-bold text-text">{{ t('common.super.themes.look') }}</h2>
+    <div class="mt-4 grid gap-4 sm:grid-cols-3">
+      {{ select('fontTheme', t('common.super.themes.fields.fontTheme'), choices.fontTheme, v.fontTheme or p.fontTheme or '', e.fontTheme) }}
+      {{ select('cornerStyle', t('common.super.themes.fields.cornerStyle'), choices.cornerStyle, v.cornerStyle or p.cornerStyle or '', e.cornerStyle) }}
+      {{ select('cardStyle', t('common.super.themes.fields.cardStyle'), choices.cardStyle, v.cardStyle or p.cardStyle or '', e.cardStyle) }}
+      {{ select('buttonShape', t('common.super.themes.fields.buttonShape'), choices.buttonShape, v.buttonShape or p.buttonShape or '', e.buttonShape) }}
+      {{ select('categoryDivider', t('common.super.themes.fields.categoryDivider'), choices.categoryDivider, v.categoryDivider or p.categoryDivider or '', e.categoryDivider) }}
+      {{ select('categoryMarker', t('common.super.themes.fields.categoryMarker'), choices.categoryMarker, v.categoryMarker or p.categoryMarker or '', e.categoryMarker) }}
+      {{ select('headingAlign', t('common.super.themes.fields.headingAlign'), choices.headingAlign, v.headingAlign or p.headingAlign or '', e.headingAlign) }}
+      {{ select('priceStyle', t('common.super.themes.fields.priceStyle'), choices.priceStyle, v.priceStyle or p.priceStyle or '', e.priceStyle) }}
+      {{ select('backgroundStyle', t('common.super.themes.fields.backgroundStyle'), choices.backgroundStyle, v.backgroundStyle or p.backgroundStyle or '', e.backgroundStyle) }}
+      {{ select('backgroundPattern', t('common.super.themes.fields.backgroundPattern'), choices.backgroundPattern, v.backgroundPattern or p.backgroundPattern or '', e.backgroundPattern) }}
+      {{ select('themeDecor', t('common.super.themes.fields.themeDecor'), choices.themeDecor, v.themeDecor or p.themeDecor or '', e.themeDecor) }}
+    </div>
+  </section>
+
+  <div class="flex flex-wrap gap-3">
+    <button type="submit" class="inline-flex min-h-11 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-on hover:bg-primary-hover">{{ t('common.admin.form.save') }}</button>
+    <a href="/super/themes" class="inline-flex min-h-11 items-center rounded-md border border-border-strong px-5 text-sm font-medium text-text hover:bg-muted-surface">{{ t('common.admin.form.cancel') }}</a>
+  </div>
+</form>
+{% endblock %}

@@ -42,6 +42,13 @@
     backgroundColor: {{ (restaurant.backgroundColor or '#F2F9FA') | dump }},
     defaultBackgroundColor: '#F2F9FA',
     backgroundContrast: null,
+    look: 'colors',
+    lookTabs: ['colors', 'text', 'header', 'layout', 'dishes'],
+    lookStep(d) {
+      const i = (this.lookTabs.indexOf(this.look) + d + this.lookTabs.length) % this.lookTabs.length;
+      this.look = this.lookTabs[i];
+      this.$nextTick(() => document.getElementById('look-tab-' + this.look).focus());
+    },
     fontTheme: {{ (restaurant.fontTheme or 'classic') | dump }},
     menuDensity: {{ (restaurant.menuDensity or 'comfortable') | dump }},
     cornerStyle: {{ (restaurant.cornerStyle or 'rounded') | dump }},
@@ -52,6 +59,7 @@
     coverHeight: {{ (restaurant.coverHeight or 'medium') | dump }},
     priceStyle: {{ (restaurant.priceStyle or 'plain') | dump }},
     headingAlign: {{ (restaurant.headingAlign or 'start') | dump }},
+    themeDecor: {{ (restaurant.themeDecor or 'none') | dump }},
     menuLayout: {{ (restaurant.menuLayout or 'grid') | dump }},
     itemImages: {{ (restaurant.itemImages or 'show') | dump }},
     itemImageShape: {{ (restaurant.itemImageShape or 'standard') | dump }},
@@ -65,7 +73,25 @@
     closeTime: {{ (restaurant.closeTime or '') | dump }},
     locale: {{ locale | dump }},
     slug: {{ restaurant.slug | dump }},
+    themes: {{ themeValues | dump }},
+    // Fills the form from a ready-made theme. Nothing is saved until the owner
+    // presses Save, and everything stays editable afterwards.
+    applyTheme(key) {
+      const theme = this.themes[key];
+      if (!theme) return;
+      Object.assign(this, theme);
+      this.primaryColorErrorDismissed = true;
+      this.secondaryColorErrorDismissed = true;
+      this.backgroundColorErrorDismissed = true;
+      this.recomputeContrast();
+      this.recomputeSecondaryContrast();
+      this.recomputeBackgroundContrast();
+      this.$dispatch('toast', { message: {{ t('common.admin.branding.themes.applied') | dump }}, variant: 'success' });
+    },
     previewUrl: '',
+    // Bumped when a photo is added or removed: the saved look is the same URL,
+    // so without it the preview frame would not reload.
+    previewRev: 0,
     previewTimer: null,
     passTemplate: {{ labels.branding.contrastPassTemplate | dump }},
     failTemplate: {{ labels.branding.contrastFailTemplate | dump }},
@@ -108,6 +134,7 @@
         previewCoverHeight: this.coverHeight,
         previewPriceStyle: this.priceStyle,
         previewHeadingAlign: this.headingAlign,
+        previewThemeDecor: this.themeDecor,
         previewMenuLayout: this.menuLayout,
         previewItemImages: this.itemImages,
         previewItemImageShape: this.itemImageShape,
@@ -115,14 +142,38 @@
         previewBackgroundStyle: this.backgroundStyle,
         previewBackgroundPattern: this.backgroundPattern,
         previewSectionSpacing: this.sectionSpacing,
+        previewRev: String(this.previewRev),
       });
       this.previewUrl = '/m/' + this.slug + '?' + params.toString();
     },
   }"
   x-init="recomputeContrast(); recomputeSecondaryContrast(); recomputeBackgroundContrast(); updatePreviewUrl()"
-  x-on:qaemati-preview-refresh.window="updatePreviewUrl()"
+  x-on:qaemati-preview-refresh.window="previewRev++; updatePreviewUrl()"
 >
   <div class="flex min-w-0 flex-col gap-6">
+    <section class="rounded-lg border border-border bg-surface p-4" aria-labelledby="themes-title">
+      <h2 id="themes-title" class="font-sans text-lg font-bold text-text">{{ t('common.admin.branding.themes.title') }}</h2>
+      <p class="mt-1 text-sm text-muted-text">{{ t('common.admin.branding.themes.intro') }}</p>
+      <ul class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+        {% for theme in themes %}
+          <li>
+            <button
+              type="button"
+              x-on:click="applyTheme('{{ theme.key }}')"
+              class="flex h-full w-full flex-col items-start gap-2 rounded-lg border border-border-strong p-3 text-start transition-colors duration-fast ease-standard hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              <span class="flex overflow-hidden rounded-full border border-border" aria-hidden="true" dir="ltr">
+                <span class="h-7 w-7" style="background: {{ theme.primaryColor }}"></span>
+                <span class="h-7 w-7" style="background: {{ theme.secondaryColor }}"></span>
+                <span class="h-7 w-7" style="background: {{ theme.backgroundColor }}"></span>
+              </span>
+              <span class="text-sm font-bold text-text">{{ theme.nameEn if locale == 'en' else theme.nameAr }}</span>
+              <span class="text-xs text-muted-text">{{ (theme.descriptionEn if locale == 'en' else theme.descriptionAr) or '' }}</span>
+            </button>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
     {% include "admin/partials/branding-images.njk" %}
     {% include "admin/partials/branding-form.njk" %}
   </div>

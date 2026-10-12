@@ -6,25 +6,28 @@ import {
   meetsPrimaryColorContrast,
   meetsSecondaryColorContrast,
 } from '../common/color';
+import { thmanyahEnabled } from '../common/thmanyah';
+import {
+  FONT_THEMES,
+  MENU_DENSITIES,
+  CORNER_STYLES,
+  CARD_STYLES,
+  BUTTON_SHAPES,
+  CATEGORY_DIVIDERS,
+  BACKGROUND_STYLES,
+  BACKGROUND_PATTERNS,
+  MENU_LAYOUTS,
+  ITEM_IMAGE_MODES,
+  ITEM_IMAGE_SHAPES,
+  CATEGORY_MARKERS,
+  LOGO_SHAPES,
+  COVER_HEIGHTS,
+  PRICE_STYLES,
+  HEADING_ALIGNS,
+  THEME_DECORS,
+  SECTION_SPACINGS,
+} from './look-options';
 import { isValidFacebook, isValidMapUrl, isValidPhone, toFacebookUrl } from '../common/contact';
-
-const FONT_THEMES = new Set(['classic', 'modern', 'clean']);
-const MENU_DENSITIES = new Set(['comfortable', 'compact', 'spacious']);
-const CORNER_STYLES = new Set(['rounded', 'sharp', 'soft']);
-const CARD_STYLES = new Set(['flat', 'raised', 'outlined', 'tinted']);
-const BUTTON_SHAPES = new Set(['rounded', 'pill', 'square']);
-const CATEGORY_DIVIDERS = new Set(['none', 'line', 'dashed', 'dotted', 'thick']);
-const BACKGROUND_STYLES = new Set(['solid', 'pattern', 'image']);
-const BACKGROUND_PATTERNS = new Set(['dots', 'grid', 'diagonal', 'checks', 'lines']);
-const MENU_LAYOUTS = new Set(['grid', 'grid3', 'list', 'large']);
-const ITEM_IMAGE_MODES = new Set(['show', 'filled', 'hide']);
-const ITEM_IMAGE_SHAPES = new Set(['standard', 'wide', 'square', 'tall', 'round']);
-const CATEGORY_MARKERS = new Set(['none', 'bar', 'dot', 'square', 'rule', 'underline']);
-const LOGO_SHAPES = new Set(['rounded', 'round', 'square']);
-const COVER_HEIGHTS = new Set(['medium', 'small', 'large']);
-const PRICE_STYLES = new Set(['plain', 'badge', 'muted']);
-const HEADING_ALIGNS = new Set(['start', 'center']);
-const SECTION_SPACINGS = new Set(['cozy', 'comfortable', 'spacious']);
 
 export interface RestaurantDetailsInput {
   nameAr: string;
@@ -60,6 +63,7 @@ export interface RestaurantDetailsInput {
   coverHeight?: string;
   priceStyle?: string;
   headingAlign?: string;
+  themeDecor?: string;
   menuLayout?: string;
   itemImages?: string;
   itemImageShape?: string;
@@ -72,6 +76,14 @@ export interface RestaurantDetailsInput {
 @Injectable()
 export class RestaurantService {
   constructor(private readonly prisma: PrismaService) {}
+
+  /** The ready-made themes an owner can start from, in the platform owner's order. */
+  activeThemes() {
+    return this.prisma.brandTheme.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+    });
+  }
 
   async findById(restaurantId: string) {
     const restaurant = await this.prisma.restaurant.findUnique({ where: { id: restaurantId } });
@@ -101,7 +113,7 @@ export class RestaurantService {
     const secondaryColor = this.validateSecondaryColor(input.secondaryColor);
     const fontTheme = this.validateChoice(
       input.fontTheme,
-      FONT_THEMES,
+      thmanyahEnabled() ? new Set([...FONT_THEMES, 'thmanyah']) : FONT_THEMES,
       'classic',
       'INVALID_FONT_THEME',
     );
@@ -184,6 +196,12 @@ export class RestaurantService {
       'start',
       'INVALID_HEADING_ALIGN',
     );
+    const themeDecor = this.validateChoice(
+      input.themeDecor,
+      THEME_DECORS,
+      'none',
+      'INVALID_THEME_DECOR',
+    );
     const backgroundStyle = this.validateChoice(
       input.backgroundStyle,
       BACKGROUND_STYLES,
@@ -237,6 +255,7 @@ export class RestaurantService {
         coverHeight,
         priceStyle,
         headingAlign,
+        themeDecor,
         menuLayout,
         itemImages,
         itemImageShape,
@@ -267,6 +286,22 @@ export class RestaurantService {
       where: { id: restaurantId },
       data: { backgroundImagePath },
     });
+  }
+
+  /** Clears the logo, cover or background photo. A background style of
+   *  "image" with no photo would show nothing, so it goes back to solid. */
+  async removeImage(restaurantId: string, kind: 'logo' | 'cover' | 'background') {
+    const restaurant = await this.findById(restaurantId);
+    const data =
+      kind === 'logo'
+        ? { logoPath: null }
+        : kind === 'cover'
+          ? { coverImagePath: null }
+          : {
+              backgroundImagePath: null,
+              ...(restaurant.backgroundStyle === 'image' ? { backgroundStyle: 'solid' } : {}),
+            };
+    return this.prisma.restaurant.update({ where: { id: restaurantId }, data });
   }
 
   /** Re-validated here even though the admin form's live JS already

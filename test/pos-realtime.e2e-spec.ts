@@ -198,6 +198,28 @@ describe('Staff screen websocket (e2e)', () => {
     return res.status;
   }
 
+  async function staffChecksOut(email: string, tableId: string): Promise<number> {
+    const cookie = await signIn(email);
+    const page = await fetch(`${base}/admin`, { headers: { Cookie: cookie } });
+    const csrf = /name="csrf_token" value="([^"]*)"/.exec(await page.text())?.[1] ?? '';
+    const res = await fetch(`${base}/admin/pos/tables/${tableId}/checkout`, {
+      method: 'POST',
+      headers: { Cookie: mergeCookies(cookie.split('; '), cookiesOf(page)), 'X-CSRF-Token': csrf },
+    });
+    return res.status;
+  }
+
+  /** A guest's phone follows its table by the table's QR token. */
+  function followTable(token: string): Socket {
+    const socket = io(`${base}/track`, {
+      transports: ['websocket'],
+      reconnection: false,
+      auth: { table: token },
+    });
+    sockets.push(socket);
+    return socket;
+  }
+
   beforeAll(async () => {
     app = await createTestApp();
     await app.listen(0, '127.0.0.1');
@@ -321,6 +343,47 @@ describe('Staff screen websocket (e2e)', () => {
     const heard = silent(staffA, 'order.new');
     await guestOrders(b);
     expect(await heard).toBe(false);
+  });
+
+  describe('tables, live', () => {
+    it('tells staff a table was taken and then freed', async () => {
+      await prisma.restaurantTable.update({
+        where: { id: a.tableId },
+        data: { occupiedAt: null, lastSeenAt: null },
+      });
+      const staff = connect(await signIn(a.email));
+      await connected(staff);
+      const taken = once<{ id: string }>(staff, 'table.updated');
+      await guestOrders(a);
+      expect(await taken).toEqual({ id: a.tableId });
+
+      const freed = once<{ id: string }>(staff, 'table.updated');
+      expect(await staffChecksOut(a.email, a.tableId)).toBe(200);
+      expect(await freed).toEqual({ id: a.tableId });
+    });
+
+    it('tells the guest at the table when it is checked out, and nothing about other tables', async () => {
+      await guestOrders(a);
+      const guest = followTable(a.tableToken);
+      const first = once<{ occupied: boolean }>(guest, 'table');
+      await connected(guest);
+      expect((await first).occupied).toBe(true);
+
+      const elsewhere = followTable(b.tableToken);
+      const initial = once(elsewhere, 'table');
+      await connected(elsewhere);
+      await initial;
+      const heardElsewhere = silent(elsewhere, 'table');
+      const closed = once<{ occupied: boolean }>(guest, 'table');
+      expect(await staffChecksOut(a.email, a.tableId)).toBe(200);
+      expect((await closed).occupied).toBe(false);
+      expect(await heardElsewhere).toBe(false);
+    });
+
+    it('turns away a table code that does not exist', async () => {
+      const guest = followTable('00000000-0000-0000-0000-000000000000');
+      expect(await once(guest, 'unknown_table')).toBeUndefined();
+    });
   });
 
   describe('a guest following their own order', () => {

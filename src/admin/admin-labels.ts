@@ -180,6 +180,7 @@ export function buildAdminLabels(i18n: I18nService, locale: Locale, defaultCurre
       primaryColorHint: t('common.admin.branding.primaryColorHint'),
       resetColor: t('common.admin.branding.resetColor'),
       logoLabel: t('common.admin.branding.logoLabel'),
+      removeImage: t('common.admin.branding.removeImage'),
       coverImageLabel: t('common.admin.branding.coverImageLabel'),
       // Raw, uninterpolated templates for the client-side live contrast
       // check (public/js/color-contrast.js) -- same pattern as

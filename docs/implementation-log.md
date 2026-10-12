@@ -380,3 +380,39 @@ The "All" chip in the category bar drew a malformed fork and knife that read as 
 - Background color and pattern now reach the whole page, and the branding preview uses the landing page phone frame.
 - Verified: lint, tsc, 318 unit, 543 e2e; browser checks at 375 and 1280 in both languages with axe.
 - Not done: no new fonts beyond the three self hosted families; the photo editor has no filters.
+
+## More typefaces
+
+- Four new self hosted typefaces for the menu, all SIL OFL (licence files beside each): Cairo, Almarai, Noto Naskh Arabic, and a serif pairing of Playfair Display (Latin) with Amiri (Arabic). Weights 400 and 700, Arabic and Latin files split by `unicode-range` so only what a page uses is downloaded (about 600 KB in all on disk, none loaded unless chosen).
+- New `fontTheme` values `cairo`, `almarai`, `naskh`, `serif` (plain text column, no migration), validated against the fixed list, with cards and live preview in the branding form, English and Arabic labels, and e2e tests.
+- Fixed: the "Classic" card showed as selected together with "Clean".
+- Not done: weight 500 and 600 fall back to the nearest declared weight for the new faces.
+
+## Table reservation, bill and checkout
+
+- A table is taken when a guest inside the allowed area opens its QR page (the page posts the phone's position to `POST /m/:slug/tables/occupy`), orders, or calls the waiter. Migration `20261020000000_table_occupancy` adds `occupiedAt`, `lastSeenAt`, `billRequestedAt` to `RestaurantTable` and a `kind` (CALL or BILL) to `WaiterCall`.
+- A scan with no orders lapses after 30 minutes (`src/pos/table-state.ts`, pure and unit tested). It is worked out from the stored times when read, so no background job is needed. A table with an order stays taken until staff check it out.
+- Guests get a "My bill" sheet (`GET /m/:slug/tables/:token/bill`, orders since the visit began, canceled ones left out) and "Ask for the bill" (`POST .../tables/bill-request`, one alert per visit, shown to staff as a call of kind BILL).
+- Staff (owner and cashier, not kitchen) get a live Tables section on the POS board with free, occupied and bill requested, order count and total, and a Check out button (`POST /admin/pos/tables/:id/checkout`) that frees the table and closes its open calls.
+- Live: a new `table.updated` event goes to the floor room; guests' phones follow their table on the `/track` socket with the table token (`auth: { table }`) and hear when it is checked out, which also clears their remembered order.
+- Verified: lint, tsc, unit and e2e (new `table-occupancy` spec and realtime cases). Not checked in a real browser: the extension was not connected.
+- Not done: a guest holding an old QR link would see the next party's bill if the table is reused (the code is per table, not per visit); no payment is taken, the waiter settles it.
+
+## Landing page tour and richer demo
+
+- The demo restaurants now show real photos: `scripts/fetch-demo-photos.py` downloads freely licensed pictures from Wikimedia Commons (public API) into `public/demo-photos`, resized, with `CREDITS.md` (author and license per photo) and `src/prisma-seed/demo-photos.json`. They are served by this app, not hot linked. The result was checked by eye and a few dishes got fixed queries or exact files; some pictures are close rather than exact (for example the sweet rice pudding), swap them in the script if a better one is found.
+- The seed (`src/prisma-seed/demo-extras.ts`) gives each restaurant its own look (cafe: Cairo, grid, round logo; restaurant: serif, list, square logo, pattern), sizes and extras on some dishes, owner pairings, three weeks of orders and menu visits for the reports and "ordered together" suggestions, and live tables (one with orders in the kitchen, one asking for the bill, one free).
+- Landing page: a "Try the whole system" section with four tabs (guest menu, two looks side by side, ordering from a real demo table, and the staff screen). Pages inside a tab load only while it is open. The staff screen is `/demo/board`, the real board partial with the demo rows, `inert` and without scripts, and exists only when DEMO_MODE is on. The tour is shown only on a demo site, because a real restaurant would otherwise get orders from visitors and expose its board.
+- Still no demo logins on the landing page (decision 44); the tour only links to the sign in page.
+- Features list and hero text now mention table orders, bills and suggestions.
+
+## Logos, category photos, more patterns and separators
+
+- The demo restaurants have drawn logos (`public/demo-photos/logo-*.svg`, original artwork) and each category has a representative dish photo.
+- Six more page background patterns (waves, zigzag, diamonds, rings, polka dots, stripes) and four more category separators (double line, fading line, ornament, zigzag). All are CSS gradients tinted with the restaurant's primary color, so nothing is downloaded; each is validated against a fixed list and covered by an e2e case. Not seen in a real browser yet: the extension was not connected.
+
+## Ready-made themes, decorations, remember me
+
+- Ready-made themes (Classic, Ramadan, Eid Al-Fitr, Eid Al-Adha, Olive harvest, Summer, Winter, Evening) fill the branding form in one click: colors, typeface, corners, cards, buttons, separators, headings, prices, background and a decoration band. They are rows in `BrandTheme` (migration `20261022000000_brand_themes` creates the table and inserts these eight), so the platform owner edits them at `/super/themes` (add, edit, order, archive, restore) with the same value and color-readability rules as a restaurant's own save (`src/admin/themes.ts`, option lists shared in `src/admin/look-options.ts`). A theme only fills the form; the owner can change anything and nothing is saved until Save. The key of a theme cannot be changed after it is created, because the page refers to it.
+- Decoration band (`themeDecor`, migration `20261021000000_theme_decor`): drawn SVG motifs repeated under the category bar in the restaurant's own colors (lantern and crescent for Ramadan, sheep for Eid Al-Adha, olive branch, sun and waves, snowflakes, stars, bunting). The art lives in `views/components/theme-decor.njk`; a theme can only pick among those drawings, a new drawing needs code. Not seen in a real browser; checked by rendering the SVGs to images.
+- "Remember me" on the sign in: ticked keeps the session cookie 30 days, not ticked ends it with the browser. Staff sign in only; the platform owner's sign in is unchanged.

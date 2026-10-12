@@ -14,7 +14,7 @@
       <ul class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {% for call in activeCalls %}
           <li class="rounded-lg border-2 p-4 {{ 'border-danger bg-danger/10' if call.status == 'OPEN' else 'border-border bg-surface' }}" data-call="{{ call.id }}" data-call-status="{{ call.status }}">
-            <p class="font-sans text-lg font-bold text-text">{{ t(P + 'callTitle', { label: call.tableLabel }) }}</p>
+            <p class="font-sans text-lg font-bold text-text">{{ t(P + ('billTitle' if call.kind == 'BILL' else 'callTitle'), { label: call.tableLabel }) }}</p>
             <p class="text-sm text-muted-text"><time dir="ltr" datetime="{{ call.createdAt.toISOString() }}">{{ call.createdAt | clock }}</time>{% if call.status == 'ACKNOWLEDGED' %} · {{ t(P + 'callAcknowledged') }}{% endif %}</p>
             <div class="mt-3 flex flex-wrap gap-2">
               {% if call.status == 'OPEN' %}
@@ -22,6 +22,30 @@
               {% endif %}
               <button type="button" hx-post="/admin/pos/calls/{{ call.id }}/resolve" hx-target="#pos-board" hx-swap="innerHTML" class="inline-flex min-h-11 items-center rounded-md border border-border-strong px-4 text-sm font-medium text-text hover:bg-muted-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(P + 'callDone') }}</button>
             </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  {% if role != 'KITCHEN' and tables and tables.length %}
+    <section aria-labelledby="tables-title" class="mt-6" data-tables>
+      <h2 id="tables-title" class="flex items-center justify-between font-sans text-lg font-bold text-text">
+        {{ t(P + 'tables') }}
+        <span class="rounded-full bg-muted-surface px-2.5 py-0.5 text-sm font-medium text-text" dir="ltr">{% set taken = [] %}{% for tb in tables %}{% if tb.state != 'FREE' %}{% set _t = taken.push(tb) %}{% endif %}{% endfor %}{{ taken.length }} / {{ tables.length }}</span>
+      </h2>
+      <ul class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {% for tb in tables %}
+          <li class="flex flex-col rounded-lg border-2 p-3 {{ 'border-danger bg-danger/10' if tb.state == 'BILL' else ('border-primary bg-primary-soft' if tb.state == 'OCCUPIED' else 'border-border bg-surface') }}" data-table="{{ tb.id }}" data-table-state="{{ tb.state }}">
+            <div class="flex items-baseline justify-between gap-2">
+              <p class="font-sans text-lg font-bold text-text">{{ tb.label }}</p>
+              <span class="text-xs font-medium text-text">{{ t(P + ('tableBill' if tb.state == 'BILL' else ('tableOccupied' if tb.state == 'OCCUPIED' else 'tableFree'))) }}</span>
+            </div>
+            {% if tb.state != 'FREE' %}
+              <p class="mt-1 text-sm text-muted-text"><time dir="ltr" datetime="{{ tb.occupiedAt.toISOString() }}">{{ tb.occupiedAt | clock }}</time> · {{ t(P + 'tableOrders', { count: tb.orders }) }}</p>
+              {% if tb.orders %}<p class="mt-1 text-sm font-bold text-text" dir="ltr">{{ tb.total | money }} {{ tb.currency | symbol(locale) }}</p>{% endif %}
+              <button type="button" hx-post="/admin/pos/tables/{{ tb.id }}/checkout" hx-confirm="{{ t(P + 'checkoutConfirm', { label: tb.label }) }}" hx-target="#pos-board" hx-swap="innerHTML" class="mt-3 inline-flex min-h-11 items-center justify-center rounded-md {{ 'bg-primary text-primary-on hover:bg-primary-hover' if tb.state == 'BILL' else 'border border-border text-text hover:bg-muted-surface' }} px-3 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ t(P + 'checkout') }}</button>
+            {% endif %}
           </li>
         {% endfor %}
       </ul>

@@ -235,6 +235,7 @@ describe('Password reset and invitation email (e2e)', () => {
 
     afterAll(async () => {
       await prisma.auditLog.deleteMany({ where: { actorId: superId } });
+      await prisma.subscription.deleteMany({ where: { planId } });
       await prisma.plan.delete({ where: { id: planId } });
       await prisma.superAdmin.delete({ where: { id: superId } });
     });

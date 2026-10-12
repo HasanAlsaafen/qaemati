@@ -29,6 +29,11 @@
       {{ input('email', t('common.admin.auth.emailLabel'), 'email', email, '', fieldErrors.email, none, 'required autocomplete="username"') }}
       {{ input('password', t('common.admin.auth.passwordLabel'), 'password', '', '', fieldErrors.password, none, 'required autocomplete="current-password"') }}
 
+      <label class="flex min-h-11 items-center gap-3 text-sm text-text">
+        <input type="checkbox" name="remember" class="h-5 w-5 rounded border-border-strong accent-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        <span>{{ t('common.admin.auth.rememberMe') }}</span>
+      </label>
+
       {{ button(t('common.admin.auth.submit'), 'primary', 'md', 'submit') }}
     </form>
     <a href="/admin/forgot" class="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline">{{ t('common.admin.auth.forgotLink') }}</a>

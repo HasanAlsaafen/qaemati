@@ -2,7 +2,8 @@ import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/commo
 import { Client } from 'pg';
 import { PrismaService } from '../prisma/prisma.service';
 
-export type PosEventType = 'order.new' | 'order.updated' | 'call.new' | 'call.updated';
+export type PosEventType =
+  'order.new' | 'order.updated' | 'call.new' | 'call.updated' | 'table.updated';
 
 /** Only ids travel, never order contents: a screen asks the server for the details. */
 export interface PosEvent {

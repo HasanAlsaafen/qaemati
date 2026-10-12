@@ -30,7 +30,7 @@
 <details class="mt-10 rounded-lg border border-border bg-surface p-4" id="location">
   <summary class="inline-flex min-h-11 cursor-pointer items-center font-sans text-lg font-bold text-text">{{ t(P + 'settingsTitle') }}</summary>
   <p class="mt-2 max-w-2xl text-sm text-muted-text">{{ t(P + 'settingsIntro') }}</p>
-  <form hx-post="/admin/pos/settings" hx-swap="none" class="mt-4 grid max-w-2xl gap-4 sm:grid-cols-2">
+  <form data-dirty-guard="pos-settings" hx-post="/admin/pos/settings" hx-swap="none" class="mt-4 grid max-w-2xl gap-4 sm:grid-cols-2">
     {{ input('latitude', t(P + 'latitude'), 'text', location.latitude, '', none, none, 'inputmode="decimal"', 'ltr') }}
     {{ input('longitude', t(P + 'longitude'), 'text', location.longitude, '', none, none, 'inputmode="decimal"', 'ltr') }}
     <div class="sm:col-span-2">

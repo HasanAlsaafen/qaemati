@@ -35,10 +35,11 @@ export class PosGateway implements OnGatewayInit, OnGatewayConnection, OnModuleD
 
   afterInit(): void {
     this.unsubscribe = this.bus.subscribe((event: PosEvent) => {
-      // A waiter call is for the floor. The kitchen hears about orders only.
-      const room = event.type.startsWith('call.')
-        ? floorRoomFor(event.restaurantId)
-        : roomFor(event.restaurantId);
+      // A waiter call or a table change is for the floor. The kitchen hears about orders only.
+      const room =
+        event.type.startsWith('call.') || event.type === 'table.updated'
+          ? floorRoomFor(event.restaurantId)
+          : roomFor(event.restaurantId);
       this.server.to(room).emit(event.type, { id: event.id });
     });
   }

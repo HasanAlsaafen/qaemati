@@ -12,6 +12,7 @@ import { isServable } from '../tenancy/tenant-access';
 import { checkLocation, GuestPosition } from './geo';
 import { fromCents, lineKey, parseLineKey, toCents } from './order-lines';
 import { PosEventBus } from './pos-event-bus';
+import { TablesService } from './tables.service';
 
 export type GuestErrorCode =
   | 'unknown_table'
@@ -23,7 +24,8 @@ export type GuestErrorCode =
   | 'rate_limited'
   | 'invalid_order'
   | 'item_unavailable'
-  | 'unknown_order';
+  | 'unknown_order'
+  | 'nothing_to_bill';
 
 /** A refusal the guest can be told about, with the HTTP status that fits it. */
 export class GuestPosError extends Error {
@@ -63,6 +65,7 @@ export class GuestPosService {
     private readonly prisma: PrismaService,
     private readonly tenancy: TenancyService,
     private readonly bus: PosEventBus,
+    private readonly tables: TablesService,
     @Inject(RATE_LIMIT_STORE) private readonly limits: RateLimitStore,
   ) {}
 
@@ -98,6 +101,8 @@ export class GuestPosService {
     const distance = this.verifyLocation(restaurant, input);
 
     const priced = await this.priceLines(restaurant.id, input.lines);
+    // The visit starts before the order, so the order belongs to its bill.
+    await this.tables.touch(restaurant.id, table.id);
     const order = await this.prisma.$transaction(async (tx) => {
       const rows = await tx.$queryRaw<{ number: number }[]>(Prisma.sql`
         UPDATE "Restaurant" SET "nextOrderNumber" = "nextOrderNumber" + 1
@@ -146,8 +151,14 @@ export class GuestPosService {
 
     // A second tap while staff have not answered the first is not a second call.
     const open = await this.prisma.waiterCall.findFirst({
-      where: { restaurantId: restaurant.id, tableId: table.id, status: { not: 'RESOLVED' } },
+      where: {
+        restaurantId: restaurant.id,
+        tableId: table.id,
+        kind: 'CALL',
+        status: { not: 'RESOLVED' },
+      },
     });
+    await this.tables.touch(restaurant.id, table.id);
     if (open) return { id: open.id, alreadyCalled: true };
     await this.limit(`call-table:${table.id}`, CALL_COOLDOWN_MS, 1);
 
@@ -161,6 +172,49 @@ export class GuestPosService {
     });
     await this.bus.publish({ type: 'call.new', restaurantId: restaurant.id, id: call.id });
     return { id: call.id, alreadyCalled: false };
+  }
+
+  /** A guest inside the allowed area opened the table's QR code: the table is taken. */
+  async occupy(slug: string, input: GuestPosPosition & { table: string }, ip: string) {
+    const { restaurant, table } = await this.gate(slug, input.table);
+    await this.limit(`occupy-ip:${ip}`, ORDER_WINDOW_MS, 30);
+    await this.limit(`occupy-table:${table.id}`, 60_000, 12);
+    this.verifyLocation(restaurant, input);
+    await this.tables.touch(restaurant.id, table.id);
+    return { occupied: true };
+  }
+
+  /** What the table owes so far, for whoever holds the table's QR code. */
+  async bill(slug: string, token: string, ip: string) {
+    await this.limit(`bill-ip:${ip}`, 60_000, 60);
+    const { restaurant, table } = await this.gate(slug, token);
+    return this.tables.bill(restaurant.id, table.id);
+  }
+
+  /** The guest asks for the bill: one alert for the floor, once per visit. */
+  async requestBill(slug: string, input: GuestPosPosition & { table: string }, ip: string) {
+    const { restaurant, table } = await this.gate(slug, input.table);
+    await this.limit(`call-ip:${ip}`, ORDER_WINDOW_MS, 12);
+    this.verifyLocation(restaurant, input);
+    const bill = await this.tables.bill(restaurant.id, table.id);
+    if (!bill.occupied || bill.orders.length === 0) throw new GuestPosError('nothing_to_bill', 409);
+    if (bill.billRequested) return { alreadyRequested: true };
+
+    const call = await this.prisma.waiterCall.create({
+      data: {
+        restaurantId: restaurant.id,
+        tableId: table.id,
+        tableLabel: table.label,
+        kind: 'BILL',
+      },
+    });
+    await this.prisma.restaurantTable.update({
+      where: { id: table.id },
+      data: { billRequestedAt: new Date(), lastSeenAt: new Date() },
+    });
+    await this.bus.publish({ type: 'call.new', restaurantId: restaurant.id, id: call.id });
+    await this.bus.publish({ type: 'table.updated', restaurantId: restaurant.id, id: table.id });
+    return { alreadyRequested: false };
   }
 
   /** The restaurant and table behind a QR code, if ordering from it is allowed at all. */

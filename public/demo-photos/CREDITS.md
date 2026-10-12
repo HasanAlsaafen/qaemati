@@ -1,0 +1,58 @@
+# Demo photo credits
+
+Photos from Wikimedia Commons, resized and cropped. Each keeps its own license.
+
+- `arabic-coffee.jpg`: [File:Arabic coffee with dates.jpg](https://commons.wikimedia.org/wiki/File:Arabic_coffee_with_dates.jpg) by Slywire, CC BY-SA 4.0
+- `baklava-assortment.jpg`: [File:Baklava - Turkish special, 80-ply.JPEG](https://commons.wikimedia.org/wiki/File:Baklava_-_Turkish_special,_80-ply.JPEG) by Kultigin, Public domain
+- `baklava.jpg`: [File:Baklava 1.jpg](https://commons.wikimedia.org/wiki/File:Baklava_1.jpg) by Challiyan, CC BY-SA 4.0
+- `basbousa.jpg`: [File:Vegan Basbousa by Uncle Lou's Kitchen.jpg](https://commons.wikimedia.org/wiki/File:Vegan_Basbousa_by_Uncle_Lou%27s_Kitchen.jpg) by Bedtimepiano, CC BY-SA 4.0
+- `berry-smoothie.jpg`: [File:Kid friendly green smoothie in a personalized glass with spinach, Greek yogurt, frozen blueberries, blackberries and strawberries and berries, banana in a glass bowl on a wood table (16225943125).jpg](https://commons.wikimedia.org/wiki/File:Kid_friendly_green_smoothie_in_a_personalized_glass_with_spinach,_Greek_yogurt,_frozen_blueberries,_blackberries_and_strawberries_and_berries,_banana_in_a_glass_bowl_on_a_wood_table_(16225943125).jpg) by Personal Creations, CC BY 2.0
+- `cappuccino.jpg`: [File:Cappuccino myanmar.jpg](https://commons.wikimedia.org/wiki/File:Cappuccino_myanmar.jpg) by စောအဲဆို, CC BY-SA 4.0
+- `cheese-sambousek.jpg`: [File:Sambousek (4009290205).jpg](https://commons.wikimedia.org/wiki/File:Sambousek_(4009290205).jpg) by Charles Haynes from Hobart, Australia, CC BY-SA 2.0
+- `chicken-shawarma-sandwich.jpg`: [File:Shawarma-sandwich-01.jpg](https://commons.wikimedia.org/wiki/File:Shawarma-sandwich-01.jpg) by Vera Yu and David Li, CC BY 2.0
+- `chicken-shish-tawook.jpg`: [File:Food in the Islamic Middle East - Shish Taouk.jpg](https://commons.wikimedia.org/wiki/File:Food_in_the_Islamic_Middle_East_-_Shish_Taouk.jpg) by Nelcfood, CC BY-SA 4.0
+- `chocolate-lava-cake.jpg`: [File:Chocolate Lava Cake 1 (28791097360).jpg](https://commons.wikimedia.org/wiki/File:Chocolate_Lava_Cake_1_(28791097360).jpg) by Sharon Chen from Austin, United States, CC BY 2.0
+- `cover-cafe.jpg`: [File:Figaro Coffee shop interior in Salawag, Dasmariñas, Cavite — 19 Mar 2022.jpg](https://commons.wikimedia.org/wiki/File:Figaro_Coffee_shop_interior_in_Salawag,_Dasmari%C3%B1as,_Cavite_%E2%80%94_19_Mar_2022.jpg) by UndueMarmot, CC BY 4.0
+- `cover-grill.jpg`: [File:Iraqi Kebab.jpg](https://commons.wikimedia.org/wiki/File:Iraqi_Kebab.jpg) by Abdulsalam Al Dabbagh, CC BY-SA 4.0
+- `falafel-sandwich.jpg`: [File:Falafel Sandwich at Utsunomiya.jpg](https://commons.wikimedia.org/wiki/File:Falafel_Sandwich_at_Utsunomiya.jpg) by Miyuki Meinaka, CC BY-SA 4.0
+- `fattoush.jpg`: [File:Fattoush Portulaca oleracea.jpg](https://commons.wikimedia.org/wiki/File:Fattoush_Portulaca_oleracea.jpg) by Sakateka, CC BY-SA 4.0
+- `foul-medammes.jpg`: [File:Foul Mdammis, Tunisie.jpg](https://commons.wikimedia.org/wiki/File:Foul_Mdammis,_Tunisie.jpg) by Habib M'henni, CC BY-SA 3.0
+- `freekeh-with-chicken.jpg`: [File:Freekeh with roasted vegetables.jpg](https://commons.wikimedia.org/wiki/File:Freekeh_with_roasted_vegetables.jpg) by Kristen Taylor, CC BY 2.0
+- `fresh-orange-juice.jpg`: [File:Orange juice 1 edit1.jpg](https://commons.wikimedia.org/wiki/File:Orange_juice_1_edit1.jpg) by Agency of the United States Department of Agriculture
+Edited Version by: Arad, Public domain
+- `fried-kibbeh.jpg`: [File:קובה חתוך לשניים - Kibbeh split in two.jpg](https://commons.wikimedia.org/wiki/File:%D7%A7%D7%95%D7%91%D7%94_%D7%97%D7%AA%D7%95%D7%9A_%D7%9C%D7%A9%D7%A0%D7%99%D7%99%D7%9D_-_Kibbeh_split_in_two.jpg) by Revital Salomon, CC BY-SA 4.0
+- `grilled-fish-fillet.jpg`: [File:140531 Forellen auf dem Grill.jpg](https://commons.wikimedia.org/wiki/File:140531_Forellen_auf_dem_Grill.jpg) by Ansgar Koreng, CC BY-SA 3.0 de
+- `grilled-vegetable-sandwich.jpg`: [File:A fresh sandwich filled with grilled vegetables.jpg](https://commons.wikimedia.org/wiki/File:A_fresh_sandwich_filled_with_grilled_vegetables.jpg) by Shixart1985, CC BY 2.0
+- `halloumi-sandwich.jpg`: [File:Spicy & Smoky Halloumi Sandwich - T @ The Dials 2025-04-12.jpg](https://commons.wikimedia.org/wiki/File:Spicy_%26_Smoky_Halloumi_Sandwich_-_T_@_The_Dials_2025-04-12.jpg) by Andy Li, CC0
+- `hot-chocolate.jpg`: [File:Trending Hot Chocolate Bomb or Hot Cocoa Bomb - Gujarat - SHAILI 008.jpg](https://commons.wikimedia.org/wiki/File:Trending_Hot_Chocolate_Bomb_or_Hot_Cocoa_Bomb_-_Gujarat_-_SHAILI_008.jpg) by Shaili Sharma, CC BY-SA 4.0
+- `hummus-with-pita.jpg`: [File:Homemade hummus and pita 03.jpg](https://commons.wikimedia.org/wiki/File:Homemade_hummus_and_pita_03.jpg) by Satdeep Gill, CC BY-SA 4.0
+- `hummus.jpg`: [File:02021 0752 (2) Hummus, Vegan food in Poland.jpg](https://commons.wikimedia.org/wiki/File:02021_0752_(2)_Hummus,_Vegan_food_in_Poland.jpg) by Silar, CC BY-SA 4.0
+- `iced-latte.jpg`: [File:Peanut Crispy and Iced Latte - The Wildflower Cafe 2025-08-26.jpg](https://commons.wikimedia.org/wiki/File:Peanut_Crispy_and_Iced_Latte_-_The_Wildflower_Cafe_2025-08-26.jpg) by Andy Li, CC0
+- `iced-matcha.jpg`: [File:Iced Yuzu, Ginger & Lion's Mane Matcha - Trading Post Coffee Roasters 2026-07-27.jpg](https://commons.wikimedia.org/wiki/File:Iced_Yuzu,_Ginger_%26_Lion%27s_Mane_Matcha_-_Trading_Post_Coffee_Roasters_2026-07-27.jpg) by Andy Li, CC0
+- `knafeh-nabulsieh.jpg`: [File:Kanafeh in Isfiya.jpg](https://commons.wikimedia.org/wiki/File:Kanafeh_in_Isfiya.jpg) by ס.ג'יבלי, CC BY-SA 4.0
+- `labneh-zaatar-plate.jpg`: [File:Labneh (5196911587).jpg](https://commons.wikimedia.org/wiki/File:Labneh_(5196911587).jpg) by Leslie Seaton from Seattle, WA, USA, CC BY 2.0
+- `lamb-chops.jpg`: [File:Lamb chops with mash.JPG](https://commons.wikimedia.org/wiki/File:Lamb_chops_with_mash.JPG) by Unknown, Public domain
+- `lamb-kofta.jpg`: [File:Vegan lamb kofta at Barcha.jpg](https://commons.wikimedia.org/wiki/File:Vegan_lamb_kofta_at_Barcha.jpg) by Mx. Granger, CC0
+- `lentil-soup.jpg`: [File:Bowl of lentil soup with green and red lentils.jpg](https://commons.wikimedia.org/wiki/File:Bowl_of_lentil_soup_with_green_and_red_lentils.jpg) by Whoisjohngalt, CC BY-SA 4.0
+- `maamoul.jpg`: [File:Mamoul biscotti libanesi.jpg](https://commons.wikimedia.org/wiki/File:Mamoul_biscotti_libanesi.jpg) by fugzu, CC BY 2.0
+- `manakeesh-cheese.jpg`: [File:Za'atar with cheese manakish at Agasi, Lajpat Nagar, Delhi (2025-10-04).jpg](https://commons.wikimedia.org/wiki/File:Za%27atar_with_cheese_manakish_at_Agasi,_Lajpat_Nagar,_Delhi_(2025-10-04).jpg) by Contrapunctus-1, CC BY-SA 4.0
+- `manakeesh-halloumi-zaatar.jpg`: [File:Zaatar Mankousheh.jpg](https://commons.wikimedia.org/wiki/File:Zaatar_Mankousheh.jpg) by Elie.ghob, CC BY-SA 4.0
+- `manakeesh-zaatar.jpg`: [File:Manakish Za'atar.jpg](https://commons.wikimedia.org/wiki/File:Manakish_Za%27atar.jpg) by myahya, CC BY-SA 2.0
+- `mansaf.jpg`: [File:Jordanian Traditional Mansaf, Petra Restaurant, 2026 (01).jpg](https://commons.wikimedia.org/wiki/File:Jordanian_Traditional_Mansaf,_Petra_Restaurant,_2026_(01).jpg) by Bahnfrend, CC BY-SA 4.0
+- `maqluba.jpg`: [File:Makluba.JPG](https://commons.wikimedia.org/wiki/File:Makluba.JPG) by Arafataslan, Public domain
+- `mint-lemonade.jpg`: [File:Mint lemonade in summer.jpg](https://commons.wikimedia.org/wiki/File:Mint_lemonade_in_summer.jpg) by Twilightin, CC BY-SA 4.0
+- `mixed-grill.jpg`: [File:Mixed Grill with Hummus, Air Arabia, 2025 (01).jpg](https://commons.wikimedia.org/wiki/File:Mixed_Grill_with_Hummus,_Air_Arabia,_2025_(01).jpg) by Bahnfrend, CC BY-SA 4.0
+- `molokhia.jpg`: [File:Molokhia 2.JPG](https://commons.wikimedia.org/wiki/File:Molokhia_2.JPG) by Showshow777, CC BY-SA 4.0
+- `moutabal.jpg`: [File:Grand assortiment de nourriture libanaise (Lyon, 2017).jpg](https://commons.wikimedia.org/wiki/File:Grand_assortiment_de_nourriture_libanaise_(Lyon,_2017).jpg) by Benoît Prieur, CC0
+- `okra-stew.jpg`: [File:Spicy Texan Fall Vegetable Stew, Okra and eggplant (4040528901).jpg](https://commons.wikimedia.org/wiki/File:Spicy_Texan_Fall_Vegetable_Stew,_Okra_and_eggplant_(4040528901).jpg) by Kari Sullivan from Austin, TX, CC BY 2.0
+- `olive-cheese-plate.jpg`: [File:Tomatoes and cheese and olives on sticks at a party.JPG](https://commons.wikimedia.org/wiki/File:Tomatoes_and_cheese_and_olives_on_sticks_at_a_party.JPG) by Tomwsulcer, CC0
+- `pancakes-with-honey.jpg`: [File:Foodiesfeed.com pouring-honey-on-pancakes-with-walnuts.jpg](https://commons.wikimedia.org/wiki/File:Foodiesfeed.com_pouring-honey-on-pancakes-with-walnuts.jpg) by Mae Mu, CC0
+- `rice-pudding.jpg`: [File:Colourful bowl rice cakes (Put chai ko).jpg](https://commons.wikimedia.org/wiki/File:Colourful_bowl_rice_cakes_(Put_chai_ko).jpg) by Fumikas Sagisavas, CC0
+- `shakshuka.jpg`: [File:Shakshuka by Calliopejen1.jpg](https://commons.wikimedia.org/wiki/File:Shakshuka_by_Calliopejen1.jpg) by Calliopejen1, CC BY-SA 3.0
+- `spanish-latte.jpg`: [File:Latte macchiato with coffee beans.jpg](https://commons.wikimedia.org/wiki/File:Latte_macchiato_with_coffee_beans.jpg) by א (Aleph), CC BY-SA 2.5
+- `spinach-fatayer.jpg`: [File:Spinach Pastry.jpg](https://commons.wikimedia.org/wiki/File:Spinach_Pastry.jpg) by روتانا, CC BY 4.0
+- `stuffed-zucchini.jpg`: [File:Zucchini stuffed with vegetables.jpg](https://commons.wikimedia.org/wiki/File:Zucchini_stuffed_with_vegetables.jpg) by MOs810, CC BY 4.0
+- `tabbouleh.jpg`: [File:Flickr - cyclonebill - Tabbouleh.jpg](https://commons.wikimedia.org/wiki/File:Flickr_-_cyclonebill_-_Tabbouleh.jpg) by cyclonebill, CC BY-SA 2.0
+- `turkish-coffee.jpg`: [File:Turkish coffee cups in Adana 04.jpg](https://commons.wikimedia.org/wiki/File:Turkish_coffee_cups_in_Adana_04.jpg) by Julvsel, CC BY-SA 4.0
+- `um-ali.jpg`: [File:Umm Ali.JPG](https://commons.wikimedia.org/wiki/File:Umm_Ali.JPG) by Miansari66, CC0
+- `warak-enab.jpg`: [File:Postna sarma (vegetarian sarma, Cuisine of Serbia).jpg](https://commons.wikimedia.org/wiki/File:Postna_sarma_(vegetarian_sarma,_Cuisine_of_Serbia).jpg) by Petar Milošević, CC BY-SA 4.0

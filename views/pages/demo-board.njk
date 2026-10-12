@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}" dir="{{ dir }}">
+<head>
+  <title>{{ t('common.admin.pos.title') }}</title>
+  <meta name="robots" content="noindex">
+  {% include "partials/head.njk" %}
+</head>
+<body class="bg-bg text-text font-sans antialiased">
+  {# A picture of the live screen: nothing in it can be pressed or focused. #}
+  <div inert class="select-none px-4 pb-6 pt-4">
+    {% include "admin/partials/pos-board.njk" %}
+  </div>
+</body>
+</html>

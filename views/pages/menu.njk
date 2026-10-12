@@ -1,6 +1,7 @@
 {% extends "layouts/menu.njk" %}
 
 {% from "components/restaurant-header.njk" import restaurantHeader %}
+{% from "components/theme-decor.njk" import themeDecor %}
 {% from "components/category-chip.njk" import categoryChip, categoryAllChip %}
 {% from "components/menu-item-card.njk" import menuItemCard %}
 {% from "components/item-detail-sheet.njk" import itemDetailSheet %}
@@ -133,6 +134,9 @@
 </div>
 
 <main id="main-content" tabindex="-1" class="mx-auto max-w-4xl px-4 py-6 sm:px-6 print:max-w-none focus:outline-none">
+  {% if menu.themeDecor and menu.themeDecor != 'none' %}
+    <div class="-mx-4 -mt-6 mb-4 overflow-hidden sm:-mx-6 print:hidden">{{ themeDecor(menu.themeDecor) }}</div>
+  {% endif %}
   <div data-menu-empty-state class="hidden">
     {{ emptyState(t('common.menu.noResults'), '') }}
   </div>
@@ -171,7 +175,7 @@
   </div>
 {% endif %}
 {% if tableOrder %}
-  {{ waiterButton(tableOrder, tableLabel, labels.tableOrder) }}
+  {{ waiterButton(tableOrder, tableLabel, labels.tableOrder, locale) }}
 {% endif %}
 {% endblock %}
 

@@ -157,6 +157,7 @@
     });
     socket.on('order.updated', refresh);
     socket.on('call.updated', refresh);
+    socket.on('table.updated', refresh);
   } else {
     show('offline');
   }

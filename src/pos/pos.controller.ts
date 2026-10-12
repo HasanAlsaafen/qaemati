@@ -16,6 +16,7 @@ import { triggerToast } from '../admin/htmx-toast';
 import { ValidationFailedException } from '../common/validation/validation-failed.exception';
 import { RequiresFeature } from '../tenancy/requires-feature';
 import { OrderStatusDto, PosSettingsDto } from './dto/pos.dto';
+import { TablesService } from './tables.service';
 import { PosService } from './pos.service';
 import { canEditSettings, canHandleCalls, canSetOrderStatus, parseRole, Role } from './roles';
 
@@ -38,6 +39,7 @@ const refuse = (): never => {
 export class PosController {
   constructor(
     private readonly pos: PosService,
+    private readonly tables: TablesService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -102,6 +104,19 @@ export class PosController {
       req.session.restaurantId as string,
       id,
       'RESOLVED',
+      req.session.adminUserId as string,
+    );
+    return this.boardFor(req);
+  }
+
+  @Post('tables/:id/checkout')
+  @HttpCode(200)
+  @Render('admin/partials/pos-board')
+  async checkout(@Param('id') id: string, @Req() req: Request) {
+    if (!canHandleCalls(roleOf(req))) refuse();
+    await this.tables.checkout(
+      req.session.restaurantId as string,
+      id,
       req.session.adminUserId as string,
     );
     return this.boardFor(req);

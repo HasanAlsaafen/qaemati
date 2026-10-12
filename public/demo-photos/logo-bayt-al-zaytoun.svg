@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Bayt Al-Zaytoun">
+  <rect width="256" height="256" fill="#07808D"/>
+  <g fill="#F2A33A">
+    <ellipse cx="128" cy="62" rx="9" ry="22"/>
+    <ellipse cx="128" cy="62" rx="9" ry="22" transform="rotate(-42 128 90)"/>
+    <ellipse cx="128" cy="62" rx="9" ry="22" transform="rotate(42 128 90)"/>
+  </g>
+  <g fill="none" stroke="#FBF6EE" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M84 132h88v34a36 36 0 0 1-36 36h-16a36 36 0 0 1-36-36z"/>
+    <path d="M172 144h10a16 16 0 0 1 0 32h-14"/>
+    <path d="M104 118c-7-8 7-14 0-22M128 118c-7-8 7-14 0-22M152 118c-7-8 7-14 0-22" stroke-width="6"/>
+  </g>
+</svg>

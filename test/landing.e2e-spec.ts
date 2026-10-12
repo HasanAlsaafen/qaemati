@@ -127,6 +127,40 @@ describe('Landing page (e2e)', () => {
     });
   });
 
+  describe('the tour of the whole system', () => {
+    it('is on a demo site, with every tab and the staff screen picture', async () => {
+      process.env.DEMO_MODE = 'true';
+      const html = (await page('en')).text;
+      for (const tab of ['menu', 'looks', 'table', 'staff']) {
+        expect(html).toContain(`id="tour-panel-${tab}"`);
+      }
+      expect(html).toMatch(/\/demo\/board\?slug=[a-z0-9-]+&lang=en/);
+      expect(html).toContain('href="#tour"');
+    });
+
+    it('is not on a real site', async () => {
+      process.env.DEMO_MODE = 'false';
+      const html = (await page('en')).text;
+      expect(html).not.toContain('id="tour"');
+      expect(html).not.toContain('/demo/board');
+    });
+
+    it('serves the read-only staff screen only on a demo site', async () => {
+      process.env.DEMO_MODE = 'true';
+      const ok = await request(app.getHttpServer()).get(
+        '/demo/board?slug=test-restaurant-landing&lang=en',
+      );
+      expect(ok.status).toBe(200);
+      expect(ok.text).toContain('<div inert');
+      expect(ok.text).not.toContain('hx-post="/admin/pos');
+      expect((await request(app.getHttpServer()).get('/demo/board?slug=nope')).status).toBe(404);
+      process.env.DEMO_MODE = 'false';
+      expect(
+        (await request(app.getHttpServer()).get('/demo/board?slug=test-restaurant-landing')).status,
+      ).toBe(404);
+    });
+  });
+
   describe('the phone', () => {
     it('is an iPhone showing the real menu, in the language being read', async () => {
       process.env.DEMO_MODE = 'false';

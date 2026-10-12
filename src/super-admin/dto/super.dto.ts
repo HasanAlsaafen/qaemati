@@ -191,3 +191,52 @@ export class VoidPaymentDto extends BaseFormDto {
   @MaxLength(200, { message: 'tooLong' })
   reason!: string;
 }
+
+/** The look a ready-made theme fills in. The values are checked in ThemesAdminService. */
+export class ThemeDto extends BaseFormDto {
+  @IsNotEmpty({ message: 'required' })
+  @IsString({ message: 'invalid' })
+  @MaxLength(80, { message: 'tooLong' })
+  nameAr!: string;
+
+  @IsNotEmpty({ message: 'required' })
+  @IsString({ message: 'invalid' })
+  @MaxLength(80, { message: 'tooLong' })
+  nameEn!: string;
+
+  @IsOptional()
+  @IsString({ message: 'invalid' })
+  @MaxLength(200, { message: 'tooLong' })
+  descriptionAr?: string;
+
+  @IsOptional()
+  @IsString({ message: 'invalid' })
+  @MaxLength(200, { message: 'tooLong' })
+  descriptionEn?: string;
+
+  @IsOptional()
+  @Matches(/^$|^\d{1,4}$/, { message: 'invalidInteger' })
+  sortOrder?: string;
+
+  @IsString({ message: 'invalid' }) @MaxLength(7, { message: 'tooLong' }) primaryColor!: string;
+  @IsString({ message: 'invalid' }) @MaxLength(7, { message: 'tooLong' }) secondaryColor!: string;
+  @IsString({ message: 'invalid' }) @MaxLength(7, { message: 'tooLong' }) backgroundColor!: string;
+  @IsString({ message: 'invalid' }) @MaxLength(32, { message: 'tooLong' }) fontTheme!: string;
+  @IsString({ message: 'invalid' }) @MaxLength(32, { message: 'tooLong' }) cornerStyle!: string;
+  @IsString({ message: 'invalid' }) @MaxLength(32, { message: 'tooLong' }) cardStyle!: string;
+  @IsString({ message: 'invalid' }) @MaxLength(32, { message: 'tooLong' }) buttonShape!: string;
+  @IsString({ message: 'invalid' }) @MaxLength(32, { message: 'tooLong' }) categoryDivider!: string;
+  @IsString({ message: 'invalid' }) @MaxLength(32, { message: 'tooLong' }) categoryMarker!: string;
+  @IsString({ message: 'invalid' }) @MaxLength(32, { message: 'tooLong' }) headingAlign!: string;
+  @IsString({ message: 'invalid' }) @MaxLength(32, { message: 'tooLong' }) priceStyle!: string;
+  @IsString({ message: 'invalid' }) @MaxLength(32, { message: 'tooLong' }) backgroundStyle!: string;
+  @IsString({ message: 'invalid' })
+  @MaxLength(32, { message: 'tooLong' })
+  backgroundPattern!: string;
+  @IsString({ message: 'invalid' }) @MaxLength(32, { message: 'tooLong' }) themeDecor!: string;
+}
+
+export class CreateThemeDto extends ThemeDto {
+  @Matches(/^[a-z][a-zA-Z0-9]{1,30}$/, { message: 'invalid' })
+  key!: string;
+}

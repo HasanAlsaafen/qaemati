@@ -85,8 +85,21 @@ function tableOrderState(config) {
     _socket: null,
     _poll: null,
 
+    // The bill sheet: { occupied, billRequested, orders, total, currency } from the server.
+    billOpen: false,
+    bill: null,
+    billBusy: false,
+    billClosed: false,
+    _tableSocket: null,
+    _lastReserve: 0,
+
     init: function () {
+      if (config.live) this.watchTable();
       if (!config.track) return;
+      var forgetOnClose = this;
+      window.addEventListener('qaemati-table-closed', function () {
+        forgetOnClose.forget();
+      });
       var saved = null;
       try {
         saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
@@ -97,6 +110,119 @@ function tableOrderState(config) {
         this.tracking = { token: saved.token, number: saved.number, status: 'NEW', total: saved.total, currency: saved.currency };
         this.follow();
       }
+    },
+
+    // Taking the table: the server only agrees when this phone is inside the
+    // allowed area, and a phone that will not share its location simply does not
+    // reserve anything. Staff see the table go busy, live.
+    reserve: function () {
+      var self = this;
+      self._lastReserve = Date.now();
+      position()
+        .then(function (where) {
+          if (where.error) return null;
+          return postJson('/m/' + encodeURIComponent(config.slug) + '/tables/occupy', {
+            table: config.token,
+            lat: where.lat,
+            lng: where.lng,
+            accuracy: where.accuracy,
+          });
+        })
+        .catch(function () {
+          // Nothing to tell the guest: ordering and calling still check on their own.
+        });
+    },
+
+    // Hears when staff check the table out, so the guest's page lets go too.
+    watchTable: function () {
+      var self = this;
+      self.reserve();
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden && Date.now() - self._lastReserve > 5 * 60000) self.reserve();
+      });
+      if (!window.io) return;
+      var wasOccupied = false;
+      self._tableSocket = window.io('/track', { auth: { table: config.token }, transports: ['websocket', 'polling'] });
+      self._tableSocket.on('table', function (payload) {
+        if (payload.occupied) {
+          wasOccupied = true;
+          self.billClosed = false;
+          if (self.billOpen) self.loadBill();
+        } else if (wasOccupied) {
+          wasOccupied = false;
+          self.bill = null;
+          self.billClosed = true;
+          try {
+            localStorage.removeItem(storageKey);
+          } catch (e) {
+            // Nothing stored, nothing to remove.
+          }
+          window.dispatchEvent(new CustomEvent('qaemati-table-closed'));
+        }
+      });
+    },
+
+    openBill: function () {
+      this.billOpen = true;
+      this.loadBill();
+    },
+
+    closeBill: function () {
+      this.billOpen = false;
+    },
+
+    loadBill: function () {
+      var self = this;
+      return fetch('/m/' + encodeURIComponent(config.slug) + '/tables/' + encodeURIComponent(config.token) + '/bill', {
+        credentials: 'same-origin',
+        headers: { Accept: 'application/json' },
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (body) {
+          if (body && body.orders) self.bill = body;
+        })
+        .catch(function () {
+          // The next socket event or reopen tries again.
+        });
+    },
+
+    itemName: function (line) {
+      return config.lang === 'ar' ? line.nameAr : line.nameEn;
+    },
+
+    askBill: function () {
+      if (this.billBusy) return;
+      var self = this;
+      self.billBusy = true;
+      position()
+        .then(function (where) {
+          if (where.error) {
+            toastMessage(text.errors.location_required, 'danger');
+            return null;
+          }
+          return postJson('/m/' + encodeURIComponent(config.slug) + '/tables/bill-request', {
+            table: config.token,
+            lat: where.lat,
+            lng: where.lng,
+            accuracy: where.accuracy,
+          });
+        })
+        .then(function (result) {
+          if (!result) return;
+          if (result.ok) {
+            toastMessage(text.billRequestedToast, 'success');
+            return self.loadBill();
+          }
+          toastMessage(words(result), 'danger');
+        })
+        .catch(function () {
+          toastMessage(text.network, 'danger');
+        })
+        .then(function () {
+          self.billBusy = false;
+        });
     },
 
     statusText: function () {

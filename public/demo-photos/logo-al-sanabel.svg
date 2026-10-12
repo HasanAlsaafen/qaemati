@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Al-Sanabel">
+  <rect width="256" height="256" fill="#1E5F74"/>
+  <circle cx="128" cy="128" r="104" fill="none" stroke="#B8862B" stroke-width="6"/>
+  <path d="M128 214V96" stroke="#FBF6EE" stroke-width="8" stroke-linecap="round"/>
+  <g fill="#FBF6EE">
+    <ellipse cx="128" cy="62" rx="11" ry="24"/>
+    <ellipse cx="106" cy="84" rx="10" ry="22" transform="rotate(-28 106 84)"/>
+    <ellipse cx="150" cy="84" rx="10" ry="22" transform="rotate(28 150 84)"/>
+    <ellipse cx="102" cy="116" rx="10" ry="22" transform="rotate(-34 102 116)"/>
+    <ellipse cx="154" cy="116" rx="10" ry="22" transform="rotate(34 154 116)"/>
+    <ellipse cx="104" cy="148" rx="9" ry="20" transform="rotate(-38 104 148)"/>
+    <ellipse cx="152" cy="148" rx="9" ry="20" transform="rotate(38 152 148)"/>
+  </g>
+  <path d="M92 214c14-10 30-14 36-14s22 4 36 14" fill="none" stroke="#B8862B" stroke-width="7" stroke-linecap="round"/>
+</svg>

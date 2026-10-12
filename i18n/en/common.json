@@ -15,11 +15,12 @@
         "pricing": "Plans",
         "faq": "Questions",
         "signIn": "Owner sign in",
-        "menu": "Menu"
+        "menu": "Menu",
+        "tour": "Try it live"
       },
       "hero": {
         "title": "Your menu, one scan away.",
-        "text": "Qaemati puts your restaurant's menu on your guests' phones, in Arabic and English. They scan a QR code, browse, and send their order to your WhatsApp. You edit prices and dishes from your own phone.",
+        "text": "Qaemati puts your restaurant's menu on your guests' phones, in Arabic and English. They scan a QR code, browse, and send their order to your WhatsApp, or straight to your kitchen screen from the table. You edit prices and dishes from your own phone.",
         "note": "No app to install. No commission on orders. Nothing you create is ever deleted.",
         "primary": "Get in touch",
         "primaryTrial": "Start your free trial",
@@ -84,6 +85,18 @@
           {
             "title": "Works on a weak connection",
             "text": "Pages are small, the menu can be installed like an app, and it opens again without a connection."
+          },
+          {
+            "title": "Orders from the table",
+            "text": "Guests send their order from the table to a live screen for your kitchen and cashier, with a sound for every new order."
+          },
+          {
+            "title": "Tables, bills and checkout",
+            "text": "See which tables are taken, let guests view their bill and ask for it, and check the table out when they leave."
+          },
+          {
+            "title": "Smart suggestions",
+            "text": "Offer dishes that go well together: your own pairings first, then what other tables really order together."
           }
         ]
       },
@@ -153,7 +166,62 @@
       },
       "footer": {
         "tagline": "Digital menus for restaurants and cafes.",
-        "rights": "All rights reserved."
+        "rights": "All rights reserved.",
+        "photos": "Demo photos from Wikimedia Commons, see the credits"
+      },
+      "tour": {
+        "title": "Try the whole system",
+        "intro": "Everything here is the real product running on sample restaurants. Open a menu, order from a table, then see the order land on the staff screen.",
+        "tabs": {
+          "menu": "Guest menu",
+          "looks": "Your own look",
+          "table": "Order from a table",
+          "staff": "Staff screen"
+        },
+        "menu": {
+          "title": "A menu guests enjoy using",
+          "points": [
+            "Arabic and English with one tap, in both directions.",
+            "Search, category tabs, dish photos and tags like spicy and vegetarian.",
+            "Sizes and extras on a dish, with the price worked out for the guest.",
+            "Several menus with their own hours: breakfast ends and closes by itself.",
+            "Today's specials, popular dishes, and an app guests can install that works offline."
+          ]
+        },
+        "looks": {
+          "title": "Your restaurant, your look",
+          "text": "Two restaurants on the same system. Left: a cafe. Right: a family restaurant.",
+          "points": [
+            "Your colors, logo and cover photo, and fonts that suit Arabic and Latin text.",
+            "Grid, list or large cards, round or tall photos, sharp or soft corners, patterns and backgrounds.",
+            "A photo editor in the browser: crop, zoom and rotate before anything is uploaded.",
+            "Text stays readable whatever colors you pick."
+          ]
+        },
+        "table": {
+          "title": "Order from the table",
+          "points": [
+            "Guests scan the table's QR code. Opening it inside the restaurant reserves the table.",
+            "They choose dishes and send them to the kitchen. No app and no sign up.",
+            "\"You might also like\" suggestions from the owner's pairings and from what other tables order together.",
+            "They follow the order live, call the waiter, see their bill and ask for it.",
+            "A location check keeps orders to guests who are really there (it is switched off in this demo)."
+          ],
+          "note": "Try it: add a dish and send the order, then open the Staff screen tab to see it arrive."
+        },
+        "staff": {
+          "title": "Your team's live screen",
+          "points": [
+            "New orders appear with a sound the moment a guest sends them.",
+            "Cashier, kitchen and owner each see only what they need.",
+            "Every table at a glance: free, occupied, asking for the bill. One tap checks it out.",
+            "Guest calls ring until someone answers.",
+            "Reports, bulk price tools, QR printing, branding and your team are in the owner area."
+          ],
+          "caption": "A read-only picture of the live screen. Sign in to use the real one.",
+          "browser": "Orders screen",
+          "signIn": "Open the sign in"
+        }
       }
     }
   },
@@ -283,6 +351,16 @@
       "calling": "Calling the waiter",
       "called": "The waiter has been called",
       "alreadyCalled": "The waiter is already on the way",
+      "myBill": "My bill",
+      "billTitle": "Your bill",
+      "billEmpty": "Nothing ordered yet.",
+      "billTotal": "Total",
+      "askBill": "Ask for the bill",
+      "billAsked": "The waiter has been told and will bring your bill.",
+      "billRequestedToast": "The waiter is bringing your bill",
+      "billClosed": "Thank you for visiting. This table has been checked out.",
+      "billOrder": "Order {number}",
+      "billLoading": "Loading your bill",
       "locationNote": "Before sending, we check that you are at the restaurant.",
       "tableLine": "Table {label}",
       "network": "Could not reach the restaurant. Check your connection and try again.",
@@ -296,7 +374,8 @@
         "rate_limited": "Too many requests. Please wait a moment and try again.",
         "invalid_order": "Something in your order is no longer valid. Please review it and try again.",
         "item_unavailable": "{item} is not available right now. Remove it and send again.",
-        "unknown_order": "We could not find this order."
+        "unknown_order": "We could not find this order.",
+        "nothing_to_bill": "You have nothing on this table to bill yet."
       },
       "statusTitle": "Order {number}",
       "status": {
@@ -352,7 +431,8 @@
       "fixErrors": "Some fields need attention.",
       "resetInvalid": "This link has expired or was already used. Request a new one.",
       "resetDone": "Your password was changed. Sign in with the new one.",
-      "passwordHintMin": "At least {min} characters."
+      "passwordHintMin": "At least {min} characters.",
+      "rememberMe": "Remember me on this device"
     },
     "nav": {
       "dashboard": "Dashboard",
@@ -517,6 +597,8 @@
       "contrastFailLabel": "{ratio}:1 contrast with white text, too light, pick a darker color",
       "resetColor": "Reset to default",
       "logoLabel": "Logo",
+      "removeImage": "Remove image",
+      "imageRemovedToast": "Image removed",
       "coverImageLabel": "Cover image",
       "savedToast": "Branding saved",
       "invalidColorToast": "Enter a valid color.",
@@ -577,6 +659,14 @@
       "invalidPhone": "Enter a valid phone number, for example 02 222 0111.",
       "invalidFacebook": "Enter a Facebook page name or its full link.",
       "invalidMapUrl": "Enter a link that starts with https.",
+      "tabs": {
+        "hint": "Pick a group, changes show in the preview straight away.",
+        "colors": "Colors and background",
+        "text": "Text",
+        "header": "Logo and cover",
+        "layout": "Menu layout",
+        "dishes": "Dishes and cards"
+      },
       "look": {
         "layout": {
           "label": "Dish cards",
@@ -633,7 +723,12 @@
         },
         "extra": {
           "fontTheme": {
-            "clean": "Clean"
+            "clean": "Clean",
+            "thmanyah": "Thmanyah",
+            "cairo": "Cairo",
+            "almarai": "Almarai",
+            "naskh": "Naskh traditional",
+            "serif": "Serif (Amiri)"
           },
           "menuDensity": {
             "spacious": "Spacious"
@@ -650,11 +745,21 @@
           },
           "categoryDivider": {
             "dotted": "Dotted",
-            "thick": "Thick"
+            "thick": "Thick",
+            "double": "Double line",
+            "fade": "Fading line",
+            "ornament": "Ornament",
+            "zigzag": "Zigzag"
           },
           "backgroundPattern": {
             "checks": "Checks",
-            "lines": "Lines"
+            "lines": "Lines",
+            "waves": "Waves",
+            "zigzag": "Zigzag",
+            "diamonds": "Diamonds",
+            "rings": "Rings",
+            "polka": "Polka dots",
+            "stripes": "Stripes"
           },
           "menuLayout": {
             "grid3": "Three columns"
@@ -666,7 +771,24 @@
             "square": "Square",
             "rule": "Rule"
           }
+        },
+        "decor": {
+          "label": "Seasonal decoration",
+          "hint": "A band of drawings under the category bar, in your colors.",
+          "none": "None",
+          "ramadan": "Ramadan",
+          "eidFitr": "Eid Al-Fitr",
+          "eidAdha": "Eid Al-Adha",
+          "olive": "Olive branch",
+          "summer": "Summer",
+          "winter": "Winter",
+          "evening": "Evening"
         }
+      },
+      "themes": {
+        "title": "Ready-made themes",
+        "intro": "Pick a starting look for the season or an occasion. It fills the settings below and the preview. Change anything you like, then press Save.",
+        "applied": "Theme applied. Check the preview, then press Save."
       }
     },
     "tour": {
@@ -715,6 +837,14 @@
       "emptyColumn": "Nothing here.",
       "calls": "Waiter calls",
       "callTitle": "Table {label} is calling",
+      "billTitle": "Table {label} asked for the bill",
+      "tables": "Tables",
+      "tableFree": "Free",
+      "tableOccupied": "Occupied",
+      "tableBill": "Bill requested",
+      "tableOrders": "{count} orders",
+      "checkout": "Check out",
+      "checkoutConfirm": "Check out table {label}? It becomes free and its open calls are closed.",
       "callAck": "On my way",
       "callDone": "Done",
       "callAcknowledged": "Someone is on the way",
@@ -957,7 +1087,8 @@
       "payments": "Payments",
       "audit": "Activity log",
       "security": "Security",
-      "reports": "Reports"
+      "reports": "Reports",
+      "themes": "Themes"
     },
     "login": {
       "title": "Platform sign in"
@@ -1070,7 +1201,11 @@
       "paidUntilRequired": "Enter the date it is paid until.",
       "lastAdmin": "A restaurant must keep at least one owner account.",
       "amountZero": "The amount must be above zero.",
-      "noSubscription": "This restaurant has no subscription."
+      "noSubscription": "This restaurant has no subscription.",
+      "themeKeyTaken": "That key is already used by another theme.",
+      "invalidColor": "Enter a color like #1565C0.",
+      "colorContrast": "That color is too light or too dark to keep the text readable.",
+      "invalidOption": "Pick one of the listed choices."
     },
     "flash": {
       "tenantCreated": "Restaurant created.",
@@ -1088,7 +1223,11 @@
       "planRestored": "Plan restored.",
       "paymentRecorded": "Payment recorded and the subscription extended.",
       "paymentVoided": "Payment voided.",
-      "twoFactorOff": "Two step verification is off."
+      "twoFactorOff": "Two step verification is off.",
+      "themeCreated": "Theme created.",
+      "themeSaved": "Theme saved.",
+      "themeArchived": "Theme archived. Owners no longer see it.",
+      "themeRestored": "Theme restored."
     },
     "mailedTo": "A sign in link was also emailed to {email}.",
     "security": {
@@ -1170,6 +1309,35 @@
       "state_trial": "Trial",
       "state_grace": "Past due, in grace",
       "noRenewals": "Nothing is due in the next 30 days."
+    },
+    "themes": {
+      "add": "Add a theme",
+      "intro": "Ready-made looks restaurant owners can start from. Changes show on their branding page straight away. A theme only fills their form; they can change it and nothing is saved until they press Save.",
+      "archived": "Archived",
+      "archive": "Archive",
+      "restore": "Restore",
+      "key": "Key",
+      "keyHint": "Letters and numbers, starting with a letter. It cannot be changed later.",
+      "sortOrder": "Order",
+      "colors": "Colors",
+      "colorsHint": "The same readability rules as a restaurant's own colors apply.",
+      "look": "Look",
+      "fields": {
+        "primaryColor": "Primary color",
+        "secondaryColor": "Secondary color",
+        "backgroundColor": "Page background",
+        "fontTheme": "Typeface",
+        "cornerStyle": "Corners",
+        "cardStyle": "Cards",
+        "buttonShape": "Buttons",
+        "categoryDivider": "Separator",
+        "categoryMarker": "Category mark",
+        "headingAlign": "Headings",
+        "priceStyle": "Prices",
+        "backgroundStyle": "Background",
+        "backgroundPattern": "Pattern",
+        "themeDecor": "Decoration band"
+      }
     }
   },
   "signup": {

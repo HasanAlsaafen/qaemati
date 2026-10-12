@@ -53,6 +53,48 @@ export class GuestPosController {
     );
   }
 
+  @Post('tables/occupy')
+  @HttpCode(200)
+  async occupy(
+    @Param('slug') slug: string,
+    @Body() body: CallWaiterDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.respond(
+      req,
+      res,
+      () => this.guest.occupy(slug, { ...body }, req.ip ?? 'unknown'),
+      200,
+    );
+  }
+
+  @Get('tables/:token/bill')
+  async bill(
+    @Param('slug') slug: string,
+    @Param('token') token: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.respond(req, res, () => this.guest.bill(slug, token, req.ip ?? 'unknown'), 200);
+  }
+
+  @Post('tables/bill-request')
+  @HttpCode(200)
+  async requestBill(
+    @Param('slug') slug: string,
+    @Body() body: CallWaiterDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.respond(
+      req,
+      res,
+      () => this.guest.requestBill(slug, { ...body }, req.ip ?? 'unknown'),
+      200,
+    );
+  }
+
   private async respond<T extends object>(
     req: Request,
     res: Response,

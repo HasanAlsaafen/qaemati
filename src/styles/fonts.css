@@ -123,3 +123,203 @@
   src: url('/fonts/inter/inter-variable-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+20AC, U+2122;
 }
+
+/* Extra typefaces for the menu look (migration-free: fontTheme is plain text). 400 and 700 only. */
+
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/cairo/cairo-400-arabic.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/cairo/cairo-400-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC,
+    U+2122;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/cairo/cairo-700-arabic.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/cairo/cairo-700-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC,
+    U+2122;
+}
+
+@font-face {
+  font-family: 'Almarai';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/almarai/almarai-400-arabic.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+
+@font-face {
+  font-family: 'Almarai';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/almarai/almarai-400-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC,
+    U+2122;
+}
+
+@font-face {
+  font-family: 'Almarai';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/almarai/almarai-700-arabic.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+
+@font-face {
+  font-family: 'Almarai';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/almarai/almarai-700-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC,
+    U+2122;
+}
+
+@font-face {
+  font-family: 'Amiri';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/amiri/amiri-400-arabic.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+
+@font-face {
+  font-family: 'Amiri';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/amiri/amiri-400-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC,
+    U+2122;
+}
+
+@font-face {
+  font-family: 'Amiri';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/amiri/amiri-700-arabic.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+
+@font-face {
+  font-family: 'Amiri';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/amiri/amiri-700-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC,
+    U+2122;
+}
+
+@font-face {
+  font-family: 'Noto Naskh Arabic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/noto-naskh-arabic/noto-naskh-arabic-400-arabic.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+
+@font-face {
+  font-family: 'Noto Naskh Arabic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/noto-naskh-arabic/noto-naskh-arabic-400-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC,
+    U+2122;
+}
+
+@font-face {
+  font-family: 'Noto Naskh Arabic';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/noto-naskh-arabic/noto-naskh-arabic-700-arabic.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+
+@font-face {
+  font-family: 'Noto Naskh Arabic';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/noto-naskh-arabic/noto-naskh-arabic-700-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC,
+    U+2122;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/playfair-display/playfair-display-400-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC,
+    U+2122;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/playfair-display/playfair-display-700-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC,
+    U+2122;
+}

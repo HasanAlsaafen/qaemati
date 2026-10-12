@@ -13,6 +13,7 @@
     { href: '/super', label: t('common.super.nav.dashboard'), match: 'dashboard' },
     { href: '/super/restaurants', label: t('common.super.nav.restaurants'), match: 'restaurants' },
     { href: '/super/plans', label: t('common.super.nav.plans'), match: 'plans' },
+    { href: '/super/themes', label: t('common.super.nav.themes'), match: 'themes' },
     { href: '/super/payments', label: t('common.super.nav.payments'), match: 'payments' },
     { href: '/super/reports', label: t('common.super.nav.reports'), match: 'reports' },
     { href: '/super/audit', label: t('common.super.nav.audit'), match: 'audit' },
@@ -67,5 +68,6 @@
     </div>
   </div>
   {{ toastHost() }}
+  <script defer src="{{ asset('/js/password-toggle.js') }}"></script>
 </body>
 </html>

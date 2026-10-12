@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { thmanyahEnabled } from '../common/thmanyah';
 import { ItemTag } from '@prisma/client';
 import { I18nService } from 'nestjs-i18n';
 import { Locale } from '../common/middleware/locale-view.middleware';
@@ -178,6 +179,8 @@ export interface MenuView {
   coverHeight: string;
   priceStyle: string;
   headingAlign: string;
+  /** A seasonal motif band, see Restaurant.themeDecor. */
+  themeDecor: string;
   menuLayout: string;
   itemImages: string;
   itemImageShape: string;
@@ -226,6 +229,7 @@ export interface MenuPreviewOverrides {
   coverHeight?: string;
   priceStyle?: string;
   headingAlign?: string;
+  themeDecor?: string;
   menuLayout?: string;
   itemImages?: string;
   itemImageShape?: string;
@@ -290,8 +294,11 @@ export class MenuService {
       isPreviewOwner && preview!.secondaryColor
         ? preview!.secondaryColor
         : restaurant.secondaryColor;
-    const effectiveFontTheme =
+    const chosenFontTheme =
       isPreviewOwner && preview!.fontTheme ? preview!.fontTheme : restaurant.fontTheme;
+    // Thmanyah may only be served where the license is confirmed (thmanyah.ts).
+    const effectiveFontTheme =
+      chosenFontTheme === 'thmanyah' && !thmanyahEnabled() ? 'classic' : chosenFontTheme;
     const effectiveMenuDensity =
       isPreviewOwner && preview!.menuDensity ? preview!.menuDensity : restaurant.menuDensity;
     const effectiveCornerStyle =
@@ -328,6 +335,8 @@ export class MenuService {
       isPreviewOwner && preview!.priceStyle ? preview!.priceStyle : restaurant.priceStyle;
     const effectiveHeadingAlign =
       isPreviewOwner && preview!.headingAlign ? preview!.headingAlign : restaurant.headingAlign;
+    const effectiveThemeDecor =
+      isPreviewOwner && preview!.themeDecor ? preview!.themeDecor : restaurant.themeDecor;
     const effectiveBackgroundStyle =
       isPreviewOwner && preview!.backgroundStyle
         ? preview!.backgroundStyle
@@ -520,6 +529,7 @@ export class MenuService {
       coverHeight: effectiveCoverHeight,
       priceStyle: effectivePriceStyle,
       headingAlign: effectiveHeadingAlign,
+      themeDecor: effectiveThemeDecor,
       menuLayout: effectiveMenuLayout,
       itemImages: effectiveItemImages,
       itemImageShape: effectiveItemImageShape,

@@ -2,6 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { OrderStatus, WaiterCallStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { PosEventBus } from './pos-event-bus';
+import { TablesService } from './tables.service';
 import { canHandleCalls, Role } from './roles';
 
 /** The only ways an order moves. A finished or canceled order stays that way. */
@@ -34,11 +35,12 @@ export class PosService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly bus: PosEventBus,
+    private readonly tables: TablesService,
   ) {}
 
   async board(restaurantId: string, role: Role = 'OWNER') {
     const since = new Date(Date.now() - RECENT_MS);
-    const [orders, calls] = await Promise.all([
+    const [orders, calls, tables] = await Promise.all([
       this.prisma.order.findMany({
         where: {
           restaurantId,
@@ -62,10 +64,12 @@ export class PosService {
             take: 100,
           })
         : Promise.resolve([]),
+      canHandleCalls(role) ? this.tables.board(restaurantId) : Promise.resolve([]),
     ]);
     return {
       orders,
       calls,
+      tables,
       counts: {
         newOrders: orders.filter((o) => o.status === 'NEW').length,
         openCalls: calls.filter((c) => c.status === 'OPEN').length,

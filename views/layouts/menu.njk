@@ -47,11 +47,14 @@
       <meta name="theme-color" content="{{ menu.primaryColorCss.primary }}">
     {% endif %}
   {% endif %}
+  {% if menu.fontTheme == 'thmanyah' %}
+    <link rel="stylesheet" href="{{ asset('/css/thmanyah.css') }}">
+  {% endif %}
   {# A4: a restaurant's own brand color overrides the Zaytoun default
      tokens (src/styles/tokens.css) for this page only -- scoped here
      via inline :root, not by editing the shared stylesheet, so every
      other restaurant's menu keeps the default palette. #}
-  {% if menu.primaryColorCss or menu.secondaryColorCss or menu.fontTheme == 'modern' or menu.fontTheme == 'clean' or menu.cornerStyleCss or menu.backgroundColorCss or menu.buttonShapeCss %}
+  {% if menu.primaryColorCss or menu.secondaryColorCss or (menu.fontTheme and menu.fontTheme != 'classic') or menu.cornerStyleCss or menu.backgroundColorCss or menu.buttonShapeCss %}
     <style>
       :root {
         {% if menu.primaryColorCss %}
@@ -69,6 +72,21 @@
         {% if menu.fontTheme == 'clean' %}
         --font-sans: 'Inter', 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
         --font-display: 'Inter', 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+        {% elif menu.fontTheme == 'cairo' %}
+        --font-sans: 'Cairo', 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+        --font-display: 'Cairo', 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+        {% elif menu.fontTheme == 'almarai' %}
+        --font-sans: 'Almarai', 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+        --font-display: 'Almarai', 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+        {% elif menu.fontTheme == 'naskh' %}
+        --font-sans: 'Noto Naskh Arabic', 'Amiri', 'Times New Roman', serif;
+        --font-display: 'Noto Naskh Arabic', 'Amiri', 'Times New Roman', serif;
+        {% elif menu.fontTheme == 'serif' %}
+        --font-sans: 'Playfair Display', 'Amiri', 'Times New Roman', serif;
+        --font-display: 'Playfair Display', 'Amiri', 'Times New Roman', serif;
+        {% elif menu.fontTheme == 'thmanyah' %}
+        --font-sans: 'Thmanyah Sans', 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+        --font-display: 'Thmanyah Serif Display', 'Thmanyah Sans', 'Tajawal', Tahoma, serif;
         {% elif menu.fontTheme == 'modern' %}
         {# The "modern" theme swaps Tajawal for IBM Plex Sans Arabic, which is
            already self-hosted, so nothing new is loaded. #}
@@ -106,6 +124,7 @@
   data-cover-height="{{ menu.coverHeight }}"
   data-price-style="{{ menu.priceStyle }}"
   data-heading-align="{{ menu.headingAlign }}"
+  data-theme-decor="{{ menu.themeDecor }}"
   data-background-style="{{ menu.backgroundStyle }}"
   data-background-pattern="{{ menu.backgroundPattern }}"
   data-section-spacing="{{ menu.sectionSpacing }}"

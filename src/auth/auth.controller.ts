@@ -7,6 +7,8 @@ import { LoginRateLimiter } from './login-rate-limiter';
 import { LoginDto } from './dto/login.dto';
 import { canOpen, homeFor } from '../pos/roles';
 
+const REMEMBER_MS = 30 * 24 * 60 * 60 * 1000;
+
 @Controller('admin')
 export class AuthController {
   constructor(
@@ -82,6 +84,11 @@ export class AuthController {
     await new Promise<void>((resolve, reject) => {
       req.session.regenerate((err) => (err ? reject(err) : resolve()));
     });
+
+    // Ticked: the browser keeps the sign in for 30 days. Not ticked: it ends
+    // when the browser is closed, which is what a shared computer needs.
+    if (body.remember === 'on') req.session.cookie.maxAge = REMEMBER_MS;
+    else req.session.cookie.maxAge = undefined;
 
     req.session.adminUserId = admin.id;
     req.session.restaurantId = admin.restaurantId;

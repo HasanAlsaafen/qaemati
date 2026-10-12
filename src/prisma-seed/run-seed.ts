@@ -3,6 +3,17 @@ import * as bcrypt from 'bcrypt';
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { generateLogoPlaceholderSvg, generatePlaceholderSvg } from './placeholder-image';
+import {
+  DemoDish,
+  demoAddons,
+  demoBranding,
+  demoCategoryPhoto,
+  demoCover,
+  demoLogo,
+  demoPhoto,
+  demoVariants,
+  seedDemoActivity,
+} from './demo-extras';
 import { seedRestaurants } from './seed-data';
 
 /**
@@ -126,7 +137,7 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
         nameEn: restaurantData.nameEn,
         descriptionAr: restaurantData.descriptionAr,
         descriptionEn: restaurantData.descriptionEn,
-        logoPath: `/uploads/seed/restaurants/${logoFilename}`,
+        logoPath: demoLogo(restaurantData.slug) ?? `/uploads/seed/restaurants/${logoFilename}`,
         whatsapp: restaurantData.whatsapp,
         instagramHandle: restaurantData.instagramHandle,
         workingHoursAr: restaurantData.workingHoursAr,
@@ -136,6 +147,8 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
         closeTime: restaurantData.closeTime,
         currency: restaurantData.currency,
         primaryColor: restaurantData.primaryColor,
+        coverImagePath: demoPhoto(demoCover[restaurantData.slug] ?? ''),
+        ...demoBranding[restaurantData.slug],
         // A demo visitor is not standing in the restaurant, so the location
         // check is off. Turn it on from the POS page to see it work.
         latitude: 31.5326,
@@ -232,6 +245,7 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
     }
     const firstMenuId = menuIdByKey.get(menuDefinitions[0].key)!;
 
+    const dishes = new Map<string, DemoDish>();
     let categorySortOrder = 0;
     for (const categoryData of restaurantData.categories) {
       const categoryImageFilename = `${restaurantData.slug}-${slugify(categoryData.nameEn)}.svg`;
@@ -242,7 +256,9 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
       );
       const category = await prisma.category.create({
         data: {
-          imagePath: `/uploads/seed/categories/${categoryImageFilename}`,
+          imagePath:
+            demoCategoryPhoto(categoryData.nameEn) ??
+            `/uploads/seed/categories/${categoryImageFilename}`,
           restaurantId: restaurant.id,
           nameAr: categoryData.nameAr,
           nameEn: categoryData.nameEn,
@@ -259,7 +275,7 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
         const imageFilename = `${imageSeed}.svg`;
         writeItemImage(ITEMS_IMAGE_DIR, imageFilename, imageSeed);
 
-        await prisma.item.create({
+        const created = await prisma.item.create({
           data: {
             restaurantId: restaurant.id,
             categoryId: category.id,
@@ -269,15 +285,48 @@ export async function runSeed(prisma: PrismaClient): Promise<string[]> {
             descriptionEn: itemData.descriptionEn,
             price: itemData.price,
             currency: restaurantData.currency,
-            imagePath: `/uploads/seed/items/${imageFilename}`,
+            imagePath: demoPhoto(itemData.nameEn) ?? `/uploads/seed/items/${imageFilename}`,
+            variants: {
+              create: (demoVariants[itemData.nameEn] ?? []).map((v, i) => ({
+                restaurantId: restaurant.id,
+                ...v,
+                sortOrder: i,
+              })),
+            },
+            addons: {
+              create: (demoAddons[itemData.nameEn] ?? []).map((a, i) => ({
+                restaurantId: restaurant.id,
+                ...a,
+                sortOrder: i,
+              })),
+            },
             tags: itemData.tags ?? [],
             available: itemData.available ?? true,
             isTodaysSpecial: itemData.isTodaysSpecial ?? false,
             sortOrder: itemSortOrder++,
           },
         });
+        dishes.set(itemData.nameEn, {
+          id: created.id,
+          nameAr: itemData.nameAr,
+          nameEn: itemData.nameEn,
+          price: itemData.price,
+        });
       }
     }
+
+    const tables = await prisma.restaurantTable.findMany({
+      where: { restaurantId: restaurant.id },
+      orderBy: { sortOrder: 'asc' },
+      select: { id: true, label: true },
+    });
+    const orderCount = await seedDemoActivity(
+      prisma,
+      { id: restaurant.id, slug: restaurant.slug, currency: restaurantData.currency },
+      tables,
+      dishes,
+    );
+    summary.push(`Demo activity for ${restaurant.nameEn}: ${orderCount} orders`);
 
     const itemCount = restaurantData.categories.reduce((sum, c) => sum + c.items.length, 0);
     summary.push(

@@ -385,6 +385,111 @@ describe('Branding settings (e2e)', () => {
       expect(menu.text).toContain("'Inter'");
     });
 
+    it.each([
+      ['cairo', "'Cairo'"],
+      ['almarai', "'Almarai'"],
+      ['naskh', "'Noto Naskh Arabic'"],
+      ['serif', "'Playfair Display'"],
+    ])('applies the %s typeface to the public menu', async (fontTheme, family) => {
+      const res = await save({ fontTheme });
+      expect(res.status).toBe(200);
+      const menu = await request(app.getHttpServer()).get('/m/test-restaurant-branding?lang=en');
+      expect(menu.text).toContain(`--font-sans: ${family}`);
+      await save({ fontTheme: 'classic' });
+    });
+
+    it('applies Thmanyah when the web license is confirmed and falls back to Classic when not', async () => {
+      const res = await save({ fontTheme: 'thmanyah' });
+      expect(res.status).toBe(200);
+      const on = await request(app.getHttpServer()).get('/m/test-restaurant-branding?lang=en');
+      expect(on.text).toContain("--font-sans: 'Thmanyah Sans'");
+      expect(on.text).toContain('/css/thmanyah.css');
+      const prev = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+      try {
+        const off = await request(app.getHttpServer()).get('/m/test-restaurant-branding?lang=en');
+        expect(off.text).not.toContain('Thmanyah');
+        await save({ fontTheme: 'classic' });
+        await save({ fontTheme: 'thmanyah' });
+        const saved = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+        expect(saved?.fontTheme).toBe('classic');
+      } finally {
+        process.env.NODE_ENV = prev;
+      }
+      await save({ fontTheme: 'classic' });
+    });
+
+    it('guards the settings form against leaving with unsaved changes', async () => {
+      const page = await agent.get('/admin/branding').set('Cookie', 'qaemati_locale=en');
+      expect(page.text).toContain('data-dirty-guard="branding"');
+      expect(page.text).toContain('/js/dirty-guard.js');
+    });
+
+    it('groups the look choices into tabs on the branding page', async () => {
+      const page = await agent.get('/admin/branding').set('Cookie', 'qaemati_locale=en');
+      for (const tab of ['colors', 'text', 'header', 'layout', 'dishes']) {
+        expect(page.text).toContain(`id="look-panel-${tab}"`);
+      }
+    });
+
+    it.each(['waves', 'zigzag', 'diamonds', 'rings', 'polka', 'stripes'])(
+      'saves and applies the %s background pattern',
+      async (pattern) => {
+        const res = await save({ backgroundStyle: 'pattern', backgroundPattern: pattern });
+        expect(res.status).toBe(200);
+        const menu = await request(app.getHttpServer()).get('/m/test-restaurant-branding?lang=en');
+        expect(menu.text).toContain(`data-background-pattern="${pattern}"`);
+        await save({ backgroundStyle: 'solid', backgroundPattern: 'dots' });
+      },
+    );
+
+    it.each(['double', 'fade', 'ornament', 'zigzag'])(
+      'saves and applies the %s category separator',
+      async (divider) => {
+        const res = await save({ categoryDivider: divider });
+        expect(res.status).toBe(200);
+        const menu = await request(app.getHttpServer()).get('/m/test-restaurant-branding?lang=en');
+        expect(menu.text).toContain(`data-category-divider="${divider}"`);
+        await save({ categoryDivider: 'none' });
+      },
+    );
+
+    it.each(['ramadan', 'eidFitr', 'eidAdha', 'olive', 'summer', 'winter', 'evening'])(
+      'draws the %s decoration band on the public menu',
+      async (decor) => {
+        const res = await save({ themeDecor: decor });
+        expect(res.status).toBe(200);
+        const menu = await request(app.getHttpServer()).get('/m/test-restaurant-branding?lang=en');
+        expect(menu.text).toContain(`data-theme-decor="${decor}"`);
+        expect(menu.text).toContain(`id="decor-${decor}"`);
+        await save({ themeDecor: 'none' });
+        const plain = await request(app.getHttpServer()).get('/m/test-restaurant-branding?lang=en');
+        expect(plain.text).not.toContain('class="theme-decor"');
+      },
+    );
+
+    it('rejects an unknown decoration', async () => {
+      await save({ themeDecor: 'sparkles' });
+      const saved = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+      expect(saved?.themeDecor).not.toBe('sparkles');
+    });
+
+    it('offers every ready-made theme on the branding page', async () => {
+      const page = await agent.get('/admin/branding').set('Cookie', 'qaemati_locale=en');
+      for (const key of [
+        'classic',
+        'ramadan',
+        'eidFitr',
+        'eidAdha',
+        'olive',
+        'summer',
+        'winter',
+        'evening',
+      ]) {
+        expect(page.text).toContain(`applyTheme('${key}')`);
+      }
+    });
+
     it('lets a chosen background color and pattern show through the page bands', async () => {
       await save({ backgroundColor: '#F0E6D6', backgroundStyle: 'solid' });
       const color = await request(app.getHttpServer()).get('/m/test-restaurant-branding?lang=en');
@@ -484,6 +589,38 @@ describe('Branding settings (e2e)', () => {
     const menuRes = await request(app.getHttpServer()).get(`/m/test-restaurant-branding?lang=en`);
     expect(menuRes.status).toBe(200);
     expect(menuRes.text).toContain(`background-image: url('${restaurant?.backgroundImagePath}')`);
+  });
+
+  it('removes the logo, cover and background photos', async () => {
+    await prisma.restaurant.update({
+      where: { id: restaurantId },
+      data: {
+        logoPath: '/uploads/restaurants/a.png',
+        coverImagePath: '/uploads/restaurants/b.png',
+        backgroundImagePath: '/uploads/restaurants/c.png',
+        backgroundStyle: 'image',
+      },
+    });
+    const token = await csrfToken('/admin/branding?lang=en');
+    for (const kind of ['logo', 'cover', 'background']) {
+      const res = await agent
+        .delete(`/admin/branding/${kind}/image`)
+        .set('X-CSRF-Token', token)
+        .set('Cookie', 'qaemati_locale=en');
+      expect(res.status).toBe(200);
+    }
+    const saved = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+    expect(saved).toMatchObject({
+      logoPath: null,
+      coverImagePath: null,
+      backgroundImagePath: null,
+      backgroundStyle: 'solid',
+    });
+    const bad = await agent
+      .delete('/admin/branding/nope/image')
+      .set('X-CSRF-Token', token)
+      .set('Cookie', 'qaemati_locale=en');
+    expect(bad.status).toBe(400);
   });
 
   it('rejects a non-image file upload for the logo', async () => {

@@ -128,6 +128,10 @@ model Restaurant {
   priceStyle   String @default("plain")
   headingAlign String @default("start")
 
+  /// A seasonal motif drawn as a band on the menu: none, or a theme key such as
+  /// ramadan or eidAdha. Decoration only, never carries text.
+  themeDecor String @default("none")
+
   /// Admin customization: 'solid' (the original flat --color-bg,
   /// possibly itself overridden by backgroundColor) | 'pattern' (a
   /// subtle repeating CSS pattern tinted with --color-primary, see
@@ -475,6 +479,14 @@ model RestaurantTable {
 
   sortOrder Int @default(0)
 
+  /// When the current visit began. Null means the table is free. Orders placed
+  /// at or after this moment are the visit's bill; checkout clears it.
+  occupiedAt      DateTime?
+  /// The last time the guest's phone, an order or a call touched the table.
+  /// A visit with no orders and no touch for 30 minutes counts as free.
+  lastSeenAt      DateTime?
+  billRequestedAt DateTime?
+
   orders      Order[]
   waiterCalls WaiterCall[]
 
@@ -700,6 +712,11 @@ enum OrderStatus {
   CANCELED
 }
 
+enum WaiterCallKind {
+  CALL
+  BILL
+}
+
 enum WaiterCallStatus {
   OPEN
   ACKNOWLEDGED
@@ -774,6 +791,7 @@ model WaiterCall {
   tableLabel String
 
   status WaiterCallStatus @default(OPEN)
+  kind   WaiterCallKind   @default(CALL)
 
   distanceMeters Int?
 
@@ -869,4 +887,41 @@ model SuggestionAdd {
   createdAt DateTime @default(now())
 
   @@index([restaurantId, createdAt])
+}
+
+/// A ready-made look the restaurant owner can start from (a season, an
+/// occasion). Platform-wide, edited by the platform owner. Choosing one only
+/// fills the owner's branding form; it is not stored on the restaurant.
+model BrandTheme {
+  id String @id @default(cuid())
+
+  /// Short and stable: the branding page refers to a theme by it.
+  key String @unique
+
+  nameAr        String
+  nameEn        String
+  descriptionAr String?
+  descriptionEn String?
+
+  primaryColor      String
+  secondaryColor    String
+  backgroundColor   String
+  fontTheme         String
+  cornerStyle       String
+  cardStyle         String
+  buttonShape       String
+  categoryDivider   String
+  categoryMarker    String
+  headingAlign      String
+  priceStyle        String
+  backgroundStyle   String
+  backgroundPattern String
+  themeDecor        String
+
+  /// Archived themes are hidden from owners but kept.
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

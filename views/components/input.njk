@@ -13,6 +13,7 @@
   {% set inputId = 'field-' + name %}
   <div class="flex flex-col gap-1.5">
     <label for="{{ inputId }}" class="text-sm font-medium text-text">{{ label }}</label>
+    {% if type == 'password' %}<div class="relative">{% endif %}
     <input
       id="{{ inputId }}"
       name="{{ name }}"
@@ -20,10 +21,22 @@
       value="{{ value }}"
       placeholder="{{ placeholder }}"
       {% if dir %}dir="{{ dir }}"{% elif type in LTR_TYPES %}dir="ltr"{% endif %}
-      class="min-h-11 rounded-md border bg-surface px-3 text-base text-text placeholder:text-muted-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'border-danger' if error else 'border-border-strong' }}"
+      class="{{ 'w-full pe-12 ' if type == 'password' }}min-h-11 rounded-md border bg-surface px-3 text-base text-text placeholder:text-muted-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary {{ 'border-danger' if error else 'border-border-strong' }}"
       {% if error %}aria-invalid="true" aria-describedby="{{ inputId }}-error"{% elif hint %}aria-describedby="{{ inputId }}-hint"{% endif %}
       {{ attrs | safe }}
     >
+    {% if type == 'password' %}
+      <button
+        type="button"
+        data-password-toggle="{{ inputId }}"
+        aria-pressed="false"
+        class="absolute end-1 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-md text-muted-text hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      >
+        <svg data-eye-open width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg data-eye-off class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.1 10.1 0 0 1 12 19c-6.5 0-10-7-10-7a17.7 17.7 0 0 1 4.1-4.9M9.9 5.2A9.7 9.7 0 0 1 12 5c6.5 0 10 7 10 7a17.8 17.8 0 0 1-2.2 3.2M1 1l22 22"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+      </button>
+    </div>
+    {% endif %}
     {% if error %}
       <p id="{{ inputId }}-error" class="text-sm text-danger">{{ error }}</p>
     {% elif hint %}

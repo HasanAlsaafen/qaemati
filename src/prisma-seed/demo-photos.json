@@ -1,0 +1,428 @@
+{
+  "Arabic Coffee": "arabic-coffee.jpg",
+  "Baklava": "baklava.jpg",
+  "Baklava Assortment": "baklava-assortment.jpg",
+  "Basbousa": "basbousa.jpg",
+  "Berry Smoothie": "berry-smoothie.jpg",
+  "Cappuccino": "cappuccino.jpg",
+  "Cheese Sambousek": "cheese-sambousek.jpg",
+  "Chicken Shawarma Sandwich": "chicken-shawarma-sandwich.jpg",
+  "Chicken Shish Tawook": "chicken-shish-tawook.jpg",
+  "Chocolate Lava Cake": "chocolate-lava-cake.jpg",
+  "Falafel Sandwich": "falafel-sandwich.jpg",
+  "Fattoush": "fattoush.jpg",
+  "Foul Medammes": "foul-medammes.jpg",
+  "Freekeh with Chicken": "freekeh-with-chicken.jpg",
+  "Fresh Orange Juice": "fresh-orange-juice.jpg",
+  "Fried Kibbeh": "fried-kibbeh.jpg",
+  "Grilled Fish Fillet": "grilled-fish-fillet.jpg",
+  "Grilled Vegetable Sandwich": "grilled-vegetable-sandwich.jpg",
+  "Halloumi Sandwich": "halloumi-sandwich.jpg",
+  "Hot Chocolate": "hot-chocolate.jpg",
+  "Hummus": "hummus.jpg",
+  "Hummus with Pita": "hummus-with-pita.jpg",
+  "Iced Latte": "iced-latte.jpg",
+  "Iced Matcha": "iced-matcha.jpg",
+  "Knafeh Nabulsieh": "knafeh-nabulsieh.jpg",
+  "Labneh & Zaatar Plate": "labneh-zaatar-plate.jpg",
+  "Lamb Chops": "lamb-chops.jpg",
+  "Lamb Kofta": "lamb-kofta.jpg",
+  "Lentil Soup": "lentil-soup.jpg",
+  "Maamoul": "maamoul.jpg",
+  "Manakeesh Cheese": "manakeesh-cheese.jpg",
+  "Manakeesh Halloumi & Zaatar": "manakeesh-halloumi-zaatar.jpg",
+  "Manakeesh Zaatar": "manakeesh-zaatar.jpg",
+  "Mansaf": "mansaf.jpg",
+  "Maqluba": "maqluba.jpg",
+  "Mint Lemonade": "mint-lemonade.jpg",
+  "Mixed Grill": "mixed-grill.jpg",
+  "Molokhia": "molokhia.jpg",
+  "Moutabal": "moutabal.jpg",
+  "Okra Stew": "okra-stew.jpg",
+  "Olive & Cheese Plate": "olive-cheese-plate.jpg",
+  "Pancakes with Honey": "pancakes-with-honey.jpg",
+  "Rice Pudding": "rice-pudding.jpg",
+  "Shakshuka": "shakshuka.jpg",
+  "Spanish Latte": "spanish-latte.jpg",
+  "Spinach Fatayer": "spinach-fatayer.jpg",
+  "Stuffed Zucchini": "stuffed-zucchini.jpg",
+  "Tabbouleh": "tabbouleh.jpg",
+  "Turkish Coffee": "turkish-coffee.jpg",
+  "Um Ali": "um-ali.jpg",
+  "Warak Enab": "warak-enab.jpg",
+  "_credits": {
+    "arabic-coffee.jpg": {
+      "author": "Slywire",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Arabic_coffee_with_dates.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Arabic_coffee_with_dates.jpg/960px-Arabic_coffee_with_dates.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Arabic coffee with dates.jpg"
+    },
+    "baklava-assortment.jpg": {
+      "author": "Kultigin",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Baklava_-_Turkish_special,_80-ply.JPEG",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8f/Baklava_-_Turkish_special%2C_80-ply.JPEG/960px-Baklava_-_Turkish_special%2C_80-ply.JPEG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Baklava - Turkish special, 80-ply.JPEG"
+    },
+    "baklava.jpg": {
+      "author": "Challiyan",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Baklava_1.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/51/Baklava_1.jpg/960px-Baklava_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Baklava 1.jpg"
+    },
+    "basbousa.jpg": {
+      "author": "Bedtimepiano",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vegan_Basbousa_by_Uncle_Lou%27s_Kitchen.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Vegan_Basbousa_by_Uncle_Lou%27s_Kitchen.jpg/960px-Vegan_Basbousa_by_Uncle_Lou%27s_Kitchen.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Vegan Basbousa by Uncle Lou's Kitchen.jpg"
+    },
+    "berry-smoothie.jpg": {
+      "author": "Personal Creations",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kid_friendly_green_smoothie_in_a_personalized_glass_with_spinach,_Greek_yogurt,_frozen_blueberries,_blackberries_and_strawberries_and_berries,_banana_in_a_glass_bowl_on_a_wood_table_(16225943125).jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Kid_friendly_green_smoothie_in_a_personalized_glass_with_spinach%2C_Greek_yogurt%2C_frozen_blueberries%2C_blackberries_and_strawberries_and_berries%2C_banana_in_a_glass_bowl_on_a_wood_table_%2816225943125%29.jpg/960px-thumbnail.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Kid friendly green smoothie in a personalized glass with spinach, Greek yogurt, frozen blueberries, blackberries and strawberries and berries, banana in a glass bowl on a wood table (16225943125).jpg"
+    },
+    "cappuccino.jpg": {
+      "author": "စောအဲဆို",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cappuccino_myanmar.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Cappuccino_myanmar.jpg/960px-Cappuccino_myanmar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Cappuccino myanmar.jpg"
+    },
+    "cheese-sambousek.jpg": {
+      "author": "Charles Haynes from Hobart, Australia",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sambousek_(4009290205).jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Sambousek_%284009290205%29.jpg/960px-Sambousek_%284009290205%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Sambousek (4009290205).jpg"
+    },
+    "chicken-shawarma-sandwich.jpg": {
+      "author": "Vera Yu and David Li",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Shawarma-sandwich-01.jpg",
+      "thumb": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Shawarma-sandwich-01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "title": "File:Shawarma-sandwich-01.jpg"
+    },
+    "chicken-shish-tawook.jpg": {
+      "author": "Nelcfood",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Food_in_the_Islamic_Middle_East_-_Shish_Taouk.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/Food_in_the_Islamic_Middle_East_-_Shish_Taouk.jpg/960px-Food_in_the_Islamic_Middle_East_-_Shish_Taouk.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Food in the Islamic Middle East - Shish Taouk.jpg"
+    },
+    "chocolate-lava-cake.jpg": {
+      "author": "Sharon Chen from Austin, United States",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chocolate_Lava_Cake_1_(28791097360).jpg",
+      "thumb": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Chocolate_Lava_Cake_1_%2828791097360%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "title": "File:Chocolate Lava Cake 1 (28791097360).jpg"
+    },
+    "cover-cafe.jpg": {
+      "author": "UndueMarmot",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Figaro_Coffee_shop_interior_in_Salawag,_Dasmari%C3%B1as,_Cavite_%E2%80%94_19_Mar_2022.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Figaro_Coffee_shop_interior_in_Salawag%2C_Dasmari%C3%B1as%2C_Cavite_%E2%80%94_19_Mar_2022.jpg/960px-Figaro_Coffee_shop_interior_in_Salawag%2C_Dasmari%C3%B1as%2C_Cavite_%E2%80%94_19_Mar_2022.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Figaro Coffee shop interior in Salawag, Dasmariñas, Cavite — 19 Mar 2022.jpg"
+    },
+    "cover-grill.jpg": {
+      "author": "Abdulsalam Al Dabbagh",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Iraqi_Kebab.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Iraqi_Kebab.jpg/960px-Iraqi_Kebab.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Iraqi Kebab.jpg"
+    },
+    "falafel-sandwich.jpg": {
+      "author": "Miyuki Meinaka",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Falafel_Sandwich_at_Utsunomiya.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Falafel_Sandwich_at_Utsunomiya.jpg/960px-Falafel_Sandwich_at_Utsunomiya.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Falafel Sandwich at Utsunomiya.jpg"
+    },
+    "fattoush.jpg": {
+      "author": "Sakateka",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fattoush_Portulaca_oleracea.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Fattoush_Portulaca_oleracea.jpg/960px-Fattoush_Portulaca_oleracea.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Fattoush Portulaca oleracea.jpg"
+    },
+    "foul-medammes.jpg": {
+      "author": "Habib M'henni",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Foul_Mdammis,_Tunisie.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fb/Foul_Mdammis%2C_Tunisie.jpg/960px-Foul_Mdammis%2C_Tunisie.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Foul Mdammis, Tunisie.jpg"
+    },
+    "freekeh-with-chicken.jpg": {
+      "author": "Kristen Taylor",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Freekeh_with_roasted_vegetables.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/Freekeh_with_roasted_vegetables.jpg/960px-Freekeh_with_roasted_vegetables.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Freekeh with roasted vegetables.jpg"
+    },
+    "fresh-orange-juice.jpg": {
+      "author": "Agency of the United States Department of Agriculture\nEdited Version by: Arad",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Orange_juice_1_edit1.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/Orange_juice_1_edit1.jpg/960px-Orange_juice_1_edit1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Orange juice 1 edit1.jpg"
+    },
+    "fried-kibbeh.jpg": {
+      "author": "Revital Salomon",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%D7%A7%D7%95%D7%91%D7%94_%D7%97%D7%AA%D7%95%D7%9A_%D7%9C%D7%A9%D7%A0%D7%99%D7%99%D7%9D_-_Kibbeh_split_in_two.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fb/%D7%A7%D7%95%D7%91%D7%94_%D7%97%D7%AA%D7%95%D7%9A_%D7%9C%D7%A9%D7%A0%D7%99%D7%99%D7%9D_-_Kibbeh_split_in_two.jpg/960px-%D7%A7%D7%95%D7%91%D7%94_%D7%97%D7%AA%D7%95%D7%9A_%D7%9C%D7%A9%D7%A0%D7%99%D7%99%D7%9D_-_Kibbeh_split_in_two.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:קובה חתוך לשניים - Kibbeh split in two.jpg"
+    },
+    "grilled-fish-fillet.jpg": {
+      "author": "Ansgar Koreng",
+      "license": "CC BY-SA 3.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:140531_Forellen_auf_dem_Grill.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/140531_Forellen_auf_dem_Grill.jpg/960px-140531_Forellen_auf_dem_Grill.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:140531 Forellen auf dem Grill.jpg"
+    },
+    "grilled-vegetable-sandwich.jpg": {
+      "author": "Shixart1985",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:A_fresh_sandwich_filled_with_grilled_vegetables.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/A_fresh_sandwich_filled_with_grilled_vegetables.jpg/960px-A_fresh_sandwich_filled_with_grilled_vegetables.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:A fresh sandwich filled with grilled vegetables.jpg"
+    },
+    "halloumi-sandwich.jpg": {
+      "author": "Andy Li",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Spicy_%26_Smoky_Halloumi_Sandwich_-_T_@_The_Dials_2025-04-12.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/19/Spicy_%26_Smoky_Halloumi_Sandwich_-_T_%40_The_Dials_2025-04-12.jpg/960px-Spicy_%26_Smoky_Halloumi_Sandwich_-_T_%40_The_Dials_2025-04-12.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Spicy & Smoky Halloumi Sandwich - T @ The Dials 2025-04-12.jpg"
+    },
+    "hot-chocolate.jpg": {
+      "author": "Shaili Sharma",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Trending_Hot_Chocolate_Bomb_or_Hot_Cocoa_Bomb_-_Gujarat_-_SHAILI_008.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/77/Trending_Hot_Chocolate_Bomb_or_Hot_Cocoa_Bomb_-_Gujarat_-_SHAILI_008.jpg/960px-Trending_Hot_Chocolate_Bomb_or_Hot_Cocoa_Bomb_-_Gujarat_-_SHAILI_008.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Trending Hot Chocolate Bomb or Hot Cocoa Bomb - Gujarat - SHAILI 008.jpg"
+    },
+    "hummus-with-pita.jpg": {
+      "author": "Satdeep Gill",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Homemade_hummus_and_pita_03.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Homemade_hummus_and_pita_03.jpg/960px-Homemade_hummus_and_pita_03.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Homemade hummus and pita 03.jpg"
+    },
+    "hummus.jpg": {
+      "author": "Silar",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:02021_0752_(2)_Hummus,_Vegan_food_in_Poland.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/02021_0752_%282%29_Hummus%2C_Vegan_food_in_Poland.jpg/960px-02021_0752_%282%29_Hummus%2C_Vegan_food_in_Poland.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:02021 0752 (2) Hummus, Vegan food in Poland.jpg"
+    },
+    "iced-latte.jpg": {
+      "author": "Andy Li",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Peanut_Crispy_and_Iced_Latte_-_The_Wildflower_Cafe_2025-08-26.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Peanut_Crispy_and_Iced_Latte_-_The_Wildflower_Cafe_2025-08-26.jpg/960px-Peanut_Crispy_and_Iced_Latte_-_The_Wildflower_Cafe_2025-08-26.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Peanut Crispy and Iced Latte - The Wildflower Cafe 2025-08-26.jpg"
+    },
+    "iced-matcha.jpg": {
+      "author": "Andy Li",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Iced_Yuzu,_Ginger_%26_Lion%27s_Mane_Matcha_-_Trading_Post_Coffee_Roasters_2026-07-27.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Iced_Yuzu%2C_Ginger_%26_Lion%27s_Mane_Matcha_-_Trading_Post_Coffee_Roasters_2026-07-27.jpg/960px-Iced_Yuzu%2C_Ginger_%26_Lion%27s_Mane_Matcha_-_Trading_Post_Coffee_Roasters_2026-07-27.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Iced Yuzu, Ginger & Lion's Mane Matcha - Trading Post Coffee Roasters 2026-07-27.jpg"
+    },
+    "knafeh-nabulsieh.jpg": {
+      "author": "ס.ג'יבלי",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kanafeh_in_Isfiya.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Kanafeh_in_Isfiya.jpg/960px-Kanafeh_in_Isfiya.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Kanafeh in Isfiya.jpg"
+    },
+    "labneh-zaatar-plate.jpg": {
+      "author": "Leslie Seaton from Seattle, WA, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Labneh_(5196911587).jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Labneh_%285196911587%29.jpg/960px-Labneh_%285196911587%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Labneh (5196911587).jpg"
+    },
+    "lamb-chops.jpg": {
+      "author": "Unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lamb_chops_with_mash.JPG",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Lamb_chops_with_mash.JPG/960px-Lamb_chops_with_mash.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Lamb chops with mash.JPG"
+    },
+    "lamb-kofta.jpg": {
+      "author": "Mx. Granger",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vegan_lamb_kofta_at_Barcha.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Vegan_lamb_kofta_at_Barcha.jpg/960px-Vegan_lamb_kofta_at_Barcha.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Vegan lamb kofta at Barcha.jpg"
+    },
+    "lentil-soup.jpg": {
+      "author": "Whoisjohngalt",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bowl_of_lentil_soup_with_green_and_red_lentils.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/Bowl_of_lentil_soup_with_green_and_red_lentils.jpg/960px-Bowl_of_lentil_soup_with_green_and_red_lentils.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Bowl of lentil soup with green and red lentils.jpg"
+    },
+    "maamoul.jpg": {
+      "author": "fugzu",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mamoul_biscotti_libanesi.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Mamoul_biscotti_libanesi.jpg/960px-Mamoul_biscotti_libanesi.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Mamoul biscotti libanesi.jpg"
+    },
+    "manakeesh-cheese.jpg": {
+      "author": "Contrapunctus-1",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Za%27atar_with_cheese_manakish_at_Agasi,_Lajpat_Nagar,_Delhi_(2025-10-04).jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Za%27atar_with_cheese_manakish_at_Agasi%2C_Lajpat_Nagar%2C_Delhi_%282025-10-04%29.jpg/960px-Za%27atar_with_cheese_manakish_at_Agasi%2C_Lajpat_Nagar%2C_Delhi_%282025-10-04%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Za'atar with cheese manakish at Agasi, Lajpat Nagar, Delhi (2025-10-04).jpg"
+    },
+    "manakeesh-halloumi-zaatar.jpg": {
+      "author": "Elie.ghob",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Zaatar_Mankousheh.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Zaatar_Mankousheh.jpg/960px-Zaatar_Mankousheh.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Zaatar Mankousheh.jpg"
+    },
+    "manakeesh-zaatar.jpg": {
+      "author": "myahya",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Manakish_Za%27atar.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Manakish_Za%27atar.jpg/960px-Manakish_Za%27atar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Manakish Za'atar.jpg"
+    },
+    "mansaf.jpg": {
+      "author": "Bahnfrend",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jordanian_Traditional_Mansaf,_Petra_Restaurant,_2026_(01).jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Jordanian_Traditional_Mansaf%2C_Petra_Restaurant%2C_2026_%2801%29.jpg/960px-Jordanian_Traditional_Mansaf%2C_Petra_Restaurant%2C_2026_%2801%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Jordanian Traditional Mansaf, Petra Restaurant, 2026 (01).jpg"
+    },
+    "maqluba.jpg": {
+      "author": "Arafataslan",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Makluba.JPG",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Makluba.JPG/960px-Makluba.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Makluba.JPG"
+    },
+    "mint-lemonade.jpg": {
+      "author": "Twilightin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mint_lemonade_in_summer.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/Mint_lemonade_in_summer.jpg/960px-Mint_lemonade_in_summer.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Mint lemonade in summer.jpg"
+    },
+    "mixed-grill.jpg": {
+      "author": "Bahnfrend",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mixed_Grill_with_Hummus,_Air_Arabia,_2025_(01).jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Mixed_Grill_with_Hummus%2C_Air_Arabia%2C_2025_%2801%29.jpg/960px-Mixed_Grill_with_Hummus%2C_Air_Arabia%2C_2025_%2801%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Mixed Grill with Hummus, Air Arabia, 2025 (01).jpg"
+    },
+    "molokhia.jpg": {
+      "author": "Showshow777",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Molokhia_2.JPG",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Molokhia_2.JPG/960px-Molokhia_2.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Molokhia 2.JPG"
+    },
+    "moutabal.jpg": {
+      "author": "Benoît Prieur",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Grand_assortiment_de_nourriture_libanaise_(Lyon,_2017).jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Grand_assortiment_de_nourriture_libanaise_%28Lyon%2C_2017%29.jpg/960px-Grand_assortiment_de_nourriture_libanaise_%28Lyon%2C_2017%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Grand assortiment de nourriture libanaise (Lyon, 2017).jpg"
+    },
+    "okra-stew.jpg": {
+      "author": "Kari Sullivan from Austin, TX",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Spicy_Texan_Fall_Vegetable_Stew,_Okra_and_eggplant_(4040528901).jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Spicy_Texan_Fall_Vegetable_Stew%2C_Okra_and_eggplant_%284040528901%29.jpg/960px-Spicy_Texan_Fall_Vegetable_Stew%2C_Okra_and_eggplant_%284040528901%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Spicy Texan Fall Vegetable Stew, Okra and eggplant (4040528901).jpg"
+    },
+    "olive-cheese-plate.jpg": {
+      "author": "Tomwsulcer",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tomatoes_and_cheese_and_olives_on_sticks_at_a_party.JPG",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Tomatoes_and_cheese_and_olives_on_sticks_at_a_party.JPG/960px-Tomatoes_and_cheese_and_olives_on_sticks_at_a_party.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Tomatoes and cheese and olives on sticks at a party.JPG"
+    },
+    "pancakes-with-honey.jpg": {
+      "author": "Mae Mu",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Foodiesfeed.com_pouring-honey-on-pancakes-with-walnuts.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Foodiesfeed.com_pouring-honey-on-pancakes-with-walnuts.jpg/960px-Foodiesfeed.com_pouring-honey-on-pancakes-with-walnuts.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Foodiesfeed.com pouring-honey-on-pancakes-with-walnuts.jpg"
+    },
+    "rice-pudding.jpg": {
+      "author": "Fumikas Sagisavas",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Colourful_bowl_rice_cakes_(Put_chai_ko).jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Colourful_bowl_rice_cakes_%28Put_chai_ko%29.jpg/960px-Colourful_bowl_rice_cakes_%28Put_chai_ko%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Colourful bowl rice cakes (Put chai ko).jpg"
+    },
+    "shakshuka.jpg": {
+      "author": "Calliopejen1",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Shakshuka_by_Calliopejen1.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Shakshuka_by_Calliopejen1.jpg/960px-Shakshuka_by_Calliopejen1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Shakshuka by Calliopejen1.jpg"
+    },
+    "spanish-latte.jpg": {
+      "author": "א (Aleph)",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Latte_macchiato_with_coffee_beans.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Latte_macchiato_with_coffee_beans.jpg/960px-Latte_macchiato_with_coffee_beans.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Latte macchiato with coffee beans.jpg"
+    },
+    "spinach-fatayer.jpg": {
+      "author": "روتانا",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Spinach_Pastry.jpg",
+      "thumb": "https://upload.wikimedia.org/wikipedia/commons/4/41/Spinach_Pastry.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "title": "File:Spinach Pastry.jpg"
+    },
+    "stuffed-zucchini.jpg": {
+      "author": "MOs810",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Zucchini_stuffed_with_vegetables.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Zucchini_stuffed_with_vegetables.jpg/960px-Zucchini_stuffed_with_vegetables.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Zucchini stuffed with vegetables.jpg"
+    },
+    "tabbouleh.jpg": {
+      "author": "cyclonebill",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Flickr_-_cyclonebill_-_Tabbouleh.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Flickr_-_cyclonebill_-_Tabbouleh.jpg/960px-Flickr_-_cyclonebill_-_Tabbouleh.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Flickr - cyclonebill - Tabbouleh.jpg"
+    },
+    "turkish-coffee.jpg": {
+      "author": "Julvsel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Turkish_coffee_cups_in_Adana_04.jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Turkish_coffee_cups_in_Adana_04.jpg/960px-Turkish_coffee_cups_in_Adana_04.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Turkish coffee cups in Adana 04.jpg"
+    },
+    "um-ali.jpg": {
+      "author": "Miansari66",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Umm_Ali.JPG",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Umm_Ali.JPG/960px-Umm_Ali.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Umm Ali.JPG"
+    },
+    "warak-enab.jpg": {
+      "author": "Petar Milošević",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Postna_sarma_(vegetarian_sarma,_Cuisine_of_Serbia).jpg",
+      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Postna_sarma_%28vegetarian_sarma%2C_Cuisine_of_Serbia%29.jpg/960px-Postna_sarma_%28vegetarian_sarma%2C_Cuisine_of_Serbia%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "title": "File:Postna sarma (vegetarian sarma, Cuisine of Serbia).jpg"
+    }
+  },
+  "cover-cafe": "cover-cafe.jpg",
+  "cover-grill": "cover-grill.jpg"
+}

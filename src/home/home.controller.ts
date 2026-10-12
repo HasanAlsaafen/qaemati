@@ -51,6 +51,26 @@ export class HomeController {
     return rows.map((row) => row.slug);
   }
 
+  /**
+   * What the "try it" tour needs, on a demo site only: the two sample menus (two
+   * looks), a free table to order from and nothing about logins: the landing page never lists them.
+   */
+  private async tour(slugs: string[], demoSlug: string) {
+    const live: string[] = [];
+    for (const slug of [demoSlug, ...slugs]) {
+      if (!live.includes(slug) && (await this.liveDemoSlug([slug]))) live.push(slug);
+    }
+    const table = await this.prisma.restaurantTable.findFirst({
+      where: { restaurant: { slug: demoSlug } },
+      orderBy: { sortOrder: 'desc' },
+      select: { token: true, label: true },
+    });
+    return {
+      slugs: live.slice(0, 2),
+      table,
+    };
+  }
+
   @Get()
   @Render('pages/home')
   async index(@Req() req: Request) {
@@ -64,9 +84,10 @@ export class HomeController {
     });
     const landingPlans = toLandingPlans(plans, locale);
     const contact = landingContact();
+    const demoSlugList = demoMode ? await this.demoSlugs() : [];
     const demoSlug = await this.liveDemoSlug([
       process.env.LANDING_DEMO_SLUG?.trim(),
-      ...(demoMode ? await this.demoSlugs() : []),
+      ...demoSlugList,
     ]);
 
     return {
@@ -94,6 +115,7 @@ export class HomeController {
       hasTrial: landingPlans.some((plan) => plan.trialDays > 0),
       contact,
       demoSlug,
+      tour: demoMode && demoSlug ? await this.tour(demoSlugList, demoSlug) : null,
       year: new Date().getFullYear(),
     };
   }
