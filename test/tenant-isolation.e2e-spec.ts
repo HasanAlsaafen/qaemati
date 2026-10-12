@@ -24,6 +24,7 @@ describe('Tenant isolation (e2e)', () => {
     categoryId: '',
     itemId: '',
     tableId: '',
+    sessionId: '',
   };
   const SECRET = 'TENANT-B-SECRET-DISH';
 
@@ -49,11 +50,13 @@ describe('Tenant isolation (e2e)', () => {
       category: await prisma.category.findUnique({ where: { id: B.categoryId } }),
       item: await prisma.item.findUnique({ where: { id: B.itemId } }),
       table: await prisma.restaurantTable.findUnique({ where: { id: B.tableId } }),
+      session: await prisma.tableSession.findUnique({ where: { id: B.sessionId } }),
       counts: {
         items: await prisma.item.count({ where: { restaurantId: bId } }),
         categories: await prisma.category.count({ where: { restaurantId: bId } }),
         menus: await prisma.menu.count({ where: { restaurantId: bId } }),
         tables: await prisma.restaurantTable.count({ where: { restaurantId: bId } }),
+        sessions: await prisma.tableSession.count({ where: { restaurantId: bId } }),
       },
     });
   }
@@ -87,6 +90,9 @@ describe('Tenant isolation (e2e)', () => {
     ).id;
     B.tableId = (
       await prisma.restaurantTable.create({ data: { restaurantId: bId, label: 'B-table' } })
+    ).id;
+    B.sessionId = (
+      await prisma.tableSession.create({ data: { restaurantId: bId, tableId: B.tableId } })
     ).id;
     await prisma.menu.create({ data: { restaurantId: aId, nameAr: 'أ', nameEn: 'A menu' } });
     agentA = await loginAsAdmin(app, a.admin.email);
@@ -141,6 +147,7 @@ describe('Tenant isolation (e2e)', () => {
     ['edit a table', 'patch', () => `/admin/qr/tables/${B.tableId}`, { label: 'hacked' }],
     ['delete a table', 'delete', () => `/admin/qr/tables/${B.tableId}`, {}],
     ['move a table', 'post', () => `/admin/qr/tables/${B.tableId}/move`, { direction: 'up' }],
+    ['check out a table', 'post', () => `/admin/pos/tables/${B.tableId}/checkout`, {}],
     ['duplicate a dish', 'post', () => `/admin/bulk/items/${B.itemId}/duplicate`, {}],
   ];
 
@@ -206,5 +213,51 @@ describe('Tenant isolation (e2e)', () => {
   it("keeps the other restaurant's dishes out of its own public menu", async () => {
     const res = await request(app.getHttpServer()).get(`/m/test-restaurant-iso-a?lang=en`);
     expect(res.text).not.toContain(SECRET);
+  });
+});
+
+describe('Tenant isolation of table sessions (e2e)', () => {
+  let app: NestExpressApplication;
+  let prisma: PrismaService;
+  let aId: string;
+  let bId: string;
+
+  beforeAll(async () => {
+    app = await createTestApp();
+    prisma = app.get(PrismaService);
+    aId = (await createTestRestaurant(prisma, 'iso-sess-a')).restaurant.id;
+    bId = (await createTestRestaurant(prisma, 'iso-sess-b')).restaurant.id;
+  });
+
+  afterAll(async () => {
+    await deleteTestRestaurant(prisma, aId);
+    await deleteTestRestaurant(prisma, bId);
+    await app.close();
+  });
+
+  it('keeps every session in the restaurant of its table', async () => {
+    const table = await prisma.restaurantTable.create({ data: { restaurantId: bId, label: 'S' } });
+    const session = await prisma.tableSession.create({
+      data: { restaurantId: bId, tableId: table.id },
+    });
+    expect(await prisma.tableSession.count({ where: { restaurantId: aId } })).toBe(0);
+    expect(
+      await prisma.tableSession.findFirst({ where: { id: session.id, restaurantId: aId } }),
+    ).toBeNull();
+  });
+
+  it('allows only one open session per table, in the database itself', async () => {
+    const table = await prisma.restaurantTable.create({ data: { restaurantId: aId, label: 'U' } });
+    await prisma.tableSession.create({ data: { restaurantId: aId, tableId: table.id } });
+    await expect(
+      prisma.tableSession.create({ data: { restaurantId: aId, tableId: table.id } }),
+    ).rejects.toMatchObject({ code: 'P2002' });
+    await prisma.tableSession.updateMany({
+      where: { tableId: table.id },
+      data: { status: 'CLOSED', closedAt: new Date() },
+    });
+    await expect(
+      prisma.tableSession.create({ data: { restaurantId: aId, tableId: table.id } }),
+    ).resolves.toBeDefined();
   });
 });

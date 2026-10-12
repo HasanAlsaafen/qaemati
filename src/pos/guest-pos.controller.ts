@@ -3,6 +3,9 @@ import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 import { CallWaiterDto, PlaceOrderDto } from './dto/guest-pos.dto';
 import { GuestPosError, GuestPosService } from './guest-pos.service';
+import { sessionIdleMs, signSessionCookie, TABLE_SESSION_COOKIE } from './table-session-token';
+
+const sessionCookie = (req: Request): unknown => req.cookies?.[TABLE_SESSION_COOKIE];
 
 /** The public side of table service: a guest at a table sends an order or calls the waiter. */
 @Controller('m/:slug')
@@ -20,9 +23,22 @@ export class GuestPosController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
-    await this.respond(req, res, () =>
-      this.guest.placeOrder(slug, { ...body }, req.ip ?? 'unknown'),
-    );
+    await this.respond(req, res, async () => {
+      const { sessionId, ...result } = await this.guest.placeOrder(
+        slug,
+        { ...body },
+        req.ip ?? 'unknown',
+      );
+      // The proof of membership: signed, httpOnly, and sent only to this restaurant's menu.
+      res.cookie(TABLE_SESSION_COOKIE, signSessionCookie(sessionId), {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: `/m/${slug}`,
+        maxAge: sessionIdleMs(),
+      });
+      return result;
+    });
   }
 
   @Get('orders/:token')
@@ -35,7 +51,7 @@ export class GuestPosController {
     await this.respond(
       req,
       res,
-      () => this.guest.orderStatus(slug, token, req.ip ?? 'unknown'),
+      () => this.guest.orderStatus(slug, token, req.ip ?? 'unknown', sessionCookie(req)),
       200,
     );
   }
@@ -49,7 +65,7 @@ export class GuestPosController {
     @Res() res: Response,
   ): Promise<void> {
     await this.respond(req, res, () =>
-      this.guest.callWaiter(slug, { ...body }, req.ip ?? 'unknown'),
+      this.guest.callWaiter(slug, { ...body }, req.ip ?? 'unknown', sessionCookie(req)),
     );
   }
 
@@ -69,6 +85,20 @@ export class GuestPosController {
     );
   }
 
+  @Get('tables/session-ticket')
+  async ticket(
+    @Param('slug') slug: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.respond(
+      req,
+      res,
+      () => this.guest.socketTicket(slug, req.ip ?? 'unknown', sessionCookie(req)),
+      200,
+    );
+  }
+
   @Get('tables/:token/bill')
   async bill(
     @Param('slug') slug: string,
@@ -76,7 +106,12 @@ export class GuestPosController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
-    await this.respond(req, res, () => this.guest.bill(slug, token, req.ip ?? 'unknown'), 200);
+    await this.respond(
+      req,
+      res,
+      () => this.guest.bill(slug, token, req.ip ?? 'unknown', sessionCookie(req)),
+      200,
+    );
   }
 
   @Post('tables/bill-request')
@@ -90,7 +125,7 @@ export class GuestPosController {
     await this.respond(
       req,
       res,
-      () => this.guest.requestBill(slug, { ...body }, req.ip ?? 'unknown'),
+      () => this.guest.requestBill(slug, { ...body }, req.ip ?? 'unknown', sessionCookie(req)),
       200,
     );
   }

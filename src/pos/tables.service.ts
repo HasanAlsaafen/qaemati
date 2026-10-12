@@ -7,6 +7,13 @@ import { tableState, TableState } from './table-state';
 
 const BILLABLE: { not: OrderStatus } = { not: 'CANCELED' };
 
+export interface BillOrder {
+  number: number;
+  status: OrderStatus;
+  total: string;
+  items: { nameAr: string; nameEn: string; quantity: number; lineTotal: string }[];
+}
+
 export interface TableCard {
   id: string;
   label: string;
@@ -20,8 +27,7 @@ export interface TableCard {
 /**
  * Which tables are taken. A visit starts when a guest inside the allowed area
  * opens the table's QR code, orders, or calls, and ends when staff check the
- * table out. The bill is whatever was ordered (and not canceled) since the
- * visit began.
+ * table out. The bill is whatever the table's session ordered (and did not cancel).
  */
 @Injectable()
 export class TablesService {
@@ -85,25 +91,32 @@ export class TablesService {
     });
   }
 
-  /** The guest's bill for the visit in progress, by the table's QR token. */
-  async bill(restaurantId: string, tableId: string) {
+  /** What a guest without a valid table session sees: nothing, the same as a free table. */
+  emptyBill() {
+    return {
+      occupied: false,
+      billRequested: false,
+      orders: [] as BillOrder[],
+      total: '0.00',
+      currency: '',
+    };
+  }
+
+  /** The bill of one table session, which the caller has already proven the guest belongs to. */
+  async bill(restaurantId: string, tableId: string, sessionId: string) {
     const table = await this.prisma.restaurantTable.findFirstOrThrow({
       where: { id: tableId, restaurantId },
     });
-    const orders = table.occupiedAt
-      ? await this.prisma.order.findMany({
-          where: { tableId, restaurantId, status: BILLABLE, createdAt: { gte: table.occupiedAt } },
-          include: { items: { orderBy: { id: 'asc' } } },
-          orderBy: { createdAt: 'asc' },
-        })
-      : [];
-    const state = tableState(table, orders.length, new Date());
-    if (state === 'FREE')
-      return { occupied: false, billRequested: false, orders: [], total: '0.00', currency: '' };
+    const orders = await this.prisma.order.findMany({
+      where: { sessionId, tableId, restaurantId, status: BILLABLE },
+      include: { items: { orderBy: { id: 'asc' } } },
+      orderBy: { createdAt: 'asc' },
+    });
+    if (tableState(table, orders.length, new Date()) === 'FREE') return this.emptyBill();
     const cents = orders.reduce((sum, o) => sum + toCents(o.total), 0);
     return {
       occupied: true,
-      billRequested: state === 'BILL',
+      billRequested: Boolean(table.billRequestedAt),
       orders: orders.map((o) => ({
         number: o.number,
         status: o.status,
@@ -131,7 +144,12 @@ export class TablesService {
       where: { restaurantId, tableId, status: { not: 'RESOLVED' } },
       select: { id: true },
     });
+    // The session closes with the table, so the party's cookie stops working at once.
     await this.prisma.$transaction([
+      this.prisma.tableSession.updateMany({
+        where: { restaurantId, tableId, status: 'OPEN' },
+        data: { status: 'CLOSED', closedAt: new Date() },
+      }),
       this.prisma.restaurantTable.update({
         where: { id: tableId },
         data: { occupiedAt: null, lastSeenAt: null, billRequestedAt: null },

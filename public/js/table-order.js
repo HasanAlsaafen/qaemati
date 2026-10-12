@@ -45,6 +45,24 @@ function postJson(url, payload) {
   });
 }
 
+// The session cookie cannot reach the websocket, so the server hands out a
+// short lived ticket for it. No ticket means this phone is in no table session.
+function socketTicket(slug) {
+  return fetch('/m/' + encodeURIComponent(slug) + '/tables/session-ticket', {
+    credentials: 'same-origin',
+    headers: { Accept: 'application/json' },
+  })
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (body) {
+      return body && body.ticket ? body.ticket : null;
+    })
+    .catch(function () {
+      return null;
+    });
+}
+
 function toastMessage(message, variant) {
   window.dispatchEvent(new CustomEvent('toast', { detail: { message: message, variant: variant } }));
 }
@@ -142,7 +160,15 @@ function tableOrderState(config) {
       });
       if (!window.io) return;
       var wasOccupied = false;
-      self._tableSocket = window.io('/track', { auth: { table: config.token }, transports: ['websocket', 'polling'] });
+      self._tableSocket = window.io('/track', {
+        // Asked again on every reconnect, because a ticket only lives a minute.
+        auth: function (send) {
+          socketTicket(config.slug).then(function (ticket) {
+            send({ table: config.token, ticket: ticket });
+          });
+        },
+        transports: ['websocket', 'polling'],
+      });
       self._tableSocket.on('table', function (payload) {
         if (payload.occupied) {
           wasOccupied = true;
@@ -263,7 +289,8 @@ function tableOrderState(config) {
     // Live over a websocket when the browser has it, otherwise a slow poll.
     follow: function () {
       var self = this;
-      var url = '/m/' + encodeURIComponent(config.slug) + '/orders/' + encodeURIComponent(self.tracking.token);
+      var trackToken = self.tracking.token;
+      var url = '/m/' + encodeURIComponent(config.slug) + '/orders/' + encodeURIComponent(trackToken);
       function check() {
         fetch(url, { credentials: 'same-origin', headers: { Accept: 'application/json' } })
           .then(function (response) {
@@ -278,7 +305,14 @@ function tableOrderState(config) {
       }
       check();
       if (window.io) {
-        self._socket = window.io('/track', { auth: { token: self.tracking.token }, transports: ['websocket', 'polling'] });
+        self._socket = window.io('/track', {
+          auth: function (send) {
+            socketTicket(config.slug).then(function (ticket) {
+              send({ token: trackToken, ticket: ticket });
+            });
+          },
+          transports: ['websocket', 'polling'],
+        });
         self._socket.on('status', function (payload) {
           self.setStatus(payload.status);
         });
@@ -340,6 +374,11 @@ function tableOrderState(config) {
             store.clear();
             self.phase = 'idle';
             self.open = true;
+            // The order just gave this phone its table session: listen to it from now on.
+            if (self._tableSocket) {
+              self._tableSocket.disconnect();
+              self._tableSocket.connect();
+            }
             self.follow();
           } else {
             self.message = words(result);

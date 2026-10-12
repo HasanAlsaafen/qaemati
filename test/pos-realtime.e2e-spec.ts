@@ -125,7 +125,9 @@ describe('Staff screen websocket (e2e)', () => {
     });
 
   /** A guest sends an order, with its own session and CSRF token, over real HTTP. */
-  async function guestOrders(r: Restaurant): Promise<{ id: string; track: string }> {
+  async function guestOrders(
+    r: Restaurant,
+  ): Promise<{ id: string; track: string; cookie: string }> {
     // This suite sends many orders from one address and table on purpose.
     const limits = app.get<RateLimitStore>(RATE_LIMIT_STORE);
     await Promise.all(
@@ -150,7 +152,16 @@ describe('Staff screen websocket (e2e)', () => {
       }),
     });
     expect(res.status).toBe(201);
-    return res.json();
+    const cookie = cookiesOf(res).find((c) => c.startsWith('qaemati_ts=')) ?? '';
+    return { ...(await res.json()), cookie };
+  }
+
+  /** What the browser does before it opens a socket: swap the session cookie for a short lived ticket. */
+  async function ticketFor(r: Restaurant, cookie: string): Promise<string | null> {
+    const res = await fetch(`${base}/m/${r.slug}/tables/session-ticket`, {
+      headers: { Cookie: cookie },
+    });
+    return (await res.json()).ticket;
   }
 
   async function guestCalls(r: Restaurant): Promise<{ id: string }> {
@@ -170,11 +181,15 @@ describe('Staff screen websocket (e2e)', () => {
   }
 
   /** A guest follows one order, with nothing but its token. */
-  function follow(token: unknown, headers: Record<string, string> = {}): Socket {
+  function follow(
+    token: unknown,
+    headers: Record<string, string> = {},
+    ticket: string | null = null,
+  ): Socket {
     const socket = io(`${base}/track`, {
       transports: ['websocket'],
       reconnection: false,
-      auth: { token },
+      auth: { token, ticket },
       extraHeaders: headers,
     });
     sockets.push(socket);
@@ -210,11 +225,11 @@ describe('Staff screen websocket (e2e)', () => {
   }
 
   /** A guest's phone follows its table by the table's QR token. */
-  function followTable(token: string): Socket {
+  function followTable(token: string, ticket: string | null = null): Socket {
     const socket = io(`${base}/track`, {
       transports: ['websocket'],
       reconnection: false,
-      auth: { table: token },
+      auth: { table: token, ticket },
     });
     sockets.push(socket);
     return socket;
@@ -363,8 +378,8 @@ describe('Staff screen websocket (e2e)', () => {
     });
 
     it('tells the guest at the table when it is checked out, and nothing about other tables', async () => {
-      await guestOrders(a);
-      const guest = followTable(a.tableToken);
+      const mine = await guestOrders(a);
+      const guest = followTable(a.tableToken, await ticketFor(a, mine.cookie));
       const first = once<{ occupied: boolean }>(guest, 'table');
       await connected(guest);
       expect((await first).occupied).toBe(true);
@@ -380,16 +395,16 @@ describe('Staff screen websocket (e2e)', () => {
       expect(await heardElsewhere).toBe(false);
     });
 
-    it('turns away a table code that does not exist', async () => {
+    it('shows an empty table to a code that does not exist, like any guest with no session', async () => {
       const guest = followTable('00000000-0000-0000-0000-000000000000');
-      expect(await once(guest, 'unknown_table')).toBeUndefined();
+      expect(await once(guest, 'table')).toEqual({ occupied: false, billRequested: false });
     });
   });
 
   describe('a guest following their own order', () => {
     it('is told where the order stands, and hears every change after that', async () => {
       const placed = await guestOrders(a);
-      const guest = follow(placed.track);
+      const guest = follow(placed.track, {}, await ticketFor(a, placed.cookie));
       const first = once<{ status: string }>(guest, 'status');
       await connected(guest);
       expect(await first).toEqual({ status: 'NEW' });
@@ -401,7 +416,7 @@ describe('Staff screen websocket (e2e)', () => {
 
     it('is sent the status only, never anything about what was ordered', async () => {
       const placed = await guestOrders(a);
-      const guest = follow(placed.track);
+      const guest = follow(placed.track, {}, await ticketFor(a, placed.cookie));
       const first = once<Record<string, unknown>>(guest, 'status');
       await first.then((payload) => expect(Object.keys(payload)).toEqual(['status']));
     });
@@ -409,7 +424,7 @@ describe('Staff screen websocket (e2e)', () => {
     it('hears nothing about anyone else order', async () => {
       const mine = await guestOrders(a);
       const theirs = await guestOrders(a);
-      const guest = follow(mine.track);
+      const guest = follow(mine.track, {}, await ticketFor(a, mine.cookie));
       await once(guest, 'status');
       const heard = silent(guest, 'status', 800);
       expect(await staffMoves(a.email, theirs.id, 'PREPARING')).toBe(200);
@@ -430,7 +445,11 @@ describe('Staff screen websocket (e2e)', () => {
 
     it('cannot be opened by another website', async () => {
       const placed = await guestOrders(a);
-      const guest = follow(placed.track, { Origin: 'https://evil.example' });
+      const guest = follow(
+        placed.track,
+        { Origin: 'https://evil.example' },
+        await ticketFor(a, placed.cookie),
+      );
       await expect(connected(guest)).rejects.toBeDefined();
     });
 

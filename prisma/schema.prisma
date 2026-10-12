@@ -35,6 +35,7 @@ model Restaurant {
 
   orders         Order[]
   waiterCalls    WaiterCall[]
+  tableSessions  TableSession[]
   notices        NotificationLog[]
   pairings       ItemPairing[]
   suggestionAdds SuggestionAdd[]
@@ -489,6 +490,7 @@ model RestaurantTable {
 
   orders      Order[]
   waiterCalls WaiterCall[]
+  sessions    TableSession[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -723,6 +725,39 @@ enum WaiterCallStatus {
   RESOLVED
 }
 
+enum TableSessionStatus {
+  OPEN
+  CLOSED
+}
+
+/// One party's visit to a table, and the only thing that proves a guest may see
+/// a bill or follow an order. At most one is OPEN per table: the migration adds a
+/// partial unique index on "tableId" WHERE status = 'OPEN', which Prisma cannot
+/// express here. Opened by the first table order, closed by staff checkout or by
+/// idle expiry.
+model TableSession {
+  id String @id @default(cuid())
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  tableId String
+  table   RestaurantTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+
+  status         TableSessionStatus @default(OPEN)
+  openedAt       DateTime           @default(now())
+  closedAt       DateTime?
+  /// Moved by orders, waiter calls and bill requests. Idle expiry reads it.
+  lastActivityAt DateTime           @default(now())
+
+  orders      Order[]
+  waiterCalls WaiterCall[]
+
+  @@index([restaurantId])
+  @@index([tableId, status])
+  @@index([status, lastActivityAt])
+}
+
 /// An order a guest sent from a table. Prices and names are copied in when it
 /// is placed, so editing the menu later never changes an order already taken.
 model Order {
@@ -734,6 +769,11 @@ model Order {
   tableId    String?
   table      RestaurantTable? @relation(fields: [tableId], references: [id], onDelete: SetNull)
   tableLabel String
+
+  /// The party's visit this order belongs to. Null only on orders taken before
+  /// table sessions existed, which no guest can look up any more.
+  sessionId String?
+  session   TableSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
 
   number Int
   status OrderStatus @default(NEW)
@@ -759,6 +799,7 @@ model Order {
 
   @@unique([restaurantId, number])
   @@index([restaurantId, status, createdAt])
+  @@index([sessionId])
 }
 
 model OrderItem {
@@ -789,6 +830,11 @@ model WaiterCall {
   tableId    String?
   table      RestaurantTable? @relation(fields: [tableId], references: [id], onDelete: SetNull)
   tableLabel String
+
+  /// The visit this call came from, when the guest held a valid session.
+  /// A call made by someone who only scanned the code has none.
+  sessionId String?
+  session   TableSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
 
   status WaiterCallStatus @default(OPEN)
   kind   WaiterCallKind   @default(CALL)

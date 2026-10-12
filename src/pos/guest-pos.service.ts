@@ -13,6 +13,8 @@ import { checkLocation, GuestPosition } from './geo';
 import { fromCents, lineKey, parseLineKey, toCents } from './order-lines';
 import { PosEventBus } from './pos-event-bus';
 import { TablesService } from './tables.service';
+import { TableSessionService } from './table-session.service';
+import { signSocketTicket } from './table-session-token';
 
 export type GuestErrorCode =
   | 'unknown_table'
@@ -66,6 +68,7 @@ export class GuestPosService {
     private readonly tenancy: TenancyService,
     private readonly bus: PosEventBus,
     private readonly tables: TablesService,
+    private readonly sessions: TableSessionService,
     @Inject(RATE_LIMIT_STORE) private readonly limits: RateLimitStore,
   ) {}
 
@@ -101,6 +104,8 @@ export class GuestPosService {
     const distance = this.verifyLocation(restaurant, input);
 
     const priced = await this.priceLines(restaurant.id, input.lines);
+    // Ordering is what joins a party to the table's session, whatever cookie it held before.
+    const session = await this.sessions.openOrJoin(restaurant.id, table.id);
     // The visit starts before the order, so the order belongs to its bill.
     await this.tables.touch(restaurant.id, table.id);
     const order = await this.prisma.$transaction(async (tx) => {
@@ -114,6 +119,7 @@ export class GuestPosService {
           restaurantId: restaurant.id,
           tableId: table.id,
           tableLabel: table.label,
+          sessionId: session.id,
           number: Number(rows[0].number),
           note: cleanNote(input.note),
           total: fromCents(priced.totalCents),
@@ -130,22 +136,48 @@ export class GuestPosService {
       track: order.publicToken,
       total: fromCents(priced.totalCents),
       currency: priced.currency,
+      /** For the controller to put in a cookie. Never sent in the body. */
+      sessionId: session.id,
     };
   }
 
-  /** The guest's view of their own order: a number and where it is, nothing else. */
-  async orderStatus(slug: string, token: string, ip: string) {
+  /**
+   * The guest's view of their own order: a number and where it is, nothing else.
+   * Only for a guest in the table session the order belongs to. Anyone else gets
+   * the same answer as for a token that does not exist.
+   */
+  async orderStatus(slug: string, token: string, ip: string, cookie: unknown) {
     await this.limit(`track-ip:${ip}`, 60_000, 90);
-    const order = await this.prisma.order.findFirst({
-      where: { publicToken: token, restaurant: { slug } },
-      select: { number: true, status: true },
-    });
+    const session = await this.sessions.resolveCookie(slug, cookie);
+    const order = session
+      ? await this.prisma.order.findFirst({
+          where: { publicToken: token, sessionId: session.id, restaurantId: session.restaurantId },
+          select: { number: true, status: true },
+        })
+      : null;
     if (!order) throw new GuestPosError('unknown_order', 404);
     return order;
   }
 
-  async callWaiter(slug: string, input: GuestPosPosition & { table: string }, ip: string) {
+  /**
+   * A short lived ticket for the live connection, which cannot carry the
+   * cookie. Null when the guest holds no valid session.
+   */
+  async socketTicket(slug: string, ip: string, cookie: unknown) {
+    await this.limit(`ticket-ip:${ip}`, 60_000, 60);
+    const session = await this.sessions.resolveCookie(slug, cookie);
+    return { ticket: session ? signSocketTicket(session.id) : null };
+  }
+
+  async callWaiter(
+    slug: string,
+    input: GuestPosPosition & { table: string },
+    ip: string,
+    cookie: unknown,
+  ) {
     const { restaurant, table } = await this.gate(slug, input.table);
+    // A guest who has ordered is tied to their party. Someone who only scanned the code is not.
+    const session = await this.sessionAt(slug, table.id, cookie);
     await this.limit(`call-ip:${ip}`, ORDER_WINDOW_MS, 12);
     const distance = this.verifyLocation(restaurant, input);
 
@@ -159,6 +191,7 @@ export class GuestPosService {
       },
     });
     await this.tables.touch(restaurant.id, table.id);
+    if (session) await this.sessions.touch(session.id);
     if (open) return { id: open.id, alreadyCalled: true };
     await this.limit(`call-table:${table.id}`, CALL_COOLDOWN_MS, 1);
 
@@ -167,6 +200,7 @@ export class GuestPosService {
         restaurantId: restaurant.id,
         tableId: table.id,
         tableLabel: table.label,
+        sessionId: session?.id ?? null,
         distanceMeters: distance,
       },
     });
@@ -184,19 +218,33 @@ export class GuestPosService {
     return { occupied: true };
   }
 
-  /** What the table owes so far, for whoever holds the table's QR code. */
-  async bill(slug: string, token: string, ip: string) {
+  /**
+   * What the party owes so far. The QR code alone shows nothing: the guest must
+   * hold the cookie of this table's open session, otherwise the answer is the
+   * same empty bill a free table gives.
+   */
+  async bill(slug: string, token: string, ip: string, cookie: unknown) {
     await this.limit(`bill-ip:${ip}`, 60_000, 60);
     const { restaurant, table } = await this.gate(slug, token);
-    return this.tables.bill(restaurant.id, table.id);
+    const session = await this.sessionAt(slug, table.id, cookie);
+    if (!session) return this.tables.emptyBill();
+    return this.tables.bill(restaurant.id, table.id, session.id);
   }
 
   /** The guest asks for the bill: one alert for the floor, once per visit. */
-  async requestBill(slug: string, input: GuestPosPosition & { table: string }, ip: string) {
+  async requestBill(
+    slug: string,
+    input: GuestPosPosition & { table: string },
+    ip: string,
+    cookie: unknown,
+  ) {
     const { restaurant, table } = await this.gate(slug, input.table);
     await this.limit(`call-ip:${ip}`, ORDER_WINDOW_MS, 12);
     this.verifyLocation(restaurant, input);
-    const bill = await this.tables.bill(restaurant.id, table.id);
+    // Only a member of the open session can ask. Anyone else is told there is nothing to bill.
+    const session = await this.sessionAt(slug, table.id, cookie);
+    if (!session) throw new GuestPosError('nothing_to_bill', 409);
+    const bill = await this.tables.bill(restaurant.id, table.id, session.id);
     if (!bill.occupied || bill.orders.length === 0) throw new GuestPosError('nothing_to_bill', 409);
     if (bill.billRequested) return { alreadyRequested: true };
 
@@ -205,9 +253,11 @@ export class GuestPosService {
         restaurantId: restaurant.id,
         tableId: table.id,
         tableLabel: table.label,
+        sessionId: session.id,
         kind: 'BILL',
       },
     });
+    await this.sessions.touch(session.id);
     await this.prisma.restaurantTable.update({
       where: { id: table.id },
       data: { billRequestedAt: new Date(), lastSeenAt: new Date() },
@@ -215,6 +265,12 @@ export class GuestPosService {
     await this.bus.publish({ type: 'call.new', restaurantId: restaurant.id, id: call.id });
     await this.bus.publish({ type: 'table.updated', restaurantId: restaurant.id, id: table.id });
     return { alreadyRequested: false };
+  }
+
+  /** The guest's session, only if it belongs to this very table. */
+  private async sessionAt(slug: string, tableId: string, cookie: unknown) {
+    const session = await this.sessions.resolveCookie(slug, cookie);
+    return session && session.tableId === tableId ? session : null;
   }
 
   /** The restaurant and table behind a QR code, if ordering from it is allowed at all. */

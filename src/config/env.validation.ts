@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { IsIn, IsOptional, IsString, validateSync } from 'class-validator';
+import { IsIn, IsNumberString, IsOptional, IsString, validateSync } from 'class-validator';
 
 const PLACEHOLDER_MARKER = 'change-me';
 const MIN_SECRET_LENGTH = 16;
@@ -69,6 +69,11 @@ class EnvironmentVariables {
   @IsOptional()
   @IsIn(['true', 'false'])
   SIGNUP_ENABLED?: string;
+
+  /** Hours without activity before a table session counts as closed (default 6). */
+  @IsOptional()
+  @IsNumberString()
+  TABLE_SESSION_IDLE_HOURS?: string;
 
   @IsOptional()
   @IsIn(['true', 'false'])

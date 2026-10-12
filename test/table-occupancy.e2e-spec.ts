@@ -326,7 +326,8 @@ describe('Table reservation, bill and checkout (e2e)', () => {
       await new Promise((resolve) => setTimeout(resolve, 20));
       await occupy();
       const bill = await guest.get(`/m/${slug}/tables/${table.token}/bill`);
-      expect(bill.body).toMatchObject({ occupied: true, total: '0.00' });
+      // Scanning alone joins no session, so the old cookie shows an empty bill, not the next party's.
+      expect(bill.body).toMatchObject({ occupied: false, total: '0.00' });
       expect(bill.body.orders).toHaveLength(0);
     });
 

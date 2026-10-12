@@ -98,7 +98,7 @@ The browser extension was not connected for several late features, so these were
 
 ### Known gaps and bugs to fix
 
-- A guest holding an old table QR link can see the next party's bill if the table is reused, because the code identifies the table and not the visit.
+- Table sessions (decision 66) close the old QR link leak. Guests at one table who each order share one bill; a guest who only scanned sees an empty bill until they order. Not yet looked at in a real browser.
 - Suggestions are not shown in the order tracking view, and the popular fallback ignores time of day.
 - No per restaurant switch for the "ask name, phone and location" WhatsApp rule.
 - Fonts: weights 500 and 600 fall back to 400 or 700 for the four new typefaces. The photo editor has no filters.

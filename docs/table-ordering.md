@@ -52,7 +52,19 @@ The guest's phone reports where it is. The server measures the distance to the r
 
 ## How the guest follows an order
 
-The order response carries a random `track` token. The menu keeps it in the browser, asks `GET /m/:slug/orders/:token` for the status, and also listens on a websocket namespace `/track` where the token is the only way in and only that one order's status is ever sent. If websockets are unavailable it polls every 8 seconds. A wrong, guessed or foreign token, an order id, or another restaurant's slug all answer 404 / `unknown_order`.
+The order response carries a random `track` token. The menu keeps it in the browser, asks `GET /m/:slug/orders/:token` for the status (the session cookie must match the order), and also listens on a websocket namespace `/track` where the token plus a session ticket are the way in and only that one order's status is ever sent. If websockets are unavailable it polls every 8 seconds. A wrong, guessed or foreign token, an order id, or another restaurant's slug all answer 404 / `unknown_order`.
+
+## Table sessions: who may see a bill
+
+The QR code only names the table. What lets a guest see a bill or follow an order is membership of the table's current **session** (one party's visit, model `TableSession`).
+
+- The first table order on a table with no open session starts one; later orders attach to it. The database allows only one open session per table (a partial unique index in the migration). Orders and waiter calls store the `sessionId`.
+- Placing an order sets the cookie `qaemati_ts` (httpOnly, SameSite=Lax, path `/m/<slug>`), holding the session id and a signature. Nothing is kept in localStorage.
+- **Guests who each place an order at the same table join the same open session and share one bill.** That is intended: a table is one party. Someone who only scans the code joins nothing and has to order first.
+- "My bill", the bill request, order tracking and the `/track` websocket all answer from the session the cookie proves. With no cookie, a cookie for a closed or idle session, or one for another table or restaurant, the bill is empty and an order answers 404, the same as for a code that does not exist.
+- The websocket cannot receive the cookie (its path is `/socket.io`), so the page asks `GET /m/:slug/tables/session-ticket` and sends the 60 second ticket in the handshake. A socket of a session that closes is told and cut off.
+- Staff check out closes the open session in the same transaction that frees the table, so the cookie stops working at once. A session with no order, call or bill request for `TABLE_SESSION_IDLE_HOURS` (default 6) counts as closed when read, and an hourly job closes it and frees the table unless the table was scanned since. The job claims each row with a conditional update, so running on several servers is safe, and it follows `REMINDERS_ENABLED`.
+- Orders made before sessions existed have no session and cannot be looked up by any guest. Staff screens and reports do not use sessions.
 
 ## Safeguards
 

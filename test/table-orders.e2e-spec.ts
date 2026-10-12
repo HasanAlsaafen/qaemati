@@ -551,13 +551,21 @@ describe('Table orders and waiter calls (e2e)', () => {
   });
 
   describe('following an order', () => {
+    // The guest's table session cookie, as the browser would send it back.
+    let sessionCookie = '';
     const status = (slugName: string, trackToken: string) =>
       request(app.getHttpServer())
         .get(`/m/${slugName}/orders/${trackToken}`)
-        .set('Cookie', 'qaemati_locale=en');
+        .set('Cookie', ['qaemati_locale=en', sessionCookie].filter(Boolean).join('; '));
+    const placeAndRemember = async () => {
+      const placed = await order([{ key: burger.id, qty: 1 }]);
+      const set = (placed.headers['set-cookie'] as unknown as string[]) ?? [];
+      sessionCookie = set.find((c) => c.startsWith('qaemati_ts='))?.split(';')[0] ?? '';
+      return placed;
+    };
 
     it('gives the guest a private token and shows only the number and the status', async () => {
-      const placed = await order([{ key: burger.id, qty: 1 }]);
+      const placed = await placeAndRemember();
       expect(placed.body.track).toMatch(/^[0-9a-f-]{36}$/);
       expect(placed.body.track).not.toBe(placed.body.id);
       const res = await status(slug, placed.body.track);
@@ -567,7 +575,7 @@ describe('Table orders and waiter calls (e2e)', () => {
     });
 
     it('follows the order as staff move it along', async () => {
-      const placed = await order([{ key: burger.id, qty: 1 }]);
+      const placed = await placeAndRemember();
       await prisma.order.update({ where: { id: placed.body.id }, data: { status: 'READY' } });
       expect((await status(slug, placed.body.track)).body.status).toBe('READY');
       await prisma.order.update({ where: { id: placed.body.id }, data: { status: 'CANCELED' } });
@@ -586,6 +594,14 @@ describe('Table orders and waiter calls (e2e)', () => {
         expect(res.status).toBe(404);
         expect(res.body.error).toBe('unknown_order');
       }
+    });
+
+    it('does not show the order to a guest without the session cookie', async () => {
+      const placed = await placeAndRemember();
+      sessionCookie = '';
+      const res = await status(slug, placed.body.track);
+      expect(res.status).toBe(404);
+      expect(res.body.error).toBe('unknown_order');
     });
 
     it('answers in Arabic for an Arabic reader', async () => {
