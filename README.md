@@ -152,3 +152,4 @@ gradient SVG placeholders (`prisma/seed/placeholder-image.ts`), never real photo
 - The typeface is Tajawal with IBM Plex Sans Arabic as fallback, both open fonts self-hosted in
   `public/fonts` (see `docs/design-system.md`). The older Thmanyah files are kept but unused.
 - All demo data is fictional; no real businesses or copyrighted assets are used.
+# qaemati
